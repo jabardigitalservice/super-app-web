@@ -1,4 +1,4 @@
-# jsa-landing-page
+# Sapawarga Landing Page
 
 ## Build Setup
 
