@@ -1,0 +1,14 @@
+[
+  {
+      "relation": [
+          "delegate_permission/common.handle_all_urls"
+      ],
+      "target": {
+          "namespace": "android_app",
+          "package_name": "com.sapawarga.jds",
+          "sha256_cert_fingerprints": [
+              "72:15:69:8c:16:f1:43:82:BB:92:C0:41:68:69:2C:eb:F8:c2:DB:52:88:76:80:9b:0E:fe:34:ae:3B:00:B1:8F"
+          ]
+      }
+  }
+]
