@@ -1,0 +1,13 @@
+[context.production]
+  command = "BASE_URL=$BASE_URL_PRODUCTION API_KEY=$API_KEY_PRODUCTION npm run generate"
+
+[context.main]
+  command = "BASE_URL=$BASE_URL_STAGING API_KEY=$API_KEY_STAGING npm run generate"
+
+[context.deploy-preview]
+  command = "BASE_URL=$BASE_URL_STAGING API_KEY=$API_KEY_STAGING npm run generate"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html/"
+  status = 200
