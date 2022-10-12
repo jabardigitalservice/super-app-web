@@ -1,28 +1,53 @@
 <template>
-  <div class="input-text">
-    <label
-      :class="{
-        'input-text__label' : true,
-        'input-text__label--italic': labelItalic,
-        'input-text__label--error' : error,
-      }"
-      :for="label"
+  <div class="flex flex-col gap-1">
+    <div
+      class="flex justify-between items-center w-full"
     >
-      {{ label }}
-    </label>
+      <label
+        :class="{
+          'text-gray-800 ' : true,
+          'text-red-700' : error,
+        }"
+        :for="label"
+      >
+        {{ label }}
+      </label>
+      <div v-if="isShowPasswordLevel && levelPassword" class="w-1/3 flex items-center">
+        <div
+          :class="{
+            'text-xs mr-2' : true,
+            'text-red-500' : levelPassword === 'Lemah',
+            'text-yellow-600' : levelPassword === 'Sedang',
+            'text-green-500' : levelPassword === 'Kuat'
+          }"
+        >
+          {{ levelPassword }}
+        </div>
+        <div class="w-full bg-gray-200 h-2 rounded-md">
+          <div
+            :class="{
+              'h-2 rounded-md' : true,
+              'w-1/3 bg-red-500' : levelPassword === 'Lemah',
+              'w-2/3 bg-yellow-600' : levelPassword === 'Sedang',
+              'w-full bg-green-500' : levelPassword === 'Kuat'
+            }"
+          />
+        </div>
+      </div>
+    </div>
     <div
       :class="{
-        'input-text__wrapper-input': true,
-        'input-text__wrapper-input--focus': isFocused,
-        'input-text__wrapper-input--error': error
+        'flex justify-between items-center w-full h-9 rounded-lg bg-gray-100 border border-gray-400 overflow-hidden': true,
+        'border-green-700': isFocused,
+        'border-red-700': error
       }"
     >
       <div
         v-if="$slots['icon-left']"
         :class="{
-          'input-text__icon-left': true,
-          'input-text__icon-left--border': iconLeftType === 'border',
-          'input-text__icon-left--focus': iconLeftType !== 'border' && isTyped
+          'h-full w-8 flex items-center justify-center bg-gray-50': true,
+          'bg-gray-100 border border-r-gray-200': iconLeftType === 'border',
+          'bg-white': iconLeftType !== 'border' && isTyped
         }"
         @click="onClickEye"
       >
@@ -31,8 +56,8 @@
       <input
         :id="label"
         :class="{
-          'input-text__input': true,
-          'input-text__input--typed': isTyped
+          'bg-gray-50 h-9 w-full px-2 focus:outline-none text-gray-800 rounded-l text-sm leading-4 placeholder-gray-600': true,
+          'bg-white': isTyped
         }"
         :placeholder="placeholder"
         :type="mType"
@@ -46,16 +71,21 @@
       <div
         v-if="type === 'password' || $slots['icon-right']"
         :class="{
-          'input-text__icon-right': true,
-          'input-text__icon-right--border': iconRightType === 'border',
-          'input-text__icon-right--focus': isTyped
+          'h-full w-8 flex items-center justify-center bg-gray-50 text-gray-800': true,
+          'bg-gray-100 border border-l-gray-200': iconRightType === 'border',
+          'bg-white': isTyped
         }"
       >
-        <jds-icon
+        <IconEyeOn
           v-if="!$slots['icon-right']"
-          class="cursor-pointer"
-          :name="iconEye"
-          size="1rem"
+          v-show="iconEye === 'eye'"
+          class="cursor-pointer text-gray-800"
+          @click="onClickEye"
+        />
+        <IconEyeOff
+          v-if="!$slots['icon-right']"
+          v-show="iconEye === 'eye-off'"
+          class="cursor-pointer text-gray-800"
           @click="onClickEye"
         />
         <slot name="icon-right" />
@@ -65,8 +95,14 @@
 </template>
 
 <script>
+import IconEyeOn from '~/assets/icon/eye-on.svg?inline'
+import IconEyeOff from '~/assets/icon/eye-off.svg?inline'
 export default {
   name: 'BaseInputText',
+  components: {
+    IconEyeOn,
+    IconEyeOff
+  },
   props: {
     /**
      * Auto focus on fill
@@ -104,13 +140,6 @@ export default {
       default: ''
     },
     /**
-     * font style the label make style italic
-     */
-    labelItalic: {
-      type: Boolean,
-      default: false
-    },
-    /**
      * placeholder input text
      */
     placeholder: {
@@ -137,6 +166,13 @@ export default {
     error: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Auto focus on fill
+     */
+    isShowPasswordLevel: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -144,7 +180,8 @@ export default {
       isFocused: false,
       isTyped: false,
       iconEye: 'eye',
-      isShowPassword: false
+      isShowPassword: false,
+      levelPassword: ''
     }
   },
   computed: {
@@ -159,6 +196,25 @@ export default {
         return 'text'
       }
       return this.type
+    }
+  },
+  watch: {
+    value (password) {
+      // eslint-disable-next-line prefer-regex-literals
+      const strongPassword = new RegExp('(?=.{6,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])')
+      // eslint-disable-next-line prefer-regex-literals
+      const mediumPassword = new RegExp('(?=.{6,})(?=.*[a-z|A-Z])(?=.*[0-9])')
+      // eslint-disable-next-line prefer-regex-literals
+      const lowPassword = new RegExp('(?=.{6,})(?=.*[a-z|A-Z|^A-Za-z0-9])|(?=.{1,})(?=.*[a-z|A-Z|^A-Za-z0-9])')
+      if (strongPassword.test(password)) {
+        this.levelPassword = 'Kuat'
+      } else if (mediumPassword.test(password)) {
+        this.levelPassword = 'Sedang'
+      } else if (lowPassword.test(password)) {
+        this.levelPassword = 'Lemah'
+      } else {
+        this.levelPassword = ''
+      }
     }
   },
   methods: {
@@ -191,7 +247,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>
