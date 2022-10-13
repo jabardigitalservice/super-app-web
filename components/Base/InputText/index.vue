@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col gap-1">
-    <div
-      class="flex justify-between items-center w-full"
-    >
+    <div class="flex justify-between items-center w-full">
       <label
         :class="{
           'text-gray-800 ' : true,
@@ -44,21 +42,14 @@
     >
       <div
         v-if="$slots['icon-left']"
-        :class="{
-          'h-full w-8 flex items-center justify-center bg-gray-50': true,
-          'bg-gray-100 border border-r-gray-200': iconLeftType === 'border',
-          'bg-white': iconLeftType !== 'border' && isTyped
-        }"
+        class="h-full w-8 flex items-center justify-center bg-gray-50"
         @click="onClickEye"
       >
         <slot name="icon-left" />
       </div>
       <input
         :id="label"
-        :class="{
-          'bg-gray-50 h-9 w-full px-2 focus:outline-none text-gray-800 rounded-l text-sm leading-4 placeholder-gray-600': true,
-          'bg-white': isTyped
-        }"
+        class="bg-gray-50 h-9 w-full px-2 focus:outline-none text-gray-800 rounded-l text-sm leading-4 placeholder-gray-600"
         :placeholder="placeholder"
         :type="mType"
         :value="value"
@@ -70,22 +61,24 @@
       >
       <div
         v-if="type === 'password' || $slots['icon-right']"
-        :class="{
-          'h-full w-8 flex items-center justify-center bg-gray-50 text-gray-800': true,
-          'bg-gray-100 border border-l-gray-200': iconRightType === 'border',
-          'bg-white': isTyped
-        }"
+        class="h-full w-8 flex items-center justify-center bg-gray-50 text-gray-800"
       >
         <IconEyeOn
           v-if="!$slots['icon-right']"
           v-show="iconEye === 'eye'"
-          class="cursor-pointer text-gray-800"
+          :class="{
+            'cursor-pointer text-gray-800' : true,
+            'border-green-700 text-green-800': isFocused || isTyped,
+          }"
           @click="onClickEye"
         />
         <IconEyeOff
           v-if="!$slots['icon-right']"
           v-show="iconEye === 'eye-off'"
-          class="cursor-pointer text-gray-800"
+          :class="{
+            'cursor-pointer text-gray-800' : true,
+            'border-green-700 text-green-800': isFocused || isTyped,
+          }"
           @click="onClickEye"
         />
         <slot name="icon-right" />
@@ -147,20 +140,6 @@ export default {
       default: ''
     },
     /**
-     * different style icon right normal or border type
-     */
-    iconRightType: {
-      type: String,
-      default: 'normal'
-    },
-    /**
-     * different style icon left normal or border type
-     */
-    iconLeftType: {
-      type: String,
-      default: 'normal'
-    },
-    /**
      * Error state
      */
     error: {
@@ -199,6 +178,9 @@ export default {
     }
   },
   watch: {
+    /**
+     * check password strength input text on input
+     */
     value (password) {
       // eslint-disable-next-line prefer-regex-literals
       const strongPassword = new RegExp('(?=.{6,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])')
