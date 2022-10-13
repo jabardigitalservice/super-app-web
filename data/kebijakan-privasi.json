@@ -1,0 +1,49 @@
+{
+  "name":"Kebijakan Privasi",
+  "pictureLight":"kebijakan-privasi-light.svg",
+  "pictureDark":"kebijakan-privasi-dark.svg",
+  "description": "<p class='text-[14px] font-[Lato] text-[#424242]'>Kebijakan Privasi ini mengatur mengenai kebijakan dan prosedur dalam mengumpulkan, menggunakan, dan menjaga data yang diperoleh dari pelanggan (selanjutnya disebut <b>“Anda”</b> atau <b>“Pengguna”</b>) sehubungan dengan penggunaan layanan yang disediakan di aplikasi SAPAWARGA (<b>“Aplikasi”</b>). Pada Kebijakan Privasi ini, kecuali secara tegas disebutkan berbeda, berlaku untuk Situs, Aplikasi dan semua produk dan layanan yang disediakan oleh Situs dan Aplikasi.</p>",
+  "updated":"20 September 2022",
+   "details":[
+      {
+        "title":"Data Pribadi Pengguna",
+        "description":"Kami mengumpulkan data pribadi dari Pengguna kami melalui berbagai cara, termasuk namun tidak terbatas pada, ketika Pengguna mengunjungi Aplikasi dan menggunakan layanan, mendaftar sebagai Pengguna, menggunakan layanan tertentu, mengisi dan melengkapi formulir, dan yang berkaitan dengan kegiatan, layanan, fitur, atau konten yang kami sediakan dalam Aplikasi. Pengguna dapat diminta memberikan data, termasuk namun tidak terbatas pada nama, alamat e-mail, alamat sesuai KTP dan alamat domisili, foto, Nomor Induk Kependudukan, tanggal lahir, jenis kelamin, dan nomor telepon. Kami mengumpulkan data pribadi dari Pengguna, yang secara sukarela diberikan kepada kami. Pengguna dapat setiap saat menolak memberikan data pribadi, kecuali jika hal tersebut dapat membatasi mereka untuk mengakses bagian tertentu dalam Aplikasi."
+      },
+      {
+        "title":"Data Non-Pribadi Pengguna",
+        "description":"Kami dapat mengumpulkan data non-pribadi Pengguna ketika berinteraksi dengan Situs dan Aplikasi. Data non-pribadi termasuk perangkat telepon, data lokasi dan informasi lainnya berkaitan dengan cara Pengguna terhubung dengan Aplikasi kami, termasuk, namun tidak terbatas seperti internet protocol (IP), model perangkat, sistem operasi, layanan internet, sosial media, dan pengaturan aplikasi saat menggunakan Layanan, waktu, dan tanggal penggunaan layanan, dan statistik lain."
+      },
+      {
+        "title":"Cookies",
+        "description":"Situs kami tidak menggunakan cookies secara eksplisit. Namun, Aplikasi mungkin menggunakan kode dan library pihak ketiga yang menggunakan cookies untuk mengumpulkan informasi dan memperbaiki layanan mereka. Pengguna dapat menginstruksikan browser mereka, dengan mengubah pilihan, untuk berhenti menerima cookies atau untuk meminta Pengguna sebelum menerima cookies dari situs-situs yang dikunjungi. Jika Pengguna tidak menerima cookies, maka Pengguna mungkin tidak dapat menggunakan semua bagian dari Situs dan Aplikasi atau semua fungsi dari layanan kami."
+      },
+      {
+        "title":"Bagaimana Kami Menggunakan Data Pribadi dan Data Non-Pribadi Pengguna",
+        "description":"`Data pribadi dan data non-pribadi Pengguna hanya digunakan seperti yang dijelaskan dalam Kebijakan Privasi ini, kecuali Pengguna telah menyetujui hal lain berkaitan dengan penggunaan data pribadi. Kami menggunakan data pribadi dan data non-pribadi Pengguna untuk tujuan berikut:<br/>"
+      },
+      {
+        "title":"Perlindungan Data Pribadi Pengguna",
+        "description":"Kami berkomitmen untuk menjaga dan melindungi data pribadi Anda. Kami menerapkan langkah-langkah wajar yang dirancanguntuk melindungi data pribadi Anda dari akses yang tidak sah."
+      },
+      {
+        "title":"Berbagi Data Pribadi dan Data Non-Pribadi Pengguna Dengan Pihak Ketiga",
+        "description":"Kami sewaktu-waktu bekerja sama dengan badan usaha, yayasan atau individu pihak ketiga demi melaksanakan tujuan-tujuan berikut:<ol style='list-style-type:decimal;margin-left:50px;'><li>Untuk memfasilitasi layanan kami;</li><li>Untuk menyediakan layanan atas nama kami;</li><li>Untuk melaksanakan layanan yang berhubungan dengan layanan kami;</li><li>Untuk mendampingi kami dalam menganalisis bagaimana layanan kami digunakan;</li><li>Untuk membantu melaksanakan layanan lainnya; dan </li><li> Untuk mendukung tujuan lain sebagaimana tercantum pada Kebijakan Privasi ini.</li></ol>Dengan ini kami memberitahu Pengguna bahwa pihak ketiga ini memiliki akses kepada informasi data pribadi dan data non-pribadi Pengguna demi melaksanakan tujuan-tujuan di atas. Pihak ketiga tersebut berkewajiban untuk menjaga kerahasiaan dan tidak menggunakan informasi tersebut untuk keperluan lain."
+      },
+      {
+        "title":"Perubahan Kebijakan Privasi",
+        "description":"Kami memiliki hak, diskresi, untuk mengubah, memodifikasi, menambah, atau menghapus bagian dari Kebijakan Privasi ini setiap saat. Namun, jika sewaktu-waktu di masa depan kami merencanakan untuk menggunakan informasi pribadi dengan cara yang secara material berbeda dari kebijakan ini, kami akan memberitahu perubahan tersebut dan memberikan Anda kesempatan untuk memilih penggunaan yang berbeda tersebut. Jika Anda tetap menggunakan Aplikasi setelah adanya pengumuman setiap perubahan Kebijakan Privasi ini berarti Anda menerima perubahan tersebut."
+      },
+      {
+        "title":"Mengubah atau Menghapus Data Anda",
+        "description":"Semua Pengguna terdaftar dapat meninjau, memperbarui atau memperbaiki informasi pribadi yang diberikan saat pendaftaran dengan mengubah halaman profil akun atau permintaan ke tim customer service kami. Jika Pengguna memilih untuk keluar sepenuhnya, maka akun Pengguna mungkin menjadi dinonaktifkan. Namun, kami tidak dapat menghapus data pribadi Pengguna dari catatan pihak ketiga yang telah disediakan dengan informasi Pengguna sesuai dengan kebijakan ini."
+      },
+      {
+        "title":"Perangkat Lunak dan Ekstensi yang Dilarang",
+        "description":"Kami berkomitmen untuk menjaga seluruh data pribadi Anda.Untuk melindungi seluruh data pada Situs dan Aplikasi, kami tidak mengizinkan Pengguna menggunakan perangkat lunak pihak ketiga, termasuk perayap (crawler), bot, plug-in browser, atau ekstensi browser (juga disebut “add-on”), yang mengambil data, mengubah tampilan, atau mengotomatisasi aktivitas di Aplikasi namun tidak terbatas pada kegiatan yang dilarang sebagai berikut:<ol style='list-style-type:decimal;margin-left:50px;'><li>Mengembangkan, mendukung, atau menggunakan perangkat lunak, perangkat, skrip, robot, atau cara dan proses lainnya (termasuk perayap, plug-in dan add-on browser, atau teknologi lainnya) untuk mengambil secara melawan hukum sebagian atau seluruh data yang terdapat dalam Aplikasi;</li><li>Mengganti atau mengubah tampilan di Aplikasi;</li><li>Melakukan deep-link pada seluruh produk dan layanan kami untuk tujuan apa pun, tanpa persetujuan kami.</li>Pengguna yang menggunakan alat untuk tujuan di atas berarti melanggar Kebijakan Privasi Situs dan Aplikasi. Kami berhak untuk membatasi atau menutup akun serta melakukan blokir alamat IP Pengguna yang melanggar Kebijakan Privasi Aplikasi tanpa pemberitahuan sebelumnya. Untuk menjaga keamanan seluruh data kami, kami selalu meningkatkan sistem keamanan secara teratur untuk mencegah penggunaan alat pengambil data, otomatisasi, dan alat lain yang menyalahgunakan penggunaan Aplikasi."
+      },
+      {
+        "title":"Persetujuan",
+        "description":"Dengan menggunakan Aplikasi kami, Pengguna dengan ini menyetujui Kebijakan Privasi dengan ketentuan-ketentuannya. Kebijakan Privasi ini dapat diperbaharui atau diubah, dan perubahan tersebut akan dimuat di halaman ini."
+      }
+    ]
+}
