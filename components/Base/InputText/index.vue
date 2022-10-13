@@ -61,14 +61,14 @@
       >
       <div
         v-if="type === 'password' || $slots['icon-right']"
-        class="h-full w-8 flex items-center justify-center bg-gray-50 text-gray-800"
+        class="h-full w-8 flex items-center justify-center bg-gray-50"
       >
         <IconEyeOn
           v-if="!$slots['icon-right']"
           v-show="iconEye === 'eye'"
           :class="{
-            'cursor-pointer text-gray-800' : true,
-            'border-green-700 text-green-800': isFocused || isTyped,
+            'cursor-pointer stroke-gray-800' : true,
+            'stroke-green-800' : isTyped || isFocused
           }"
           @click="onClickEye"
         />
@@ -76,13 +76,19 @@
           v-if="!$slots['icon-right']"
           v-show="iconEye === 'eye-off'"
           :class="{
-            'cursor-pointer text-gray-800' : true,
-            'border-green-700 text-green-800': isFocused || isTyped,
+            'cursor-pointer stroke-gray-800' : true,
+            'stroke-green-800' : isTyped || isFocused
           }"
           @click="onClickEye"
         />
         <slot name="icon-right" />
       </div>
+    </div>
+    <div v-if="isShowInfo" class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3">
+      <IconWarning />
+      <p class="text-xs text-gray-700">
+        Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol.
+      </p>
     </div>
   </div>
 </template>
@@ -90,11 +96,14 @@
 <script>
 import IconEyeOn from '~/assets/icon/eye-on.svg?inline'
 import IconEyeOff from '~/assets/icon/eye-off.svg?inline'
+import IconWarning from '~/assets/images/warning.svg?inline'
+
 export default {
   name: 'BaseInputText',
   components: {
     IconEyeOn,
-    IconEyeOff
+    IconEyeOff,
+    IconWarning
   },
   props: {
     /**
@@ -147,9 +156,16 @@ export default {
       default: false
     },
     /**
-     * Auto focus on fill
+     * Show password level
      */
     isShowPasswordLevel: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Show password info
+     */
+    isShowInfo: {
       type: Boolean,
       default: false
     }
