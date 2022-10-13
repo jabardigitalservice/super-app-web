@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [],
+  content: ['./src/**/*.{html,js,vue}'],
   theme: {
     extend: {
       fontFamily: {
@@ -23,6 +23,18 @@ module.exports = {
           700: '#D32F2F',
           800: '#C62828',
           900: '#B71B1C'
+        },
+        yellow: {
+          50: '#FFF9E1',
+          100: '#FFEEB4',
+          200: '#FFE483',
+          300: '#FFDA4F',
+          400: '#FFD026',
+          500: '#FFC800',
+          600: '#FFB900',
+          700: '#FFA600',
+          800: '#FF9500',
+          900: '#FF7500'
         },
         green: {
           50: '#E6F6EC',
