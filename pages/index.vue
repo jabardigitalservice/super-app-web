@@ -1,5 +1,5 @@
 <template>
-  <div class="text-[64px]">
+  <div>
     Coming Soon
   </div>
 </template>
