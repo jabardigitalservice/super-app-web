@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center w-full">
       <label
         :class="{
-          'text-gray-800 ' : true,
+          'text-gray-800 font-roboto text-sm ' : true,
           'text-red-700' : error,
         }"
         :for="label"
