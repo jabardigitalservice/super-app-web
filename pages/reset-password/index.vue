@@ -23,6 +23,7 @@
             type="password"
             autocomplete="off"
             :is-show-password-level="true"
+            :is-show-info="true"
           >
             <template #icon-left>
               <IconKey />
@@ -40,6 +41,12 @@
               <IconKey />
             </template>
           </BaseInputText>
+          <BaseButton
+            class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
+            @click="onClickSave"
+          >
+            Simpan Perubahan
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -58,8 +65,14 @@ export default {
   },
   data () {
     return {
+      loading: false,
       password: '',
       passwordConfirmation: ''
+    }
+  },
+  methods: {
+    onClickSave () {
+      // todo: update save password
     }
   }
 }
