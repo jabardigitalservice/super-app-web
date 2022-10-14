@@ -87,26 +87,19 @@
     <p v-if="errorMessage" class="text-red-700 text-xs">
       {{ errorMessage }}
     </p>
-    <div v-if="isShowInfo" class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3">
-      <IconWarning />
-      <p class="text-xs text-gray-700">
-        Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol.
-      </p>
-    </div>
+    <slot name="text-info" />
   </div>
 </template>
 
 <script>
 import IconEyeOn from '~/assets/icon/eye-on.svg?inline'
 import IconEyeOff from '~/assets/icon/eye-off.svg?inline'
-import IconWarning from '~/assets/images/warning.svg?inline'
 
 export default {
   name: 'BaseInputText',
   components: {
     IconEyeOn,
-    IconEyeOff,
-    IconWarning
+    IconEyeOff
   },
   props: {
     /**
@@ -169,13 +162,6 @@ export default {
      * Show password level
      */
     isShowPasswordLevel: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Show password info
-     */
-    isShowInfo: {
       type: Boolean,
       default: false
     }

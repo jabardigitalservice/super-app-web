@@ -16,11 +16,18 @@
           type="password"
           autocomplete="off"
           :is-show-password-level="true"
-          :is-show-info="true"
           :error-message="errorPassword"
         >
           <template #icon-left>
             <IconKey />
+          </template>
+          <template #text-info>
+            <div class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3">
+              <IconWarning />
+              <p class="text-xs text-gray-700">
+                Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol.
+              </p>
+            </div>
           </template>
         </BaseInputText>
         <BaseInputText
@@ -48,13 +55,16 @@
 </template>
 
 <script>
+import IconWarning from '~/assets/images/warning.svg?inline'
 import IconLock from '~/assets/images/lock.svg?inline'
 import IconKey from '~/assets/icon/key.svg?inline'
 
 export default {
   name: 'ComponentResetPassword',
   components: {
-    IconLock, IconKey
+    IconLock,
+    IconKey,
+    IconWarning
   },
   data () {
     return {
@@ -67,7 +77,6 @@ export default {
   },
   watch: {
     password (value) {
-      console.log(value.length)
       if (value.length === 0) {
         this.errorPassword = 'Password baru tidak boleh kosong'
       } else if (value.length < 6) {
