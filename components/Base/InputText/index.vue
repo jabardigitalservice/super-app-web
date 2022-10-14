@@ -4,7 +4,7 @@
       <label
         :class="{
           'text-gray-800 font-roboto text-sm ' : true,
-          'text-red-700' : error,
+          'text-red-700' : error || errorMessage,
         }"
         :for="label"
       >
@@ -84,6 +84,9 @@
         <slot name="icon-right" />
       </div>
     </div>
+    <p v-if="errorMessage" class="text-red-700 text-xs">
+      {{ errorMessage }}
+    </p>
     <div v-if="isShowInfo" class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3">
       <IconWarning />
       <p class="text-xs text-gray-700">
@@ -154,6 +157,13 @@ export default {
     error: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Error message
+     */
+    errorMessage: {
+      type: String,
+      default: ''
     },
     /**
      * Show password level
