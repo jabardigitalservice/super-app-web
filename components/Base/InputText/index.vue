@@ -64,8 +64,7 @@
         class="h-full w-8 flex items-center justify-center bg-gray-50"
       >
         <IconEyeOn
-          v-if="!$slots['icon-right']"
-          v-show="iconEye === 'eye'"
+          v-if="!$slots['icon-right'] && iconEye === 'eye'"
           :class="{
             'cursor-pointer stroke-gray-800' : true,
             'stroke-green-800' : isTyped || isFocused
@@ -73,8 +72,7 @@
           @click="onClickEye"
         />
         <IconEyeOff
-          v-if="!$slots['icon-right']"
-          v-show="iconEye === 'eye-off'"
+          v-if="!$slots['icon-right'] && iconEye === 'eye-off'"
           :class="{
             'cursor-pointer stroke-gray-800' : true,
             'stroke-green-800' : isTyped || isFocused
