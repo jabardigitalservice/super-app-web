@@ -60,10 +60,11 @@ export default {
       const dataDecoded = Buffer.from(queryToken, 'base64').toString('utf-8') // decode to string from base46
       const token = dataDecoded.split(':')[0] // get token from result data decode
       const userId = dataDecoded.split(':')[1] // get userId from result data userId
+      const tokenEncode = Buffer.from(token).toString('base64') // encoded token
       try {
         // request verification token
         await $axios.post('/v1/user/auth/verify/registration', {
-          token,
+          token: tokenEncode,
           userId
         })
 
