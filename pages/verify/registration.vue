@@ -63,7 +63,7 @@ export default {
       const tokenEncode = Buffer.from(token).toString('base64') // encoded token
       try {
         // request verification token
-        await $axios.post('/v1/user/auth/verify/registration', {
+        await $axios.post('/user/auth/verify/registration', {
           token: tokenEncode,
           userId
         })
