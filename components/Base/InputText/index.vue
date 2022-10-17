@@ -3,8 +3,8 @@
     <div class="flex justify-between items-center w-full">
       <label
         :class="{
-          'text-gray-800 ' : true,
-          'text-red-700' : error,
+          'text-gray-800 font-roboto text-sm ' : true,
+          'text-red-700' : error || errorMessage,
         }"
         :for="label"
       >
@@ -61,35 +61,38 @@
       >
       <div
         v-if="type === 'password' || $slots['icon-right']"
-        class="h-full w-8 flex items-center justify-center bg-gray-50 text-gray-800"
+        class="h-full w-8 flex items-center justify-center bg-gray-50"
       >
         <IconEyeOn
-          v-if="!$slots['icon-right']"
-          v-show="iconEye === 'eye'"
+          v-if="!$slots['icon-right'] && iconEye === 'eye'"
           :class="{
-            'cursor-pointer text-gray-800' : true,
-            'border-green-700 text-green-800': isFocused || isTyped,
+            'cursor-pointer stroke-gray-800' : true,
+            'stroke-green-800' : isTyped || isFocused
           }"
           @click="onClickEye"
         />
         <IconEyeOff
-          v-if="!$slots['icon-right']"
-          v-show="iconEye === 'eye-off'"
+          v-if="!$slots['icon-right'] && iconEye === 'eye-off'"
           :class="{
-            'cursor-pointer text-gray-800' : true,
-            'border-green-700 text-green-800': isFocused || isTyped,
+            'cursor-pointer stroke-gray-800' : true,
+            'stroke-green-800' : isTyped || isFocused
           }"
           @click="onClickEye"
         />
         <slot name="icon-right" />
       </div>
     </div>
+    <p v-if="errorMessage" class="text-red-700 text-xs">
+      {{ errorMessage }}
+    </p>
+    <slot name="text-info" />
   </div>
 </template>
 
 <script>
 import IconEyeOn from '~/assets/icon/eye-on.svg?inline'
 import IconEyeOff from '~/assets/icon/eye-off.svg?inline'
+
 export default {
   name: 'BaseInputText',
   components: {
@@ -147,7 +150,14 @@ export default {
       default: false
     },
     /**
-     * Auto focus on fill
+     * Error message
+     */
+    errorMessage: {
+      type: String,
+      default: ''
+    },
+    /**
+     * Show password level
      */
     isShowPasswordLevel: {
       type: Boolean,
