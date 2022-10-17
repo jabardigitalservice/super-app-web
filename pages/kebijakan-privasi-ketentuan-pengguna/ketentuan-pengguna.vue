@@ -1,8 +1,10 @@
 <template>
-  <ContentDetail :data-json="dataJson" />
+  <div>
+    <ContentDetail :data-json="dataJson" />
+  </div>
 </template>
 <script>
-import dataKebijakanPrivasi from '~/data/kebijakan-privasi.json'
+import dataKetentuanPengguna from '~/data/ketentuan-pengguna.json'
 import ContentDetail from '~/components/KebijakanPrivasiKetentuanPengguna/ContentDetail.vue'
 
 export default {
@@ -10,7 +12,7 @@ export default {
   components: { ContentDetail },
   layout: 'DetailKebijakanPrivasiKetentuanPengguna',
   data () {
-    return { dataJson: dataKebijakanPrivasi }
+    return { dataJson: dataKetentuanPengguna }
   }
 }
 </script>
