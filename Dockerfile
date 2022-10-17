@@ -8,6 +8,10 @@ WORKDIR /usr/src/nuxt-app
 # copy the app, note .dockerignore
 COPY . /usr/src/nuxt-app/
 RUN npm ci
+
+ARG API_KEY
+ENV API_KEY $API_KEY
+
 RUN npm run build
 
 EXPOSE 3000

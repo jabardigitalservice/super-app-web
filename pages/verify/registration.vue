@@ -25,9 +25,6 @@
           <p v-else class="text-information">
             Harap untuk menggunakan link verifikasi yang masih aktif.
           </p>
-          <div class="email">
-            Email: <span class="link">admin@gmail.com</span>
-          </div>
           <div class="thanks">
             Terima kasih.
           </div>
@@ -72,6 +69,7 @@ export default {
         isVerified = true
       } catch (error) {
         // silent error
+        console.log(error.response)
       }
     }
 
