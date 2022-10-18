@@ -44,7 +44,7 @@ export default {
         const timestamp = dataDecoded.split(':').slice(2).join(':')
 
         try {
-          await this.$axios.post('/v1/user/auth/change-password-forgot', {
+          await this.$axios.post('/user/auth/change-password-forgot', {
             token: tokenEncoded,
             userId,
             password
