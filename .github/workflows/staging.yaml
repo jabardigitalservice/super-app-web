@@ -36,6 +36,9 @@ jobs:
           tags: ${{ secrets.SERVICE_IMAGENAME_STAGING }}:${{ steps.vars.outputs.sha_short }}
           build-args: |
             API_KEY=${{ secrets.API_KEY }}
+            SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+            SENTRY_ENABLED=${{ secrets.SENTRY_ENABLED }}
+            SENTRY_SAMPLE_RATE=${{ secrets.SENTRY_SAMPLE_RATE }}
 
       # GitOps
       - name: GitOps ArgoCD Setup
