@@ -1,22 +1,34 @@
-# Dockerfile
-FROM node:lts-bullseye-slim
+FROM node:lts-alpine as builder
 
-# create destination directory
-RUN mkdir -p /usr/src/nuxt-app
-WORKDIR /usr/src/nuxt-app
+WORKDIR /app
 
-# copy the app, note .dockerignore
-COPY . /usr/src/nuxt-app/
-RUN npm ci
+COPY . .
+
+RUN yarn install \
+  --prefer-offline \
+  --frozen-lockfile \
+  --non-interactive \
+  --production=false
 
 ARG API_KEY
 ENV API_KEY $API_KEY
 
-RUN npm run build
+RUN yarn build
 
+RUN rm -rf node_modules && \
+  NODE_ENV=production yarn install \
+  --prefer-offline \
+  --pure-lockfile \
+  --non-interactive \
+  --production=true
+
+FROM node:lts-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app  .
+
+ENV HOST 0.0.0.0
 EXPOSE 3000
 
-ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=3000
-
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
