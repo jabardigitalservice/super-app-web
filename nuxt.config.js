@@ -1,7 +1,4 @@
 export default {
-  // Target: https://go.nuxtjs.dev/config-target
-  target: 'static',
-
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Sapawarga',
@@ -55,7 +52,7 @@ export default {
     display: 'swap',
     families: {
       Roboto: {
-        wght: [700]
+        wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
       },
       Lato: {
         wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
@@ -64,10 +61,17 @@ export default {
     overwriting: true
   },
 
+  // Private runtime config
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
+    }
+  },
+
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.BASE_URL,
+    baseURL: 'http://localhost:3000', // fallback
     headers: {
       common: {
         'Api-Key': process.env.API_KEY,
