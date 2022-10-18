@@ -47,7 +47,7 @@
 <script>
 export default {
   name: 'VerificationRegistrationPage',
-  async asyncData ({ $axios, query }) {
+  async asyncData ({ $axios, query, $sentry }) {
     let isVerified = false
     const queryToken = query.token
 
@@ -69,7 +69,7 @@ export default {
         isVerified = true
       } catch (error) {
         // silent error
-        console.log(error.response)
+        $sentry.captureException(error)
       }
     }
 
