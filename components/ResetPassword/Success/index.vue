@@ -14,7 +14,7 @@
           Ubah Password Berhasil
         </h1>
         <p class="text-gray-800 font-lato text-sm pt-4">
-          Perubahan password dengan email <strong>email@gmail.com</strong> berhasil dilakukan.
+          Perubahan password berhasil dilakukan.
         </p>
       </div>
     </div>
