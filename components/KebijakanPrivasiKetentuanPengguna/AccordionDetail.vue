@@ -1,7 +1,7 @@
 <template>
   <details class="border-b-2 border-[#FAFAFA] dark:border-[#1F2121]">
     <summary>
-      <div class="flex justify-between items-center py-[22px] px-[16px]">
+      <div class="flex justify-between items-center py-[22px] md:px-0">
         <div class="truncate overflow-hidden min-w-0 flex-1 text-[Roboto] text-[18px] font-semibold text-gray-800 dark:text-[#AAB0B7]">
           {{ title }}
         </div>
@@ -10,7 +10,8 @@
         </div>
       </div>
     </summary>
-    <div class="px-[16px] text-[14px] font-[Lato] mb-5" v-html="description" />
+    <!-- eslint-disable vue/no-v-html -->
+    <div class="text-[14px] font-[Lato] mb-5" v-html="description" />
   </details>
 </template>
 
@@ -50,6 +51,11 @@ export default {
 </script>
 
 <style scoped>
+
+  details summary{
+    padding: 0 16px;
+  }
+
   details summary::marker {
    content:"";
   }
@@ -69,7 +75,12 @@ export default {
 
   details[open] {
     background-color: #FAFAFA;
-    border-left: 4px solid #16A75C;
+    border-left: 2px solid #16A75C;
+    padding: 0 16px;
+  }
+
+  details[open] summary{
+    padding: 0px;
   }
 
   @media (prefers-color-scheme: dark) {

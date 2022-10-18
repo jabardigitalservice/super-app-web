@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="container mx-auto mt-[38px]">
-      <div class="mx-[16px] sm:mx-10">
+    <div class="container mx-auto mt-[16px] md:mt-[38px]">
+      <div class="mx-[16px] md:mx-10">
         <div class="mb-[22px]">
           <Breadcumbs :title="dataJson.name" :link="dataJson.link" />
         </div>
@@ -19,7 +19,7 @@
         </div>
         <!-- eslint-disable vue/no-v-html -->
         <div class="mt-[16px] mb-[24px]" v-html="dataJson.description" />
-        <div v-show="dataJson.requirement!==undefined" class=" bg-gray-50 py-[8px] mb-[46px] rounded-lg w-full h-fit dark:bg-[#292C2A] lg:mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
+        <div v-show="dataJson.requirement!==undefined" class=" bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
           <div class="flex lg:items-center">
             <div class="flex-shrink-0 mt-1 lg:mt-0">
               <IconWarningCircle />
@@ -27,6 +27,10 @@
             <div class="ml-2" v-html="dataJson.requirement" />
           </div>
         </div>
+      </div>
+    </div>
+    <div class="container mx-auto">
+      <div class="md:mx-10">
         <div v-for="detail in dataJson.details" :key="detail.title">
           <AccordionDetail :title="detail.title" :description="detail.description" />
         </div>
