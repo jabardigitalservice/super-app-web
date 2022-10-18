@@ -35,7 +35,7 @@ export default {
       const queryToken = this.$route.query.token
 
       if (queryToken) {
-        // this.display = 'loading'
+        this.display = 'loading'
         // extract token, userid, & timestamp
         const dataDecoded = Buffer.from(queryToken, 'base64').toString('utf-8')
         const token = dataDecoded.split(':')[0]
