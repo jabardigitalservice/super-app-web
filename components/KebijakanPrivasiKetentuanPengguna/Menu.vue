@@ -5,13 +5,13 @@
         <component :is="icon" class="icon" />
       </div>
       <div class="lg:ml-5 mt-5 lg:mt-0 min-w-0 flex-1">
-        <h1 class="uppercase text-[16px] font-[Roboto] font-bold">
+        <h1 class="uppercase text-[16px] font-roboto font-bold">
           {{ title }}
         </h1>
-        <p class="text-[14x] font-[Lato] mt-3 mb-3 text-[#424242]">
+        <p class="text-[14x] font-lato mt-3 mb-3 text-[#424242]">
           {{ description }}
         </p>
-        <NuxtLink :to="link" class="font-[Lato] text-green-600 font-bold text-[14px] mb-3">
+        <NuxtLink :to="link" class="font-lato text-green-600 font-bold text-[14px] mb-3">
           Baca {{ title }} Kami
         </NuxtLink>
       </div>

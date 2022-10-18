@@ -1,17 +1,17 @@
 <template>
   <nav class="flex flex-wrap items-center">
     <div class="inline-block">
-      <nuxt-link to="/kebijakan-privasi-ketentuan-pengguna" class="font-lato text-[14px] font-bold text-[#1E88E5]">
+      <NuxtLink to="/kebijakan-privasi-ketentuan-pengguna" class="font-lato underline text-[14px] font-bold text-[#1E88E5]">
         Kebijakan dan Ketentuan
-      </nuxt-link>
+      </NuxtLink>
     </div>
     <div class="inline-block flex-shrink-0 ml-[13px] mr-[17px] mt-1">
       <IconChevronRight class="icon-chevron-right" />
     </div>
     <div class="inline-block">
-      <nuxt-link :to="link" class="font-lato text-[14px] font-bold text-gray-800 dark:text-[#20A95A]">
+      <NuxtLink :to="link" class="font-lato text-[14px] font-bold text-gray-800 dark:text-[#20A95A]">
         {{ title }}
-      </nuxt-link>
+      </NuxtLink>
     </div>
   </nav>
 </template>

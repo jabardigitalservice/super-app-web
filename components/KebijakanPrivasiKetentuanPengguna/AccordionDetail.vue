@@ -2,7 +2,7 @@
   <details class="border-b-2 border-[#FAFAFA] dark:border-[#1F2121]">
     <summary>
       <div class="flex justify-between items-center py-[22px] md:px-0">
-        <div class="truncate overflow-hidden min-w-0 flex-1 text-[Roboto] text-[18px] font-semibold text-gray-800 dark:text-[#AAB0B7]">
+        <div class="truncate overflow-hidden capitalize min-w-0 flex-1 font-roboto text-[18px] font-semibold text-gray-800 dark:text-[#AAB0B7]">
           {{ title }}
         </div>
         <div class="flex-shrink-0 arrow ml-2">
@@ -11,7 +11,7 @@
       </div>
     </summary>
     <!-- eslint-disable vue/no-v-html -->
-    <div class="text-[14px] font-[Lato] mb-5" v-html="description" />
+    <div class="text-[14px] font-lato mb-5" v-html="description" />
   </details>
 </template>
 

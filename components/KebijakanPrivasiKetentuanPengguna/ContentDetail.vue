@@ -14,12 +14,12 @@
             <IconCalendar />
           </div>
           <p class="ml-2 text-[12px] min-w-0 flex-1 dark:text[#AAB0B7]">
-            Diperbaharui per tanggal <b class="text-[12px] dark:text-[#E9E9E9]">{{ dataJson.updated }}</b>
+            Diperbaharui per tanggal <strong class="text-[12px] dark:text-[#E9E9E9]">{{ dataJson.updated }}</strong>
           </p>
         </div>
         <!-- eslint-disable vue/no-v-html -->
         <div class="mt-[16px] mb-[24px]" v-html="dataJson.description" />
-        <div v-show="dataJson.requirement!==undefined" class=" bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
+        <div v-show="dataJson.requirement" class=" bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
           <div class="flex lg:items-center">
             <div class="flex-shrink-0 mt-1 lg:mt-0">
               <IconWarningCircle />
