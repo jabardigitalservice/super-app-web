@@ -70,7 +70,8 @@ export default {
     baseURL: process.env.BASE_URL,
     headers: {
       common: {
-        'Api-Key': process.env.API_KEY
+        'Api-Key': process.env.API_KEY,
+        'Cache-Control': 'no-cache'
       }
     }
   },

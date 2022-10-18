@@ -50,7 +50,7 @@ export default {
             password
           }, {
             headers: {
-              'x-timestamp': timestamp,
+              'X-Timestamp': timestamp,
               'Access-Control-Allow-Origin': '*'
             }
           })
