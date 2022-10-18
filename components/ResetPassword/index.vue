@@ -45,6 +45,7 @@
         </BaseInputText>
         <BaseButton
           class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
+          :disabled="!isEnabledButton"
           @click="onClickSave"
         >
           Simpan Perubahan
@@ -73,6 +74,16 @@ export default {
       passwordConfirmation: '',
       errorPassword: null,
       errorConfirmation: null
+    }
+  },
+  computed: {
+    isEnabledButton () {
+      return !!((
+        this.password.length &&
+        this.passwordConfirmation.length &&
+        !this.errorPassword &&
+        !this.errorConfirmation
+      ))
     }
   },
   watch: {
