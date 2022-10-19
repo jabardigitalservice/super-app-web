@@ -1,29 +1,9 @@
-FROM node:lts-alpine as builder
-
-WORKDIR /app
-
-COPY . .
-
-RUN yarn install \
-  --prefer-offline \
-  --frozen-lockfile \
-  --non-interactive \
-  --production=false
-
-RUN yarn build
-
-RUN rm -rf node_modules && \
-  NODE_ENV=production yarn install \
-  --prefer-offline \
-  --pure-lockfile \
-  --non-interactive \
-  --production=true
-
 FROM node:lts-alpine
 
 WORKDIR /app
-
-COPY --from=builder /app  .
+COPY package*.json ./
+RUN npm install
+COPY . .
 
 ARG API_KEY
 ARG SENTRY_DSN
@@ -36,7 +16,9 @@ ENV SENTRY_DSN $SENTRY_DSN
 ENV SENTRY_SAMPLE_RATE $SENTRY_SAMPLE_RATE
 ENV SENTRY_ENABLED $SENTRY_ENABLED
 ENV HOST 0.0.0.0
+ENV PORT 3000
+
 
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "npm", "start" ]
