@@ -69,6 +69,7 @@ export default {
         isVerified = true
       } catch (error) {
         // silent error
+        console.error(JSON.stringify(error))
         $sentry.captureException(error)
       }
     }
