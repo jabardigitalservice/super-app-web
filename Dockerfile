@@ -1,18 +1,40 @@
-# Dockerfile
-FROM node:lts-bullseye-slim
+FROM node:lts-alpine as builder
 
-# create destination directory
-RUN mkdir -p /usr/src/nuxt-app
-WORKDIR /usr/src/nuxt-app
+WORKDIR /app
 
-# copy the app, note .dockerignore
-COPY . /usr/src/nuxt-app/
-RUN npm ci
-RUN npm run build
+COPY . .
+
+RUN yarn install \
+  --prefer-offline \
+  --frozen-lockfile \
+  --non-interactive \
+  --production=false
+
+RUN yarn build
+
+RUN rm -rf node_modules && \
+  NODE_ENV=production yarn install \
+  --prefer-offline \
+  --pure-lockfile \
+  --non-interactive \
+  --production=true
+
+FROM node:lts-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app  .
+
+ARG API_KEY
+ARG SENTRY_DSN
+ARG SENTRY_SAMPLE_RATE
+ARG SENTRY_ENABLED
+ENV API_KEY $API_KEY
+ENV SENTRY_DSN $SENTRY_DSN
+ENV SENTRY_SAMPLE_RATE $SENTRY_SAMPLE_RATE
+ENV SENTRY_ENABLED $SENTRY_ENABLED
+ENV HOST 0.0.0.0
 
 EXPOSE 3000
 
-ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=3000
-
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
