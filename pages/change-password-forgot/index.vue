@@ -50,13 +50,13 @@ export default {
             password
           }, {
             headers: {
-              'X-Timestamp': timestamp,
-              'Access-Control-Allow-Origin': '*'
+              'X-Timestamp': timestamp
             }
           })
           this.display = 'success'
         } catch (error) {
           this.display = 'form'
+          this.$sentry.captureException(error)
         }
       }
     }

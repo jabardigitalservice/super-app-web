@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center h-full">
+  <div class="flex justify-center">
     <div class="bg-white w-96 h-[515px] rounded-lg p-6 flex flex-col justify-center items-center">
       <div class="flex justify-center items-center">
         <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full" />

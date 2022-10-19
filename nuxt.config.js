@@ -106,8 +106,7 @@ export default {
     baseURL: 'http://localhost:3000', // fallback
     headers: {
       common: {
-        'Api-Key': process.env.API_KEY,
-        'Cache-Control': 'no-cache'
+        'Api-Key': process.env.API_KEY
       }
     }
   },
