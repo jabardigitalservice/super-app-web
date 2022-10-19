@@ -18,13 +18,13 @@
           </p>
         </div>
         <!-- eslint-disable vue/no-v-html -->
-        <div class="mt-[16px] mb-[24px]" v-html="dataJson.description" />
+        <div class="mt-[16px] mb-[24px] text-[14px] font-lato text-[#424242] dark:text-[#AAB0B7]" v-html="dataJson.description" />
         <div v-show="dataJson.requirement" class=" bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
           <div class="flex lg:items-center">
             <div class="flex-shrink-0 mt-1 lg:mt-0">
               <IconWarningCircle />
             </div>
-            <div class="ml-2" v-html="dataJson.requirement" />
+            <div class="ml-2 text-gray-700 font-[400] text-[14px] dark:text-[#AAB0B7]" v-html="dataJson.requirement" />
           </div>
         </div>
       </div>

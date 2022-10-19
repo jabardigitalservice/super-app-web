@@ -11,7 +11,7 @@
       </div>
     </summary>
     <!-- eslint-disable vue/no-v-html -->
-    <div class="text-[14px] font-lato mb-5" v-html="description" />
+    <div class="text-[14px] font-lato mb-5 text-[#424242] dark:text-[#AAB0B7]" v-html="description" />
   </details>
 </template>
 
