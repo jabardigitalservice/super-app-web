@@ -90,6 +90,9 @@ export default {
 
   // Public runtime config
   publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
+    },
     sentry: {
       config: {
         environment: process.env.SENTRY_ENVIRONMENT
