@@ -90,6 +90,9 @@ export default {
 
   // Public runtime config
   publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
+    },
     sentry: {
       config: {
         environment: process.env.SENTRY_ENVIRONMENT
@@ -103,7 +106,8 @@ export default {
     baseURL: 'http://localhost:3000', // fallback
     headers: {
       common: {
-        'Api-Key': process.env.API_KEY
+        'Api-Key': process.env.API_KEY,
+        'Cache-Control': 'no-cache'
       }
     }
   },

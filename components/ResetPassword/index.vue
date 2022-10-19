@@ -1,7 +1,7 @@
 <template>
-  <div class="flex justify-center items-center">
-    <div class="bg-white rounded-lg p-6 font-normal w-96">
-      <div class="flex justify-center items-center my-6">
+  <div class="flex justify-center h-full">
+    <div class="bg-white w-96 h-[515px] rounded-lg p-6 flex flex-col justify-center items-center">
+      <div class="flex justify-center items-center">
         <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full" />
       </div>
       <div class="flex flex-col gap-6">
@@ -45,6 +45,7 @@
         </BaseInputText>
         <BaseButton
           class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
+          :disabled="!isEnabledButton"
           @click="onClickSave"
         >
           Simpan Perubahan
@@ -75,6 +76,16 @@ export default {
       errorConfirmation: null
     }
   },
+  computed: {
+    isEnabledButton () {
+      return !!((
+        this.password.length &&
+        this.passwordConfirmation.length &&
+        !this.errorPassword &&
+        !this.errorConfirmation
+      ))
+    }
+  },
   watch: {
     password (value) {
       if (value.length === 0) {
@@ -97,7 +108,7 @@ export default {
   },
   methods: {
     onClickSave () {
-      this.$emit('on-click-save')
+      this.$emit('on-click-save', this.password)
     }
   }
 }
