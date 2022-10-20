@@ -39,8 +39,6 @@ jobs:
             SENTRY_DSN=${{ secrets.SENTRY_DSN }}
             SENTRY_ENABLED=${{ secrets.SENTRY_ENABLED }}
             SENTRY_SAMPLE_RATE=${{ secrets.SENTRY_SAMPLE_RATE }}
-            PUBLIC_PATH=${{ secrets.PUBLIC_PATH }}
-
       # GitOps
       - name: GitOps ArgoCD Setup
         run: |
