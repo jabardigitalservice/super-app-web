@@ -111,6 +111,10 @@ export default {
     }
   },
 
+  router: {
+    base: process.env.PUBLIC_PATH || '/'
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   }
