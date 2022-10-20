@@ -1,11 +1,11 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
-    <div class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg">
+    <div class="bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low">
       <div class="flex justify-center items-center">
-        <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full" />
+        <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium" />
       </div>
       <div class="flex flex-col gap-6">
-        <h1 class="font-lora font-bold text-2xl text-gray-900 mt-4">
+        <h1 class="font-lora font-bold text-2xl text-gray-900 mt-4 dark:text-dark-text-high">
           Buat Password Baru
         </h1>
         <BaseInputText
@@ -22,9 +22,9 @@
             <IconKey />
           </template>
           <template #text-info>
-            <div class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3">
+            <div class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3 dark:bg-dark-emphasis-medium">
               <IconWarning />
-              <p class="text-xs text-gray-700">
+              <p class="text-xs text-gray-700 self-center dark:text-dark-text-medium">
                 Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol.
               </p>
             </div>

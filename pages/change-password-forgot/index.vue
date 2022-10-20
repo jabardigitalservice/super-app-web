@@ -1,15 +1,15 @@
 <template>
-  <div class="h-screen bg-background">
+  <div class="h-screen bg-background dark:bg-black">
     <div class="h-full block sm:flex sm:flex-col sm:justify-center sm:items-center">
       <div class="hidden justify-center items-center gap-2 mb-6 sm:flex">
-        <div class="rounded-full bg-white w-10 h-10 flex justify-center items-center">
+        <div class="rounded-full bg-white w-10 h-10 flex justify-center items-center dark:bg-dark-emphasis-medium">
           <IconLogo width="24" height="33.38" />
         </div>
         <span class="font-roboto font-bold">Sapawarga</span>
       </div>
-      <div class="flex flex-row gap-4 pl-4 items-center bg-white border-b-2 border-gray-100 h-[52px] sm:hidden">
-        <IconArrowLeft />
-        <p class="font roboto font-bold text-gray-900">
+      <div class="flex flex-row gap-4 pl-4 items-center bg-white border-b-2 border-gray-100 h-[52px] sm:hidden dark:bg-dark-emphasis-medium dark:border-dark-emphasis-medium">
+        <IconArrowLeft class="stroke-gray-900 dark:stroke-dark-text-high" />
+        <p class="font roboto font-bold text-gray-900 dark:text-dark-text-high">
           Buat Password Baru
         </p>
       </div>

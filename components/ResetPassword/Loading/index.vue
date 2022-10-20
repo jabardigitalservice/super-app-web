@@ -1,8 +1,8 @@
 <template>
   <div class="flex justify-center">
-    <div class="bg-white w-96 h-[515px] rounded-lg p-6 flex flex-col justify-center items-center">
+    <div class="bg-white w-96 h-[515px] rounded-lg p-6 flex flex-col justify-center items-center dark:bg-black">
       <div class="flex justify-center items-center w-[120px] h-[120px] relative">
-        <IconLock class="bg-gray-50 rounded-full" />
+        <IconLock class="bg-gray-50 rounded-full dark:bg-dark-emphasis-medium" />
         <div class="bg-blue-600 absolute bottom-0 right-0 w-[42px] h-[42px] rounded-full flex justify-center items-center">
           <IconProgress1 v-show="showIcon === 1" class="w-7 h-7" />
           <IconProgress2 v-show="showIcon === 2" class="w-7 h-7" />
@@ -12,7 +12,7 @@
           <IconProgress6 v-show="showIcon === 6" class="w-7 h-7" />
         </div>
       </div>
-      <p class="my-6 text-gray-800 font-lato text-sm">
+      <p class="my-6 text-gray-800 font-lato text-sm dark:text-dark-text-medium">
         Menyimpan password baru ...
       </p>
     </div>
