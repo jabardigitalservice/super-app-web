@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center">
-    <div class="bg-white w-96 h-[515px] rounded-lg p-6 flex flex-col justify-center items-center">
+  <div class="h-full flex justify-center sm:h-auto">
+    <div class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg">
       <div class="flex justify-center items-center">
         <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full" />
       </div>
