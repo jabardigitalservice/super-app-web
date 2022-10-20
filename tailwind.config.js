@@ -92,6 +92,19 @@ module.exports = {
           700: '#083461',
           800: '#022B55',
           900: '#001B3D'
+        },
+        dark: {
+          emphasis: {
+            low: '#1F2121',
+            medium: '#292C2A',
+            high: '#D7D7D7'
+          },
+          text: {
+            low: '#868C89',
+            medium: '#AAB0B7',
+            high: '#E9E9E9',
+            error: '#DD5E5E'
+          }
         }
       }
     }
