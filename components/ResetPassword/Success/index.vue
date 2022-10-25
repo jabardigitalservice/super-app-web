@@ -32,9 +32,6 @@ export default {
     IconCheck
   },
   props: {
-    /**
-     * make modal visible or not
-     */
     email: {
       type: String,
       default: ''
