@@ -22,6 +22,7 @@
       />
       <ResetPasswordSuccess
         v-else-if="display === 'success'"
+        :email="email"
       />
     </div>
   </div>
@@ -36,7 +37,8 @@ export default {
   components: { IconLogo, IconArrowLeft },
   data () {
     return {
-      display: 'form'
+      display: 'form',
+      email: ''
     }
   },
   methods: {
@@ -53,7 +55,7 @@ export default {
         const timestamp = dataDecoded.split(':').slice(2).join(':')
 
         try {
-          await this.$axios.post('/user/auth/change-password-forgot', {
+          const response = await this.$axios.post('/user/auth/change-password-forgot', {
             token: tokenEncoded,
             userId,
             password
@@ -62,6 +64,8 @@ export default {
               'X-Timestamp': timestamp
             }
           })
+          const { data } = response.data
+          this.email = data?.email
           this.display = 'success'
         } catch (error) {
           this.display = 'form'
