@@ -14,7 +14,7 @@
           Ubah Password Berhasil
         </h1>
         <p class="text-gray-800 font-lato text-sm pt-4 dark:text-dark-text-medium">
-          Perubahan password berhasil dilakukan.
+          Perubahan password akun dengan email <strong>{{ email }}</strong> berhasil dilakukan. Silakan masuk ke akun Anda di aplikasi Sapawarga.
         </p>
       </div>
     </div>
@@ -30,6 +30,15 @@ export default {
   components: {
     IconKey,
     IconCheck
+  },
+  props: {
+    /**
+     * make modal visible or not
+     */
+    email: {
+      type: String,
+      default: ''
+    }
   }
 }
 </script>
