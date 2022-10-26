@@ -60,4 +60,4 @@ jobs:
           git checkout -b superapp-web-production-${{ steps.vars.outputs.sha_short }}
           git add deployment.yaml
           git commit -m "chore: update superapp web images ${{ steps.vars.outputs.sha_short }} to production"
-          git push origin superapp-web-production-${{ steps.vars.outputs.sha_short }} -o merge_request.description="# Overview \n\n - Update superapp image ${{ steps.vars.outputs.sha_short }} to production" \n\n ## Evidence \n\n - title: Update superapp image ${{ steps.vars.outputs.sha_short }} to production" \n - project: Jabar Super Apps \n - participants: @adzharamrullah \n - screenshot: " -o merge_request.create
+          git push origin superapp-web-production-${{ steps.vars.outputs.sha_short }} -o merge_request.description="# Overview \n\n - Update superapp image ${{ steps.vars.outputs.sha_short }} to production \n\n ## Evidence \n\n - title: Update superapp image ${{ steps.vars.outputs.sha_short }} to production \n - project: Jabar Super Apps \n - participants: \n - screenshot: " -o merge_request.create
