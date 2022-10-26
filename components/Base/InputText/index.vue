@@ -3,8 +3,8 @@
     <div class="flex justify-between items-center w-full">
       <label
         :class="{
-          'text-gray-800 font-roboto text-sm ' : true,
-          'text-red-700' : error || errorMessage,
+          'text-gray-800 font-roboto text-sm dark:text-dark-text-high' : true,
+          'text-red-700 dark:text-dark-text-error' : error || errorMessage,
         }"
         :for="label"
       >
@@ -37,19 +37,19 @@
       :class="{
         'flex justify-between items-center w-full h-9 rounded-lg bg-gray-100 border border-gray-400 overflow-hidden': true,
         'border-green-700': isFocused,
-        'border-red-700': error
+        'border-red-700 dark:border-dark-text-error': error
       }"
     >
       <div
         v-if="$slots['icon-left']"
-        class="h-full w-8 flex items-center justify-center bg-gray-50"
+        class="h-full w-8 flex items-center justify-center bg-gray-50 dark:bg-dark-emphasis-low"
         @click="onClickEye"
       >
         <slot name="icon-left" />
       </div>
       <input
         :id="label"
-        class="bg-gray-50 h-9 w-full px-2 focus:outline-none text-gray-800 rounded-l text-sm leading-4 placeholder-gray-600"
+        class="bg-gray-50 h-9 w-full px-2 focus:outline-none text-gray-800 text-sm leading-4 placeholder-gray-600 dark:bg-dark-emphasis-low dark:text-dark-text-low"
         :placeholder="placeholder"
         :type="mType"
         :value="value"
@@ -61,7 +61,7 @@
       >
       <div
         v-if="type === 'password' || $slots['icon-right']"
-        class="h-full w-8 flex items-center justify-center bg-gray-50"
+        class="h-full w-8 flex items-center justify-center bg-gray-50 dark:bg-dark-emphasis-low"
       >
         <IconEyeOn
           v-if="!$slots['icon-right'] && iconEye === 'eye'"
@@ -82,7 +82,7 @@
         <slot name="icon-right" />
       </div>
     </div>
-    <p v-if="errorMessage" class="text-red-700 text-xs">
+    <p v-if="errorMessage" class="text-red-700 text-xs dark:text-dark-text-error">
       {{ errorMessage }}
     </p>
     <slot name="text-info" />

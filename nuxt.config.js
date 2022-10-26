@@ -1,7 +1,4 @@
 export default {
-  // Target: https://go.nuxtjs.dev/config-target
-  target: 'static',
-
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Sapawarga',
@@ -47,15 +44,35 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    // https://sentry.nuxtjs.org/
+    '@nuxtjs/sentry'
   ],
+
+  // sentry config
+  sentry: {
+    dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
+    tracing: {
+      tracesSampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE),
+      vueOptions: {
+        tracing: true,
+        tracingOptions: {
+          hooks: ['mount', 'update'],
+          timeout: 2000,
+          trackComponents: true
+        }
+      },
+      browserOptions: {}
+    },
+    disabled: process.env.SENTRY_ENABLED === 'false'
+  },
 
   // google fonts
   googleFonts: {
     display: 'swap',
     families: {
       Roboto: {
-        wght: [700]
+        wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
       },
       Lato: {
         wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
@@ -64,10 +81,29 @@ export default {
     overwriting: true
   },
 
+  // Private runtime config
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
+    }
+  },
+
+  // Public runtime config
+  publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
+    },
+    sentry: {
+      config: {
+        environment: process.env.SENTRY_ENVIRONMENT
+      }
+    }
+  },
+
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: process.env.BASE_URL,
+    baseURL: 'http://localhost:3000', // fallback
     headers: {
       common: {
         'Api-Key': process.env.API_KEY

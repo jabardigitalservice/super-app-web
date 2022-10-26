@@ -1,0 +1,13 @@
+[{
+    "title": "Kebijakan Privasi",
+    "icon": "icon-kebijakan-privasi",
+    "description": "Membahas mengenai kebijakan dan prosedur dalam mengumpulkan, menggunakan, dan menjaga data yang diperoleh dari pengguna.",
+    "link": "/kebijakan-privasi-ketentuan-pengguna/kebijakan-privasi"
+  },
+  {
+    "title": "Ketentuan Pengguna",
+    "icon": "icon-ketentuan-pengguna",
+    "description": "Ketentuan ini merupakan perjanjian yang harus dibaca, dipahami, dan disetujui oleh pengguna sebelum mengakses dan/atau menggunakan SAPAWARGA.",
+    "link": "/kebijakan-privasi-ketentuan-pengguna/ketentuan-pengguna"
+  }
+]
