@@ -35,7 +35,7 @@ jobs:
           push: true
           tags: ${{ secrets.SERVICE_IMAGENAME }}:${{ steps.vars.outputs.sha_short }}
           build-args: |
-            API_KEY=${{ secrets.API_KEY }}
+            API_KEY=${{ secrets.API_KEY_PRODUCTION }}
             SENTRY_DSN=${{ secrets.SENTRY_DSN }}
             SENTRY_ENABLED=${{ secrets.SENTRY_ENABLED }}
             SENTRY_SAMPLE_RATE=${{ secrets.SENTRY_SAMPLE_RATE }}
