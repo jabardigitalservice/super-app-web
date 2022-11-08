@@ -35,7 +35,7 @@
                 Tidak merasa melakukan aktifitas ini, silahkan hubungi tim support kami di
               </div>
               <div class="link">
-                support@sapawarga.jabarprov.go.id
+                sapawarga@jabarprov.go.id
               </div>
             </div>
           </div>
