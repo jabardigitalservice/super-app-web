@@ -1,7 +1,7 @@
 <template class="bg-white dark:bg-black">
-  <div class="container mx-auto">
-    <div class="lg:grid grid-cols-2 mt-10">
-      <div v-for="content in contents" :key="content.title">
+  <div class="lg:pt-[14px] lg:px-[80px] flex justify-center">
+    <div class="lg:grid grid-cols-2 max-w-[1280px] gap-x-[100px]">
+      <div v-for="content in contents" :key="content.title" class="h-fit">
         <Menu
           :icon="content.icon"
           :title="content.title"

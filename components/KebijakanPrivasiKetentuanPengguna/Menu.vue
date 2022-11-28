@@ -1,6 +1,6 @@
 <template>
-  <div class="border-b-2 border-gray-100 dark:border-[#292C2A] lg:dark:border-0 lg:mx-5 xl:mx-3">
-    <div class="lg:flex justify-center items-start mt-8 lg:mt-0 mx-10 lg:mx-0 pb-3">
+  <div class="border-b-2 border-gray-100 dark:border-[#292C2A] mb-[24px] lg:dark:border-0 lg:mx-5 xl:mx-3">
+    <div class="lg:flex justify-center items-start p-[16px]">
       <div class="flex-shrink-0">
         <component :is="icon" class="icon" />
       </div>
