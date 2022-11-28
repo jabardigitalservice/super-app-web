@@ -1,13 +1,15 @@
 <template class="bg-white dark:bg-black">
-  <div class="lg:pt-[14px] lg:px-[80px] flex justify-center">
-    <div class="lg:grid grid-cols-2 max-w-[1280px] gap-x-[100px]">
-      <div v-for="content in contents" :key="content.title" class="h-fit">
-        <Menu
-          :icon="content.icon"
-          :title="content.title"
-          :description="content.description"
-          :link="content.link"
-        />
+  <div class="flex justify-center">
+    <div class="border-gray-100 lg:pt-[14px] lg:px-[80px]">
+      <div class="lg:grid grid-flow-col auto-cols-auto max-w-[1280px] gap-x-[100px]">
+        <div v-for="content in contents" :key="content.title" class="border-b border-gray-100 dark:border-[#292C2A] lg:dark:border-0 mb-[24px]">
+          <Menu
+            :icon="content.icon"
+            :title="content.title"
+            :description="content.description"
+            :link="content.link"
+          />
+        </div>
       </div>
     </div>
   </div>
