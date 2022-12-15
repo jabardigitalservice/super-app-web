@@ -3,7 +3,7 @@
   "icon":"icon-kebijakan-privasi",
   "link": "/kebijakan-privasi-ketentuan-pengguna/kebijakan-privasi",
   "description": "Kebijakan Privasi ini mengatur mengenai kebijakan dan prosedur dalam mengumpulkan, menggunakan, dan menjaga data yang diperoleh dari pelanggan (selanjutnya disebut <strong class='text-[#212121] dark:text-[#E9E9E9]'>“Anda”</strong> atau <strong class='text-[#212121] dark:text-[#E9E9E9]'>“Pengguna”</strong>) sehubungan dengan penggunaan layanan yang disediakan di aplikasi SAPAWARGA (<strong class='text-[#212121] dark:text-[#E9E9E9]'>“Aplikasi”</strong>). Pada Kebijakan Privasi ini, kecuali secara tegas disebutkan berbeda, berlaku untuk Situs, Aplikasi dan semua produk dan layanan yang disediakan oleh Situs dan Aplikasi.",
-  "updated":"20 September 2022",
+  "updated":"7 November 2022",
    "details":[
       {
         "title":"Data Pribadi Pengguna",
@@ -27,7 +27,11 @@
       },
       {
         "title":"Berbagi Data Pribadi dan Data Non-Pribadi Pengguna Dengan Pihak Ketiga",
-        "description":"Kami hanya mengumpulkan dan menggunakan data dalam bentuk foto diri, foto KTP, foto diri dengan memegang KTP selama proses verifikasi dan validasi identitas Pengguna dan akan segera dihapus setelah proses tersebut selesai. Data pribadi maupun data non-pribadi lainnya digunakan sesuai dengan tujuan pengolahan selama Pengguna masih menggunakan Situs atau Aplikasi Kami. Kami akan menghentikan pemrosesan data Pengguna pada saat Pengguna menghapus akun di Situs atau Aplikasi Kami.</br></br>Kami sewaktu-waktu bekerja sama dengan badan usaha, yayasan atau individu pihak ketiga demi melaksanakan tujuan-tujuan berikut:<ol style='list-style-type:decimal;margin-left:15px;'><li><p style='margin-left:2px;'>Untuk memfasilitasi layanan kami.</p></li><li><p style='margin-left:2px;'>Untuk menyediakan layanan atas nama kami.</p></li><li><p style='margin-left:2px;'>Untuk melaksanakan layanan yang berhubungan dengan layanan kami.</p></li><li><p style='margin-left:2px;'>Untuk mendampingi kami dalam menganalisis bagaimana layanan kami digunakan.</p></li><li><p style='margin-left:2px;'>Untuk membantu melaksanakan layanan lainnya; dan </p></li><li><p style='margin-left:2px;'>Untuk mendukung tujuan lain sebagaimana tercantum pada Kebijakan Privasi ini.</p></li></ol><br/>Dengan ini kami memberitahu Pengguna bahwa pihak ketiga ini memiliki akses kepada informasi data pribadi dan data non-pribadi Pengguna demi melaksanakan tujuan-tujuan di atas. Pihak ketiga tersebut berkewajiban untuk menjaga kerahasiaan dan tidak menggunakan informasi tersebut untuk keperluan lain."
+        "description":"Kami sewaktu-waktu bekerja sama dengan badan usaha, yayasan atau individu pihak ketiga demi melaksanakan tujuan-tujuan berikut:<ol style='list-style-type:decimal;margin-left:15px;'><li><p style='margin-left:2px;'>Untuk memfasilitasi layanan kami.</p></li><li><p style='margin-left:2px;'>Untuk menyediakan layanan atas nama kami.</p></li><li><p style='margin-left:2px;'>Untuk melaksanakan layanan yang berhubungan dengan layanan kami.</p></li><li><p style='margin-left:2px;'>Untuk mendampingi kami dalam menganalisis bagaimana layanan kami digunakan.</p></li><li><p style='margin-left:2px;'>Untuk membantu melaksanakan layanan lainnya; dan </p></li><li><p style='margin-left:2px;'>Untuk mendukung tujuan lain sebagaimana tercantum pada Kebijakan Privasi ini.</p></li></ol><br/>Dengan ini kami memberitahu Pengguna bahwa pihak ketiga ini memiliki akses kepada informasi data pribadi dan data non-pribadi Pengguna demi melaksanakan tujuan-tujuan di atas. Pihak ketiga tersebut berkewajiban untuk menjaga kerahasiaan dan tidak menggunakan informasi tersebut untuk keperluan lain."
+      },
+      {
+        "title":"Jangka Waktu Data",
+        "description":"Kami hanya mengumpulkan dan menggunakan data dalam bentuk foto diri, foto KTP, foto diri dengan memegang KTP selama proses verifikasi dan validasi identitas Anda dan akan segera dihapus setelah proses tersebut selesai. Data pribadi maupun data non-pribadi lainnya digunakan sesuai dengan tujuan pengolahan selama Anda masih menggunakan Situs atau Aplikasi Kami. Kami akan menghentikan pemrosesan data Anda pada saat Anda menghapus akun di Situs atau Aplikasi Kami."
       },
       {
         "title":"Perubahan Kebijakan Privasi",
