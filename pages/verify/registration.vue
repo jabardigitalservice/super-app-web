@@ -28,17 +28,16 @@
           <div class="thanks">
             Terima kasih.
           </div>
-          <div class="info">
-            <img src="~/assets/images/warning.svg" alt="icon warning">
-            <div>
-              <div>
-                Tidak merasa melakukan aktifitas ini, silahkan hubungi tim support kami di
-              </div>
-              <div class="link">
+          <BaseSectionMessage
+            type="info"
+            text="Tidak merasa melakukan aktifitas ini, silakan hubungi tim support kami di"
+          >
+            <template #footer-text>
+              <p class="text-green-600">
                 sapawarga@jabarprov.go.id
-              </div>
-            </div>
-          </div>
+              </p>
+            </template>
+          </BaseSectionMessage>
         </div>
       </div>
     </div>
@@ -174,22 +173,7 @@ export default {
 
 .thanks {
   margin-top: 16px;
-}
-
-.link {
-  color: #1E88E5;
-}
-
-.info {
-  border-radius: 8px;
-  width: 100%;
-  margin-top: 16px;
-  line-height: 18px;
-  padding: 8px;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  align-items: flex-start;
+  margin-bottom: 16px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -210,8 +194,8 @@ export default {
     background-color: #FFFFFF;;
   }
 
-  .circle-icon, .info {
-    background-color: #FAFAFA;
+  .circle-icon {
+    background-color: #F9FBFC;
   }
 }
 
@@ -233,8 +217,8 @@ export default {
     background-color: #1F2121;
   }
 
-  .circle-icon, .info {
-    background-color: #292C2A;
+  .circle-icon {
+    background-color: #1F2121;
   }
 }
 </style>
