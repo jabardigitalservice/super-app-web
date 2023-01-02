@@ -25,6 +25,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/vue-gtag.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -38,7 +39,9 @@ export default {
     '@nuxtjs/tailwindcss',
     // google fonts
     '@nuxtjs/google-fonts',
-    '@nuxtjs/svg'
+    '@nuxtjs/svg',
+    // https://google-analytics.nuxtjs.org
+    '@nuxtjs/google-analytics'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -49,6 +52,10 @@ export default {
     '@nuxtjs/sentry'
   ],
 
+  // google analytics
+  googleAnalytics: {
+    id: process.env.GOOGLE_ANALYTICS_ID
+  },
   // sentry config
   sentry: {
     dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
@@ -97,6 +104,9 @@ export default {
       config: {
         environment: process.env.SENTRY_ENVIRONMENT
       }
+    },
+    googleAnalytics: {
+      id: process.env.GOOGLE_ANALYTICS_ID
     }
   },
 
