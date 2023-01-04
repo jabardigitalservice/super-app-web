@@ -39,9 +39,7 @@ export default {
     '@nuxtjs/tailwindcss',
     // google fonts
     '@nuxtjs/google-fonts',
-    '@nuxtjs/svg',
-    // https://google-analytics.nuxtjs.org
-    '@nuxtjs/google-analytics'
+    '@nuxtjs/svg'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -52,10 +50,6 @@ export default {
     '@nuxtjs/sentry'
   ],
 
-  // google analytics
-  googleAnalytics: {
-    id: process.env.GOOGLE_ANALYTICS_ID
-  },
   // sentry config
   sentry: {
     dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
@@ -87,7 +81,6 @@ export default {
     },
     overwriting: true
   },
-
   // Private runtime config
   privateRuntimeConfig: {
     axios: {
@@ -105,9 +98,7 @@ export default {
         environment: process.env.SENTRY_ENVIRONMENT
       }
     },
-    googleAnalytics: {
-      id: process.env.GOOGLE_ANALYTICS_ID
-    }
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
