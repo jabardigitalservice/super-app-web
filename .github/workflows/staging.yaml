@@ -58,7 +58,7 @@ jobs:
           cd jds-terraform-gke/k8s/superapp/development/web
           git config user.email "github-action@github.com"
           git config user.name "Github Action"
-          git checkout -b superapp-web-staging-${{ steps.vars.outputs.sha_short }}-test
+          git checkout master
           git add deployment.yaml
           git commit -m "chore: update superapp web images ${{ steps.vars.outputs.sha_short }}-test to staging"
-          git push origin superapp-web-staging-${{ steps.vars.outputs.sha_short }}-test -o merge_request.description="# Overview \n\n - Update superapp image ${{ steps.vars.outputs.sha_short }}-test to staging \n\n ## Evidence \n\n - title: Update superapp image ${{ steps.vars.outputs.sha_short }}-test to staging \n - project: Jabar Super Apps \n - participants: @adzharamrullah \n - screenshot: " -o merge_request.create
+          git push origin master
