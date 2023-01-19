@@ -4,7 +4,7 @@
       <div class="flex justify-center items-center">
         <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium" />
       </div>
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-[22px]">
         <h1 class="font-lora font-bold text-2xl text-gray-900 mt-4 dark:text-dark-text-high">
           Buat Password Baru
         </h1>
@@ -22,12 +22,10 @@
             <IconKey />
           </template>
           <template #text-info>
-            <div class="flex justify-between gap-2 bg-gray-50 p-2 rounded-lg mt-3 dark:bg-dark-emphasis-medium">
-              <IconWarning />
-              <p class="text-xs text-gray-700 self-center dark:text-dark-text-medium">
-                Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol.
-              </p>
-            </div>
+            <BaseSectionMessage
+              type="info"
+              text="Password minimal 6 karakter dengan kombinasi huruf kapital, angka dan simbol."
+            />
           </template>
         </BaseInputText>
         <BaseInputText
@@ -56,7 +54,6 @@
 </template>
 
 <script>
-import IconWarning from '~/assets/images/warning.svg?inline'
 import IconLock from '~/assets/images/lock.svg?inline'
 import IconKey from '~/assets/icon/key.svg?inline'
 
@@ -64,8 +61,7 @@ export default {
   name: 'ComponentResetPassword',
   components: {
     IconLock,
-    IconKey,
-    IconWarning
+    IconKey
   },
   data () {
     return {

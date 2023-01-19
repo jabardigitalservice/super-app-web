@@ -25,6 +25,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/vue-gtag.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -80,7 +81,6 @@ export default {
     },
     overwriting: true
   },
-
   // Private runtime config
   privateRuntimeConfig: {
     axios: {
@@ -97,7 +97,8 @@ export default {
       config: {
         environment: process.env.SENTRY_ENVIRONMENT
       }
-    }
+    },
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
