@@ -28,6 +28,19 @@ export default {
     '~/plugins/vue-gtag.js'
   ],
 
+  render: {
+    static: {
+      setHeaders: (resp, path) => {
+        if (
+          resp.req.originalUrl ===
+          '/.well-known/apple-app-site-association'
+        ) {
+          resp.setHeader('Content-Type', 'application/json')
+        }
+      }
+    }
+  },
+
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
@@ -115,4 +128,5 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   }
+
 }
