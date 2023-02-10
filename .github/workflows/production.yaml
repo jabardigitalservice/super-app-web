@@ -44,7 +44,7 @@ jobs:
             NEW_RELIC_LICENSE_KEY=${{secrets.NEW_RELIC_LICENSE_KEY}}
             NEW_RELIC_ACCOUNT_ID=${{secrets.NEW_RELIC_ACCOUNT_ID}}
             NEW_RELIC_BROWSER_LICENSE_KEY=${{secrets.NEW_RELIC_BROWSER_LICENSE_KEY}}
-            NEW_RELIC_APPLICATION_ID ${{secrets.NEW_RELIC_APPLICATION_ID_PRODUCTION}}
+            NEW_RELIC_APPLICATION_ID=${{secrets.NEW_RELIC_APPLICATION_ID_PRODUCTION}}
       # GitOps
       - name: GitOps ArgoCD Setup
         run: |
