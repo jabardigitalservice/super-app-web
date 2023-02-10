@@ -116,7 +116,7 @@ export default {
     googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
     newrelicData: {
       accountId: process.env.NEW_RELIC_ACCOUNT_ID,
-      agentId: process.env.NEW_RELIC_AGENT_ID,
+      agentId: process.env.NEW_RELIC_APPLICATION_ID,
       licenseKey: process.env.NEW_RELIC_BROWSER_LICENSE_KEY,
       applicationId: process.env.NEW_RELIC_APPLICATION_ID
     }
