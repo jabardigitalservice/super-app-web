@@ -60,28 +60,8 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    // https://sentry.nuxtjs.org/
-    '@nuxtjs/sentry'
+    '@nuxtjs/axios'
   ],
-
-  // sentry config
-  sentry: {
-    dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
-    tracing: {
-      tracesSampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE),
-      vueOptions: {
-        tracing: true,
-        tracingOptions: {
-          hooks: ['mount', 'update'],
-          timeout: 2000,
-          trackComponents: true
-        }
-      },
-      browserOptions: {}
-    },
-    disabled: process.env.SENTRY_ENABLED === 'false'
-  },
 
   // google fonts
   googleFonts: {
