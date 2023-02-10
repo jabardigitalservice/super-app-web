@@ -69,7 +69,6 @@ export default {
           this.display = 'success'
         } catch (error) {
           this.display = 'form'
-          this.$sentry.captureException(error)
         }
       }
     }

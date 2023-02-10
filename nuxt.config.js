@@ -15,7 +15,8 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }
-    ]
+    ],
+    __dangerouslyDisableSanitizers: ['innerHTML']
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -25,7 +26,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/vue-gtag.js'
+    '~/plugins/vue-gtag.js',
+    '~/plugins/newrelic-plugins.server.js'
   ],
 
   render: {
@@ -58,28 +60,8 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    // https://sentry.nuxtjs.org/
-    '@nuxtjs/sentry'
+    '@nuxtjs/axios'
   ],
-
-  // sentry config
-  sentry: {
-    dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
-    tracing: {
-      tracesSampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE),
-      vueOptions: {
-        tracing: true,
-        tracingOptions: {
-          hooks: ['mount', 'update'],
-          timeout: 2000,
-          trackComponents: true
-        }
-      },
-      browserOptions: {}
-    },
-    disabled: process.env.SENTRY_ENABLED === 'false'
-  },
 
   // google fonts
   googleFonts: {
@@ -111,7 +93,13 @@ export default {
         environment: process.env.SENTRY_ENVIRONMENT
       }
     },
-    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
+    newrelicData: {
+      accountId: process.env.NEW_RELIC_ACCOUNT_ID,
+      agentId: process.env.NEW_RELIC_APPLICATION_ID,
+      licenseKey: process.env.NEW_RELIC_BROWSER_LICENSE_KEY,
+      applicationId: process.env.NEW_RELIC_APPLICATION_ID
+    }
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
