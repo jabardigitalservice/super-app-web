@@ -16,7 +16,14 @@ export default {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }
     ],
-    __dangerouslyDisableSanitizers: ['innerHTML']
+    script: [
+      {
+        src: '/newrelic-script.js',
+        'data-account-id': `${process.env.NEW_RELIC_ACCOUNT_ID}`,
+        'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
+        'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`
+      }
+    ]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -93,13 +100,7 @@ export default {
         environment: process.env.SENTRY_ENVIRONMENT
       }
     },
-    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
-    newrelicData: {
-      accountId: process.env.NEW_RELIC_ACCOUNT_ID,
-      agentId: process.env.NEW_RELIC_APPLICATION_ID,
-      licenseKey: process.env.NEW_RELIC_BROWSER_LICENSE_KEY,
-      applicationId: process.env.NEW_RELIC_APPLICATION_ID
-    }
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
