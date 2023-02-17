@@ -1,6 +1,7 @@
 /*eslint-disable*/
-// for get data from environment
+// get data from environment
 const tagScript = document.querySelector('script[data-account-id][data-browser-license-key][data-application-id]')
+
 
 ;window.NREUM||(NREUM={});NREUM.init={distributed_tracing:{enabled:true},privacy:{cookies_enabled:true},ajax:{deny_list:["bam.nr-data.net"]}};
 
