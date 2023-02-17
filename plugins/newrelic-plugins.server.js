@@ -1,11 +1,6 @@
 import newrelic from 'newrelic'
-import { generateBrowserScript } from '~/static/newrelic-browser'
 
-export default ({ $config, app }, inject) => {
-  const script = generateBrowserScript($config.newrelicData)
-  app.head.script.push({
-    hid: 'newrelic',
-    innerHTML: script
-  })
+export default ({ app, route }, inject) => {
+  newrelic.setTransactionName(route.path)
   inject('newrelicSetup', newrelic)
 }
