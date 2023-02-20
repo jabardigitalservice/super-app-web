@@ -23,7 +23,8 @@ export default {
         'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
         'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`
       }
-    ]
+    ],
+    __dangerouslyDisableSanitizers: ['script']
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
