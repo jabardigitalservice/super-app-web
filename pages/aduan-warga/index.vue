@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen bg-background dark:bg-black">
     <div class="h-full block sm:flex sm:flex-col sm:justify-center sm:items-center">
-      <AduanWarga />
+      <span>Page Home Aduan Warga</span>
     </div>
   </div>
 </template>
