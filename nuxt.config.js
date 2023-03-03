@@ -15,7 +15,16 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }
-    ]
+    ],
+    script: [
+      {
+        src: '/newrelic-script.js',
+        'data-account-id': `${process.env.NEW_RELIC_ACCOUNT_ID}`,
+        'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
+        'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`
+      }
+    ],
+    __dangerouslyDisableSanitizers: ['script']
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -25,8 +34,22 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/vue-gtag.js'
+    '~/plugins/vue-gtag.js',
+    '~/plugins/newrelic-plugins.server.js'
   ],
+
+  render: {
+    static: {
+      setHeaders: (resp, path) => {
+        if (
+          resp.req.originalUrl ===
+          '/.well-known/apple-app-site-association'
+        ) {
+          resp.setHeader('Content-Type', 'application/json')
+        }
+      }
+    }
+  },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -45,28 +68,8 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    // https://sentry.nuxtjs.org/
-    '@nuxtjs/sentry'
+    '@nuxtjs/axios'
   ],
-
-  // sentry config
-  sentry: {
-    dsn: process.env.SENTRY_DSN, // Enter your project's DSN here
-    tracing: {
-      tracesSampleRate: parseFloat(process.env.SENTRY_SAMPLE_RATE),
-      vueOptions: {
-        tracing: true,
-        tracingOptions: {
-          hooks: ['mount', 'update'],
-          timeout: 2000,
-          trackComponents: true
-        }
-      },
-      browserOptions: {}
-    },
-    disabled: process.env.SENTRY_ENABLED === 'false'
-  },
 
   // google fonts
   googleFonts: {
@@ -115,4 +118,5 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   }
+
 }

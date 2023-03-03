@@ -46,10 +46,9 @@
 <script>
 export default {
   name: 'VerificationRegistrationPage',
-  async asyncData ({ $axios, query, $sentry }) {
+  async asyncData ({ $axios, query, $newrelicSetup }) {
     let isVerified = false
     const queryToken = query.token
-
     // if query token is exist
     if (queryToken) {
       // extract token & userid
@@ -68,7 +67,7 @@ export default {
         isVerified = true
       } catch (error) {
         // silent error
-        $sentry.captureException(error)
+        $newrelicSetup.noticeError(error)
       }
     }
 

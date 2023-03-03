@@ -40,6 +40,11 @@ jobs:
             SENTRY_ENABLED=${{ secrets.SENTRY_ENABLED }}
             SENTRY_SAMPLE_RATE=${{ secrets.SENTRY_SAMPLE_RATE }}
             GOOGLE_ANALYTICS_ID=${{secrets.GOOGLE_ANALYTICS_ID_STAGING}}
+            NEW_RELIC_APP_NAME=${{secrets.NEW_RELIC_APP_NAME_STAGING}}
+            NEW_RELIC_LICENSE_KEY=${{secrets.NEW_RELIC_LICENSE_KEY}}
+            NEW_RELIC_ACCOUNT_ID=${{secrets.NEW_RELIC_ACCOUNT_ID}}
+            NEW_RELIC_BROWSER_LICENSE_KEY=${{secrets.NEW_RELIC_BROWSER_LICENSE_KEY}}
+            NEW_RELIC_APPLICATION_ID=${{secrets.NEW_RELIC_APPLICATION_ID_STAGING}}
       # GitOps
       - name: GitOps ArgoCD Setup
         run: |
