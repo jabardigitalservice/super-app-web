@@ -4,18 +4,19 @@
       class="bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low"
     >
       <div
-        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium"
+        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium m-auto"
       >
         <ImageLoudSpeaker class="" />
       </div>
-      <div class="flex flex-col gap-[22px]">
+      <div class="flex flex-col gap-[22px] mt-auto">
         <BaseInputText
+          v-model="idAduan"
           placeholder="ID Aduan"
           type="number"
           name="id-aduan"
           label="Masukkan nomor ID Aduan dari aduan Anda sebelumnya."
           autocomplete="off"
-          :error="false"
+          :error="errorCheck"
         >
           <template #icon-left>
             <IconLoudSpeaker />
@@ -44,12 +45,13 @@ export default {
   },
   data () {
     return {
-      errorCheck: false
+      errorCheck: false,
+      idAduan: ''
     }
   },
   methods: {
     onClickCheck () {
-
+      this.errorCheck = this.idAduan === ''
     }
   }
 }
