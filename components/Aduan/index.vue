@@ -6,7 +6,7 @@
       <div
         class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium m-auto"
       >
-        <ImageLoudSpeaker class="" />
+        <ImageLoudSpeaker />
       </div>
       <div class="flex flex-col gap-[22px] mt-auto">
         <BaseInputText
