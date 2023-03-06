@@ -17,6 +17,7 @@
           label="Masukkan nomor ID Aduan dari aduan Anda sebelumnya."
           autocomplete="off"
           :error="errorCheck"
+          :disabled="errorCheck"
         >
           <template #icon-left>
             <IconLoudSpeaker />
@@ -24,10 +25,21 @@
         </BaseInputText>
 
         <BaseButton
-          class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
+          class="text-sm text-white mb-2"
+          :class="
+            errorCheck
+              ? 'bg-red-400 hover:bg-red-600'
+              : 'bg-green-700 hover:bg-green-600'
+          "
+          :error-button="errorCheck"
+          :error-button-message="errorMessage"
           @click="onClickCheck"
         >
-          Cek Status Aduan
+          {{
+            errorMessage && errorCheck
+              ? "ID Aduan harus diisi"
+              : "Cek Status Aduan"
+          }}
         </BaseButton>
       </div>
     </div>
@@ -46,12 +58,19 @@ export default {
   data () {
     return {
       errorCheck: false,
-      idAduan: ''
+      idAduan: '',
+      errorMessage: ''
     }
   },
   methods: {
     onClickCheck () {
-      this.errorCheck = this.idAduan === ''
+      if (this.idAduan) {
+        this.errorMessage = ''
+        this.errorCheck = false
+      } else {
+        this.errorMessage = 'OK'
+        this.errorCheck = !this.errorCheck
+      }
     }
   }
 }
