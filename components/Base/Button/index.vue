@@ -21,10 +21,6 @@
 export default {
   name: 'BaseButton',
   props: {
-    errorButton: {
-      type: Boolean,
-      default: false
-    },
     errorButtonMessage: {
       type: String,
       default: ''
