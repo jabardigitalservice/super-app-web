@@ -31,7 +31,6 @@
               ? 'bg-red-400 hover:bg-red-600'
               : 'bg-green-700 hover:bg-green-600'
           "
-          :error-button="errorCheck"
           :error-button-message="errorMessage"
           @click="onClickCheck"
         >
@@ -68,7 +67,7 @@ export default {
         this.errorMessage = ''
         this.errorCheck = false
       } else {
-        this.errorMessage = 'OK'
+        this.errorMessage = this.errorMessage ? '' : 'OK'
         this.errorCheck = !this.errorCheck
       }
     }
