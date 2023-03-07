@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Milestone from '~/components/Aduan/milestone.vue'
+import Milestone from '~/components/Aduan/Milestone.vue'
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
