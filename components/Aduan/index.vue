@@ -66,6 +66,11 @@ export default {
       if (this.idAduan) {
         this.errorMessage = ''
         this.errorCheck = false
+
+        // todo: this just for test redirect to detail aduan warga, if API ready i fix it
+        if (this.idAduan === '123456') {
+          this.$router.push('/aduan-warga/detail')
+        }
       } else {
         this.errorMessage = this.errorMessage ? '' : 'OK'
         this.errorCheck = !this.errorCheck
