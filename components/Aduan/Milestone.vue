@@ -32,12 +32,7 @@
           </template>
         </TextMilestone>
 
-        <template
-          v-if="
-            milestone.status === dataStatusMilestone.followUp.status ||
-              milestone.status === dataStatusMilestone.done.status
-          "
-        >
+        <template v-if="isFollowUpOrDone(milestone.status)">
           <TextMilestone>
             <template #information>
               Penanggung Jawab
@@ -62,13 +57,7 @@
         </template>
       </CardMilestone>
 
-      <CardMilestone
-        v-if="
-          milestone.status === dataStatusMilestone.rejected.status ||
-            milestone.status === dataStatusMilestone.followUp.status
-        "
-        class="mt-2"
-      >
+      <CardMilestone v-if="isRejectedOrFollowUp(milestone.status)" class="mt-2">
         <TextMilestone
           v-if="milestone.status === dataStatusMilestone.rejected.status"
         >
@@ -204,9 +193,19 @@ export default {
             conditionAduan: ''
           }
       }
+    },
+    isRejectedOrFollowUp (status) {
+      return (
+        status === dataStatusMilestone.rejected.status ||
+        status === dataStatusMilestone.followUp.status
+      )
+    },
+    isFollowUpOrDone (status) {
+      return (
+        status === dataStatusMilestone.followUp.status ||
+        status === dataStatusMilestone.done.status
+      )
     }
   }
 }
 </script>
-
-<style></style>
