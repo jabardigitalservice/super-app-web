@@ -3,20 +3,20 @@
     class="bg-white w-full h-screen dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
   >
     <div class="p-4">
-      <Milestone :data-milestone="dataDummy" />
+      <Milestone :data-milestone="dataDummy" @open-dialog="openDialog" />
     </div>
-    <div class="absolute w-full h-full top-0 bg-black opacity-60" />
+
+    <BaseBlurPopup :show-popup="showDialog" />
 
     <BaseDialog
-      :show-popup="true"
+      :show-popup="showDialog"
       title="Konfirmasi Penyelesaian"
       label-button-approve="Ya, Sangat Membantu"
       label-button-reject="Tidak Membantu"
-      information-message=""
+      information-message="Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR."
+      @close="showDialog = false"
     >
-      <template #confirmationText>
-        Apakah penyelesaian dari instansi ini membantu?
-      </template>
+      Apakah penyelesaian dari instansi ini membantu?
     </BaseDialog>
   </div>
 </template>
@@ -71,7 +71,13 @@ export default {
           time: '18:00',
           name: 'Admin'
         }
-      ]
+      ],
+      showDialog: false
+    }
+  },
+  methods: {
+    openDialog () {
+      this.showDialog = true
     }
   }
 }
