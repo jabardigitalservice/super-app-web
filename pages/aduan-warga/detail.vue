@@ -1,16 +1,8 @@
-<template>
-  <div class="h-screen bg-background dark:bg-black">
-    <div
-      class="h-full block sm:flex sm:flex-col sm:justify-center sm:items-center"
-    >
-      <div class="h-full sm:h-auto">
-        <div
-          class="bg-white w-full h-full p-4 dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
-        >
-          <Milestone :data-milestone="dataDummy" />
-        </div>
-      </div>
-    </div>
+<template class="h-screen bg-background dark:bg-black">
+  <div
+    class="bg-white w-full h-full p-4 dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
+  >
+    <Milestone :data-milestone="dataDummy" />
   </div>
 </template>
 
