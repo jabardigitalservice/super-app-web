@@ -91,7 +91,7 @@
         class="w-full"
       >
         <BaseButton
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
+          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2"
         >
           Buat Aduan Baru
         </BaseButton>
@@ -103,7 +103,7 @@
         class="w-full"
       >
         <BaseButton
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
+          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2"
         >
           Apakah penyelesaian ini membantu?
         </BaseButton>

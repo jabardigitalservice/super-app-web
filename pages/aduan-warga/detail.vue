@@ -1,8 +1,23 @@
 <template class="h-screen bg-background dark:bg-black">
   <div
-    class="bg-white w-full h-full p-4 dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
+    class="bg-white w-full h-screen dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
   >
-    <Milestone :data-milestone="dataDummy" />
+    <div class="p-4">
+      <Milestone :data-milestone="dataDummy" />
+    </div>
+    <div class="absolute w-full h-full top-0 bg-black opacity-60" />
+
+    <BaseDialog
+      :show-popup="true"
+      title="Konfirmasi Penyelesaian"
+      label-button-approve="Ya, Sangat Membantu"
+      label-button-reject="Tidak Membantu"
+      information-message=""
+    >
+      <template #confirmationText>
+        Apakah penyelesaian dari instansi ini membantu?
+      </template>
+    </BaseDialog>
   </div>
 </template>
 
