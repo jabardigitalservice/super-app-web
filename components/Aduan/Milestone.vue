@@ -91,23 +91,19 @@
         class="w-full"
       >
         <BaseButton
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
+          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2"
         >
           Buat Aduan Baru
         </BaseButton>
       </NuxtLink>
 
-      <NuxtLink
+      <BaseButton
         v-if="milestone.status === dataStatusMilestone.done.status"
-        to="/aduan-warga/redirect-aduan"
-        class="w-full"
+        class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2"
+        @click="openDialog"
       >
-        <BaseButton
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
-        >
-          Apakah penyelesaian ini membantu?
-        </BaseButton>
-      </NuxtLink>
+        Apakah penyelesaian ini membantu?
+      </BaseButton>
 
       <!--  this dummy slicing, i want fixit if API ready -->
     </li>
@@ -205,6 +201,9 @@ export default {
         status === dataStatusMilestone.followUp.status ||
         status === dataStatusMilestone.done.status
       )
+    },
+    openDialog () {
+      this.$emit('open-dialog')
     }
   }
 }

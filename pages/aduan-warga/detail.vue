@@ -1,8 +1,23 @@
 <template class="h-screen bg-background dark:bg-black">
   <div
-    class="bg-white w-full h-full p-4 dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
+    class="bg-white w-full h-screen dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
   >
-    <Milestone :data-milestone="dataDummy" />
+    <div class="p-4">
+      <Milestone :data-milestone="dataDummy" @open-dialog="openDialog" />
+    </div>
+
+    <BaseBlurPopup :show-popup="showDialog" />
+
+    <BaseDialog
+      :show-popup="showDialog"
+      title="Konfirmasi Penyelesaian"
+      label-button-approve="Ya, Sangat Membantu"
+      label-button-reject="Tidak Membantu"
+      information-message="Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR."
+      @close="showDialog = false"
+    >
+      Apakah penyelesaian dari instansi ini membantu?
+    </BaseDialog>
   </div>
 </template>
 
@@ -56,7 +71,13 @@ export default {
           time: '18:00',
           name: 'Admin'
         }
-      ]
+      ],
+      showDialog: false
+    }
+  },
+  methods: {
+    openDialog () {
+      this.showDialog = true
     }
   }
 }
