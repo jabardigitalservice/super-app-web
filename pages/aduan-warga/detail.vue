@@ -1,7 +1,5 @@
-<template class="h-screen bg-background dark:bg-black">
-  <div
-    class="bg-white w-full h-screen dark:bg-black rounded-lg sm:dark:bg-dark-emphasis-low overflow-y-auto"
-  >
+<template class="h-screen bg-background">
+  <div class="bg-white w-full h-screen rounded-lg overflow-y-auto">
     <div class="p-4">
       <Milestone :data-milestone="dataDummy" @open-dialog="openDialog" />
     </div>

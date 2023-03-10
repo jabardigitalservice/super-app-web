@@ -1,10 +1,10 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
     <div
-      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low"
+      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg"
     >
       <div
-        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium m-auto"
+        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full m-auto"
       >
         <ImageLoudSpeaker />
       </div>
