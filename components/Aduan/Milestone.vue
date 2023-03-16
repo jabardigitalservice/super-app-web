@@ -29,14 +29,18 @@
           <TextMilestone>
             <span class="text-gray-500 mb-1 text-[11px]">{{ milestone.date }} - {{ milestone.time }}</span>
             <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">{{
-              isWaiting(milestone.status)
+              milestone.status === dataStatusMilestone.waiting.status
+                ? "Aduan Anda sedang"
+                : "Aduan Anda telah"
             }}</span>
             <div>
               <span
                 :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
               >{{ getStatusTextAndIcon(milestone.status).status }}</span>
               <span :class="index > 0 ? 'text-gray-400' : 'text-gray-800'">{{
-                isCordination(milestone.status)
+                milestone.status === dataStatusMilestone.cordination.status
+                  ? "Ke"
+                  : "Oleh"
               }}</span>
               <span
                 :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
@@ -99,7 +103,10 @@
         </CardMilestone>
 
         <NuxtLink
-          v-if="milestone.status === dataStatusMilestone.rejected.status && index === 0"
+          v-if="
+            milestone.status === dataStatusMilestone.rejected.status &&
+              index === 0
+          "
           to="/aduan-warga/redirect-aduan"
           class="w-full"
         >
@@ -111,14 +118,16 @@
         </NuxtLink>
 
         <BaseButton
-          v-if="milestone.status === dataStatusMilestone.done.status && index === 0"
+          v-if="
+            milestone.status === dataStatusMilestone.done.status && index === 0
+          "
           class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
           @click="openDialog"
         >
           Apakah penyelesaian ini membantu?
         </BaseButton>
 
-      <!--  this dummy slicing, i want fixit if API ready -->
+        <!--  this dummy slicing, i want fixit if API ready -->
       </div>
     </div>
   </div>
@@ -208,20 +217,7 @@ export default {
         status === dataStatusMilestone.done.status
       )
     },
-    isWaiting (status) {
-      if (status === dataStatusMilestone.waiting.status) {
-        return 'Aduan Anda sedang'
-      } else {
-        return 'Aduan Anda telah'
-      }
-    },
-    isCordination (status) {
-      if (status === dataStatusMilestone.cordination.status) {
-        return 'Ke'
-      } else {
-        return 'Oleh'
-      }
-    },
+
     openDialog () {
       this.$emit('open-dialog')
     }
