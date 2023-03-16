@@ -69,7 +69,7 @@ export default {
           time: '18:00',
           name: 'Admin'
         }
-      ],
+      ].reverse(),
       showDialog: false
     }
   },

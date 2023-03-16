@@ -8,7 +8,6 @@
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <!-- todo: in design only used alert information, if there is a design for error and approve, you should develop it here  -->
     <div
       v-if="message"
       class="py-[16px] px-[12px] font-lato text-gray-800 bg-[#F9FBFC] border rounded-lg border-[#EFF1F3]"
