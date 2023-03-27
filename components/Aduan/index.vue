@@ -1,10 +1,10 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
     <div
-      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg"
+      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-black"
     >
       <div
-        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full m-auto"
+        class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full m-auto dark:bg-dark-emphasis-medium"
       >
         <ImageLoudSpeaker />
       </div>
@@ -12,6 +12,7 @@
         <BaseInputText
           v-model="idAduan"
           placeholder="ID Aduan"
+          class="dark:text-dark-text-medium"
           type="number"
           name="id-aduan"
           label="Masukkan nomor ID Aduan dari aduan Anda sebelumnya."
@@ -25,7 +26,7 @@
         </BaseInputText>
 
         <BaseButton
-          class="text-sm text-white mb-2"
+          class="text-sm text-white mb-2 dark:border-0"
           :class="
             errorCheck
               ? 'bg-red-400 hover:bg-red-600'
@@ -91,4 +92,9 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
 }
+
+label {
+  @apply dark:!text-dark-text-medium
+}
+
 </style>
