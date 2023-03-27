@@ -7,67 +7,122 @@
     >
       <div class="flex flex-col items-center mr-4">
         <div
-          class="flex items-center justify-center border w-[26px] h-[26px] bg-gray-50 rounded-lg -left-3 ring-8 ring-white"
+          class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
         >
           <BaseIconSvg
             :icon="`/icon/${getStatusTextAndIcon(milestone.status).icon}`"
             class="!shadow-lg !w-[14px] !h-[14px]"
             :fill-color="
               index > 0
-                ? '#BDBDBD'
+                ? '#868C89'
                 : `${getStatusTextAndIcon(milestone.status).fillColor}`
             "
           />
         </div>
         <div
           v-if="index !== dataMilestone.length - 1"
-          class="w-px h-full bg-gray-300"
+          class="w-px h-full bg-gray-300 dark:bg-dark-emphasis-medium"
         />
       </div>
       <div class="w-full">
         <CardMilestone>
           <TextMilestone>
-            <span class="text-gray-500 mb-1 text-[11px]">{{ milestone.date }} - {{ milestone.time }}</span>
-            <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">{{
+            <span
+              class="text-gray-500 mb-1 text-[11px]"
+              :class="
+                index > 0
+                  ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
+                  : 'text-gray-500 dark:text-dark-text-low'
+              "
+            >{{ milestone.date }} - {{ milestone.time }}</span>
+            <span
+              :class="
+                index > 0
+                  ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                  : 'text-gray-600 dark:text-dark-text-low '
+              "
+            >{{
               milestone.status === dataStatusMilestone.waiting.status
                 ? "Aduan Anda sedang"
                 : "Aduan Anda telah"
             }}</span>
             <div>
               <span
-                :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                "
               >{{ getStatusTextAndIcon(milestone.status).status }}</span>
-              <span :class="index > 0 ? 'text-gray-400' : 'text-gray-800'">{{
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-400 dark:text-dark-text-low'
+                    : 'text-gray-800 dark:text-dark-text-low'
+                "
+              >{{
                 milestone.status === dataStatusMilestone.cordination.status
                   ? "Ke"
                   : "Oleh"
               }}</span>
               <span
-                :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                "
               >{{ milestone.name }}</span>
             </div>
           </TextMilestone>
 
           <template v-if="isFollowUpOrDone(milestone.status)">
             <TextMilestone>
-              <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">Penanggung Jawab</span>
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                    : 'text-gray-600 dark:text-dark-text-low'
+                "
+              >Penanggung Jawab</span>
 
-              <span :class="index > 0 ? 'text-gray-500' : 'text-gray-800'">Asep Kumaha</span>
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'text-gray-800 dark:text-dark-text-high'
+                "
+              >Asep Kumaha</span>
             </TextMilestone>
 
             <TextMilestone>
-              <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">Estimasi Pengerjaan</span>
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                    : 'text-gray-600 dark:text-dark-text-low '
+                "
+              >Estimasi Pengerjaan</span>
 
               <div>
                 <span
                   :class="
-                    index > 0 ? 'text-gray-500' : 'font-bold text-gray-800'
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
                   "
                 >20 Des 2022</span>
-                <span :class="index > 0 ? 'text-gray-400' : 'text-gray-800'">sampai</span>
                 <span
                   :class="
-                    index > 0 ? 'text-gray-500' : 'font-bold text-gray-800'
+                    index > 0
+                      ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                      : 'text-gray-800 dark:text-dark-text-low '
+                  "
+                >sampai</span>
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
                   "
                 >22 Des 2022</span>
               </div>
@@ -82,22 +137,42 @@
           <TextMilestone
             v-if="milestone.status === dataStatusMilestone.rejected.status"
           >
-            <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">
+            <span
+              :class="
+                index > 0
+                  ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                  : 'text-gray-600 dark:text-dark-text-low '
+              "
+            >
               Catatan</span>
 
             <span
-              :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
+              :class="
+                index > 0
+                  ? 'text-gray-500 dark:text-dark-text-low'
+                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+              "
             >Foto Kurang jelas, dan lokasi detail belum dilengkapi</span>
           </TextMilestone>
 
           <TextMilestone
             v-if="milestone.status === dataStatusMilestone.followUp.status"
           >
-            <span :class="index > 0 ? 'text-gray-400' : 'text-gray-600'">
+            <span
+              :class="
+                index > 0
+                  ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                  : 'text-gray-600 dark:text-dark-text-low '
+              "
+            >
               Tanggapan</span>
 
             <span
-              :class="index > 0 ? 'text-gray-500' : 'font-bold text-gray-900'"
+              :class="
+                index > 0
+                  ? 'text-gray-500 dark:text-dark-text-low'
+                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+              "
             >Data diri kurang lengkap</span>
           </TextMilestone>
         </CardMilestone>
@@ -111,7 +186,7 @@
           class="w-full"
         >
           <BaseButton
-            class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
+            class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
           >
             Buat Aduan Baru
           </BaseButton>
@@ -121,7 +196,7 @@
           v-if="
             milestone.status === dataStatusMilestone.done.status && index === 0
           "
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2"
+          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
           @click="openDialog"
         >
           Apakah penyelesaian ini membantu?
