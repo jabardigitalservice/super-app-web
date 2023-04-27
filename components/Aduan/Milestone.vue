@@ -34,7 +34,7 @@
                   ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
                   : 'text-gray-500 dark:text-dark-text-low'
               "
-            >{{ milestone.date }} - {{ milestone.time }}</span>
+            >{{ milestone.tanggal_update }} - {{ milestone.time }}</span>
             <span
               :class="
                 index > 0
