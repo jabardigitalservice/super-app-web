@@ -1,44 +1,57 @@
 export const dataStatusMilestone = Object.freeze({
-  waiting: {
-    status: 1,
+  menungguVerifikasi: {
+    status: 'Menunggu Verifikasi',
     textStatus: 'Menunggu Verifikasi',
     icon: 'waiting.svg',
-    fillColor: '#FF7500'
+    fillColor: '#FF7500',
+    getName: 'admin_monitoring_status_aduan'
   },
-  rejected: {
-    status: 2,
+  ditolak: {
+    status: 'Ditolak',
     textStatus: 'Ditolak',
     icon: 'rejected.svg',
-    fillColor: '#F44336'
+    fillColor: '#F44336',
+    getName: 'admin_monitoring_status_aduan'
   },
-  verification: {
-    status: 3,
+  terverifikasi: {
+    status: 'Terverifikasi',
     textStatus: 'Terverifikasi',
     icon: 'verfication.svg',
-    fillColor: '#FF7500'
+    fillColor: '#FF7500',
+    getName: 'admin_monitoring_status_aduan'
   },
-  cordination: {
-    status: 4,
+  dikoordinasikan: {
+    status: 'Dikoordinasikan',
     textStatus: 'Dikoordinasikan',
     icon: 'cordination.svg',
-    fillColor: '#1E88E5'
+    fillColor: '#1E88E5',
+    getName: 'admin_monitoring_status_aduan'
   },
-  followUp: {
-    status: 5,
+  ditindakLanjuti: {
+    status: 'Ditindaklanjuti',
     textStatus: 'Ditindaklanjuti',
     icon: 'follow-up.svg',
-    fillColor: '#FF7500'
+    fillColor: '#FF7500',
+    getName: 'nama_instansi_penanggung_jawab'
   },
-  done: {
-    status: 6,
+  selesai: {
+    status: 'Selesai',
     textStatus: 'Selesai Dikerjakan',
     icon: 'done.svg',
-    fillColor: '#1E88E5'
+    fillColor: '#1E88E5',
+    getName: 'nama_instansi_penanggung_jawab'
   },
-  closed: {
-    status: 7,
+  ditutup: {
+    status: 'Ditutup',
     textStatus: 'Ditutup',
     icon: 'closed.svg',
-    fillColor: '#16A75C'
+    fillColor: '#16A75C',
+    getName: 'admin_monitoring_status_aduan'
+  },
+  dialihkan: {
+    status: 'Dialihkan ke SP4N Lapor',
+    textStatus: 'Dialihkan ke SP4N Lapor',
+    icon: 'cordination.svg',
+    fillColor: '#1E88E5'
   }
 })

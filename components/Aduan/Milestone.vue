@@ -2,7 +2,7 @@
   <div class="w-full">
     <div
       v-for="(milestone, index) in dataMilestone"
-      :key="milestone.status"
+      :key="index"
       class="flex mt-3"
     >
       <div class="flex flex-col items-center mr-4">
@@ -10,12 +10,12 @@
           class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
         >
           <BaseIconSvg
-            :icon="`/icon/${getStatusTextAndIcon(milestone.status).icon}`"
+            :icon="`/icon/${getStatusTextAndIcon(milestone.status_aduan).icon}`"
             class="!shadow-lg !w-[14px] !h-[14px]"
             :fill-color="
               index > 0
                 ? '#868C89'
-                : `${getStatusTextAndIcon(milestone.status).fillColor}`
+                : `${getStatusTextAndIcon(milestone.status_aduan).fillColor}`
             "
           />
         </div>
@@ -34,7 +34,7 @@
                   ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
                   : 'text-gray-500 dark:text-dark-text-low'
               "
-            >{{ milestone.tanggal_update }} - {{ milestone.time }}</span>
+            >{{ formatDate(milestone.tanggal_update) }}</span>
             <span
               :class="
                 index > 0
@@ -42,7 +42,8 @@
                   : 'text-gray-600 dark:text-dark-text-low '
               "
             >{{
-              milestone.status === dataStatusMilestone.waiting.status
+              milestone.status_aduan ===
+                dataStatusMilestone.menungguVerifikasi.status
                 ? "Aduan Anda sedang"
                 : "Aduan Anda telah"
             }}</span>
@@ -53,7 +54,7 @@
                     ? 'text-gray-500 dark:text-dark-text-low'
                     : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ getStatusTextAndIcon(milestone.status).status }}</span>
+              >{{ getStatusTextAndIcon(milestone.status_aduan).status }}</span>
               <span
                 :class="
                   index > 0
@@ -61,7 +62,8 @@
                     : 'text-gray-800 dark:text-dark-text-low'
                 "
               >{{
-                milestone.status === dataStatusMilestone.cordination.status
+                milestone.status_aduan ===
+                  dataStatusMilestone.dikoordinasikan.status
                   ? "Ke"
                   : "Oleh"
               }}</span>
@@ -71,11 +73,11 @@
                     ? 'text-gray-500 dark:text-dark-text-low'
                     : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ milestone.name }}</span>
+              >{{ milestone[getStatusTextAndIcon(milestone.status_aduan).getName] }}</span>
             </div>
           </TextMilestone>
 
-          <template v-if="isFollowUpOrDone(milestone.status)">
+          <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
             <TextMilestone>
               <span
                 :class="
@@ -91,7 +93,7 @@
                     ? 'text-gray-500 dark:text-dark-text-low'
                     : 'text-gray-800 dark:text-dark-text-high'
                 "
-              >Asep Kumaha</span>
+              >{{ milestone.nama_kepala_pd }}</span>
             </TextMilestone>
 
             <TextMilestone>
@@ -110,7 +112,7 @@
                       ? 'text-gray-500 dark:text-dark-text-low'
                       : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
                   "
-                >20 Des 2022</span>
+                >{{ milestone.tanggal_instruksi }}</span>
                 <span
                   :class="
                     index > 0
@@ -124,18 +126,24 @@
                       ? 'text-gray-500 dark:text-dark-text-low'
                       : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
                   "
-                >22 Des 2022</span>
+                >{{ milestone.tanggal_deadline }}</span>
               </div>
             </TextMilestone>
           </template>
         </CardMilestone>
 
         <CardMilestone
-          v-if="isRejectedOrFollowUp(milestone.status)"
+          v-if="
+            isditolakOrditindakLanjuti(milestone.status_aduan) &&
+              (milestone.keterangan_status_aduan || milestone.keterangan_tambahan)
+          "
           class="mt-2"
         >
           <TextMilestone
-            v-if="milestone.status === dataStatusMilestone.rejected.status"
+            v-if="
+              milestone.status_aduan === dataStatusMilestone.ditolak.status &&
+                milestone.keterangan_status_aduan
+            "
           >
             <span
               :class="
@@ -152,11 +160,15 @@
                   ? 'text-gray-500 dark:text-dark-text-low'
                   : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
               "
-            >Foto Kurang jelas, dan lokasi detail belum dilengkapi</span>
+            >{{ milestone.keterangan_status_aduan }}</span>
           </TextMilestone>
 
-          <TextMilestone
-            v-if="milestone.status === dataStatusMilestone.followUp.status"
+          <AduanTextMilestone
+            v-if="
+              milestone.status_aduan ===
+                dataStatusMilestone.ditindakLanjuti.status &&
+                milestone.keterangan_tambahan
+            "
           >
             <span
               :class="
@@ -173,13 +185,13 @@
                   ? 'text-gray-500 dark:text-dark-text-low'
                   : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
               "
-            >Data diri kurang lengkap</span>
-          </TextMilestone>
+            >{{ milestone.keterangan_tambahan }}</span>
+          </AduanTextMilestone>
         </CardMilestone>
 
         <NuxtLink
           v-if="
-            milestone.status === dataStatusMilestone.rejected.status &&
+            milestone.status_aduan === dataStatusMilestone.ditolak.status &&
               index === 0
           "
           to="/aduan-warga/redirect-aduan"
@@ -194,7 +206,8 @@
 
         <BaseButton
           v-if="
-            milestone.status === dataStatusMilestone.done.status && index === 0
+            milestone.status_aduan === dataStatusMilestone.selesai.status &&
+              index === 0
           "
           class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
           @click="openDialog"
@@ -212,6 +225,7 @@
 import CardMilestone from './CardMilestone.vue'
 import TextMilestone from './TextMilestone.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
+import { formatDate } from '~/utils'
 
 export default {
   name: 'MilestoneAduan',
@@ -228,49 +242,64 @@ export default {
     }
   },
   methods: {
+    formatDate,
     getStatusTextAndIcon (status) {
       switch (status) {
-        case dataStatusMilestone.waiting.status:
+        case dataStatusMilestone.menungguVerifikasi.status:
           return {
-            status: dataStatusMilestone.waiting.textStatus,
-            icon: dataStatusMilestone.waiting.icon,
-            fillColor: dataStatusMilestone.waiting.fillColor
+            status: dataStatusMilestone.menungguVerifikasi.textStatus,
+            icon: dataStatusMilestone.menungguVerifikasi.icon,
+            fillColor: dataStatusMilestone.menungguVerifikasi.fillColor,
+            getName: dataStatusMilestone.menungguVerifikasi.getName
           }
-        case dataStatusMilestone.rejected.status:
+        case dataStatusMilestone.ditolak.status:
           return {
-            status: dataStatusMilestone.rejected.textStatus,
-            icon: dataStatusMilestone.rejected.icon,
-            fillColor: dataStatusMilestone.rejected.fillColor
+            status: dataStatusMilestone.ditolak.textStatus,
+            icon: dataStatusMilestone.ditolak.icon,
+            fillColor: dataStatusMilestone.ditolak.fillColor,
+            getName: dataStatusMilestone.ditolak.getName
           }
-        case dataStatusMilestone.verification.status:
+        case dataStatusMilestone.terverifikasi.status:
           return {
-            status: dataStatusMilestone.verification.textStatus,
-            icon: dataStatusMilestone.verification.icon,
-            fillColor: dataStatusMilestone.verification.fillColor
+            status: dataStatusMilestone.terverifikasi.textStatus,
+            icon: dataStatusMilestone.terverifikasi.icon,
+            fillColor: dataStatusMilestone.terverifikasi.fillColor,
+            getName: dataStatusMilestone.terverifikasi.getName
           }
-        case dataStatusMilestone.cordination.status:
+        case dataStatusMilestone.dikoordinasikan.status:
           return {
-            status: dataStatusMilestone.cordination.textStatus,
-            icon: dataStatusMilestone.cordination.icon,
-            fillColor: dataStatusMilestone.cordination.fillColor
+            status: dataStatusMilestone.dikoordinasikan.textStatus,
+            icon: dataStatusMilestone.dikoordinasikan.icon,
+            fillColor: dataStatusMilestone.dikoordinasikan.fillColor,
+            getName: dataStatusMilestone.dikoordinasikan.getName
           }
-        case dataStatusMilestone.followUp.status:
+        case dataStatusMilestone.ditindakLanjuti.status:
           return {
-            status: dataStatusMilestone.followUp.textStatus,
-            icon: dataStatusMilestone.followUp.icon,
-            fillColor: dataStatusMilestone.followUp.fillColor
+            status: dataStatusMilestone.ditindakLanjuti.textStatus,
+            icon: dataStatusMilestone.ditindakLanjuti.icon,
+            fillColor: dataStatusMilestone.ditindakLanjuti.fillColor,
+            getName: dataStatusMilestone.ditindakLanjuti.getName
           }
-        case dataStatusMilestone.done.status:
+        case dataStatusMilestone.selesai.status:
           return {
-            status: dataStatusMilestone.done.textStatus,
-            icon: dataStatusMilestone.done.icon,
-            fillColor: dataStatusMilestone.done.fillColor
+            status: dataStatusMilestone.selesai.textStatus,
+            icon: dataStatusMilestone.selesai.icon,
+            fillColor: dataStatusMilestone.selesai.fillColor,
+            getName: dataStatusMilestone.selesai.getName
           }
-        case dataStatusMilestone.closed.status:
+        case dataStatusMilestone.ditutup.status:
           return {
-            status: dataStatusMilestone.closed.textStatus,
-            icon: dataStatusMilestone.closed.icon,
-            fillColor: dataStatusMilestone.closed.fillColor
+            status: dataStatusMilestone.ditutup.textStatus,
+            icon: dataStatusMilestone.ditutup.icon,
+            fillColor: dataStatusMilestone.ditutup.fillColor,
+            getName: dataStatusMilestone.ditutup.getName
+          }
+        case dataStatusMilestone.dialihkan.status:
+          return {
+            status: dataStatusMilestone.dialihkan.textStatus,
+            icon: dataStatusMilestone.dialihkan.icon,
+            fillColor: dataStatusMilestone.dialihkan.fillColor,
+            getName: dataStatusMilestone.dialihkan.getName
           }
         default:
           return {
@@ -280,16 +309,16 @@ export default {
           }
       }
     },
-    isRejectedOrFollowUp (status) {
+    isditolakOrditindakLanjuti (status) {
       return (
-        status === dataStatusMilestone.rejected.status ||
-        status === dataStatusMilestone.followUp.status
+        status === dataStatusMilestone.ditolak.status ||
+        status === dataStatusMilestone.ditindakLanjuti.status
       )
     },
-    isFollowUpOrDone (status) {
+    isditindakLanjutiOrselesai (status) {
       return (
-        status === dataStatusMilestone.followUp.status ||
-        status === dataStatusMilestone.done.status
+        status === dataStatusMilestone.ditindakLanjuti.status ||
+        status === dataStatusMilestone.selesai.status
       )
     },
 
