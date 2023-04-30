@@ -34,7 +34,7 @@
                   ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
                   : 'text-gray-500 dark:text-dark-text-low'
               "
-            >{{ formatDate(milestone.tanggal_update) }}</span>
+            >{{ formatDate(milestone.tanggal_update,'EEEE, dd MMMM yyyy - HH:mm') }}</span>
             <span
               :class="
                 index > 0
