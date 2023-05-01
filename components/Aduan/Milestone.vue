@@ -34,7 +34,12 @@
                   ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
                   : 'text-gray-500 dark:text-dark-text-low'
               "
-            >{{ formatDate(milestone.tanggal_update,'EEEE, dd MMMM yyyy - HH:mm') }}</span>
+            >{{
+              formatDate(
+                milestone.tanggal_update,
+                "EEEE, dd MMMM yyyy - HH:mm"
+              )
+            }}</span>
             <span
               :class="
                 index > 0
@@ -52,7 +57,7 @@
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
               >{{ getStatusTextAndIcon(milestone.status_aduan).status }}</span>
               <span
@@ -71,9 +76,13 @@
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ milestone[getStatusTextAndIcon(milestone.status_aduan).getName] }}</span>
+              >{{
+                milestone[
+                  getStatusTextAndIcon(milestone.status_aduan).getNameStatus
+                ]
+              }}</span>
             </div>
           </TextMilestone>
 
@@ -91,7 +100,7 @@
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'text-gray-800 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-800 dark:text-dark-text-high'
                 "
               >{{ milestone.nama_kepala_pd }}</span>
             </TextMilestone>
@@ -110,7 +119,7 @@
                   :class="
                     index > 0
                       ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
+                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
                   "
                 >{{ milestone.tanggal_instruksi }}</span>
                 <span
@@ -124,7 +133,7 @@
                   :class="
                     index > 0
                       ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
+                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
                   "
                 >{{ milestone.tanggal_deadline }}</span>
               </div>
@@ -158,7 +167,7 @@
               :class="
                 index > 0
                   ? 'text-gray-500 dark:text-dark-text-low'
-                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                  : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
             >{{ milestone.keterangan_status_aduan }}</span>
           </TextMilestone>
@@ -183,7 +192,7 @@
               :class="
                 index > 0
                   ? 'text-gray-500 dark:text-dark-text-low'
-                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                  : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
             >{{ milestone.keterangan_tambahan }}</span>
           </AduanTextMilestone>
@@ -214,8 +223,6 @@
         >
           Apakah penyelesaian ini membantu?
         </BaseButton>
-
-        <!--  this dummy slicing, i want fixit if API ready -->
       </div>
     </div>
   </div>
@@ -250,56 +257,56 @@ export default {
             status: dataStatusMilestone.menungguVerifikasi.textStatus,
             icon: dataStatusMilestone.menungguVerifikasi.icon,
             fillColor: dataStatusMilestone.menungguVerifikasi.fillColor,
-            getName: dataStatusMilestone.menungguVerifikasi.getName
+            getNameStatus: dataStatusMilestone.menungguVerifikasi.getNameStatus
           }
         case dataStatusMilestone.ditolak.status:
           return {
             status: dataStatusMilestone.ditolak.textStatus,
             icon: dataStatusMilestone.ditolak.icon,
             fillColor: dataStatusMilestone.ditolak.fillColor,
-            getName: dataStatusMilestone.ditolak.getName
+            getNameStatus: dataStatusMilestone.ditolak.getNameStatus
           }
         case dataStatusMilestone.terverifikasi.status:
           return {
             status: dataStatusMilestone.terverifikasi.textStatus,
             icon: dataStatusMilestone.terverifikasi.icon,
             fillColor: dataStatusMilestone.terverifikasi.fillColor,
-            getName: dataStatusMilestone.terverifikasi.getName
+            getNameStatus: dataStatusMilestone.terverifikasi.getNameStatus
           }
         case dataStatusMilestone.dikoordinasikan.status:
           return {
             status: dataStatusMilestone.dikoordinasikan.textStatus,
             icon: dataStatusMilestone.dikoordinasikan.icon,
             fillColor: dataStatusMilestone.dikoordinasikan.fillColor,
-            getName: dataStatusMilestone.dikoordinasikan.getName
+            getNameStatus: dataStatusMilestone.dikoordinasikan.getNameStatus
           }
         case dataStatusMilestone.ditindakLanjuti.status:
           return {
             status: dataStatusMilestone.ditindakLanjuti.textStatus,
             icon: dataStatusMilestone.ditindakLanjuti.icon,
             fillColor: dataStatusMilestone.ditindakLanjuti.fillColor,
-            getName: dataStatusMilestone.ditindakLanjuti.getName
+            getNameStatus: dataStatusMilestone.ditindakLanjuti.getNameStatus
           }
         case dataStatusMilestone.selesai.status:
           return {
             status: dataStatusMilestone.selesai.textStatus,
             icon: dataStatusMilestone.selesai.icon,
             fillColor: dataStatusMilestone.selesai.fillColor,
-            getName: dataStatusMilestone.selesai.getName
+            getNameStatus: dataStatusMilestone.selesai.getNameStatus
           }
         case dataStatusMilestone.ditutup.status:
           return {
             status: dataStatusMilestone.ditutup.textStatus,
             icon: dataStatusMilestone.ditutup.icon,
             fillColor: dataStatusMilestone.ditutup.fillColor,
-            getName: dataStatusMilestone.ditutup.getName
+            getNameStatus: dataStatusMilestone.ditutup.getNameStatus
           }
         case dataStatusMilestone.dialihkan.status:
           return {
             status: dataStatusMilestone.dialihkan.textStatus,
             icon: dataStatusMilestone.dialihkan.icon,
             fillColor: dataStatusMilestone.dialihkan.fillColor,
-            getName: dataStatusMilestone.dialihkan.getName
+            getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
           }
         default:
           return {

@@ -50,7 +50,7 @@
           <BaseButton
             v-if="labelButtonReject"
             class="w-full border-none bg-white text-green-700 text-[14px] font-lato mt-4"
-            @click="submitHandle"
+            @click="submitReject"
           >
             {{ labelButtonReject }}
           </BaseButton>
@@ -95,6 +95,9 @@ export default {
     },
     submitHandle () {
       this.$emit('submit')
+    },
+    submitReject () {
+      this.$emit('reject')
     }
   }
 }
