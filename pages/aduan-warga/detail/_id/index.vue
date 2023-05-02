@@ -13,7 +13,11 @@
       title="Konfirmasi Penyelesaian"
       label-button-approve="Ya, Sangat Membantu"
       label-button-reject="Tidak, Buat Aduan Baru"
-      :information-message="idSpanLaporIsExists ? `Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR.` : ''"
+      :information-message="
+        idSpanLaporIsExists
+          ? `Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR.`
+          : ''
+      "
       @close="showDialog = false"
       @submit="backToSearchAduan"
       @reject="goToCreateAduan"
@@ -30,9 +34,10 @@ export default {
   components: { Milestone },
   data () {
     return {
-      // data: [],
+      data: [],
+      token: '',
       idSpanLaporIsExists: false,
-      data: [
+      dataDummy: [
         {
           id_aduan: '5571685772206594124',
           status_aduan: 'Menunggu Verifikasi',
@@ -161,19 +166,29 @@ export default {
             date: 'Sabtu, 11 Februari 2023, 01:16',
             log: [
               {
-                date: 'Minggu, 12 Februari 2023, 17:09',
+                date: 'Rabu, 22 Februari 2023, 11:13',
                 keterangan:
-                  'Laporan dilempar ke Pemerintah Provinsi Jawa Barat oleh Admin Nasional SP4N-LAPOR!'
+                  'Laporan didisposisikan ke Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bekasi oleh Pemerintah Kabupaten Bekasi'
               },
               {
-                date: 'Senin, 13 Februari 2023, 16:02',
+                date: 'Kamis, 23 Februari 2023, 10:44',
                 keterangan:
-                  'Laporan didisposisikan ke Dinas Pendidikan, Pemerintah Provinsi Jawa Barat oleh Pemerintah Provinsi Jawa Barat'
+                  'Yth. Pelapor, \n\nTerima kasih atas laporan Anda. Terkait hal tersebut akan kami sampaikan ke unit yang bersangkutan dan akan segera kami tindaklanjuti sesuai batas waktu tindaklanjut di SP4N LAPOR!'
               },
               {
-                date: 'Selasa, 14 Februari 2023, 08:25',
+                date: 'Kamis, 23 Februari 2023, 11:11',
                 keterangan:
-                  'Selamat pagi, Jika memiliki bukti yang cukup, silahkan langsung mengajukan persoalan ini kepada pihak yang berwajib yaitu aparat kepolisian. Apabila benar, masalah ini sudah masuk ke ranah pidana.'
+                  'Terima Kasih atas laporan Pengaduannya. Terkait Dugaan galian C Ilegal diarea Cikarang Selatan dapat kami sampaikan sebagai berikut :\n1. Bahwa Perizinan Galian C bukan  penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi. (merupakan kewenangan Pemerintah Pusat yaitu Kementerian Energi dan \n    Sumber Daya Mineral)\n2. Kerusakan Infrastruktur jalan didalam kawasan Lippo Cikarang bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.\n3. Parkiran liar truk - truk tanah tersebut mengganggu lalu lalang kendaraan logistik ke kawasan industri. Bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.'
+              },
+              {
+                date: 'Kamis, 23 Februari 2023, 16:41',
+                keterangan:
+                  'Yang kami sampaikan adalah, meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
+              },
+              {
+                date: 'Senin, 27 Februari 2023, 19:20',
+                keterangan:
+                  'Terima kasih atas tanggapannya. \n\nTanggapan kami (sebagaimana telah kami konsultasikan dengan APKASI, sebagai salah satu organ pendorong revisi pendelegasian wewenang pertambangan): meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
               }
             ]
           }
@@ -182,28 +197,24 @@ export default {
       showDialog: false
     }
   },
-  // async fetch () {
-  //   try {
-  //     const token =
-  //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoianNhX2FkdWFuX2FwaSIsImV4cGlyZXMiOjE2ODI4NjcwODMuMTQ3OTU4fQ.Pc_DMIOWahzcTyRNcYBvXjRKUd99EfIoWN51NpRjzik'
-  //     const options = {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`
-  //       },
-  //       data: {
-  //         id_aduan: '5572530782204661889'
-  //       }
-  //     }
-  //     const response = await this.$axios.post(
-  //       'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/id_aduan',
-  //       options
-  //     )
-  //     const { data } = response.data
-  //     console.log(data)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // },
+  async fetch () {
+    try {
+      const response = await this.$axios.post(
+        'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/login',
+        {
+          username: 'jsa_aduan_api',
+          password: 'fde92ef9514076'
+        }
+      )
+
+      this.token = response.data.access_token
+      if (this.token) {
+        this.getDataAduanById()
+      }
+    } catch (error) {
+      this.data = this.dataDummy
+    }
+  },
   methods: {
     openDialog (idSpanLapor) {
       this.showDialog = true
@@ -214,6 +225,26 @@ export default {
     },
     goToCreateAduan () {
       this.$router.push('/aduan-warga/redirect-aduan')
+    },
+    async getDataAduanById () {
+      if (this.token) {
+        try {
+          const response = await this.$axios.post(
+            'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/id_aduan',
+            {
+              id_aduan: this.$route.params.id
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${this.token}`
+              }
+            }
+          )
+          this.data = response.data
+        } catch (error) {
+          // console.log(error)
+        }
+      }
     }
   }
 }

@@ -48,9 +48,7 @@
                     ? 'text-gray-500 dark:text-dark-text-low'
                     : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
-              >{{
-                milestone.log_span_lapor.id
-              }}</span>
+              >{{ milestone.log_span_lapor.id }}</span>
             </div>
           </TextMilestone>
           <!-- text for status aduan -->
@@ -65,8 +63,8 @@
               class="text-gray-500 mb-1 text-[11px]"
               :class="
                 index > 0
-                  ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
-                  : 'text-gray-500 dark:text-dark-text-low'
+                  ? ' dark:text-dark-text-low dark:text-opacity-60'
+                  : ' dark:text-dark-text-low'
               "
             >{{
               formatDate(
@@ -261,6 +259,59 @@
         >
           Apakah penyelesaian ini membantu ?
         </BaseButton>
+
+        <!-- card milestone for log span lapor -->
+        <template
+          v-if="
+            isSpanLapor(
+              milestone.status_aduan,
+              milestone.id_aduan_span_lapor
+            ) && milestone.log_span_lapor.log.length > 0
+          "
+        >
+          <div
+            v-for="(logSpan, indexLog) in milestone.log_span_lapor.log"
+            :key="indexLog"
+          >
+            <CardMilestone v-if="indexLog < 2" class="mt-2">
+              <TextMilestone>
+                <span
+                  class="mb-1 text-[11px]"
+                  :class="
+                    indexLog > 0
+                      ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                      : 'text-gray-600 dark:text-dark-text-low'
+                  "
+                >{{ logSpan.date }}</span>
+
+                <div>
+                  <span
+                    class="log-span"
+                    :class="
+                      indexLog > 0
+                        ? 'text-gray-500 dark:text-dark-text-low'
+                        : 'font-medium text-gray-900 dark:text-dark-text-high'
+                    "
+                  >{{ logSpan.keterangan }}</span>
+                </div>
+              </TextMilestone>
+            </CardMilestone>
+          </div>
+
+          <div v-if="milestone.log_span_lapor.log.length > 2" class="w-full">
+            <BaseButton
+              class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0"
+              @click="
+                setLogSpanLapor(
+                  milestone.log_span_lapor.log,
+                  milestone.id_aduan_span_lapor
+                )
+              "
+            >
+              Lihat Semua Status
+            </BaseButton>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -283,7 +334,9 @@ export default {
   },
   data () {
     return {
-      dataStatusMilestone
+      dataStatusMilestone,
+      content:
+        'Terima Kasih atas laporan Pengaduannya. Terkait Dugaan galian C Ilegal diarea Cikarang Selatan dapat kami sampaikan sebagai berikut :\n1. Bahwa Perizinan Galian C bukan  penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi. (merupakan kewenangan Pemerintah Pusat yaitu Kementerian Energi dan \n    Sumber Daya Mineral)\n2. Kerusakan Infrastruktur jalan didalam kawasan Lippo Cikarang bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.\n3. Parkiran liar truk - truk tanah tersebut mengganggu lalu lalang kendaraan logistik ke kawasan industri. Bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.'
     }
   },
   methods: {
@@ -398,7 +451,17 @@ export default {
 
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
+    },
+    setLogSpanLapor (logSpan, idAduanSpanLapor) {
+      this.$store.commit('setLogSpan', logSpan)
+      this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
     }
   }
 }
 </script>
+
+<style scoped>
+.log-span {
+  white-space: pre-wrap;
+}
+</style>
