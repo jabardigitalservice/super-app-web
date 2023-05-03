@@ -9,19 +9,12 @@
         <ImageLoudSpeaker />
       </div>
       <div>
-        <span class="font-medium text-gray-900 dark:text-dark-text-high">Aduan Tidak Ditemukan!</span>
+        <span class="font-medium text-gray-900 dark:text-dark-text-medium font-lato">Aduan Tidak Ditemukan!</span>
       </div>
       <div class="flex flex-col mt-auto w-full gap-y-4">
         <NuxtLink to="/aduan-warga" class="w-full">
           <BaseButton
             class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 dark:border-0"
-          >
-            Cari Aduan
-          </BaseButton>
-        </NuxtLink>
-        <NuxtLink to="/aduan-warga/redirect-aduan" class="w-full">
-          <BaseButton
-            class="text-[12px] font-lato text-green-700 bg-white hover:bg-green-600 hover:text-white w-full !px-3 !py-2 dark:border-0"
           >
             Buat Aduan
           </BaseButton>
