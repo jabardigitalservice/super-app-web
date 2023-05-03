@@ -10,7 +10,7 @@
   >
     <div
       v-if="message"
-      class="py-[16px] px-[12px] font-lato bg-[#F9FBFC] border rounded-lg border-[#EFF1F3] dark:bg-dark-emphasis-medium"
+      class="py-[16px] px-[12px] font-lato bg-[#F9FBFC] border rounded-lg border-[#EFF1F3] dark:border-dark-emphasis-medium dark:bg-dark-emphasis-medium"
     >
       <div class="flex justify-start items-start">
         <BaseIconSvg

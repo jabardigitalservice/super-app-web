@@ -132,68 +132,68 @@ export default {
           id_aduan_span_lapor: '1231231',
           nama_kepala_pd: 'Bambang Tirtoyuliono',
           log_span_lapor: null
+        },
+        {
+          id_aduan: '5572530782204661889',
+          status_aduan: 'Dialihkan ke SP4N Lapor',
+          tanggal_aduan: '2023-04-14',
+          admin_monitoring_status_aduan: 'Tim Penentu Kewenangan',
+          tanggal_instruksi: null,
+          tanggal_deadline: null,
+          nama_instansi_penanggung_jawab: 'KOTA BANDUNG',
+          keterangan_status_aduan: 'kewenangan dishub kota bandung',
+          keterangan_tambahan: '',
+          tanggal_update: '2023-04-29T18:07:49.982573',
+          id_aduan_span_lapor: '',
+          nama_kepala_pd: '',
+          log_span_lapor: null
+        },
+        {
+          id_aduan: '5572530782204661889',
+          status_aduan: 'Dialihkan ke SP4N Lapor',
+          tanggal_aduan: '2023-04-14',
+          admin_monitoring_status_aduan: 'Tim Penentu Kewenangan',
+          tanggal_instruksi: null,
+          tanggal_deadline: null,
+          nama_instansi_penanggung_jawab: 'KOTA BANDUNG',
+          keterangan_status_aduan: 'kewenangan dishub kota bandung',
+          keterangan_tambahan: '',
+          tanggal_update: '2023-04-29T18:07:49.982573',
+          id_aduan_span_lapor: '6340753',
+          nama_kepala_pd: '',
+          log_span_lapor: {
+            id: '6340753',
+            status: 'Ditutup oleh Sistem',
+            date: 'Sabtu, 11 Februari 2023, 01:16',
+            log: [
+              {
+                date: 'Rabu, 22 Februari 2023, 11:13',
+                keterangan:
+                  'Laporan didisposisikan ke Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bekasi oleh Pemerintah Kabupaten Bekasi'
+              },
+              {
+                date: 'Kamis, 23 Februari 2023, 10:44',
+                keterangan:
+                  'Yth. Pelapor, \n\nTerima kasih atas laporan Anda. Terkait hal tersebut akan kami sampaikan ke unit yang bersangkutan dan akan segera kami tindaklanjuti sesuai batas waktu tindaklanjut di SP4N LAPOR!'
+              },
+              {
+                date: 'Kamis, 23 Februari 2023, 11:11',
+                keterangan:
+                  'Terima Kasih atas laporan Pengaduannya. Terkait Dugaan galian C Ilegal diarea Cikarang Selatan dapat kami sampaikan sebagai berikut :\n1. Bahwa Perizinan Galian C bukan  penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi. (merupakan kewenangan Pemerintah Pusat yaitu Kementerian Energi dan \n    Sumber Daya Mineral)\n2. Kerusakan Infrastruktur jalan didalam kawasan Lippo Cikarang bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.\n3. Parkiran liar truk - truk tanah tersebut mengganggu lalu lalang kendaraan logistik ke kawasan industri. Bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.'
+              },
+              {
+                date: 'Kamis, 23 Februari 2023, 16:41',
+                keterangan:
+                  'Yang kami sampaikan adalah, meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
+              },
+              {
+                date: 'Senin, 27 Februari 2023, 19:20',
+                keterangan:
+                  'Terima kasih atas tanggapannya. \n\nTanggapan kami (sebagaimana telah kami konsultasikan dengan APKASI, sebagai salah satu organ pendorong revisi pendelegasian wewenang pertambangan): meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
+              }
+            ]
+          }
         }
-        // {
-        //   id_aduan: '5572530782204661889',
-        //   status_aduan: 'Dialihkan ke SP4N Lapor',
-        //   tanggal_aduan: '2023-04-14',
-        //   admin_monitoring_status_aduan: 'Tim Penentu Kewenangan',
-        //   tanggal_instruksi: null,
-        //   tanggal_deadline: null,
-        //   nama_instansi_penanggung_jawab: 'KOTA BANDUNG',
-        //   keterangan_status_aduan: 'kewenangan dishub kota bandung',
-        //   keterangan_tambahan: '',
-        //   tanggal_update: '2023-04-29T18:07:49.982573',
-        //   id_aduan_span_lapor: '',
-        //   nama_kepala_pd: '',
-        //   log_span_lapor: null
-        // },
-        // {
-        //   id_aduan: '5572530782204661889',
-        //   status_aduan: 'Dialihkan ke SP4N Lapor',
-        //   tanggal_aduan: '2023-04-14',
-        //   admin_monitoring_status_aduan: 'Tim Penentu Kewenangan',
-        //   tanggal_instruksi: null,
-        //   tanggal_deadline: null,
-        //   nama_instansi_penanggung_jawab: 'KOTA BANDUNG',
-        //   keterangan_status_aduan: 'kewenangan dishub kota bandung',
-        //   keterangan_tambahan: '',
-        //   tanggal_update: '2023-04-29T18:07:49.982573',
-        //   id_aduan_span_lapor: '6340753',
-        //   nama_kepala_pd: '',
-        //   log_span_lapor: {
-        //     id: '6340753',
-        //     status: 'Ditutup oleh Sistem',
-        //     date: 'Sabtu, 11 Februari 2023, 01:16',
-        //     log: [
-        //       {
-        //         date: 'Rabu, 22 Februari 2023, 11:13',
-        //         keterangan:
-        //           'Laporan didisposisikan ke Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kabupaten Bekasi oleh Pemerintah Kabupaten Bekasi'
-        //       },
-        //       {
-        //         date: 'Kamis, 23 Februari 2023, 10:44',
-        //         keterangan:
-        //           'Yth. Pelapor, \n\nTerima kasih atas laporan Anda. Terkait hal tersebut akan kami sampaikan ke unit yang bersangkutan dan akan segera kami tindaklanjuti sesuai batas waktu tindaklanjut di SP4N LAPOR!'
-        //       },
-        //       {
-        //         date: 'Kamis, 23 Februari 2023, 11:11',
-        //         keterangan:
-        //           'Terima Kasih atas laporan Pengaduannya. Terkait Dugaan galian C Ilegal diarea Cikarang Selatan dapat kami sampaikan sebagai berikut :\n1. Bahwa Perizinan Galian C bukan  penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi. (merupakan kewenangan Pemerintah Pusat yaitu Kementerian Energi dan \n    Sumber Daya Mineral)\n2. Kerusakan Infrastruktur jalan didalam kawasan Lippo Cikarang bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.\n3. Parkiran liar truk - truk tanah tersebut mengganggu lalu lalang kendaraan logistik ke kawasan industri. Bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.'
-        //       },
-        //       {
-        //         date: 'Kamis, 23 Februari 2023, 16:41',
-        //         keterangan:
-        //           'Yang kami sampaikan adalah, meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
-        //       },
-        //       {
-        //         date: 'Senin, 27 Februari 2023, 19:20',
-        //         keterangan:
-        //           'Terima kasih atas tanggapannya. \n\nTanggapan kami (sebagaimana telah kami konsultasikan dengan APKASI, sebagai salah satu organ pendorong revisi pendelegasian wewenang pertambangan): meskipun Pemkab tidak berwenang untuk mengeluarkan ijin untuk galian C, namun Pemkab berwenang untuk melakukan pengawasan maupun pengecekkan bahwa suatu galian memiliki ijin atau tidak.\n\nPerpres No. 55 tahun 2022 tentang Pendelegasian Pemberian Perizinan Berusaha di Bidang Pertambangan Mineral dan Batubara\n\nProses perizinan galian C dan tambang rakyat harus mendapatkan rekomendasi dari pemkab atau pemkot setempat sebelum izin dikeluarkan oleh pihak pemprov. Sedangkan pengawasannya dapat dilakukan oleh pemkab atau pemkot langsung.'
-        //       }
-        //     ]
-        //   }
-        // }
       ].reverse(),
       showDialog: false,
       loading: false

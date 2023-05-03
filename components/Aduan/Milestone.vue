@@ -300,7 +300,7 @@
 
           <div v-if="milestone.log_span_lapor.log.length > 2" class="w-full">
             <BaseButton
-              class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0"
+              class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
               @click="
                 setLogSpanLapor(
                   milestone.log_span_lapor.log,
