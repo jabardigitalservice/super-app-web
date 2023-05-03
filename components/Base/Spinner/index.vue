@@ -10,7 +10,7 @@ export default {
   props: {
     showSpinner: {
       type: Boolean,
-      default: false
+      default: true
     }
   }
 }

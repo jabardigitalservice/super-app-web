@@ -33,19 +33,9 @@ import Milestone from '~/components/Aduan/Milestone.vue'
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
-  data () {
-    return {
-      data: [],
-      token: '',
-      idSpanLaporIsExists: false,
-      showDialog: false,
-      loading: false
-    }
-  },
-  async fetch () {
-    this.loading = true
+  async asyncData ({ $axios, $newrelicSetup, params, redirect }) {
     try {
-      const response = await this.$axios.post(
+      const response = await $axios.post(
         'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/login',
         {
           username: 'jsa_aduan_api',
@@ -53,14 +43,47 @@ export default {
         }
       )
 
-      this.token = response.data.access_token
-      if (this.token) {
-        this.getDataAduanById()
+      const token = response.data.access_token
+
+      if (token) {
+        const dataResponse = await $axios.post(
+          'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/id_aduan',
+          {
+            id_aduan: params.id
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        // console.log(dataResponse.data)
+
+        if (dataResponse.data.length > 0) {
+          return {
+            loading: false,
+            token,
+            data: dataResponse.data
+          }
+        } else {
+          redirect(`/aduan-warga/not-found/${params.id}`)
+        }
       }
     } catch (error) {
-      this.$newrelicSetup.noticeError(error)
+      // silent error
+      $newrelicSetup.noticeError(error)
     }
   },
+  data () {
+    return {
+      data: [],
+      token: '',
+      idSpanLaporIsExists: false,
+      showDialog: false,
+      loading: true
+    }
+  },
+
   methods: {
     openDialog (idSpanLapor) {
       this.showDialog = true
@@ -71,27 +94,6 @@ export default {
     },
     goToCreateAduan () {
       this.$router.push('/aduan-warga/redirect-aduan')
-    },
-    async getDataAduanById () {
-      if (this.token) {
-        try {
-          const response = await this.$axios.post(
-            'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/id_aduan',
-            {
-              id_aduan: this.$route.params.id
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${this.token}`
-              }
-            }
-          )
-          this.data = response.data
-          this.loading = false
-        } catch (error) {
-          this.$newrelicSetup.noticeError(error)
-        }
-      }
     }
   }
 }
