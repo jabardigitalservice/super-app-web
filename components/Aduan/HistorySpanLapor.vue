@@ -3,29 +3,26 @@
     <div
       v-for="(log, index) in $store.state.logSpan"
       :key="index"
-      class="flex mt-3"
+      class="flex my-5"
     >
-      <div class="w-full">
+      <div class="w-full flex flex-col">
         <CardLogSpan>
-          <div class="font-lato flex justify-start text-[12px] mt-1 ml-2">
+          <div class="font-lato flex justify-start mt-1 ml-2">
             <BaseIconSvg
               icon="/icon/calender.svg"
               class="!shadow-lg !w-[14px] !h-[14px]"
               :fill-color="'#9E9E9E'"
             />
             <span
-              class="text-gray-500 mb-1 text-[11px] dark:text-dark-text-low ml-2"
+              class="text-gray-800 mb-1 text-xs dark:text-dark-text-low ml-2"
             >{{ log.date }}</span>
           </div>
-          <!-- <TextMilestone class="flex justify-start">
-
-            <div>
-              <span
-                class="log-span font-medium text-gray-900 dark:text-dark-text-high"
-              >{{ log.keterangan }}</span>
-            </div>
-          </TextMilestone> -->
         </CardLogSpan>
+        <div class="font-lato mt-3 ml-8 bg-white dark:bg-black">
+          <span
+            class="log-span text-sm text-gray-800 dark:text-dark-text-high"
+          >{{ log.keterangan }}</span>
+        </div>
       </div>
     </div>
   </div>
