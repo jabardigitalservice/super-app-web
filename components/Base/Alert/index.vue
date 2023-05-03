@@ -10,7 +10,7 @@
   >
     <div
       v-if="message"
-      class="py-[16px] px-[12px] font-lato text-gray-800 bg-[#F9FBFC] border rounded-lg border-[#EFF1F3]"
+      class="py-[16px] px-[12px] font-lato bg-[#F9FBFC] border rounded-lg border-[#EFF1F3] dark:bg-dark-emphasis-medium"
     >
       <div class="flex justify-start items-start">
         <BaseIconSvg
@@ -19,7 +19,9 @@
         />
 
         <div class="ml-[13px]">
-          <p class="text-[14px] text-gray-800 font-lato">
+          <p
+            class="text-[14px] text-gray-800 font-lato dark:text-dark-text-medium"
+          >
             {{ message }}
           </p>
         </div>
