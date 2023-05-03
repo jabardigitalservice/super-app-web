@@ -3,6 +3,7 @@
     class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
   >
     <div class="p-4">
+      <BaseSpinner :show-spinner="loading" />
       <Milestone :data-milestone="data" @open-dialog="openDialog" />
     </div>
 
@@ -194,10 +195,12 @@ export default {
           }
         }
       ].reverse(),
-      showDialog: false
+      showDialog: false,
+      loading: false
     }
   },
   async fetch () {
+    this.loading = true
     try {
       const response = await this.$axios.post(
         'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/login',
@@ -212,6 +215,7 @@ export default {
         this.getDataAduanById()
       }
     } catch (error) {
+      this.$newrelicSetup.noticeError(error)
       this.data = this.dataDummy
     }
   },
@@ -241,7 +245,9 @@ export default {
             }
           )
           this.data = response.data
+          this.loading = false
         } catch (error) {
+          this.$newrelicSetup.noticeError(error)
           // console.log(error)
         }
       }

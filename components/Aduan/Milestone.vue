@@ -180,7 +180,7 @@
         <CardMilestone
           v-if="
             isditolakOrditindakLanjuti(milestone.status_aduan) &&
-              (milestone.keterangan_status_aduan || milestone.keterangan_tambahan)
+              milestone.keterangan_status_aduan
           "
           class="mt-2"
         >
@@ -212,7 +212,7 @@
             v-if="
               milestone.status_aduan ===
                 dataStatusMilestone.ditindakLanjuti.status &&
-                milestone.keterangan_tambahan
+                milestone.keterangan_status_aduan
             "
           >
             <span
@@ -222,7 +222,7 @@
                   : 'text-gray-600 dark:text-dark-text-low '
               "
             >
-              Tanggapan</span>
+              Keterangan</span>
 
             <span
               :class="
@@ -230,7 +230,7 @@
                   ? 'text-gray-500 dark:text-dark-text-low'
                   : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
-            >{{ milestone.keterangan_tambahan }}</span>
+            >{{ milestone.keterangan_status_aduan }}</span>
           </AduanTextMilestone>
         </CardMilestone>
 
@@ -334,9 +334,7 @@ export default {
   },
   data () {
     return {
-      dataStatusMilestone,
-      content:
-        'Terima Kasih atas laporan Pengaduannya. Terkait Dugaan galian C Ilegal diarea Cikarang Selatan dapat kami sampaikan sebagai berikut :\n1. Bahwa Perizinan Galian C bukan  penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi. (merupakan kewenangan Pemerintah Pusat yaitu Kementerian Energi dan \n    Sumber Daya Mineral)\n2. Kerusakan Infrastruktur jalan didalam kawasan Lippo Cikarang bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.\n3. Parkiran liar truk - truk tanah tersebut mengganggu lalu lalang kendaraan logistik ke kawasan industri. Bukan penguasaan/Wewenang  Dinas Penanaman Modal dan Pelayanan Perizinan Terpadu Satu Pintu Kabupaten Bekasi.'
+      dataStatusMilestone
     }
   },
   methods: {
@@ -448,7 +446,6 @@ export default {
         status === dataStatusMilestone.dialihkan.status && idAduanSpanLapor
       )
     },
-
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
     },
