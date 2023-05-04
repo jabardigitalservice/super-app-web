@@ -61,7 +61,6 @@ export default {
       errorCheck: false,
       idAduan: '',
       errorMessage: '',
-      token: '',
       data: [],
       idAduanNotFound: false
     }

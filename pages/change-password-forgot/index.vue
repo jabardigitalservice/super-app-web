@@ -68,7 +68,6 @@ export default {
           this.email = data?.email
           this.display = 'success'
         } catch (error) {
-          this.$newrelicSetup.noticeError(error)
           this.display = 'form'
         }
       }
