@@ -36,9 +36,11 @@
           @click="onClickCheck"
         >
           {{
-            errorMessage && errorCheck
+            errorMessage && errorCheck && !idAduanNotFound
               ? "ID Aduan harus diisi"
-              : "Cek Status Aduan"
+              : errorMessage && errorCheck && idAduanNotFound
+                ? "ID Aduan tidak ditemukan"
+                : "Cek Status Aduan"
           }}
         </BaseButton>
       </div>
@@ -68,12 +70,20 @@ export default {
   methods: {
     onClickCheck () {
       if (this.idAduan) {
-        this.errorMessage = ''
-        this.errorCheck = false
-        this.fetchData()
+        if (this.idAduanNotFound) {
+          this.errorCheck = false
+          this.idAduan = ''
+          this.errorMessage = ''
+          this.idAduanNotFound = false
+        } else {
+          this.errorMessage = ''
+          this.errorCheck = false
+          this.fetchData()
+        }
       } else {
         this.errorMessage = this.errorMessage ? '' : 'OK'
         this.errorCheck = !this.errorCheck
+        this.idAduanNotFound = false
       }
     },
     async fetchData () {
@@ -90,8 +100,11 @@ export default {
         if (this.data) {
           this.$store.commit('setDataAduan', this.data)
           this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
+          this.idAduanNotFound = false
         } else {
           this.idAduanNotFound = true
+          this.errorMessage = this.errorMessage ? '' : 'OK'
+          this.errorCheck = !this.errorCheck
         }
       } catch (error) {
         this.$newrelicSetup.noticeError(error)
@@ -99,6 +112,7 @@ export default {
 
       this.loading = false
     }
+
   }
 }
 </script>
