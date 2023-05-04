@@ -27,11 +27,13 @@
 
         <BaseButton
           class="text-sm text-white mb-2 dark:border-0"
-          :class="
+          :class="[
             errorCheck
               ? 'bg-red-400 hover:bg-red-600'
-              : 'bg-green-700 hover:bg-green-600'
-          "
+              : 'bg-green-700 hover:bg-green-600',
+            isLoading ? 'animate-pulse ' : '',
+          ]"
+          :disabled="isLoading"
           :error-button-message="errorMessage"
           @click="onClickCheck"
         >
@@ -64,7 +66,8 @@ export default {
       idAduan: '',
       errorMessage: '',
       data: [],
-      idAduanNotFound: false
+      idAduanNotFound: false,
+      isLoading: false
     }
   },
   methods: {
@@ -87,8 +90,7 @@ export default {
       }
     },
     async fetchData () {
-      this.loading = true
-
+      this.isLoading = true
       try {
         this.data = await fetchAduanData(
           this.$aduanAPI,
@@ -110,9 +112,8 @@ export default {
         this.$newrelicSetup.noticeError(error)
       }
 
-      this.loading = false
+      this.isLoading = false
     }
-
   }
 }
 </script>
