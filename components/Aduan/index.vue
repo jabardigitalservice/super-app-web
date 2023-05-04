@@ -49,6 +49,7 @@
 <script>
 import ImageLoudSpeaker from '~/assets/images/loudspeaker.svg?inline'
 import IconLoudSpeaker from '~/assets/icon/loud-speaker.svg?inline'
+import { fetchAduanData } from '~/utils'
 export default {
   name: 'ComponentAduan',
   components: {
@@ -59,7 +60,10 @@ export default {
     return {
       errorCheck: false,
       idAduan: '',
-      errorMessage: ''
+      errorMessage: '',
+      token: '',
+      data: [],
+      idAduanNotFound: false
     }
   },
   methods: {
@@ -67,11 +71,34 @@ export default {
       if (this.idAduan) {
         this.errorMessage = ''
         this.errorCheck = false
-        this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
+        this.fetchData()
       } else {
         this.errorMessage = this.errorMessage ? '' : 'OK'
         this.errorCheck = !this.errorCheck
       }
+    },
+    async fetchData () {
+      this.loading = true
+
+      try {
+        this.data = await fetchAduanData(
+          this.$aduanAPI,
+          this.$newrelicSetup,
+          this.idAduan,
+          this.$config
+        )
+
+        if (this.data) {
+          this.$store.commit('setDataAduan', this.data)
+          this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
+        } else {
+          this.idAduanNotFound = true
+        }
+      } catch (error) {
+        this.$newrelicSetup.noticeError(error)
+      }
+
+      this.loading = false
     }
   }
 }
@@ -90,7 +117,6 @@ input[type="number"] {
 }
 
 label {
-  @apply dark:!text-dark-text-medium
+  @apply dark:!text-dark-text-medium;
 }
-
 </style>

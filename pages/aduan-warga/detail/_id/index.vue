@@ -4,7 +4,7 @@
   >
     <div class="p-4">
       <BaseSpinner :show-spinner="loading" />
-      <Milestone :data-milestone="data" @open-dialog="openDialog" />
+      <Milestone :data-milestone="dataAduan" @open-dialog="openDialog" />
     </div>
 
     <BaseBlurPopup :show-popup="showDialog" />
@@ -30,61 +30,44 @@
 
 <script>
 import Milestone from '~/components/Aduan/Milestone.vue'
+import { fetchAduanData } from '~/utils'
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
-  async asyncData ({ $axios, $newrelicSetup, params, redirect }) {
-    try {
-      const response = await $axios.post(
-        'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/login',
-        {
-          username: 'jsa_aduan_api',
-          password: 'fde92ef9514076'
-        }
-      )
-
-      const token = response.data.access_token
-
-      if (token) {
-        const dataResponse = await $axios.post(
-          'https://api.coredatajds.id/api-aduanjsa-tracking/aduan/id_aduan',
-          {
-            id_aduan: params.id
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
-        // console.log(dataResponse.data)
-
-        if (dataResponse.data.length > 0) {
-          return {
-            loading: false,
-            token,
-            data: dataResponse.data
-          }
-        } else {
-          redirect(`/aduan-warga/not-found/${params.id}`)
-        }
-      }
-    } catch (error) {
-      // silent error
-      $newrelicSetup.noticeError(error)
-    }
-  },
   data () {
     return {
-      data: [],
-      token: '',
       idSpanLaporIsExists: false,
       showDialog: false,
-      loading: true
+      loading: false
     }
   },
-
+  computed: {
+    dataAduan () {
+      return this.$store.state.dataAduan
+    }
+  },
+  created () {
+    if (this.$store.state.dataAduan.length === 0) {
+      this.loadData()
+    }
+  },
   methods: {
+    async loadData () {
+      this.loading = true
+      try {
+        const data = await fetchAduanData(
+          this.$aduanAPI,
+          this.$newrelicSetup,
+          this.$route.params.id,
+          this.$config
+        )
+        this.$store.commit('setDataAduan', data)
+        this.loading = false
+      } catch (error) {
+        this.loading = false
+        this.$newrelicSetup.noticeError(error)
+      }
+    },
     openDialog (idSpanLapor) {
       this.showDialog = true
       this.idSpanLaporIsExists = !!idSpanLapor

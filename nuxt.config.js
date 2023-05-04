@@ -35,7 +35,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/vue-gtag.js',
-    '~/plugins/newrelic-plugins.server.js'
+    '~/plugins/newrelic-plugins.server.js',
+    '~/plugins/aduan-api.js'
   ],
 
   render: {
@@ -89,6 +90,7 @@ export default {
     axios: {
       baseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT
     }
+
   },
 
   // Public runtime config
@@ -101,7 +103,8 @@ export default {
         environment: process.env.SENTRY_ENVIRONMENT
       }
     },
-    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID
+    googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
+    baseURLAduan: { url: process.env.BASE_URL_ADUAN, username: process.env.USERNAME_URL_ADUAN, password: process.env.PASSWORD_URL_ADUAN }
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

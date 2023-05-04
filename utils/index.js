@@ -9,3 +9,36 @@ export function formatDate (date, format) {
   }
   return '-'
 }
+
+export async function fetchAduanData ($aduanAPI, $newrelicSetup, idAduan, config) {
+  try {
+    const response = await $aduanAPI.post('/aduan/login', {
+      username: config.baseURLAduan.username,
+      password: config.baseURLAduan.password
+    })
+
+    const token = response.data.access_token
+
+    if (token) {
+      const dataResponse = await $aduanAPI.post(
+        '/aduan/id_aduan',
+        {
+          id_aduan: idAduan
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (dataResponse.data.length > 0) {
+        return dataResponse.data
+      }
+    }
+  } catch (error) {
+    $newrelicSetup.noticeError(error)
+  }
+
+  return null
+}
