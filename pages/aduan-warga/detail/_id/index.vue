@@ -41,6 +41,11 @@ export default {
       loading: false
     }
   },
+  head () {
+    return {
+      title: `Status Aduan - ID ${this.$route.params.id}`
+    }
+  },
   computed: {
     dataAduan () {
       return this.$store.state.dataAduan

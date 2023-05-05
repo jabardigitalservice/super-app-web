@@ -10,6 +10,11 @@
 import HistorySpanLapor from '~/components/Aduan/HistorySpanLapor.vue'
 export default {
   name: 'LogSpanLapor',
-  components: { HistorySpanLapor }
+  components: { HistorySpanLapor },
+  head () {
+    return {
+      title: `Status SP4N Lapor - ID ${this.$route.params.id}`
+    }
+  }
 }
 </script>
