@@ -101,6 +101,7 @@ export default {
 
         if (this.data) {
           this.$store.commit('setDataAduan', this.data)
+          this.$store.commit('setLogSpan', this.data?.log_span_lapor?.log?.reverse())
           this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
           this.idAduanNotFound = false
         } else {
