@@ -10,12 +10,22 @@
           class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
         >
           <BaseIconSvg
-            :icon="`/icon/${getStatusTextAndIcon(milestone.status_aduan).icon}`"
+            :icon="`/icon/${
+              getStatusTextAndIcon(
+                milestone.status_aduan,
+                milestone?.log_span_lapor?.status
+              ).icon
+            }`"
             class="!shadow-lg !w-[14px] !h-[14px]"
             :fill-color="
               index > 0
                 ? '#868C89'
-                : `${getStatusTextAndIcon(milestone.status_aduan).fillColor}`
+                : `${
+                  getStatusTextAndIcon(
+                    milestone.status_aduan,
+                    milestone?.log_span_lapor?.status
+                  ).fillColor
+                }`
             "
           />
         </div>
@@ -48,7 +58,7 @@
                     ? 'text-gray-500 dark:text-dark-text-low'
                     : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ milestone.log_span_lapor.id }}</span>
+              >{{ milestone.id_aduan_span_lapor }}</span>
             </div>
           </TextMilestone>
           <!-- text for status aduan -->
@@ -81,7 +91,8 @@
             >{{
               getHelperTextBeforeStatusAduan(
                 milestone.status_aduan,
-                milestone.id_aduan_span_lapor
+                milestone.id_aduan_span_lapor,
+                milestone?.log_span_lapor?.status
               )
             }}</span>
             <div>
@@ -96,7 +107,7 @@
                   milestone.status_aduan,
                   milestone.id_aduan_span_lapor
                 )
-                  ? milestone.log_span_lapor.status
+                  ? milestone?.log_span_lapor?.status
                   : getStatusTextAndIcon(milestone.status_aduan).status
               }}</span>
               <span
@@ -186,8 +197,10 @@
         >
           <TextMilestone
             v-if="
-              milestone.status_aduan === dataStatusMilestone.ditolak.status &&
+              showCatatanDitolak(
+                milestone.status_aduan,
                 milestone.keterangan_status_aduan
+              )
             "
           >
             <span
@@ -208,11 +221,12 @@
             >{{ milestone.keterangan_status_aduan }}</span>
           </TextMilestone>
 
-          <AduanTextMilestone
+          <TextMilestone
             v-if="
-              milestone.status_aduan ===
-                dataStatusMilestone.ditindakLanjuti.status &&
+              showKeteranganDitindakLanjuti(
+                milestone.status_aduan,
                 milestone.keterangan_status_aduan
+              )
             "
           >
             <span
@@ -231,14 +245,11 @@
                   : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
             >{{ milestone.keterangan_status_aduan }}</span>
-          </AduanTextMilestone>
+          </TextMilestone>
         </CardMilestone>
 
         <NuxtLink
-          v-if="
-            milestone.status_aduan === dataStatusMilestone.ditolak.status &&
-              index === 0
-          "
+          v-if="showButtonBuatAduanBaru(milestone.status_aduan) && index === 0"
           to="/aduan-warga/redirect-aduan"
           class="w-full"
         >
@@ -249,28 +260,19 @@
           </BaseButton>
         </NuxtLink>
 
-        <BaseButton
-          v-if="
-            milestone.status_aduan === dataStatusMilestone.selesai.status &&
-              index === 0
-          "
-          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-          @click="openDialog(milestone.id_aduan_span_lapor)"
-        >
-          Apakah penyelesaian ini membantu ?
-        </BaseButton>
-
         <!-- card milestone for log span lapor -->
         <template
           v-if="
             isSpanLapor(
               milestone.status_aduan,
               milestone.id_aduan_span_lapor
-            ) && milestone.log_span_lapor.log.length > 0
+            ) && milestone?.log_span_lapor?.log?.length > 0
           "
         >
           <div
-            v-for="(logSpan, indexLog) in milestone.log_span_lapor.log.reverse()"
+            v-for="(
+              logSpan, indexLog
+            ) in milestone?.log_span_lapor?.log.reverse()"
             :key="indexLog"
           >
             <CardMilestone v-if="indexLog < 2" class="mt-2">
@@ -298,12 +300,12 @@
             </CardMilestone>
           </div>
 
-          <div v-if="milestone.log_span_lapor.log.length > 2" class="w-full">
+          <div v-if="milestone?.log_span_lapor?.log?.length > 2" class="w-full">
             <BaseButton
               class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
               @click="
                 setLogSpanLapor(
-                  milestone.log_span_lapor.log,
+                  milestone?.log_span_lapor?.log,
                   milestone.id_aduan_span_lapor
                 )
               "
@@ -312,6 +314,20 @@
             </BaseButton>
           </div>
         </template>
+
+        <BaseButton
+          v-if="
+            isditutupOlehSpanOrSelesai(
+              milestone.status_aduan,
+              milestone?.log_span_lapor?.status,
+              index
+            )
+          "
+          class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+          @click="openDialog(milestone.id_aduan_span_lapor)"
+        >
+          Apakah penyelesaian ini membantu ?
+        </BaseButton>
       </div>
     </div>
   </div>
@@ -339,7 +355,7 @@ export default {
   },
   methods: {
     formatDate,
-    getStatusTextAndIcon (status) {
+    getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
           return {
@@ -391,11 +407,23 @@ export default {
             getNameStatus: dataStatusMilestone.ditutup.getNameStatus
           }
         case dataStatusMilestone.dialihkan.status:
-          return {
-            status: dataStatusMilestone.dialihkan.textStatus,
-            icon: dataStatusMilestone.dialihkan.icon,
-            fillColor: dataStatusMilestone.dialihkan.fillColor,
-            getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+          if (
+            typeof lastStatusSpan !== 'undefined' &&
+            lastStatusSpan.includes('Ditutup')
+          ) {
+            return {
+              status: dataStatusMilestone.dialihkan.textStatus,
+              icon: dataStatusMilestone.ditutup.icon,
+              fillColor: dataStatusMilestone.ditutup.fillColor,
+              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+            }
+          } else {
+            return {
+              status: dataStatusMilestone.dialihkan.textStatus,
+              icon: dataStatusMilestone.dialihkan.icon,
+              fillColor: dataStatusMilestone.dialihkan.fillColor,
+              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+            }
           }
         default:
           return {
@@ -415,13 +443,15 @@ export default {
           return 'Oleh'
       }
     },
-    getHelperTextBeforeStatusAduan (status, idAduanSpanLapor) {
+    getHelperTextBeforeStatusAduan (status, idAduanSpanLapor, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
           return 'Aduan Anda sedang'
         case dataStatusMilestone.dialihkan.status:
-          if (idAduanSpanLapor) {
+          if (idAduanSpanLapor && lastStatusSpan) {
             return 'Status Terakhir'
+          } else if (idAduanSpanLapor && !lastStatusSpan) {
+            return ''
           } else {
             return 'Aduan Anda telah'
           }
@@ -446,12 +476,32 @@ export default {
         status === dataStatusMilestone.dialihkan.status && idAduanSpanLapor
       )
     },
+    isditutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
+      return (
+        (status === dataStatusMilestone.selesai.status && index === 0) ||
+        (lastStatusSpan?.includes('Ditutup') &&
+          status === dataStatusMilestone.dialihkan.status &&
+          index === 0)
+      )
+    },
+    showCatatanDitolak (status, keterangan) {
+      return status === dataStatusMilestone.ditolak.status && keterangan
+    },
+    showKeteranganDitindakLanjuti (status, keterangan) {
+      return (
+        status === dataStatusMilestone.ditindakLanjuti.status && keterangan
+      )
+    },
+    showButtonBuatAduanBaru (status) {
+      return status === dataStatusMilestone.ditolak.status
+    },
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
     },
+
     setLogSpanLapor (logSpan, idAduanSpanLapor) {
-      this.$store.commit('setLogSpan', logSpan.reverse())
       this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
+      this.$store.commit('setLogSpan', logSpan.reverse())
     }
   }
 }
