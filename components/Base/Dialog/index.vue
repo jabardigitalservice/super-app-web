@@ -19,10 +19,10 @@
       </div>
 
       <div
-        class="bg-white rounded-tr-2xl rounded-tl-2xl overflow-y-auto max-h-[calc(100vh-64px-120px)] "
+        class="bg-white rounded-tr-2xl rounded-tl-2xl overflow-y-auto max-h-[calc(100vh-64px-120px)] dark:bg-dark-emphasis-medium"
       >
         <!-- HEADER -->
-        <div class="h-[50px] bg-white py-[16px] px-[24px] rounded-t-lg">
+        <div class="h-[50px] bg-white py-[16px] px-[24px] rounded-t-lg dark:bg-dark-emphasis-medium">
           <h1 class="font-roboto text-[16px] font-bold text-green-600">
             {{ title }}
           </h1>
@@ -30,7 +30,7 @@
 
         <!-- body -->
         <div class="px-[24px]">
-          <p class="font-lato text-size[14px] text-gray-800 mt-6 md:mt-8 mb-4">
+          <p class="font-lato text-size[14px] text-gray-800 mt-6 md:mt-8 mb-4 dark:text-dark-text-medium">
             <slot />
           </p>
 
@@ -42,15 +42,15 @@
         <div class="h-fit px-[24px] justify-center py-[16px]">
           <BaseButton
             v-if="labelButtonApprove"
-            class="border w-full bg-green-600 text-white rounded-lg text-[14px] font-lato"
+            class="border dark:border-none w-full bg-green-600 text-white rounded-lg text-[14px] font-lato"
             @click="submitHandle"
           >
             {{ labelButtonApprove }}
           </BaseButton>
           <BaseButton
             v-if="labelButtonReject"
-            class="w-full border-none bg-white text-green-700 text-[14px] font-lato mt-4"
-            @click="submitHandle"
+            class="w-full border-none bg-white text-green-700 text-[14px] font-lato mt-4 dark:bg-dark-emphasis-medium"
+            @click="submitReject"
           >
             {{ labelButtonReject }}
           </BaseButton>
@@ -95,6 +95,9 @@ export default {
     },
     submitHandle () {
       this.$emit('submit')
+    },
+    submitReject () {
+      this.$emit('reject')
     }
   }
 }

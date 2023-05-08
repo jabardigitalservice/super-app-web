@@ -18,7 +18,7 @@
     <div
       class="w-[360px] h-[314px] flex justify-center items-center rounded-lg bg-white"
     >
-      <h1 class="text-4xl font-bold">
+      <h1 class="text-4xl font-bold text-black">
         Redirect Page
       </h1>
     </div>

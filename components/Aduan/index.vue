@@ -27,18 +27,22 @@
 
         <BaseButton
           class="text-sm text-white mb-2 dark:border-0"
-          :class="
+          :class="[
             errorCheck
               ? 'bg-red-400 hover:bg-red-600'
-              : 'bg-green-700 hover:bg-green-600'
-          "
+              : 'bg-green-700 hover:bg-green-600',
+            isLoading ? 'animate-pulse ' : '',
+          ]"
+          :disabled="isLoading"
           :error-button-message="errorMessage"
           @click="onClickCheck"
         >
           {{
-            errorMessage && errorCheck
+            errorMessage && errorCheck && !idAduanNotFound
               ? "ID Aduan harus diisi"
-              : "Cek Status Aduan"
+              : errorMessage && errorCheck && idAduanNotFound
+                ? "ID Aduan tidak ditemukan"
+                : "Cek Status Aduan"
           }}
         </BaseButton>
       </div>
@@ -49,6 +53,7 @@
 <script>
 import ImageLoudSpeaker from '~/assets/images/loudspeaker.svg?inline'
 import IconLoudSpeaker from '~/assets/icon/loud-speaker.svg?inline'
+import { fetchAduanData } from '~/utils'
 export default {
   name: 'ComponentAduan',
   components: {
@@ -59,23 +64,56 @@ export default {
     return {
       errorCheck: false,
       idAduan: '',
-      errorMessage: ''
+      errorMessage: '',
+      data: [],
+      idAduanNotFound: false,
+      isLoading: false
     }
   },
   methods: {
     onClickCheck () {
       if (this.idAduan) {
-        this.errorMessage = ''
-        this.errorCheck = false
-
-        // todo: this just for test redirect to detail aduan warga, if API ready i fix it
-        if (this.idAduan === '123456') {
-          this.$router.push('/aduan-warga/detail')
+        if (this.idAduanNotFound) {
+          this.errorCheck = false
+          this.idAduan = ''
+          this.errorMessage = ''
+          this.idAduanNotFound = false
+        } else {
+          this.errorMessage = ''
+          this.errorCheck = false
+          this.fetchData()
         }
       } else {
         this.errorMessage = this.errorMessage ? '' : 'OK'
         this.errorCheck = !this.errorCheck
+        this.idAduanNotFound = false
       }
+    },
+    async fetchData () {
+      this.isLoading = true
+      try {
+        this.data = await fetchAduanData(
+          this.$aduanAPI,
+          this.$newrelicSetup,
+          this.idAduan,
+          this.$config
+        )
+
+        if (this.data) {
+          this.$store.commit('setDataAduan', this.data)
+          this.$store.commit('setLogSpan', this.data?.log_span_lapor?.log?.reverse())
+          this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
+          this.idAduanNotFound = false
+        } else {
+          this.idAduanNotFound = true
+          this.errorMessage = this.errorMessage ? '' : 'OK'
+          this.errorCheck = !this.errorCheck
+        }
+      } catch (error) {
+        this.$newrelicSetup.noticeError(error)
+      }
+
+      this.isLoading = false
     }
   }
 }
@@ -94,7 +132,6 @@ input[type="number"] {
 }
 
 label {
-  @apply dark:!text-dark-text-medium
+  @apply dark:!text-dark-text-medium;
 }
-
 </style>

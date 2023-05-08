@@ -2,7 +2,7 @@
   <div class="w-full">
     <div
       v-for="(milestone, index) in dataMilestone"
-      :key="milestone.status"
+      :key="index"
       class="flex mt-3"
     >
       <div class="flex flex-col items-center mr-4">
@@ -10,12 +10,22 @@
           class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
         >
           <BaseIconSvg
-            :icon="`/icon/${getStatusTextAndIcon(milestone.status).icon}`"
+            :icon="`/icon/${
+              getStatusTextAndIcon(
+                milestone.status_aduan,
+                milestone?.log_span_lapor?.status
+              ).icon
+            }`"
             class="!shadow-lg !w-[14px] !h-[14px]"
             :fill-color="
               index > 0
                 ? '#868C89'
-                : `${getStatusTextAndIcon(milestone.status).fillColor}`
+                : `${
+                  getStatusTextAndIcon(
+                    milestone.status_aduan,
+                    milestone?.log_span_lapor?.status
+                  ).fillColor
+                }`
             "
           />
         </div>
@@ -26,15 +36,52 @@
       </div>
       <div class="w-full">
         <CardMilestone>
+          <!-- text if id sp4n laporan is exist -->
+          <TextMilestone
+            v-if="
+              isSpanLapor(milestone.status_aduan, milestone.id_aduan_span_lapor)
+            "
+          >
+            <span
+              :class="
+                index > 0
+                  ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                  : 'text-gray-600 dark:text-dark-text-low '
+              "
+            >
+              ID Tracking SP4N LAPOR
+            </span>
+            <div>
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-semibold text-gray-900 dark:text-dark-text-high'
+                "
+              >{{ milestone.id_aduan_span_lapor }}</span>
+            </div>
+          </TextMilestone>
+          <!-- text for status aduan -->
           <TextMilestone>
             <span
+              v-if="
+                !isSpanLapor(
+                  milestone.status_aduan,
+                  milestone.id_aduan_span_lapor
+                )
+              "
               class="text-gray-500 mb-1 text-[11px]"
               :class="
                 index > 0
-                  ? 'text-gray-500 dark:text-dark-text-low dark:text-opacity-60'
-                  : 'text-gray-500 dark:text-dark-text-low'
+                  ? ' dark:text-dark-text-low dark:text-opacity-60'
+                  : ' dark:text-dark-text-low'
               "
-            >{{ milestone.date }} - {{ milestone.time }}</span>
+            >{{
+              formatDate(
+                milestone.tanggal_update,
+                "EEEE, dd MMMM yyyy - HH:mm"
+              )
+            }}</span>
             <span
               :class="
                 index > 0
@@ -42,40 +89,50 @@
                   : 'text-gray-600 dark:text-dark-text-low '
               "
             >{{
-              milestone.status === dataStatusMilestone.waiting.status
-                ? "Aduan Anda sedang"
-                : "Aduan Anda telah"
+              getHelperTextBeforeStatusAduan(
+                milestone.status_aduan,
+                milestone.id_aduan_span_lapor,
+                milestone?.log_span_lapor?.status
+              )
             }}</span>
             <div>
               <span
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ getStatusTextAndIcon(milestone.status).status }}</span>
+              >{{
+                isSpanLapor(
+                  milestone.status_aduan,
+                  milestone.id_aduan_span_lapor
+                )
+                  ? milestone?.log_span_lapor?.status
+                  : getStatusTextAndIcon(milestone.status_aduan).status
+              }}</span>
               <span
                 :class="
                   index > 0
                     ? 'text-gray-400 dark:text-dark-text-low'
                     : 'text-gray-800 dark:text-dark-text-low'
                 "
-              >{{
-                milestone.status === dataStatusMilestone.cordination.status
-                  ? "Ke"
-                  : "Oleh"
-              }}</span>
+              >{{ getHelperTextStatusAduan(milestone.status_aduan) }}</span>
               <span
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
-              >{{ milestone.name }}</span>
+              >{{
+                milestone[
+                  getStatusTextAndIcon(milestone.status_aduan).getNameStatus
+                ]
+              }}</span>
             </div>
           </TextMilestone>
 
-          <template v-if="isFollowUpOrDone(milestone.status)">
+          <!-- text for status ditindaklanjuti -->
+          <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
             <TextMilestone>
               <span
                 :class="
@@ -89,9 +146,9 @@
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'text-gray-800 dark:text-dark-text-high'
+                    : 'font-semibold text-gray-800 dark:text-dark-text-high'
                 "
-              >Asep Kumaha</span>
+              >{{ milestone.nama_kepala_pd }}</span>
             </TextMilestone>
 
             <TextMilestone>
@@ -108,9 +165,9 @@
                   :class="
                     index > 0
                       ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
+                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
                   "
-                >20 Des 2022</span>
+                >{{ milestone.tanggal_instruksi }}</span>
                 <span
                   :class="
                     index > 0
@@ -122,20 +179,29 @@
                   :class="
                     index > 0
                       ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-bold dark:font-medium text-gray-800 dark:text-dark-text-high'
+                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
                   "
-                >22 Des 2022</span>
+                >{{ milestone.tanggal_deadline }}</span>
               </div>
             </TextMilestone>
           </template>
         </CardMilestone>
 
+        <!-- card if catatan and tanggap is exist -->
         <CardMilestone
-          v-if="isRejectedOrFollowUp(milestone.status)"
+          v-if="
+            isditolakOrditindakLanjuti(milestone.status_aduan) &&
+              milestone.keterangan_status_aduan
+          "
           class="mt-2"
         >
           <TextMilestone
-            v-if="milestone.status === dataStatusMilestone.rejected.status"
+            v-if="
+              showCatatanDitolak(
+                milestone.status_aduan,
+                milestone.keterangan_status_aduan
+              )
+            "
           >
             <span
               :class="
@@ -150,13 +216,18 @@
               :class="
                 index > 0
                   ? 'text-gray-500 dark:text-dark-text-low'
-                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                  : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
-            >Foto Kurang jelas, dan lokasi detail belum dilengkapi</span>
+            >{{ milestone.keterangan_status_aduan }}</span>
           </TextMilestone>
 
           <TextMilestone
-            v-if="milestone.status === dataStatusMilestone.followUp.status"
+            v-if="
+              showKeteranganDitindakLanjuti(
+                milestone.status_aduan,
+                milestone.keterangan_status_aduan
+              )
+            "
           >
             <span
               :class="
@@ -165,23 +236,20 @@
                   : 'text-gray-600 dark:text-dark-text-low '
               "
             >
-              Tanggapan</span>
+              Keterangan</span>
 
             <span
               :class="
                 index > 0
                   ? 'text-gray-500 dark:text-dark-text-low'
-                  : 'font-bold dark:font-medium text-gray-900 dark:text-dark-text-high'
+                  : 'font-medium  text-gray-900 dark:text-dark-text-high'
               "
-            >Data diri kurang lengkap</span>
+            >{{ milestone.keterangan_status_aduan }}</span>
           </TextMilestone>
         </CardMilestone>
 
         <NuxtLink
-          v-if="
-            milestone.status === dataStatusMilestone.rejected.status &&
-              index === 0
-          "
+          v-if="showButtonBuatAduanBaru(milestone.status_aduan) && index === 0"
           to="/aduan-warga/redirect-aduan"
           class="w-full"
         >
@@ -192,17 +260,74 @@
           </BaseButton>
         </NuxtLink>
 
+        <!-- card milestone for log span lapor -->
+        <template
+          v-if="
+            isSpanLapor(
+              milestone.status_aduan,
+              milestone.id_aduan_span_lapor
+            ) && milestone?.log_span_lapor?.log?.length > 0
+          "
+        >
+          <div
+            v-for="(
+              logSpan, indexLog
+            ) in milestone?.log_span_lapor?.log?.reverse()"
+            :key="indexLog"
+          >
+            <CardMilestone v-if="indexLog < 2" class="mt-2">
+              <TextMilestone>
+                <span
+                  class="mb-1 text-[11px]"
+                  :class="
+                    indexLog > 0
+                      ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
+                      : 'text-gray-600 dark:text-dark-text-low'
+                  "
+                >{{ logSpan.date }}</span>
+
+                <div>
+                  <span
+                    class="log-span"
+                    :class="
+                      indexLog > 0
+                        ? 'text-gray-500 dark:text-dark-text-low'
+                        : 'font-medium text-gray-900 dark:text-dark-text-high'
+                    "
+                  >{{ logSpan.keterangan }}</span>
+                </div>
+              </TextMilestone>
+            </CardMilestone>
+          </div>
+
+          <div v-if="milestone?.log_span_lapor?.log?.length > 2" class="w-full">
+            <BaseButton
+              class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
+              @click="
+                setLogSpanLapor(
+                  milestone?.log_span_lapor?.log,
+                  milestone.id_aduan_span_lapor
+                )
+              "
+            >
+              Lihat Semua Status
+            </BaseButton>
+          </div>
+        </template>
+
         <BaseButton
           v-if="
-            milestone.status === dataStatusMilestone.done.status && index === 0
+            isditutupOlehSpanOrSelesai(
+              milestone.status_aduan,
+              milestone?.log_span_lapor?.status,
+              index
+            )
           "
           class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-          @click="openDialog"
+          @click="openDialog(milestone.id_aduan_span_lapor)"
         >
-          Apakah penyelesaian ini membantu?
+          Apakah penyelesaian ini membantu ?
         </BaseButton>
-
-        <!--  this dummy slicing, i want fixit if API ready -->
       </div>
     </div>
   </div>
@@ -212,6 +337,7 @@
 import CardMilestone from './CardMilestone.vue'
 import TextMilestone from './TextMilestone.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
+import { formatDate } from '~/utils'
 
 export default {
   name: 'MilestoneAduan',
@@ -228,49 +354,76 @@ export default {
     }
   },
   methods: {
-    getStatusTextAndIcon (status) {
+    formatDate,
+    getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
-        case dataStatusMilestone.waiting.status:
+        case dataStatusMilestone.menungguVerifikasi.status:
           return {
-            status: dataStatusMilestone.waiting.textStatus,
-            icon: dataStatusMilestone.waiting.icon,
-            fillColor: dataStatusMilestone.waiting.fillColor
+            status: dataStatusMilestone.menungguVerifikasi.textStatus,
+            icon: dataStatusMilestone.menungguVerifikasi.icon,
+            fillColor: dataStatusMilestone.menungguVerifikasi.fillColor,
+            getNameStatus: dataStatusMilestone.menungguVerifikasi.getNameStatus
           }
-        case dataStatusMilestone.rejected.status:
+        case dataStatusMilestone.ditolak.status:
           return {
-            status: dataStatusMilestone.rejected.textStatus,
-            icon: dataStatusMilestone.rejected.icon,
-            fillColor: dataStatusMilestone.rejected.fillColor
+            status: dataStatusMilestone.ditolak.textStatus,
+            icon: dataStatusMilestone.ditolak.icon,
+            fillColor: dataStatusMilestone.ditolak.fillColor,
+            getNameStatus: dataStatusMilestone.ditolak.getNameStatus
           }
-        case dataStatusMilestone.verification.status:
+        case dataStatusMilestone.terverifikasi.status:
           return {
-            status: dataStatusMilestone.verification.textStatus,
-            icon: dataStatusMilestone.verification.icon,
-            fillColor: dataStatusMilestone.verification.fillColor
+            status: dataStatusMilestone.terverifikasi.textStatus,
+            icon: dataStatusMilestone.terverifikasi.icon,
+            fillColor: dataStatusMilestone.terverifikasi.fillColor,
+            getNameStatus: dataStatusMilestone.terverifikasi.getNameStatus
           }
-        case dataStatusMilestone.cordination.status:
+        case dataStatusMilestone.dikoordinasikan.status:
           return {
-            status: dataStatusMilestone.cordination.textStatus,
-            icon: dataStatusMilestone.cordination.icon,
-            fillColor: dataStatusMilestone.cordination.fillColor
+            status: dataStatusMilestone.dikoordinasikan.textStatus,
+            icon: dataStatusMilestone.dikoordinasikan.icon,
+            fillColor: dataStatusMilestone.dikoordinasikan.fillColor,
+            getNameStatus: dataStatusMilestone.dikoordinasikan.getNameStatus
           }
-        case dataStatusMilestone.followUp.status:
+        case dataStatusMilestone.ditindakLanjuti.status:
           return {
-            status: dataStatusMilestone.followUp.textStatus,
-            icon: dataStatusMilestone.followUp.icon,
-            fillColor: dataStatusMilestone.followUp.fillColor
+            status: dataStatusMilestone.ditindakLanjuti.textStatus,
+            icon: dataStatusMilestone.ditindakLanjuti.icon,
+            fillColor: dataStatusMilestone.ditindakLanjuti.fillColor,
+            getNameStatus: dataStatusMilestone.ditindakLanjuti.getNameStatus
           }
-        case dataStatusMilestone.done.status:
+        case dataStatusMilestone.selesai.status:
           return {
-            status: dataStatusMilestone.done.textStatus,
-            icon: dataStatusMilestone.done.icon,
-            fillColor: dataStatusMilestone.done.fillColor
+            status: dataStatusMilestone.selesai.textStatus,
+            icon: dataStatusMilestone.selesai.icon,
+            fillColor: dataStatusMilestone.selesai.fillColor,
+            getNameStatus: dataStatusMilestone.selesai.getNameStatus
           }
-        case dataStatusMilestone.closed.status:
+        case dataStatusMilestone.ditutup.status:
           return {
-            status: dataStatusMilestone.closed.textStatus,
-            icon: dataStatusMilestone.closed.icon,
-            fillColor: dataStatusMilestone.closed.fillColor
+            status: dataStatusMilestone.ditutup.textStatus,
+            icon: dataStatusMilestone.ditutup.icon,
+            fillColor: dataStatusMilestone.ditutup.fillColor,
+            getNameStatus: dataStatusMilestone.ditutup.getNameStatus
+          }
+        case dataStatusMilestone.dialihkan.status:
+          if (
+            typeof lastStatusSpan !== 'undefined' &&
+            lastStatusSpan.includes('Ditutup')
+          ) {
+            return {
+              status: dataStatusMilestone.dialihkan.textStatus,
+              icon: dataStatusMilestone.ditutup.icon,
+              fillColor: dataStatusMilestone.ditutup.fillColor,
+              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+            }
+          } else {
+            return {
+              status: dataStatusMilestone.dialihkan.textStatus,
+              icon: dataStatusMilestone.dialihkan.icon,
+              fillColor: dataStatusMilestone.dialihkan.fillColor,
+              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+            }
           }
         default:
           return {
@@ -280,22 +433,81 @@ export default {
           }
       }
     },
-    isRejectedOrFollowUp (status) {
+    getHelperTextStatusAduan (status) {
+      switch (status) {
+        case dataStatusMilestone.dikoordinasikan.status:
+          return 'Ke'
+        case dataStatusMilestone.dialihkan.status:
+          return ''
+        default:
+          return 'Oleh'
+      }
+    },
+    getHelperTextBeforeStatusAduan (status, idAduanSpanLapor, lastStatusSpan) {
+      switch (status) {
+        case dataStatusMilestone.menungguVerifikasi.status:
+          return 'Aduan Anda sedang'
+        case dataStatusMilestone.dialihkan.status:
+          if (idAduanSpanLapor && lastStatusSpan) {
+            return 'Status Terakhir'
+          } else if (idAduanSpanLapor && !lastStatusSpan) {
+            return ''
+          } else {
+            return 'Aduan Anda telah'
+          }
+        default:
+          return 'Aduan Anda telah'
+      }
+    },
+    isditolakOrditindakLanjuti (status) {
       return (
-        status === dataStatusMilestone.rejected.status ||
-        status === dataStatusMilestone.followUp.status
+        status === dataStatusMilestone.ditolak.status ||
+        status === dataStatusMilestone.ditindakLanjuti.status
       )
     },
-    isFollowUpOrDone (status) {
+    isditindakLanjutiOrselesai (status) {
       return (
-        status === dataStatusMilestone.followUp.status ||
-        status === dataStatusMilestone.done.status
+        status === dataStatusMilestone.ditindakLanjuti.status ||
+        status === dataStatusMilestone.selesai.status
       )
+    },
+    isSpanLapor (status, idAduanSpanLapor) {
+      return (
+        status === dataStatusMilestone.dialihkan.status && idAduanSpanLapor
+      )
+    },
+    isditutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
+      return (
+        (status === dataStatusMilestone.selesai.status && index === 0) ||
+        (lastStatusSpan?.includes('Ditutup') &&
+          status === dataStatusMilestone.dialihkan.status &&
+          index === 0)
+      )
+    },
+    showCatatanDitolak (status, keterangan) {
+      return status === dataStatusMilestone.ditolak.status && keterangan
+    },
+    showKeteranganDitindakLanjuti (status, keterangan) {
+      return (
+        status === dataStatusMilestone.ditindakLanjuti.status && keterangan
+      )
+    },
+    showButtonBuatAduanBaru (status) {
+      return status === dataStatusMilestone.ditolak.status
+    },
+    openDialog (idSpanLapor) {
+      this.$emit('open-dialog', idSpanLapor)
     },
 
-    openDialog () {
-      this.$emit('open-dialog')
+    setLogSpanLapor (logSpan, idAduanSpanLapor) {
+      this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
     }
   }
 }
 </script>
+
+<style scoped>
+.log-span {
+  white-space: pre-wrap;
+}
+</style>
