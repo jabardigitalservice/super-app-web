@@ -261,18 +261,10 @@
         </NuxtLink>
 
         <!-- card milestone for log span lapor -->
-        <template
-          v-if="
-            isSpanLapor(
-              milestone.status_aduan,
-              milestone.id_aduan_span_lapor
-            ) && milestone?.log_span_lapor?.log?.length > 0
-          "
-        >
+
+        <div v-if="showLogSpanLapor(milestone)">
           <div
-            v-for="(
-              logSpan, indexLog
-            ) in milestone?.log_span_lapor?.log?.reverse()"
+            v-for="(logSpan, indexLog) in milestoneLogSpanLaporLogs(milestone)"
             :key="indexLog"
           >
             <CardMilestone v-if="indexLog < 2" class="mt-2">
@@ -286,12 +278,21 @@
                   "
                 >{{ logSpan.date }}</span>
 
+                <span
+                  class="mb-2 text-[11px]"
+                  :class="
+                    indexLog > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'text-gray-700 dark:text-dark-text-low'
+                  "
+                >{{ logSpan.responder }}</span>
+
                 <div>
                   <span
                     class="log-span"
                     :class="
                       indexLog > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
+                        ? 'text-gray-600 dark:text-dark-text-low'
                         : 'font-medium text-gray-900 dark:text-dark-text-high'
                     "
                   >{{ logSpan.keterangan }}</span>
@@ -313,7 +314,7 @@
               Lihat Semua Status
             </BaseButton>
           </div>
-        </template>
+        </div>
 
         <BaseButton
           v-if="
@@ -353,6 +354,7 @@ export default {
       dataStatusMilestone
     }
   },
+
   methods: {
     formatDate,
     getStatusTextAndIcon (status, lastStatusSpan) {
@@ -500,7 +502,22 @@ export default {
     },
 
     setLogSpanLapor (logSpan, idAduanSpanLapor) {
+      this.$store.commit('setLogSpan', logSpan?.reverse())
       this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
+    },
+    showLogSpanLapor (milestone) {
+      if (milestone) {
+        const statusAduan = milestone.status_aduan
+        const idAduanSpan = milestone.id_aduan_span_lapor
+        const logSpanLapor = milestone?.log_span_lapor?.log
+        return (
+          this.isSpanLapor(statusAduan, idAduanSpan) && logSpanLapor?.length > 0
+        )
+      }
+      return false
+    },
+    milestoneLogSpanLaporLogs (milestone) {
+      return milestone?.log_span_lapor?.log?.reverse() || []
     }
   }
 }
