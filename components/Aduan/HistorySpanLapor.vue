@@ -18,9 +18,16 @@
             >{{ log.date }}</span>
           </div>
         </CardLogSpan>
-        <div class="font-lato mt-3 ml-8 bg-white dark:bg-black">
+        <div class="font-lato mt-3 ml-8 bg-white dark:bg-black flex flex-col">
+          <span class="text-sm mb-3 text-gray-800 dark:text-dark-text-high">{{
+            log.responder
+          }}</span>
+
+          <span class="text-sm mb-2 text-gray-600 dark:text-dark-text-high">
+            Keterangan
+          </span>
           <span
-            class="log-span text-sm text-gray-800 dark:text-dark-text-high"
+            class="log-span text-sm text-gray-900 dark:text-dark-text-high"
           >{{ log.keterangan }}</span>
         </div>
       </div>

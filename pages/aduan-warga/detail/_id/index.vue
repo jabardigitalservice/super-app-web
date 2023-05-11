@@ -34,47 +34,44 @@ import { fetchAduanData } from '~/utils'
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
+  async asyncData ({ $aduanAPI, $newrelicSetup, params, $config }) {
+    let loading = true
+    let dataAduan = []
+
+    try {
+      const data = await fetchAduanData(
+        $aduanAPI,
+        $newrelicSetup,
+        params.id,
+        $config
+      )
+
+      dataAduan = data
+      loading = false
+    } catch (error) {
+      $newrelicSetup.noticeError(error)
+
+      loading = false
+    }
+
+    return {
+      loading,
+      dataAduan
+    }
+  },
   data () {
     return {
       idSpanLaporIsExists: false,
-      showDialog: false,
-      loading: false
+      showDialog: false
     }
   },
+
   head () {
     return {
       title: `Status Aduan - ID ${this.$route.params.id}`
     }
   },
-  computed: {
-    dataAduan () {
-      return this.$store.state.dataAduan
-    }
-  },
-  created () {
-    if (this.$store.state.dataAduan.length === 0) {
-      this.loadData()
-    }
-  },
   methods: {
-    async loadData () {
-      this.loading = true
-      try {
-        const data = await fetchAduanData(
-          this.$aduanAPI,
-          this.$newrelicSetup,
-          this.$route.params.id,
-          this.$config
-        )
-        this.$store.commit('setDataAduan', data)
-        this.$store.commit('setLogSpan', data?.log_span_lapor?.log?.reverse())
-
-        this.loading = false
-      } catch (error) {
-        this.loading = false
-        this.$newrelicSetup.noticeError(error)
-      }
-    },
     openDialog (idSpanLapor) {
       this.showDialog = true
       this.idSpanLaporIsExists = !!idSpanLapor

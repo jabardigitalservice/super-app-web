@@ -1,15 +1,11 @@
 export const state = () => ({
 
-  logSpan: [],
-  dataAduan: []
+  logSpan: []
 })
 
 export const mutations = {
   setLogSpan (state, logSpan) {
     state.logSpan = logSpan
-  },
-  setDataAduan (state, dataAduan) {
-    state.dataAduan = dataAduan
   }
 
 }
