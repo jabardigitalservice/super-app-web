@@ -264,7 +264,7 @@
 
         <div v-if="showLogSpanLapor(milestone)">
           <div
-            v-for="(logSpan, indexLog) in milestoneLogSpanLaporLogs(milestone)"
+            v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
             :key="indexLog"
           >
             <CardMilestone v-if="indexLog < 2" class="mt-2">
@@ -505,6 +505,12 @@ export default {
       this.$store.commit('setLogSpan', logSpan?.reverse())
       this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
     },
+    getLogSpanLaporLogs (milestone) {
+      if (milestone && milestone.log_span_lapor && milestone.log_span_lapor.log) {
+        return milestone.log_span_lapor.log.slice().reverse()
+      }
+      return []
+    },
     showLogSpanLapor (milestone) {
       if (milestone) {
         const statusAduan = milestone.status_aduan
@@ -515,9 +521,6 @@ export default {
         )
       }
       return false
-    },
-    milestoneLogSpanLaporLogs (milestone) {
-      return milestone?.log_span_lapor?.log?.reverse() || []
     }
   }
 }
