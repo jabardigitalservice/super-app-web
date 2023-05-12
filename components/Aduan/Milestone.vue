@@ -37,11 +37,7 @@
       <div class="w-full">
         <CardMilestone>
           <!-- text if id sp4n laporan is exist -->
-          <TextMilestone
-            v-if="
-              isSpanLapor(milestone.status_aduan, milestone.id_aduan_span_lapor)
-            "
-          >
+          <TextMilestone v-if="isSpanLapor(milestone)">
             <span
               :class="
                 index > 0
@@ -64,12 +60,7 @@
           <!-- text for status aduan -->
           <TextMilestone>
             <span
-              v-if="
-                !isSpanLapor(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor
-                )
-              "
+              v-if="!isSpanLapor(milestone)"
               class="text-gray-500 mb-1 text-[11px]"
               :class="
                 index > 0
@@ -103,10 +94,7 @@
                     : 'font-semibold text-gray-900 dark:text-dark-text-high'
                 "
               >{{
-                isSpanLapor(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor
-                )
+                isSpanLapor(milestone)
                   ? milestone?.log_span_lapor?.status
                   : getStatusTextAndIcon(milestone.status_aduan).status
               }}</span>
@@ -473,9 +461,11 @@ export default {
         status === dataStatusMilestone.selesai.status
       )
     },
-    isSpanLapor (status, idAduanSpanLapor) {
+    isSpanLapor (milestone) {
       return (
-        status === dataStatusMilestone.dialihkan.status && idAduanSpanLapor
+        milestone.status_aduan === dataStatusMilestone.dialihkan.status &&
+        milestone.id_aduan_span_lapor &&
+        milestone?.log_span_lapor?.status
       )
     },
     isditutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
@@ -506,19 +496,19 @@ export default {
       this.$router.push(`/aduan-warga/log-span-lapor/${idAduanSpanLapor}`)
     },
     getLogSpanLaporLogs (milestone) {
-      if (milestone && milestone.log_span_lapor && milestone.log_span_lapor.log) {
+      if (
+        milestone &&
+        milestone.log_span_lapor &&
+        milestone.log_span_lapor.log
+      ) {
         return milestone.log_span_lapor.log.slice().reverse()
       }
       return []
     },
     showLogSpanLapor (milestone) {
       if (milestone) {
-        const statusAduan = milestone.status_aduan
-        const idAduanSpan = milestone.id_aduan_span_lapor
         const logSpanLapor = milestone?.log_span_lapor?.log
-        return (
-          this.isSpanLapor(statusAduan, idAduanSpan) && logSpanLapor?.length > 0
-        )
+        return this.isSpanLapor(milestone) && logSpanLapor?.length > 0
       }
       return false
     }
