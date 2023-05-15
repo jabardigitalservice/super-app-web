@@ -578,8 +578,6 @@ export default {
       switch (status) {
         case dataStatusMilestone.dikoordinasikan.status:
           return 'Ke'
-        case dataStatusMilestone.dialihkan.status:
-          return ''
         default:
           return 'Oleh'
       }
