@@ -52,6 +52,7 @@ export const dataStatusMilestone = Object.freeze({
     status: 'Dialihkan ke SP4N Lapor',
     textStatus: 'Dialihkan ke SP4N Lapor',
     icon: 'cordination.svg',
-    fillColor: '#1E88E5'
+    fillColor: '#1E88E5',
+    getNameStatus: 'admin_monitoring_status_aduan'
   }
 })
