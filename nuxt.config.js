@@ -36,7 +36,9 @@ export default {
   plugins: [
     '~/plugins/vue-gtag.js',
     '~/plugins/newrelic-plugins.server.js',
-    '~/plugins/aduan-api.js'
+    '~/plugins/aduan-api.js',
+    { src: '~/plugins/dark-mode.js', mode: 'client' }
+
   ],
 
   render: {
