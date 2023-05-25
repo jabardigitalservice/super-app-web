@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
+
 ARG API_KEY
 ARG SENTRY_DSN
 ARG SENTRY_SAMPLE_RATE
