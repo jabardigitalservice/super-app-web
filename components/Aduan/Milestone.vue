@@ -221,9 +221,12 @@
                       : 'font-semibold text-gray-900 dark:text-dark-text-high'
                   "
                 >{{
-                  milestone[
-                    getStatusTextAndIcon(milestone.status_aduan).getNameStatus
-                  ]
+                  changeNameStatusByUser(
+                    milestone[
+                      getStatusTextAndIcon(milestone.status_aduan)
+                        .getNameStatus
+                    ]
+                  )
                 }}</span>
               </div>
             </TextMilestone>
@@ -316,9 +319,12 @@
                       : 'font-semibold text-gray-900 dark:text-dark-text-high'
                   "
                 >{{
-                  milestone[
-                    getStatusTextAndIcon(milestone.status_aduan).getNameStatus
-                  ]
+                  changeNameStatusByUser(
+                    milestone[
+                      getStatusTextAndIcon(milestone.status_aduan)
+                        .getNameStatus
+                    ]
+                  )
                 }}</span>
               </div>
             </TextMilestone>
@@ -580,6 +586,16 @@ export default {
           return 'Ke'
         default:
           return 'Oleh'
+      }
+    },
+    changeNameStatusByUser (name) {
+      switch (name) {
+        case 'Sistem':
+          return 'Admin'
+        case 'Tim Penentu Kewenangan':
+          return 'Dinas Terkait'
+        default:
+          return name
       }
     },
     getHelperTextBeforeStatusAduan (status, idAduanSpanLapor, lastStatusSpan) {
