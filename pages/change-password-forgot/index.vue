@@ -21,12 +21,7 @@
       </div>
       <ResetPassword v-if="display === 'form'" @on-click-save="savePassword" />
       <ResetPasswordLoading v-else-if="display === 'loading'" />
-      <ResetPasswordSuccess v-else-if="display === 'success'" :email="email" />
-      <ResetPasswordErrorLink
-        v-else-if="display === 'error'"
-        :email="email"
-        :error-message="messageErrorPage"
-      />
+      <ResetPasswordAlert v-else-if="display === 'alert'" :email="email" :type-display-alert-change-password="typeDisplayAlertChangePassword" :error-message="messageErrorPage" />
     </div>
   </div>
 </template>
@@ -43,6 +38,7 @@ export default {
       display: 'form',
       email: '',
       messageErrorPage: '',
+      typeDisplayAlertChangePassword: '',
       errorResponseMessage: {
         4010100: 'Link lupa password ini sudah pernah digunakan',
         4010101: 'Link lupa password ini sudah kedaluwarsa'
@@ -79,11 +75,13 @@ export default {
           )
           const { data } = response.data
           this.email = data?.email
-          this.display = 'success'
+          this.typeDisplayAlertChangePassword = 'success'
           this.messageErrorPage = ''
+          this.display = 'alert'
         } catch (error) {
           this.messageErrorPage = this.errorResponseMessage[error.response.data?.code] || 'Perubahaan password gagal dilakukan'
-          this.display = 'error'
+          this.typeDisplayAlertChangePassword = 'error'
+          this.display = 'alert'
         }
       }
     }
