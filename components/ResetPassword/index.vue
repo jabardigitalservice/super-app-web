@@ -48,14 +48,6 @@
         >
           Simpan Perubahan
         </BaseButton>
-        <BaseSnackBar class="bottom-0" :show-popup="true">
-          <template #snackbar-button-right>
-            <div class="flex justify-between">
-              <p> tautan tidak berlaku.</p>
-              <button>OK</button>
-            </div>
-          </template>
-        </BaseSnackBar>
       </div>
     </div>
   </div>
