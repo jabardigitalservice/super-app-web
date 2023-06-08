@@ -80,6 +80,7 @@ export default {
           const { data } = response.data
           this.email = data?.email
           this.display = 'success'
+          this.messageErrorPage = ''
         } catch (error) {
           this.messageErrorPage = this.errorResponseMessage[error.response.data?.code] || 'Perubahaan password gagal dilakukan'
           this.display = 'error'
