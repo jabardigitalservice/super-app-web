@@ -3,20 +3,23 @@
     <div class="flex justify-between items-center w-full">
       <label
         :class="{
-          'text-gray-800 font-roboto text-sm dark:text-dark-text-high' : true,
-          'text-red-700 dark:text-dark-text-error' : error || errorMessage,
+          'text-gray-800 font-roboto text-sm dark:text-dark-text-high': true,
+          'text-red-700 dark:text-dark-text-error': error || errorMessage,
         }"
         :for="label"
       >
         {{ label }}
       </label>
-      <div v-if="isShowPasswordLevel && levelPassword" class="w-1/3 flex items-center">
+      <div
+        v-if="isShowPasswordLevel && levelPassword"
+        class="w-1/3 flex items-center"
+      >
         <div
           :class="{
-            'text-xs mr-2' : true,
-            'text-red-500' : levelPassword === 'Lemah',
-            'text-yellow-600' : levelPassword === 'Sedang',
-            'text-green-500' : levelPassword === 'Kuat'
+            'text-xs mr-2': true,
+            'text-red-500': levelPassword === 'Lemah',
+            'text-yellow-600': levelPassword === 'Sedang',
+            'text-green-500': levelPassword === 'Kuat',
           }"
         >
           {{ levelPassword }}
@@ -24,10 +27,10 @@
         <div class="w-full bg-gray-200 h-2 rounded-md">
           <div
             :class="{
-              'h-2 rounded-md' : true,
-              'w-1/3 bg-red-500' : levelPassword === 'Lemah',
-              'w-2/3 bg-yellow-600' : levelPassword === 'Sedang',
-              'w-full bg-green-500' : levelPassword === 'Kuat'
+              'h-2 rounded-md': true,
+              'w-1/3 bg-red-500': levelPassword === 'Lemah',
+              'w-2/3 bg-yellow-600': levelPassword === 'Sedang',
+              'w-full bg-green-500': levelPassword === 'Kuat',
             }"
           />
         </div>
@@ -37,7 +40,7 @@
       :class="{
         'flex justify-between items-center w-full h-9 rounded-lg bg-gray-100 border border-gray-400 overflow-hidden': true,
         'border-green-700': isFocused,
-        'border-red-700 dark:border-dark-text-error': error
+        'border-red-700 dark:border-dark-text-error': error,
       }"
     >
       <div
@@ -55,6 +58,7 @@
         :value="value"
         :autofocus="autofocus"
         autocomplete="on"
+        :disabled="disabled"
         @focus="isFocused = true"
         @blur="isFocused = false"
         @input="onInput"
@@ -66,23 +70,26 @@
         <IconEyeOn
           v-if="!$slots['icon-right'] && iconEye === 'eye'"
           :class="{
-            'cursor-pointer stroke-gray-800' : true,
-            'stroke-green-800' : isTyped || isFocused
+            'cursor-pointer stroke-gray-800': true,
+            'stroke-green-800': isTyped || isFocused,
           }"
           @click="onClickEye"
         />
         <IconEyeOff
           v-if="!$slots['icon-right'] && iconEye === 'eye-off'"
           :class="{
-            'cursor-pointer stroke-gray-800' : true,
-            'stroke-green-800' : isTyped || isFocused
+            'cursor-pointer stroke-gray-800': true,
+            'stroke-green-800': isTyped || isFocused,
           }"
           @click="onClickEye"
         />
         <slot name="icon-right" />
       </div>
     </div>
-    <p v-if="errorMessage" class="text-red-700 text-xs dark:text-dark-text-error">
+    <p
+      v-if="errorMessage"
+      class="text-red-700 text-xs dark:text-dark-text-error"
+    >
       {{ errorMessage }}
     </p>
     <slot name="text-info" />
@@ -162,6 +169,10 @@ export default {
     isShowPasswordLevel: {
       type: Boolean,
       default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -193,11 +204,15 @@ export default {
      */
     value (password) {
       // eslint-disable-next-line prefer-regex-literals
-      const strongPassword = new RegExp('(?=.{6,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])')
+      const strongPassword = new RegExp(
+        '(?=.{6,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])'
+      )
       // eslint-disable-next-line prefer-regex-literals
       const mediumPassword = new RegExp('(?=.{6,})(?=.*[a-z|A-Z])(?=.*[0-9])')
       // eslint-disable-next-line prefer-regex-literals
-      const lowPassword = new RegExp('(?=.{6,})(?=.*[a-z|A-Z|^A-Za-z0-9])|(?=.{1,})(?=.*[a-z|A-Z|^A-Za-z0-9])')
+      const lowPassword = new RegExp(
+        '(?=.{6,})(?=.*[a-z|A-Z|^A-Za-z0-9])|(?=.{1,})(?=.*[a-z|A-Z|^A-Za-z0-9])'
+      )
       if (strongPassword.test(password)) {
         this.levelPassword = 'Kuat'
       } else if (mediumPassword.test(password)) {
