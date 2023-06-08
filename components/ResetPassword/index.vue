@@ -4,7 +4,7 @@
       <div class="flex justify-center items-center">
         <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium" />
       </div>
-      <div class="flex flex-col gap-[22px] relative">
+      <div class="flex flex-col gap-[22px]">
         <h1 class="font-lora font-bold text-2xl text-gray-900 mt-4 dark:text-dark-text-high">
           Buat Password Baru
         </h1>
