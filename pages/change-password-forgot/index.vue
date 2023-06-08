@@ -76,7 +76,6 @@ export default {
           const { data } = response.data
           this.email = data?.email
           this.typeDisplayAlertChangePassword = 'success'
-          this.messageErrorPage = ''
           this.display = 'alert'
         } catch (error) {
           this.messageErrorPage = this.errorResponseMessage[error.response.data?.code] || 'Perubahaan password gagal dilakukan'
