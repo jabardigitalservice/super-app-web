@@ -59,13 +59,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >{{
-                getHelperTextBeforeStatusAduan(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor,
-                  milestone?.log_span_lapor?.status
-                )
-              }}</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -196,7 +190,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >Aduan Anda telah</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -288,13 +282,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >{{
-                getHelperTextBeforeStatusAduan(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor,
-                  milestone?.log_span_lapor?.status
-                )
-              }}</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -356,7 +344,7 @@
                       ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                       : 'text-gray-600 dark:text-dark-text-low '
                   "
-                >Estimasi Pengerjaan</span>
+                >Estimasi Mulai dan Selesai Pengerjaan</span>
 
                 <div>
                   <span
@@ -365,7 +353,9 @@
                         ? 'text-gray-500 dark:text-dark-text-low'
                         : 'font-semibold text-gray-800 dark:text-dark-text-high'
                     "
-                  >{{ milestone.tanggal_instruksi }}</span>
+                  >{{
+                    formatDate(milestone.tanggal_instruksi, "dd MMMM yyyy")
+                  }}</span>
                   <span
                     :class="
                       index > 0
@@ -379,7 +369,10 @@
                         ? 'text-gray-500 dark:text-dark-text-low'
                         : 'font-semibold text-gray-800 dark:text-dark-text-high'
                     "
-                  >{{ milestone.tanggal_deadline }}</span>
+                  >
+                    {{
+                      formatDate(milestone.tanggal_deadline, "dd MMMM yyyy")
+                    }}</span>
                 </div>
               </TextMilestone>
             </template>
@@ -596,20 +589,6 @@ export default {
           return 'Dinas Terkait'
         default:
           return name
-      }
-    },
-    getHelperTextBeforeStatusAduan (status, idAduanSpanLapor, lastStatusSpan) {
-      switch (status) {
-        case dataStatusMilestone.menungguVerifikasi.status:
-          return 'Aduan Anda sedang'
-        case dataStatusMilestone.dialihkan.status:
-          if (idAduanSpanLapor && lastStatusSpan) {
-            return 'Status Terakhir'
-          } else {
-            return 'Aduan Anda telah'
-          }
-        default:
-          return 'Aduan Anda telah'
       }
     },
     isditolakOrditindakLanjuti (status) {
