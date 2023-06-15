@@ -59,13 +59,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >{{
-                getHelperTextBeforeStatusAduan(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor,
-                  milestone?.log_span_lapor?.status
-                )
-              }}</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -196,7 +190,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >Aduan Anda telah</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -288,13 +282,7 @@
                     ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
                     : 'text-gray-600 dark:text-dark-text-low '
                 "
-              >{{
-                getHelperTextBeforeStatusAduan(
-                  milestone.status_aduan,
-                  milestone.id_aduan_span_lapor,
-                  milestone?.log_span_lapor?.status
-                )
-              }}</span>
+              >Status</span>
               <div>
                 <span
                   :class="
@@ -601,20 +589,6 @@ export default {
           return 'Dinas Terkait'
         default:
           return name
-      }
-    },
-    getHelperTextBeforeStatusAduan (status, idAduanSpanLapor, lastStatusSpan) {
-      switch (status) {
-        case dataStatusMilestone.menungguVerifikasi.status:
-          return 'Aduan Anda sedang'
-        case dataStatusMilestone.dialihkan.status:
-          if (idAduanSpanLapor && lastStatusSpan) {
-            return 'Status Terakhir'
-          } else {
-            return 'Status'
-          }
-        default:
-          return 'Status'
       }
     },
     isditolakOrditindakLanjuti (status) {
