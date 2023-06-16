@@ -9,28 +9,39 @@
               milestone?.log_span_lapor?.status
             ).icon
           }`"
-          :fill-color="index > 0
-            ? '#868C89'
-            : `${
-              getStatusTextAndIcon(
-                milestone.status_aduan,
-                milestone?.log_span_lapor?.status
-              ).fillColor
-            }`"
+          :fill-color="
+            index > 0
+              ? '#868C89'
+              : `${
+                getStatusTextAndIcon(
+                  milestone.status_aduan,
+                  milestone?.log_span_lapor?.status
+                ).fillColor
+              }`
+          "
           :line-milestone="index !== dataMilestone.length - 1"
         />
         <div class="w-full">
           <CardMilestone>
             <TextMilestone>
-              <LabelText text="ID Tracking SP4N LAPOR" :condition-text="index > 0" />
+              <LabelText
+                text="ID Tracking SP4N LAPOR"
+                :condition-text="index > 0"
+              />
 
               <div class="mb-1">
-                <StatusText :condition-text="index > 0" :text="milestone.id_aduan_span_lapor" />
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="milestone.id_aduan_span_lapor"
+                />
               </div>
 
               <LabelText text="Status" :condition-text="index > 0" />
               <div>
-                <StatusText :condition-text="index > 0" :text="milestone?.log_span_lapor?.status" />
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="milestone?.log_span_lapor?.status"
+                />
               </div>
             </TextMilestone>
           </CardMilestone>
@@ -44,7 +55,11 @@
             >
               <CardMilestone v-if="indexLog < 2" class="mt-2">
                 <TextMilestone>
-                  <LabelText class="!mb-1 !text-[11px]" :text="logSpan.date" :condition-text="indexLog > 0" />
+                  <LabelText
+                    class="!mb-1 !text-[11px]"
+                    :text="logSpan.date"
+                    :condition-text="indexLog > 0"
+                  />
 
                   <span
                     class="mb-2 text-[11px]"
@@ -131,27 +146,32 @@
                 )
               }}</span>
 
-              <LabelText text="Status" :condition-text="isLogSpanLaporExist(milestone)" />
+              <LabelText
+                text="Status"
+                :condition-text="isLogSpanLaporExist(milestone)"
+              />
 
               <div>
-                <StatusText :condition-text="isLogSpanLaporExist(milestone)" :text="getStatusTextAndIcon(milestone.status_aduan).status" />
+                <StatusText
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                />
 
-                <span
-                  :class="
-                    isLogSpanLaporExist(milestone)
-                      ? 'text-gray-400 dark:text-dark-text-low'
-                      : 'text-gray-800 dark:text-dark-text-low'
-                  "
-                >{{ getHelperTextStatusAduan(milestone.status_aduan) }}</span>
+                <HelperText
+                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                />
 
                 <StatusText
                   :condition-text="isLogSpanLaporExist(milestone)"
-                  :text=" changeNameStatusByUser(
-                    milestone[
-                      getStatusTextAndIcon(milestone.status_aduan)
-                        .getNameStatus
-                    ]
-                  )"
+                  :text="
+                    changeNameStatusByUser(
+                      milestone[
+                        getStatusTextAndIcon(milestone.status_aduan)
+                          .getNameStatus
+                      ]
+                    )
+                  "
                 />
               </div>
             </TextMilestone>
@@ -171,7 +191,10 @@
                 )
               "
             >
-              <LabelText text="Keterangan" :condition-text="isLogSpanLaporExist(milestone)" />
+              <LabelText
+                text="Keterangan"
+                :condition-text="isLogSpanLaporExist(milestone)"
+              />
 
               <span
                 :class="
@@ -204,7 +227,6 @@
                 ).fillColor
               }`
           "
-
           :line-milestone="index !== dataMilestone.length - 1"
         />
         <div class="w-full">
@@ -228,23 +250,26 @@
               <LabelText text="Status" :condition-text="index > 0" />
 
               <div>
-                <StatusText :condition-text="index > 0" :text="getStatusTextAndIcon(milestone.status_aduan).status" />
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-400 dark:text-dark-text-low'
-                      : 'text-gray-800 dark:text-dark-text-low'
-                  "
-                >{{ getHelperTextStatusAduan(milestone.status_aduan) }}</span>
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                />
+
+                <HelperText
+                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                  :condition-text="index > 0"
+                />
 
                 <StatusText
                   :condition-text="index > 0"
-                  :text="changeNameStatusByUser(
-                    milestone[
-                      getStatusTextAndIcon(milestone.status_aduan)
-                        .getNameStatus
-                    ]
-                  )"
+                  :text="
+                    changeNameStatusByUser(
+                      milestone[
+                        getStatusTextAndIcon(milestone.status_aduan)
+                          .getNameStatus
+                      ]
+                    )
+                  "
                 />
               </div>
             </TextMilestone>
@@ -252,48 +277,39 @@
             <!-- text for status ditindaklanjuti -->
             <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
               <TextMilestone>
-                <LabelText text="Penanggung Jawab" :condition-text="index > 0" />
+                <LabelText
+                  text="Penanggung Jawab"
+                  :condition-text="index > 0"
+                />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
-                  "
-                >{{ milestone.nama_kepala_pd }}</span>
+                <TextDitindakLanjuti
+                  :text="milestone.nama_kepala_pd"
+                  :condition-text="index > 0"
+                />
               </TextMilestone>
 
               <TextMilestone>
-                <LabelText text="Estimasi Mulai dan Selesai Pengerjaan" :condition-text="index > 0" />
+                <LabelText
+                  text="Estimasi Mulai dan Selesai Pengerjaan"
+                  :condition-text="index > 0"
+                />
 
                 <div>
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
-                        : 'font-semibold text-gray-800 dark:text-dark-text-high'
+                  <TextDitindakLanjuti
+                    :text="
+                      formatDate(milestone.tanggal_instruksi, `dd m-m-m-m yyyy`)
                     "
-                  >{{
-                    formatDate(milestone.tanggal_instruksi, "dd MMMM yyyy")
-                  }}</span>
+                    :condition-text="index > 0"
+                  />
 
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                        : 'text-gray-800 dark:text-dark-text-low '
+                  <HelperText text="sampai" :condition-text="index > 0" />
+
+                  <TextDitindakLanjuti
+                    :text="
+                      formatDate(milestone.tanggal_deadline, `dd m-m-m-m yyyy`)
                     "
-                  >sampai</span>
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
-                        : 'font-semibold text-gray-800 dark:text-dark-text-high'
-                    "
-                  >
-                    {{
-                      formatDate(milestone.tanggal_deadline, "dd MMMM yyyy")
-                    }}</span>
+                    :condition-text="index > 0"
+                  />
                 </div>
               </TextMilestone>
             </template>
@@ -381,16 +397,26 @@
 
 <script>
 import CardMilestone from './CardMilestone.vue'
-import TextMilestone from './TextMilestone.vue'
-import IconAndLine from './IconAndLine.vue'
-import LabelText from './LabelText.vue'
-import StatusText from './StatusText.vue'
+import TextMilestone from './Text/TextMilestone.vue'
+import IconAndLine from './Text/IconAndLine.vue'
+import LabelText from './Text/LabelText.vue'
+import StatusText from './Text/StatusText.vue'
+import HelperText from './Text/HelperText.vue'
+import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
 import { formatDate } from '~/utils'
 
 export default {
   name: 'MilestoneAduan',
-  components: { TextMilestone, CardMilestone, IconAndLine, LabelText, StatusText },
+  components: {
+    TextMilestone,
+    CardMilestone,
+    IconAndLine,
+    LabelText,
+    StatusText,
+    HelperText,
+    TextDitindakLanjuti
+  },
   props: {
     dataMilestone: {
       type: Array,

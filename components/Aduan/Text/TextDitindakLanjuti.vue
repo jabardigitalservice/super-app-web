@@ -2,12 +2,10 @@
   <span
     :class="
       conditionText
-        ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-        : 'text-gray-600 dark:text-dark-text-low'
+        ? 'text-gray-500 dark:text-dark-text-low'
+        : 'font-semibold text-gray-800 dark:text-dark-text-high'
     "
-  >
-    {{ text }}
-  </span>
+  >{{ text }}</span>
 </template>
 
 <script>
@@ -24,7 +22,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>
