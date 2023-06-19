@@ -1,73 +1,47 @@
 <template>
   <div class="w-full">
     <div v-for="(milestone, index) in dataMilestone" :key="index">
-      <div v-if="isStatusSpanLaporExist(milestone)" class="flex mt-3">
-        <div class="flex flex-col items-center mr-4">
-          <div
-            class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
-          >
-            <BaseIconSvg
-              :icon="`/icon/${
+      <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
+        <IconAndLine
+          :icon="`/icon/${
+            getStatusTextAndIcon(
+              milestone.status_aduan,
+              milestone?.log_span_lapor?.status
+            ).icon
+          }`"
+          :fill-color="
+            index > 0
+              ? '#868C89'
+              : `${
                 getStatusTextAndIcon(
                   milestone.status_aduan,
                   milestone?.log_span_lapor?.status
-                ).icon
-              }`"
-              class="!shadow-lg !w-[14px] !h-[14px]"
-              :fill-color="
-                index > 0
-                  ? '#868C89'
-                  : `${
-                    getStatusTextAndIcon(
-                      milestone.status_aduan,
-                      milestone?.log_span_lapor?.status
-                    ).fillColor
-                  }`
-              "
-            />
-          </div>
-          <div
-            v-if="index !== dataMilestone.length - 1"
-            class="w-px h-full bg-gray-300 dark:bg-dark-emphasis-medium"
-          />
-        </div>
+                ).fillColor
+              }`
+          "
+          :line-milestone="index !== dataMilestone.length - 1"
+        />
         <div class="w-full">
           <CardMilestone>
             <TextMilestone>
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
-                "
-              >
-                ID Tracking SP4N LAPOR
-              </span>
+              <LabelText
+                text="ID Tracking SP4N LAPOR"
+                :condition-text="index > 0"
+              />
+
               <div class="mb-1">
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone.id_aduan_span_lapor }}</span>
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="milestone.id_aduan_span_lapor"
+                />
               </div>
 
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
-                "
-              >Status</span>
+              <LabelText text="Status" :condition-text="index > 0" />
               <div>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone?.log_span_lapor?.status }}</span>
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="milestone?.log_span_lapor?.status"
+                />
               </div>
             </TextMilestone>
           </CardMilestone>
@@ -81,14 +55,11 @@
             >
               <CardMilestone v-if="indexLog < 2" class="mt-2">
                 <TextMilestone>
-                  <span
-                    class="mb-1 text-[11px]"
-                    :class="
-                      indexLog > 0
-                        ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                        : 'text-gray-600 dark:text-dark-text-low'
-                    "
-                  >{{ logSpan.date }}</span>
+                  <LabelText
+                    class="!mb-1 !text-[11px]"
+                    :text="logSpan.date"
+                    :condition-text="indexLog > 0"
+                  />
 
                   <span
                     class="mb-2 text-[11px]"
@@ -149,32 +120,22 @@
 
       <!-- is span lapor -->
       <div v-if="isSpanLapor(milestone)" class="flex mt-3">
-        <div class="flex flex-col items-center mr-4">
-          <div
-            class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
-          >
-            <BaseIconSvg
-              :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
-              class="!shadow-lg !w-[14px] !h-[14px]"
-              :fill-color="
-                isStatusSpanLaporExist(milestone)
-                  ? '#868C89'
-                  : `${dataStatusMilestone.dialihkan.fillColor}`
-              "
-            />
-          </div>
-          <div
-            v-if="index !== dataMilestone.length - 1"
-            class="w-px h-full bg-gray-300 dark:bg-dark-emphasis-medium"
-          />
-        </div>
+        <IconAndLine
+          :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
+          :fill-color="
+            isLogSpanLaporExist(milestone)
+              ? '#868C89'
+              : `${dataStatusMilestone.dialihkan.fillColor}`
+          "
+          :line-milestone="index !== dataMilestone.length - 1"
+        />
         <div class="w-full">
           <CardMilestone>
             <TextMilestone>
               <span
                 class="text-gray-500 mb-1 text-[11px]"
                 :class="
-                  isStatusSpanLaporExist(milestone)
+                  isLogSpanLaporExist(milestone)
                     ? ' dark:text-dark-text-low dark:text-opacity-60'
                     : ' dark:text-dark-text-low'
                 "
@@ -184,45 +145,64 @@
                   "EEEE, dd MMMM yyyy - HH:mm"
                 )
               }}</span>
+
+              <LabelText
+                text="Status"
+                :condition-text="isLogSpanLaporExist(milestone)"
+              />
+
+              <div>
+                <StatusText
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                />
+
+                <HelperText
+                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                />
+
+                <StatusText
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                  :text="
+                    changeNameStatusByUser(
+                      milestone[
+                        getStatusTextAndIcon(milestone.status_aduan)
+                          .getNameStatus
+                      ]
+                    )
+                  "
+                />
+              </div>
+            </TextMilestone>
+          </CardMilestone>
+          <CardMilestone
+            v-if="
+              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
+                milestone.keterangan_status_aduan
+            "
+            class="mt-2"
+          >
+            <TextMilestone
+              v-if="
+                showKeteranganDikoordinasikanAndDialihkan(
+                  milestone.status_aduan,
+                  milestone.keterangan_status_aduan
+                )
+              "
+            >
+              <LabelText
+                text="Keterangan"
+                :condition-text="isLogSpanLaporExist(milestone)"
+              />
+
               <span
                 :class="
-                  isStatusSpanLaporExist(milestone)
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
+                  isLogSpanLaporExist(milestone)
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
                 "
-              >Status</span>
-              <div>
-                <span
-                  :class="
-                    isStatusSpanLaporExist(milestone)
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{
-                  getStatusTextAndIcon(milestone.status_aduan).status
-                }}</span>
-                <span
-                  :class="
-                    isStatusSpanLaporExist(milestone)
-                      ? 'text-gray-400 dark:text-dark-text-low'
-                      : 'text-gray-800 dark:text-dark-text-low'
-                  "
-                >{{ getHelperTextStatusAduan(milestone.status_aduan) }}</span>
-                <span
-                  :class="
-                    isStatusSpanLaporExist(milestone)
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{
-                  changeNameStatusByUser(
-                    milestone[
-                      getStatusTextAndIcon(milestone.status_aduan)
-                        .getNameStatus
-                    ]
-                  )
-                }}</span>
-              </div>
+              >{{ milestone.keterangan_status_aduan }}</span>
             </TextMilestone>
           </CardMilestone>
         </div>
@@ -230,35 +210,25 @@
 
       <!-- is not span lapor -->
       <div v-else class="flex mt-3">
-        <div class="flex flex-col items-center mr-4">
-          <div
-            class="flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
-          >
-            <BaseIconSvg
-              :icon="`/icon/${
+        <IconAndLine
+          :icon="`/icon/${
+            getStatusTextAndIcon(
+              milestone.status_aduan,
+              milestone?.log_span_lapor?.status
+            ).icon
+          }`"
+          :fill-color="
+            index > 0
+              ? '#868C89'
+              : `${
                 getStatusTextAndIcon(
                   milestone.status_aduan,
                   milestone?.log_span_lapor?.status
-                ).icon
-              }`"
-              class="!shadow-lg !w-[14px] !h-[14px]"
-              :fill-color="
-                index > 0
-                  ? '#868C89'
-                  : `${
-                    getStatusTextAndIcon(
-                      milestone.status_aduan,
-                      milestone?.log_span_lapor?.status
-                    ).fillColor
-                  }`
-              "
-            />
-          </div>
-          <div
-            v-if="index !== dataMilestone.length - 1"
-            class="w-px h-full bg-gray-300 dark:bg-dark-emphasis-medium"
-          />
-        </div>
+                ).fillColor
+              }`
+          "
+          :line-milestone="index !== dataMilestone.length - 1"
+        />
         <div class="w-full">
           <CardMilestone>
             <!-- text for status aduan -->
@@ -276,103 +246,70 @@
                   "EEEE, dd MMMM yyyy - HH:mm"
                 )
               }}</span>
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
-                "
-              >Status</span>
+
+              <LabelText text="Status" :condition-text="index > 0" />
+
               <div>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                />
+
+                <HelperText
+                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                  :condition-text="index > 0"
+                />
+
+                <StatusText
+                  :condition-text="index > 0"
+                  :text="
+                    changeNameStatusByUser(
+                      milestone[
+                        getStatusTextAndIcon(milestone.status_aduan)
+                          .getNameStatus
+                      ]
+                    )
                   "
-                >{{
-                  getStatusTextAndIcon(milestone.status_aduan).status
-                }}</span>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-400 dark:text-dark-text-low'
-                      : 'text-gray-800 dark:text-dark-text-low'
-                  "
-                >{{ getHelperTextStatusAduan(milestone.status_aduan) }}</span>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{
-                  changeNameStatusByUser(
-                    milestone[
-                      getStatusTextAndIcon(milestone.status_aduan)
-                        .getNameStatus
-                    ]
-                  )
-                }}</span>
+                />
               </div>
             </TextMilestone>
 
             <!-- text for status ditindaklanjuti -->
             <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
               <TextMilestone>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                      : 'text-gray-600 dark:text-dark-text-low'
-                  "
-                >Penanggung Jawab</span>
+                <LabelText
+                  text="Penanggung Jawab"
+                  :condition-text="index > 0"
+                />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-semibold text-gray-800 dark:text-dark-text-high'
-                  "
-                >{{ milestone.nama_kepala_pd }}</span>
+                <TextDitindakLanjuti
+                  :text="milestone.nama_kepala_pd"
+                  :condition-text="index > 0"
+                />
               </TextMilestone>
 
               <TextMilestone>
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                      : 'text-gray-600 dark:text-dark-text-low '
-                  "
-                >Estimasi Mulai dan Selesai Pengerjaan</span>
+                <LabelText
+                  text="Estimasi Mulai dan Selesai Pengerjaan"
+                  :condition-text="index > 0"
+                />
 
                 <div>
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
-                        : 'font-semibold text-gray-800 dark:text-dark-text-high'
+                  <TextDitindakLanjuti
+                    :text="
+                      formatDate(milestone.tanggal_instruksi, `dd m-m-m-m yyyy`)
                     "
-                  >{{
-                    formatDate(milestone.tanggal_instruksi, "dd MMMM yyyy")
-                  }}</span>
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                        : 'text-gray-800 dark:text-dark-text-low '
+                    :condition-text="index > 0"
+                  />
+
+                  <HelperText text="sampai" :condition-text="index > 0" />
+
+                  <TextDitindakLanjuti
+                    :text="
+                      formatDate(milestone.tanggal_deadline, `dd m-m-m-m yyyy`)
                     "
-                  >sampai</span>
-                  <span
-                    :class="
-                      index > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
-                        : 'font-semibold text-gray-800 dark:text-dark-text-high'
-                    "
-                  >
-                    {{
-                      formatDate(milestone.tanggal_deadline, "dd MMMM yyyy")
-                    }}</span>
+                    :condition-text="index > 0"
+                  />
                 </div>
               </TextMilestone>
             </template>
@@ -381,7 +318,7 @@
           <!-- card if catatan and tanggap is exist -->
           <CardMilestone
             v-if="
-              isditolakOrditindakLanjuti(milestone.status_aduan) &&
+              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
                 milestone.keterangan_status_aduan
             "
             class="mt-2"
@@ -394,40 +331,26 @@
                 )
               "
             >
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
-                "
-              >
-                Catatan</span>
+              <LabelText text="Catatan" :condition-text="index > 0" />
 
               <span
                 :class="
                   index > 0
                     ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                    : 'font-medium text-gray-900 dark:text-dark-text-high'
                 "
               >{{ milestone.keterangan_status_aduan }}</span>
             </TextMilestone>
 
             <TextMilestone
               v-if="
-                showKeteranganDitindakLanjuti(
+                showKeteranganDikoordinasikanAndDialihkan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
               "
             >
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-400 dark:text-dark-text-low dark:text-opacity-60'
-                    : 'text-gray-600 dark:text-dark-text-low '
-                "
-              >
-                Keterangan</span>
+              <LabelText text="Keterangan" :condition-text="index > 0" />
 
               <span
                 :class="
@@ -474,13 +397,26 @@
 
 <script>
 import CardMilestone from './CardMilestone.vue'
-import TextMilestone from './TextMilestone.vue'
+import TextMilestone from './Text/TextMilestone.vue'
+import IconAndLine from './Text/IconAndLine.vue'
+import LabelText from './Text/LabelText.vue'
+import StatusText from './Text/StatusText.vue'
+import HelperText from './Text/HelperText.vue'
+import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
 import { formatDate } from '~/utils'
 
 export default {
   name: 'MilestoneAduan',
-  components: { TextMilestone, CardMilestone },
+  components: {
+    TextMilestone,
+    CardMilestone,
+    IconAndLine,
+    LabelText,
+    StatusText,
+    HelperText,
+    TextDitindakLanjuti
+  },
   props: {
     dataMilestone: {
       type: Array,
@@ -591,10 +527,11 @@ export default {
           return name
       }
     },
-    isditolakOrditindakLanjuti (status) {
+    isditolakOrdikoordinasikanAndDialihkan (status) {
       return (
         status === dataStatusMilestone.ditolak.status ||
-        status === dataStatusMilestone.ditindakLanjuti.status
+        status === dataStatusMilestone.dikoordinasikan.status ||
+        status === dataStatusMilestone.dialihkan.status
       )
     },
     isditindakLanjutiOrselesai (status) {
@@ -609,11 +546,11 @@ export default {
         milestone.id_aduan_span_lapor
       )
     },
-    isStatusSpanLaporExist (milestone) {
+    isLogSpanLaporExist (milestone) {
       return (
         milestone.status_aduan === dataStatusMilestone.dialihkan.status &&
-        milestone.id_aduan_span_lapor &&
-        milestone?.log_span_lapor?.status
+        milestone.id_aduan_span_lapor !== '' &&
+        milestone?.log_span_lapor?.status !== ''
       )
     },
     isditutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
@@ -627,9 +564,11 @@ export default {
     showCatatanDitolak (status, keterangan) {
       return status === dataStatusMilestone.ditolak.status && keterangan
     },
-    showKeteranganDitindakLanjuti (status, keterangan) {
+    showKeteranganDikoordinasikanAndDialihkan (status, keterangan) {
       return (
-        status === dataStatusMilestone.ditindakLanjuti.status && keterangan
+        (status === dataStatusMilestone.dikoordinasikan.status ||
+          status === dataStatusMilestone.dialihkan.status) &&
+        keterangan
       )
     },
     showButtonBuatAduanBaru (status) {
