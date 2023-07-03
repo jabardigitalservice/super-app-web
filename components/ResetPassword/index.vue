@@ -43,7 +43,6 @@
         </BaseInputText>
         <BaseButton
           class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
-          :disabled="!isEnabledButton"
           @click="onClickSave"
         >
           Simpan Perubahan
@@ -82,30 +81,52 @@ export default {
       ))
     }
   },
-  watch: {
-    password (value) {
-      if (value.length === 0) {
-        this.errorPassword = 'Password baru tidak boleh kosong'
-      } else if (value.length < 6) {
-        this.errorPassword = 'Isian password minimal 8 karakter.'
-      } else {
-        this.errorPassword = ''
-      }
-    },
-    passwordConfirmation (value) {
-      if (value.length === 0) {
-        this.errorConfirmation = 'Konfirmasi Password baru tidak boleh kosong'
-      } else if (this.password && this.passwordConfirmation && this.password !== value) {
-        this.errorConfirmation = 'Isian password tidak sama.'
-      } else {
-        this.errorConfirmation = ''
-      }
-    }
-  },
+  // watch: {
+  //   password (value) {
+  //     if (value.length === 0) {
+  //       this.errorPassword = 'Password baru tidak boleh kosong'
+  //     } else if (value.length < 6) {
+  //       this.errorPassword = 'Isian password minimal 6 karakter.'
+  //     } else if (this.passwordMatchCheck()) {
+  //       this.errorConfirmation = 'Isian password tidak sama.'
+  //     } else if (this.checkPasswordValid(value)) {
+  //       this.errorPassword = 'Password baru harus mengandung minimal 1 huruf besar, 1 simbol dan 1 angka.'
+  //     } else {
+  //       this.errorPassword = ''
+  //     }
+  //   },
+  //   passwordConfirmation (value) {
+  //     if (value.length === 0) {
+  //       this.errorConfirmation = 'Konfirmasi Password baru tidak boleh kosong'
+  //     } else if (this.passwordMatchCheck()) {
+  //       this.errorConfirmation = 'Isian password tidak sama.'
+  //     } else {
+  //       this.errorConfirmation = ''
+  //     }
+  //   }
+  // },
   methods: {
     onClickSave () {
-      this.$emit('on-click-save', this.password)
+      if (this.newPasswordValidation() && this.newPasswordConfirmationValidation()) {
+        this.$emit('on-click-save', this.password)
+      }
+    },
+    newPasswordValidation () {
+      if (this.password.length === 0) {
+        this.errorPassword = 'Password baru tidak boleh kosong'
+      }
+    },
+    newPasswordConfirmationValidation () {
+      if (this.password.length === 0) {
+        this.errorConfirmation = 'Password baru tidak boleh kosong'
+      }
     }
+    // checkPasswordValid  (password) {
+    //   return !/(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(password)
+    // },
+    // passwordMatchCheck () {
+    //   return this.password === this.passwordConfirmation
+    // }
   }
 }
 </script>
