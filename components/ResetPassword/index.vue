@@ -1,11 +1,17 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
-    <div class="bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low">
+    <div
+      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black sm:w-[360px] sm:h-[515px] sm:rounded-lg sm:dark:bg-dark-emphasis-low"
+    >
       <div class="flex justify-center items-center">
-        <IconLock class="bg-gray-50 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium" />
+        <IconLock
+          class="bg-gray-50 w-[120px] h-[120px] rounded-full dark:bg-dark-emphasis-medium"
+        />
       </div>
       <div class="flex flex-col gap-[22px]">
-        <h1 class="font-lora font-bold text-2xl text-gray-900 mt-4 dark:text-dark-text-high">
+        <h1
+          class="font-lora font-bold text-2xl text-gray-900 mt-4 dark:text-dark-text-high"
+        >
           Buat Password Baru
         </h1>
         <BaseInputText
@@ -43,7 +49,6 @@
         </BaseInputText>
         <BaseButton
           class="bg-green-700 hover:bg-green-600 text-sm text-white mb-2"
-          :disabled="!isEnabledButton"
           @click="onClickSave"
         >
           Simpan Perubahan
@@ -74,37 +79,82 @@ export default {
   },
   computed: {
     isEnabledButton () {
-      return !!((
+      return !!(
         this.password.length &&
         this.passwordConfirmation.length &&
         !this.errorPassword &&
         !this.errorConfirmation
-      ))
+      )
     }
   },
-  watch: {
-    password (value) {
-      if (value.length === 0) {
-        this.errorPassword = 'Password baru tidak boleh kosong'
-      } else if (value.length < 6) {
-        this.errorPassword = 'Isian password minimal 8 karakter.'
-      } else {
-        this.errorPassword = ''
-      }
-    },
-    passwordConfirmation (value) {
-      if (value.length === 0) {
-        this.errorConfirmation = 'Konfirmasi Password baru tidak boleh kosong'
-      } else if (this.password && this.passwordConfirmation && this.password !== value) {
-        this.errorConfirmation = 'Isian password tidak sama.'
-      } else {
-        this.errorConfirmation = ''
-      }
-    }
-  },
+
   methods: {
     onClickSave () {
-      this.$emit('on-click-save', this.password)
+      if (this.validatePassword()) {
+        this.$emit('on-click-save', this.password)
+      }
+    },
+    validatePassword () {
+      const lowercaseRegex = /[a-z]/
+      const uppercaseRegex = /[A-Z]/
+      const numberRegex = /[0-9]/
+      const symbolRegex = /[!@#$%^&*(),.?":{}|<>]/
+
+      this.errorPassword = ''
+      this.errorConfirmation = ''
+
+      // Cek apakah password dan konfirmasi password kosong
+      if (!this.password) {
+        this.errorPassword = 'Password harus diisi'
+      }
+
+      if (!this.passwordConfirmation) {
+        this.errorConfirmation = 'Konfirmasi Password harus diisi'
+      }
+
+      if (!this.password || !this.passwordConfirmation) {
+        return false
+      }
+
+      // Cek apakah password dan konfirmasi password cocok
+      if (this.password !== this.passwordConfirmation) {
+        this.errorConfirmation = 'Konfirmasi Password tidak cocok'
+        return false
+      }
+
+      // Cek apakah password memiliki panjang minimal 6 karakter
+      if (this.password.length < 6) {
+        this.errorPassword = 'Password harus memiliki panjang minimal 6 karakter'
+        return false
+      }
+
+      // Cek apakah password memiliki huruf kecil
+      if (!lowercaseRegex.test(this.password)) {
+        this.errorPassword =
+          'Password harus mengandung setidaknya satu huruf kecil'
+        return false
+      }
+
+      // Cek apakah password memiliki huruf besar
+      if (!uppercaseRegex.test(this.password)) {
+        this.errorPassword =
+          'Password harus mengandung setidaknya satu huruf besar'
+        return false
+      }
+
+      // Cek apakah password memiliki angka
+      if (!numberRegex.test(this.password)) {
+        this.errorPassword = 'Password harus mengandung setidaknya satu angka'
+        return false
+      }
+
+      // Cek apakah password memiliki simbol
+      if (!symbolRegex.test(this.password)) {
+        this.errorPassword = 'Password harus mengandung setidaknya satu simbol'
+        return false
+      }
+
+      return true
     }
   }
 }
