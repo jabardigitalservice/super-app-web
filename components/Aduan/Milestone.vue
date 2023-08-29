@@ -297,7 +297,7 @@
                 <div>
                   <TextDitindakLanjuti
                     :text="
-                      formatDate(milestone.tanggal_instruksi, `dd m-m-m-m yyyy`)
+                      formatDate(milestone.tanggal_instruksi, `dd MMMM yyyy`)
                     "
                     :condition-text="index > 0"
                   />
@@ -306,7 +306,7 @@
 
                   <TextDitindakLanjuti
                     :text="
-                      formatDate(milestone.tanggal_deadline, `dd m-m-m-m yyyy`)
+                      formatDate(milestone.tanggal_deadline, `dd MMMM yyyy`)
                     "
                     :condition-text="index > 0"
                   />
