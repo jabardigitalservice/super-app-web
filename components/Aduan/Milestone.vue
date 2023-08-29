@@ -1,5 +1,8 @@
 <template>
   <div class="w-full">
+    <span
+      class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto"
+    >Riwayat Aduan</span>
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
         <IconAndLine

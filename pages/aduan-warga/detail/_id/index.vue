@@ -4,7 +4,12 @@
   >
     <div class="p-4">
       <BaseSpinner :show-spinner="loading" />
-      <Milestone :data-milestone="dataAduan" @open-dialog="openDialog" />
+      <AduanDetailAduan />
+      <Milestone
+        :data-milestone="dataAduan"
+        class="mt-[32px]"
+        @open-dialog="openDialog"
+      />
     </div>
 
     <BaseBlurPopup :show-popup="showDialog" />
