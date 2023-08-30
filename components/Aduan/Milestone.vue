@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <span
-      class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto"
+      class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
     >Riwayat Aduan</span>
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
@@ -50,7 +50,6 @@
           </CardMilestone>
 
           <!-- card milestone for log span lapor -->
-
           <div v-if="showLogSpanLapor(milestone)">
             <div
               v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
@@ -503,6 +502,28 @@ export default {
               fillColor: dataStatusMilestone.dialihkan.fillColor,
               getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
             }
+          }
+        case dataStatusMilestone.gagalDiverifikasi.status:
+          return {
+            status: dataStatusMilestone.gagalDiverifikasi.textStatus,
+            icon: dataStatusMilestone.gagalDiverifikasi.icon,
+            fillColor: dataStatusMilestone.gagalDiverifikasi.fillColor,
+            getNameStatus: dataStatusMilestone.gagalDiverifikasi.getNameStatus
+          }
+        case dataStatusMilestone.pengerjaanDitunda.status:
+          return {
+            status: dataStatusMilestone.pengerjaanDitunda.textStatus,
+            icon: dataStatusMilestone.pengerjaanDitunda.icon,
+            fillColor: dataStatusMilestone.pengerjaanDitunda.fillColor,
+            getNameStatus: dataStatusMilestone.pengerjaanDitunda.getNameStatus
+          }
+        case dataStatusMilestone.pengerjaanDitinjauUlang.status:
+          return {
+            status: dataStatusMilestone.pengerjaanDitinjauUlang.textStatus,
+            icon: dataStatusMilestone.pengerjaanDitinjauUlang.icon,
+            fillColor: dataStatusMilestone.pengerjaanDitinjauUlang.fillColor,
+            getNameStatus:
+              dataStatusMilestone.pengerjaanDitinjauUlang.getNameStatus
           }
         default:
           return {

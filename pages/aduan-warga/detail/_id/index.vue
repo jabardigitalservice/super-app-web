@@ -4,7 +4,7 @@
   >
     <div class="p-4">
       <BaseSpinner :show-spinner="loading" />
-      <AduanDetailAduan />
+      <AduanDetailAduan :data-aduan="dataAduan" />
       <Milestone
         :data-milestone="dataAduan"
         class="mt-[32px]"
