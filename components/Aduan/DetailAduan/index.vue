@@ -26,9 +26,17 @@
     </div>
     <div class="mt-3 flex flex-col gap-y-1">
       <TextTitle>Permasalahaan</TextTitle>
+
       <TextDetail>
-        {{ dataAduan[0].detail_aduan || "-" }}
+        {{ showFullText ? dataAduan[0]?.detail_aduan : truncatedText }}
       </TextDetail>
+      <button
+        v-if="isTruncated"
+        class="text-green-600 font-bold leading-4 mt-2 text-left text-[12px]"
+        @click="toggleTruncate"
+      >
+        {{ showFullText ? "Lihat lebih sedikit" : "Lihat selengkapnya" }}
+      </button>
     </div>
     <div
       v-if="dataAduan[0]?.foto_bukti_kejadian_evidence"
@@ -70,10 +78,26 @@ export default {
       default: () => []
     }
   },
+  data () {
+    return {
+      maxCharacters: 250,
+      showFullText: false
+    }
+  },
+  computed: {
+    isTruncated () {
+      return this.dataAduan[0]?.detail_aduan.length > this.maxCharacters
+    },
+    truncatedText () {
+      return (
+        this.dataAduan[0]?.detail_aduan.length > this.maxCharacters ? this.dataAduan[0]?.detail_aduan.substring(0, this.maxCharacters) + '...' : this.dataAduan[0]?.detail_aduan
+      )
+    }
+  },
   methods: {
     formatDate,
-    downloadFile (file) {
-      console.log(file)
+    toggleTruncate () {
+      this.showFullText = !this.showFullText
     }
   }
 }
