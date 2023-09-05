@@ -43,11 +43,9 @@
       class="mt-3 flex flex-col gap-y-1"
     >
       <TextTitle> Foto Aduan </TextTitle>
-      <a
-        download
-        target="_blank"
-        :href="dataAduan[0]?.foto_bukti_kejadian_evidence"
+      <button
         class="px-4 py-3 flex text-[12px] font-lato text-gray-800 font-bold border border-gray-300 rounded-md p-4 bg-white w-full mt-2 dark:border-0 dark:bg-dark-emphasis-medium dark:text-dark-text-high"
+        @click="goToPageFile(dataAduan[0]?.foto_bukti_kejadian_evidence)"
       >
         <div class="flex items-center gap-3 w-full justify-center">
           <BaseIconSvg
@@ -57,7 +55,7 @@
           />
           Lihat Foto Aduan
         </div>
-      </a>
+      </button>
     </div>
   </div>
 </template>
@@ -89,15 +87,20 @@ export default {
       return this.dataAduan[0]?.detail_aduan.length > this.maxCharacters
     },
     truncatedText () {
-      return (
-        this.dataAduan[0]?.detail_aduan.length > this.maxCharacters ? this.dataAduan[0]?.detail_aduan.substring(0, this.maxCharacters) + '...' : this.dataAduan[0]?.detail_aduan
-      )
+      return this.dataAduan[0]?.detail_aduan.length > this.maxCharacters
+        ? this.dataAduan[0]?.detail_aduan.substring(0, this.maxCharacters) +
+            '...'
+        : this.dataAduan[0]?.detail_aduan
     }
   },
   methods: {
     formatDate,
     toggleTruncate () {
       this.showFullText = !this.showFullText
+    },
+    goToPageFile (file) {
+      this.$store.commit('setFileAduan', file)
+      this.$router.push('/aduan-warga/file-aduan/foto-aduan')
     }
   }
 }

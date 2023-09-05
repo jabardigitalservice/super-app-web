@@ -4,6 +4,7 @@
       class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
     >Riwayat Aduan</span>
     <div v-for="(milestone, index) in dataMilestone" :key="index">
+      <!-- jika log span / history span ada -->
       <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
         <IconAndLine
           :icon="`/icon/${
@@ -121,6 +122,7 @@
       </div>
 
       <!-- is span lapor -->
+      <!-- hanya ada id number span lapor dan belum ada log span -->
       <div v-if="isSpanLapor(milestone)" class="flex mt-3">
         <IconAndLine
           :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
@@ -178,16 +180,19 @@
               </div>
             </TextMilestone>
           </CardMilestone>
+
+          <!-- memunculkan card ketika status dialihkan, ditolak dan dikordinasikan dan terdapat keterangan status dari api -->
           <CardMilestone
             v-if="
-              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
+              showCatatanOrKeterangan(milestone.status_aduan) &&
                 milestone.keterangan_status_aduan
             "
             class="mt-2"
           >
+            <!-- menampilan keterangan ketika status dialihkan ke sp4n lapor -->
             <TextMilestone
               v-if="
-                showKeteranganDikoordinasikanAndDialihkan(
+                showKeteranganStatusAduan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
@@ -276,8 +281,12 @@
               </div>
             </TextMilestone>
 
-            <!-- text for status ditindaklanjuti -->
-            <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
+            <!-- memunculkan keterangan penanung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
+            <template
+              v-if="
+                showEstimasiPengerjaanAndPenanungJawab(milestone.status_aduan)
+              "
+            >
               <TextMilestone>
                 <LabelText
                   text="Penanggung Jawab"
@@ -292,7 +301,7 @@
 
               <TextMilestone>
                 <LabelText
-                  text="Estimasi Mulai dan Selesai Pengerjaan"
+                  text="Estimasi Pengerjaan"
                   :condition-text="index > 0"
                 />
 
@@ -320,8 +329,9 @@
           <!-- card if catatan and tanggap is exist -->
           <CardMilestone
             v-if="
-              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
-                milestone.keterangan_status_aduan
+              showCatatanOrKeterangan(milestone.status_aduan) &&
+                (milestone.keterangan_status_aduan ||
+                  milestone.keterangan_tambahan)
             "
             class="mt-2"
           >
@@ -346,7 +356,7 @@
 
             <TextMilestone
               v-if="
-                showKeteranganDikoordinasikanAndDialihkan(
+                showKeteranganStatusAduan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
@@ -361,6 +371,44 @@
                     : 'font-medium  text-gray-900 dark:text-dark-text-high'
                 "
               >{{ milestone.keterangan_status_aduan }}</span>
+            </TextMilestone>
+
+            <!-- ditinjau ulang dan ditunda -->
+            <TextMilestone
+              v-if="
+                showKeteranganTambahan(
+                  milestone.status_aduan,
+                  milestone.keterangan_tambahan
+                )
+              "
+            >
+              <LabelText text="Keterangan" :condition-text="index > 0" />
+
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >{{ milestone.keterangan_tambahan }}</span>
+            </TextMilestone>
+          </CardMilestone>
+
+          <CardMilestone
+            v-if="showKeteranganDefault(milestone.status_aduan)"
+            class="mt-2"
+          >
+            <!-- keterangan default/hardcode -->
+            <TextMilestone>
+              <LabelText text="Keterangan" :condition-text="index > 0" />
+
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >{{ generateTextDefault(milestone.status_aduan) }}</span>
             </TextMilestone>
           </CardMilestone>
 
@@ -551,18 +599,29 @@ export default {
           return name
       }
     },
-    isditolakOrdikoordinasikanAndDialihkan (status) {
-      return (
-        status === dataStatusMilestone.ditolak.status ||
-        status === dataStatusMilestone.dikoordinasikan.status ||
-        status === dataStatusMilestone.dialihkan.status
-      )
+    showEstimasiPengerjaanAndPenanungJawab (status) {
+      const validStatuses = [
+        dataStatusMilestone.ditindakLanjuti.status,
+        dataStatusMilestone.selesai.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatuses.includes(status)
     },
-    isditindakLanjutiOrselesai (status) {
-      return (
-        status === dataStatusMilestone.ditindakLanjuti.status ||
-        status === dataStatusMilestone.selesai.status
-      )
+    showCatatanOrKeterangan (status) {
+      const validStatuses = [
+        dataStatusMilestone.ditolak.status,
+        dataStatusMilestone.dikoordinasikan.status,
+        dataStatusMilestone.dialihkan.status,
+        dataStatusMilestone.menungguVerifikasi.status,
+        dataStatusMilestone.terverifikasi.status,
+        dataStatusMilestone.gagalDiverifikasi.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatuses.includes(status)
     },
     isSpanLapor (milestone) {
       return (
@@ -588,15 +647,39 @@ export default {
     showCatatanDitolak (status, keterangan) {
       return status === dataStatusMilestone.ditolak.status && keterangan
     },
-    showKeteranganDikoordinasikanAndDialihkan (status, keterangan) {
+    showKeteranganStatusAduan (status, keterangan) {
       return (
         (status === dataStatusMilestone.dikoordinasikan.status ||
           status === dataStatusMilestone.dialihkan.status) &&
         keterangan
       )
     },
+    showKeteranganTambahan (status, keterangan) {
+      return (
+        (status === dataStatusMilestone.pengerjaanDitunda.status ||
+          status === dataStatusMilestone.pengerjaanDitinjauUlang.status) &&
+        keterangan
+      )
+    },
+    showKeteranganDefault (status) {
+      return (
+        status === dataStatusMilestone.menungguVerifikasi.status ||
+        status === dataStatusMilestone.terverifikasi.status ||
+        status === dataStatusMilestone.gagalDiverifikasi.status
+      )
+    },
+    generateTextDefault (status) {
+      switch (status) {
+        case dataStatusMilestone.menungguVerifikasi.status:
+          return 'Terimakasih telah melakukan pengaduan, aduan anda akan segera kami verifikasi.'
+        case dataStatusMilestone.terverifikasi.status:
+          return 'Terimakasih telah melakukan pengaduan, aduan anda akan segera kami tindaklanjuti.'
+        case dataStatusMilestone.gagalDiverifikasi.status:
+          return 'Aduan tidak bisa dianalisis lebih lanjut.'
+      }
+    },
     showButtonBuatAduanBaru (status) {
-      return status === dataStatusMilestone.ditolak.status
+      return (status === dataStatusMilestone.ditolak.status || status === dataStatusMilestone.gagalDiverifikasi.status)
     },
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
