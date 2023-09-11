@@ -3,43 +3,17 @@
     class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-black gap-[22px] mt-auto"
   >
     <swiper
-      class="absolute transition-transform duration-300 transform  max-w-full h-auto align-middle "
+      class="absolute transition-transform duration-300 transform max-w-full h-auto align-middle"
       :slides-per-view="2"
       :space-between="30"
       :centered-slides="true"
       observer
       observe-parents
       @swiper="getSwipperRefHandle"
+      @slideChange="updateZoomLevel"
     >
-      <!-- <swiper-slide v-for="(item,index) in listPhoto" :key="index">
-        <img :src="item.url" alt="photo" :class="{'opacity-20':index!==swiperRef.activeIndex}">
-
-        <img
-          :src="src"
-          :style="zoomStyles"
-          class="absolute transition-transform duration-300 transform shadow rounded max-w-full h-auto align-middle border-none"
-        >
-
-        <img
-          :src="src"
-          :style="zoomStyles"
-          class="absolute transition-transform duration-300 transform shadow rounded max-w-full h-auto align-middle border-none"
-        >
-      </swiper-slide>
-    </swiper> -->
-
-      <swiper-slide>
-        <img
-          :src="src"
-          :style="zoomStyles"
-        >
-      </swiper-slide>
-
-      <swiper-slide>
-        <img
-          :src="src"
-          :style="zoomStyles"
-        >
+      <swiper-slide v-for="(item, index) in testLooping" :key="index">
+        <img :src="src" :style="computedZoomStyles(index)">
       </swiper-slide>
     </swiper>
 
@@ -48,28 +22,28 @@
     >
       <button
         class="text-green-300 flex justify-center items-center"
-        :disabled="zoomLevel === 1"
+        :disabled="currentZoomLevel <= 1"
         @click="zoomOut"
       >
         <BaseIconSvg
           icon="/icon/zoom-out.svg"
           class="!shadow-lg !w-[32px] !h-[32px]"
-          :fill-color="zoomLevel > 1 ? '#FFFFFF' : '#70CD94'"
+          :fill-color="currentZoomLevel > 1 ? '#FFFFFF' : '#70CD94'"
         />
       </button>
       <div class="absolute left-1/2 -ml-0.5 h-[32px] w-[1px] bg-green-500" />
       <button
         class="text-white flex justify-center items-center"
+        :disabled="currentZoomLevel >= 3"
         @click="zoomIn"
       >
         <BaseIconSvg
           icon="/icon/zoom-in.svg"
           class="!shadow-lg !w-[32px] !h-[32px]"
-          fill-color="#FFFFFF"
+          :fill-color="currentZoomLevel >= 3 ? '#70CD94' : '#FFFFFF'"
         />
       </button>
     </div>
-    </swiper>
   </div>
 </template>
 
@@ -91,54 +65,74 @@ export default {
       required: true
     }
   },
-
   data () {
     return {
-      zoomLevel: 1
+      zoomLevel: 1,
+      swiperRef: null,
+      // waiting data from api
+      testLooping: [1, 1],
+      zoomLevels: []
     }
   },
-
   computed: {
-    zoomStyles () {
-      return {
-        transform: `scale(${this.zoomLevel})`
-      }
+    currentZoomLevel () {
+      const activeIndex = this.swiperRef ? this.swiperRef.activeIndex : 0
+      return this.zoomLevels[activeIndex]
     }
   },
-
+  mounted () {
+    this.zoomLevels = this.testLooping.map(() => 1)
+  },
   methods: {
+    computedZoomStyles (index) {
+      return {
+        transform: `scale(${this.zoomLevels[index]})`
+      }
+    },
     zoomIn () {
-      console.log(this.zoomLevel, 'zoom in')
-      this.zoomLevel += 0.1 // Anda bisa menyesuaikan nilai ini sesuai kebutuhan
+      if (!this.swiperRef) {
+        return
+      }
+
+      const activeIndex = this.swiperRef.activeIndex
+      if (this.zoomLevels[activeIndex] <= 3) {
+        this.$set(
+          this.zoomLevels,
+          activeIndex,
+          this.zoomLevels[activeIndex] + 0.1
+        )
+      }
     },
     zoomOut () {
-      console.log(this.zoomLevel, 'zoom out')
-      if (this.zoomLevel > 0.2) {
-        // batasi zoom out agar gambar tidak terlalu kecil
-        this.zoomLevel -= 0.1 // Anda bisa menyesuaikan nilai ini sesuai kebutuhan
+      if (!this.swiperRef) {
+        return
+      }
+
+      const activeIndex = this.swiperRef.activeIndex
+      if (this.zoomLevels[activeIndex] > 0.2) {
+        this.$set(
+          this.zoomLevels,
+          activeIndex,
+          this.zoomLevels[activeIndex] - 0.1
+        )
       }
     },
+
     getSwipperRefHandle (swiper) {
       this.swiperRef = swiper
     },
-    buttonSwipperHandle (pathButton) {
-      // if (this.swiperRef.activeIndex < this.listPhoto.length) {
-      //   if (pathButton === 'next') {
-      //     this.swiperRef.slideTo(this.swiperRef.activeIndex + 1)
-      //   } else {
-      //     this.swiperRef.slideTo(this.swiperRef.activeIndex - 1)
-      //   }
-      // }
+    updateZoomLevel () {
+      this.zoomLevels = this.testLooping.map(() => 1)
     }
   }
 }
 </script>
 
 <style scoped>
-.swiper-container{
+.swiper-container {
   width: 100%;
 }
- .swiper-slide {
+.swiper-slide {
   text-align: center;
   width: auto;
 }
