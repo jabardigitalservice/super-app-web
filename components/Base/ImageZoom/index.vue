@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-black gap-[22px] mt-auto"
+    class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[800px] sm:rounded-lg dark:bg-black gap-[22px] mt-auto"
   >
     <swiper
       class="absolute transition-transform duration-300 transform max-w-full h-auto align-middle"
@@ -69,7 +69,6 @@ export default {
     return {
       zoomLevel: 1,
       swiperRef: null,
-      // waiting data from api
       testLooping: [1, 1],
       zoomLevels: []
     }
