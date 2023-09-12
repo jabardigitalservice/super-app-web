@@ -12,7 +12,7 @@
       @swiper="getSwipperRefHandle"
       @slideChange="updateZoomLevel"
     >
-      <swiper-slide v-for="(item, index) in testLooping" :key="index">
+      <swiper-slide v-for="(item, index) in loopingDummy" :key="index">
         <img
           :src="src"
           :style="computedZoomStyles(index)"
@@ -73,7 +73,7 @@ export default {
     return {
       zoomLevel: 1,
       swiperRef: null,
-      testLooping: [1, 1],
+      loopingDummy: [1, 1],
       zoomLevels: []
     }
   },
@@ -84,7 +84,7 @@ export default {
     }
   },
   mounted () {
-    this.zoomLevels = this.testLooping.map(() => 1)
+    this.zoomLevels = this.loopingDummy.map(() => 1)
   },
   methods: {
     computedZoomStyles (index) {
@@ -117,7 +117,7 @@ export default {
       this.swiperRef = swiper
     },
     updateZoomLevel () {
-      this.zoomLevels = this.testLooping.map(() => 1)
+      this.zoomLevels = this.loopingDummy.map(() => 1)
     }
   }
 }
