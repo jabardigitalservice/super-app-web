@@ -14,6 +14,7 @@
     >
       <swiper-slide v-for="(item, index) in loopingDummy" :key="index">
         <img
+          :alt="`Foto Aduan - ${index}`"
           :src="src"
           :style="computedZoomStyles(index)"
           class="h-full w-auto"
