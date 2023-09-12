@@ -3,6 +3,7 @@
     <span
       class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
     >Riwayat Aduan</span>
+
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <!-- jika log span / history span ada -->
       <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
@@ -25,6 +26,7 @@
           "
           :line-milestone="index !== dataMilestone.length - 1"
         />
+
         <div class="w-full">
           <CardMilestone>
             <TextMilestone>
@@ -158,7 +160,9 @@
               <div>
                 <StatusText
                   :condition-text="isLogSpanLaporExist(milestone)"
-                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                  :text="
+                    getStatusTextAndIcon(milestone.status_aduan).textStatus
+                  "
                 />
 
                 <HelperText
@@ -259,7 +263,9 @@
               <div>
                 <StatusText
                   :condition-text="index > 0"
-                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                  :text="
+                    getStatusTextAndIcon(milestone.status_aduan).textStatus
+                  "
                 />
 
                 <HelperText
@@ -484,97 +490,42 @@ export default {
     getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
-          return {
-            status: dataStatusMilestone.menungguVerifikasi.textStatus,
-            icon: dataStatusMilestone.menungguVerifikasi.icon,
-            fillColor: dataStatusMilestone.menungguVerifikasi.fillColor,
-            getNameStatus: dataStatusMilestone.menungguVerifikasi.getNameStatus
-          }
+          return dataStatusMilestone.menungguVerifikasi
         case dataStatusMilestone.ditolak.status:
-          return {
-            status: dataStatusMilestone.ditolak.textStatus,
-            icon: dataStatusMilestone.ditolak.icon,
-            fillColor: dataStatusMilestone.ditolak.fillColor,
-            getNameStatus: dataStatusMilestone.ditolak.getNameStatus
-          }
+          return dataStatusMilestone.ditolak
         case dataStatusMilestone.terverifikasi.status:
-          return {
-            status: dataStatusMilestone.terverifikasi.textStatus,
-            icon: dataStatusMilestone.terverifikasi.icon,
-            fillColor: dataStatusMilestone.terverifikasi.fillColor,
-            getNameStatus: dataStatusMilestone.terverifikasi.getNameStatus
-          }
+          return dataStatusMilestone.terverifikasi
         case dataStatusMilestone.dikoordinasikan.status:
-          return {
-            status: dataStatusMilestone.dikoordinasikan.textStatus,
-            icon: dataStatusMilestone.dikoordinasikan.icon,
-            fillColor: dataStatusMilestone.dikoordinasikan.fillColor,
-            getNameStatus: dataStatusMilestone.dikoordinasikan.getNameStatus
-          }
+          return dataStatusMilestone.dikoordinasikan
         case dataStatusMilestone.ditindakLanjuti.status:
-          return {
-            status: dataStatusMilestone.ditindakLanjuti.textStatus,
-            icon: dataStatusMilestone.ditindakLanjuti.icon,
-            fillColor: dataStatusMilestone.ditindakLanjuti.fillColor,
-            getNameStatus: dataStatusMilestone.ditindakLanjuti.getNameStatus
-          }
+          return dataStatusMilestone.ditindakLanjuti
         case dataStatusMilestone.selesai.status:
-          return {
-            status: dataStatusMilestone.selesai.textStatus,
-            icon: dataStatusMilestone.selesai.icon,
-            fillColor: dataStatusMilestone.selesai.fillColor,
-            getNameStatus: dataStatusMilestone.selesai.getNameStatus
-          }
+          return dataStatusMilestone.selesai
         case dataStatusMilestone.ditutup.status:
-          return {
-            status: dataStatusMilestone.ditutup.textStatus,
-            icon: dataStatusMilestone.ditutup.icon,
-            fillColor: dataStatusMilestone.ditutup.fillColor,
-            getNameStatus: dataStatusMilestone.ditutup.getNameStatus
-          }
+          return dataStatusMilestone.ditutup
         case dataStatusMilestone.dialihkan.status:
           if (
             typeof lastStatusSpan !== 'undefined' &&
             lastStatusSpan.includes('Ditutup')
           ) {
             return {
-              status: dataStatusMilestone.dialihkan.textStatus,
+              textStatus: dataStatusMilestone.dialihkan.textStatus,
               icon: dataStatusMilestone.ditutup.icon,
               fillColor: dataStatusMilestone.ditutup.fillColor,
               getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
             }
           } else {
-            return {
-              status: dataStatusMilestone.dialihkan.textStatus,
-              icon: dataStatusMilestone.dialihkan.icon,
-              fillColor: dataStatusMilestone.dialihkan.fillColor,
-              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
-            }
+            return dataStatusMilestone.dialihkan
           }
         case dataStatusMilestone.gagalDiverifikasi.status:
-          return {
-            status: dataStatusMilestone.gagalDiverifikasi.textStatus,
-            icon: dataStatusMilestone.gagalDiverifikasi.icon,
-            fillColor: dataStatusMilestone.gagalDiverifikasi.fillColor,
-            getNameStatus: dataStatusMilestone.gagalDiverifikasi.getNameStatus
-          }
+          return dataStatusMilestone.gagalDiverifikasi
         case dataStatusMilestone.pengerjaanDitunda.status:
-          return {
-            status: dataStatusMilestone.pengerjaanDitunda.textStatus,
-            icon: dataStatusMilestone.pengerjaanDitunda.icon,
-            fillColor: dataStatusMilestone.pengerjaanDitunda.fillColor,
-            getNameStatus: dataStatusMilestone.pengerjaanDitunda.getNameStatus
-          }
+          return dataStatusMilestone.pengerjaanDitunda
         case dataStatusMilestone.pengerjaanDitinjauUlang.status:
-          return {
-            status: dataStatusMilestone.pengerjaanDitinjauUlang.textStatus,
-            icon: dataStatusMilestone.pengerjaanDitinjauUlang.icon,
-            fillColor: dataStatusMilestone.pengerjaanDitinjauUlang.fillColor,
-            getNameStatus:
-              dataStatusMilestone.pengerjaanDitinjauUlang.getNameStatus
-          }
+          return dataStatusMilestone.gagalDivepengerjaanDitinjauUlangrifikasi
         default:
           return {
+            textStatus: '',
             status: '',
             icon: '',
             fillColor: ''
@@ -679,7 +630,10 @@ export default {
       }
     },
     showButtonBuatAduanBaru (status) {
-      return (status === dataStatusMilestone.ditolak.status || status === dataStatusMilestone.gagalDiverifikasi.status)
+      return (
+        status === dataStatusMilestone.ditolak.status ||
+        status === dataStatusMilestone.gagalDiverifikasi.status
+      )
     },
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
