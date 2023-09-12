@@ -1,11 +1,11 @@
 <template>
   <div
-    class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[800px] sm:rounded-lg dark:bg-black gap-[22px] mt-auto"
+    class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black gap-[22px] mt-auto"
   >
     <swiper
-      class="absolute transition-transform duration-300 transform max-w-full h-auto align-middle"
+      class="absolute transition-transform duration-300 transform h-[450px] align-middle"
       :slides-per-view="2"
-      :space-between="30"
+      :space-between="10"
       :centered-slides="true"
       observer
       observe-parents
@@ -13,7 +13,11 @@
       @slideChange="updateZoomLevel"
     >
       <swiper-slide v-for="(item, index) in testLooping" :key="index">
-        <img :src="src" :style="computedZoomStyles(index)">
+        <img
+          :src="src"
+          :style="computedZoomStyles(index)"
+          class="h-full w-auto"
+        >
       </swiper-slide>
     </swiper>
 
@@ -89,10 +93,6 @@ export default {
       }
     },
     zoomIn () {
-      if (!this.swiperRef) {
-        return
-      }
-
       const activeIndex = this.swiperRef.activeIndex
       if (this.zoomLevels[activeIndex] <= 3) {
         this.$set(
@@ -103,10 +103,6 @@ export default {
       }
     },
     zoomOut () {
-      if (!this.swiperRef) {
-        return
-      }
-
       const activeIndex = this.swiperRef.activeIndex
       if (this.zoomLevels[activeIndex] > 0.2) {
         this.$set(
@@ -133,11 +129,6 @@ export default {
 }
 .swiper-slide {
   text-align: center;
-  width: auto;
-}
-
-.slide-image {
-  height: 400px;
-  width: auto;
+  width: 250px;
 }
 </style>
