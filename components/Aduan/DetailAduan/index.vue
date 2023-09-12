@@ -1,8 +1,10 @@
 <template>
   <div class="flex flex-col">
-    <span
+    <h6
       class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto"
-    >Detail Aduan</span>
+    >
+      Detail Aduan
+    </h6>
     <div class="grid grid-cols-2 mt-3">
       <div class="flex flex-col gap-y-1">
         <TextTitle>No. Aduan</TextTitle>
@@ -57,6 +59,7 @@
         </div>
       </button>
     </div>
+    </h1>
   </div>
 </template>
 
