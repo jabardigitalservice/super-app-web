@@ -281,10 +281,10 @@
               </div>
             </TextMilestone>
 
-            <!-- memunculkan keterangan penanung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
+            <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
             <template
               v-if="
-                showEstimasiPengerjaanAndPenanungJawab(milestone.status_aduan)
+                showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
               "
             >
               <TextMilestone>
@@ -599,7 +599,7 @@ export default {
           return name
       }
     },
-    showEstimasiPengerjaanAndPenanungJawab (status) {
+    showEstimasiPengerjaanAndPenanggungJawab (status) {
       const validStatuses = [
         dataStatusMilestone.ditindakLanjuti.status,
         dataStatusMilestone.selesai.status,
