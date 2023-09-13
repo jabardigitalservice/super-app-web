@@ -54,5 +54,26 @@ export const dataStatusMilestone = Object.freeze({
     icon: 'cordination.svg',
     fillColor: '#1E88E5',
     getNameStatus: 'admin_monitoring_status_aduan'
+  },
+  gagalDiverifikasi: {
+    status: 'Gagal Diverifikasi',
+    textStatus: 'Gagal Diverifikasi',
+    icon: 'failed-verification.svg',
+    fillColor: '#F44336',
+    getNameStatus: 'admin_monitoring_status_aduan'
+  },
+  pengerjaanDitunda: {
+    status: 'Pengerjaan Ditunda',
+    textStatus: 'Pengerjaan Ditunda',
+    icon: 'delayed.svg',
+    fillColor: '#AB47BC',
+    getNameStatus: 'nama_instansi_penanggung_jawab'
+  },
+  pengerjaanDitinjauUlang: {
+    status: 'Pengerjaan Ditinjau Ulang',
+    textStatus: 'Pengerjaan Ditinjau Ulang',
+    icon: 'review.svg',
+    fillColor: '#FF7500',
+    getNameStatus: 'nama_instansi_penanggung_jawab'
   }
 })
