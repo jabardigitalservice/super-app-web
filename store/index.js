@@ -1,7 +1,7 @@
 export const state = () => ({
 
   logSpan: [],
-  fileAduan: ''
+  fileAduan: []
 })
 
 export const mutations = {
