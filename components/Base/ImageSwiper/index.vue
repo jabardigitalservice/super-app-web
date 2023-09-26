@@ -31,7 +31,7 @@ import 'swiper/swiper-bundle.css'
 
 SwiperCore.use([Navigation, Pagination, Autoplay])
 export default {
-  name: 'BaseImageZoom',
+  name: 'BaseImageSwiper',
   components: {
     Swiper,
     SwiperSlide
