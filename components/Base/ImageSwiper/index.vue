@@ -10,13 +10,11 @@
       observer
       observe-parents
       @swiper="getSwipperRefHandle"
-      @slideChange="updateZoomLevel"
     >
-      <swiper-slide v-for="(item, index) in loopingDummy" :key="index">
+      <swiper-slide v-for="(item, index) in src" :key="index">
         <img
           :alt="`Foto Aduan - ${index}`"
-          :src="src"
-          :style="computedZoomStyles(index)"
+          :src="item"
           class="h-full w-auto"
         >
       </swiper-slide>

@@ -47,7 +47,7 @@
       <TextTitle> Foto Aduan </TextTitle>
       <button
         class="px-4 py-3 flex text-[12px] font-lato text-gray-800 font-bold border border-gray-300 rounded-md p-4 bg-white w-full mt-2 dark:border-0 dark:bg-dark-emphasis-medium dark:text-dark-text-high"
-        @click="goToPageFile(dataAduan[0]?.foto_bukti_kejadian_evidence)"
+        @click="goToPageFile(dataAduan[0].foto_bukti_kejadian_evidence.split('\n'))"
       >
         <div class="flex items-center gap-3 w-full justify-center">
           <BaseIconSvg
