@@ -38,59 +38,19 @@ export default {
   },
   props: {
     src: {
-      type: String,
-      required: true
+      type: Array,
+      default: () => []
     }
   },
   data () {
     return {
-      zoomLevel: 1,
-      swiperRef: null,
-      loopingDummy: [1, 1],
-      zoomLevels: []
+      swiperRef: null
     }
   },
-  computed: {
-    currentZoomLevel () {
-      const activeIndex = this.swiperRef ? this.swiperRef.activeIndex : 0
-      return this.zoomLevels[activeIndex]
-    }
-  },
-  mounted () {
-    this.zoomLevels = this.loopingDummy.map(() => 1)
-  },
-  methods: {
-    computedZoomStyles (index) {
-      return {
-        transform: `scale(${this.zoomLevels[index]})`
-      }
-    },
-    zoomIn () {
-      const activeIndex = this.swiperRef.activeIndex
-      if (this.zoomLevels[activeIndex] <= 3) {
-        this.$set(
-          this.zoomLevels,
-          activeIndex,
-          this.zoomLevels[activeIndex] + 0.1
-        )
-      }
-    },
-    zoomOut () {
-      const activeIndex = this.swiperRef.activeIndex
-      if (this.zoomLevels[activeIndex] > 0.2) {
-        this.$set(
-          this.zoomLevels,
-          activeIndex,
-          this.zoomLevels[activeIndex] - 0.1
-        )
-      }
-    },
 
+  methods: {
     getSwipperRefHandle (swiper) {
       this.swiperRef = swiper
-    },
-    updateZoomLevel () {
-      this.zoomLevels = this.loopingDummy.map(() => 1)
     }
   }
 }
