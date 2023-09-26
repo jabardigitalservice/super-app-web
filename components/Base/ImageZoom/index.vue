@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative bg-white w-full h-full p-4 flex flex-col justify-center items-center dark:bg-black gap-[22px] mt-auto"
+    class="bg-white w-full h-full p-4 flex justify-center items-center dark:bg-black mt-auto"
   >
     <swiper
       class="absolute transition-transform duration-300 transform h-[450px] align-middle"
@@ -21,34 +21,6 @@
         >
       </swiper-slide>
     </swiper>
-
-    <div
-      class="absolute bottom-8 mx-auto flex flex-row py-[7px] px-[12px] gap-[24px] bg-green-600 rounded-[38px] shadow-md"
-    >
-      <button
-        class="text-green-300 flex justify-center items-center"
-        :disabled="currentZoomLevel <= 1"
-        @click="zoomOut"
-      >
-        <BaseIconSvg
-          icon="/icon/zoom-out.svg"
-          class="!shadow-lg !w-[32px] !h-[32px]"
-          :fill-color="currentZoomLevel > 1 ? '#FFFFFF' : '#70CD94'"
-        />
-      </button>
-      <div class="absolute left-1/2 -ml-0.5 h-[32px] w-[1px] bg-green-500" />
-      <button
-        class="text-white flex justify-center items-center"
-        :disabled="currentZoomLevel >= 3"
-        @click="zoomIn"
-      >
-        <BaseIconSvg
-          icon="/icon/zoom-in.svg"
-          class="!shadow-lg !w-[32px] !h-[32px]"
-          :fill-color="currentZoomLevel >= 3 ? '#70CD94' : '#FFFFFF'"
-        />
-      </button>
-    </div>
   </div>
 </template>
 
