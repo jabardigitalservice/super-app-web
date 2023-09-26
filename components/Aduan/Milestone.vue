@@ -432,6 +432,18 @@
             </BaseButton>
           </NuxtLink>
 
+          <BaseButtonCustom class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0">
+            <BaseButtonBodyCustom>
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >Dokumen Bukti</span>
+            </BaseButtonBodyCustom>
+          </BaseButtonCustom>
+
           <BaseButton
             v-if="
               isditutupOlehSpanOrSelesai(
@@ -461,6 +473,8 @@ import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
 import { formatDate } from '~/utils'
+import BaseButtonCustom from '~/components/Base/ButtonCustom/Button.vue'
+import BaseButtonBodyCustom from '~/components/Base/ButtonCustom/BodyButton.vue'
 
 export default {
   name: 'MilestoneAduan',
@@ -471,7 +485,9 @@ export default {
     LabelText,
     StatusText,
     HelperText,
-    TextDitindakLanjuti
+    TextDitindakLanjuti,
+    BaseButtonCustom,
+    BaseButtonBodyCustom
   },
   props: {
     dataMilestone: {
