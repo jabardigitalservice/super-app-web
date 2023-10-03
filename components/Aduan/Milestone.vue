@@ -538,7 +538,7 @@ export default {
         case dataStatusMilestone.pengerjaanDitunda.status:
           return dataStatusMilestone.pengerjaanDitunda
         case dataStatusMilestone.pengerjaanDitinjauUlang.status:
-          return dataStatusMilestone.gagalDivepengerjaanDitinjauUlangrifikasi
+          return dataStatusMilestone.pengerjaanDitinjauUlang
         default:
           return {
             textStatus: '',
