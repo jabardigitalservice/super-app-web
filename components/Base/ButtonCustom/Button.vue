@@ -2,7 +2,7 @@
   <button
     ref="base-button-custom"
     v-bind="$attrs"
-    class="px-4 py-3 rounded-lg border whitespace-nowrap font-bold disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 disabled:border-gray-300"
+    class="px-4 py-3 rounded-lg whitespace-nowrap font-bold disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
     v-on="$listeners"
   >
     <slot />
