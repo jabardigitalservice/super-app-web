@@ -456,12 +456,7 @@
               >Dokumen Bukti</span>
 
               <span
-                class="ml-auto"
-                :class="
-                  index > 0
-                    ? 'font-medium text-gray-500 dark:text-dark-text-low'
-                    : 'font-bold  text-green-600 '
-                "
+                class="text-end font-bold  text-green-600"
               >Lihat</span>
             </BaseButtonBodyCustom>
           </BaseButtonCustom>
