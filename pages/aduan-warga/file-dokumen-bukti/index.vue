@@ -3,7 +3,7 @@
     <div class="w-full h-full">
       <div v-for="(group, groupName) in grupByTypeFile" :key="groupName">
         <template v-if="groupName === 'images'">
-          <ButtonDokumenBukti @go-to-page="gotPageFile(group.data)">
+          <ButtonDokumenBukti @go-to-page="gotPageFile(group.data,'images')">
             <div class="flex items-center">
               <div>
                 <BaseIconSvg
@@ -31,7 +31,7 @@
           <ButtonDokumenBukti
             v-for="(url, index) in group.data"
             :key="index"
-            @go-to-page="gotPageFile(url)"
+            @go-to-page="gotPageFile(url,'file')"
           >
             <div class="flex items-center">
               <div>
@@ -69,7 +69,7 @@ export default {
         'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5714318406876661727/yankes.JPG',
         'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715109954421580499/Screenshot 2023-09-25 145359.png',
         'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715120784429903272/Screenshot 2023-09-25 145340.png',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5597927940986221505/7065e0fc-ff5a-499d-86f6-b420d024c959.JPEG',
+        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5597927940986221505/7065e0fc-ff5a-499d-86f6-b420d024c959.jpeg',
         'https://www.africau.edu/images/default/sample.pdf',
         'https://www.africau.edu/images/default/sample.pdf'
       ],
@@ -119,13 +119,13 @@ export default {
       const segments = url.split('/')
       return segments[segments.length - 1]
     },
-    gotPageFile (file) {
-      if (this.fileExtension(file) === 'pdf') {
-        this.$store.commit('setFileAduan', file)
-        this.$router.push('/aduan-warga/file-aduan/files')
-      } else if (['jpg', 'jpeg', 'png'].includes(this.fileExtension(file))) {
+    gotPageFile (file, type) {
+      if (type === 'images') {
         this.$store.commit('setFileAduan', file)
         this.$router.push('/aduan-warga/file-aduan/images')
+      } else if (this.fileExtension(file) === 'pdf') {
+        this.$store.commit('setFileAduan', file)
+        this.$router.push('/aduan-warga/file-aduan/files')
       } else {
         window.location.href = file
       }
