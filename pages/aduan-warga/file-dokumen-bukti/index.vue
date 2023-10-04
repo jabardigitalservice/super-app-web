@@ -2,7 +2,7 @@
   <div class="h-screen bg-white dark:bg-dark-emphasis-low">
     <div class="w-full h-full">
       <h2>File Dokumen Bukti</h2>
-      <div v-for="(group, groupName) in groupedUrls" :key="groupName">
+      <div v-for="(group, groupName) in grupByTypeFile" :key="groupName">
         <h3>{{ groupName }}</h3>
         <ul>
           <li v-for="(url,index) in group" :key="index">
@@ -30,11 +30,11 @@ export default {
         'blob:https://superapp-admin.staging.digitalservice.id/d4566661-0642-4cf4-bc51-5c1b61d8a7c1.pdf',
         'blob:https://superapp-admin.staging.digitalservice.id/d4566661-0642-4cf4-bc51-5c1b61d8a7c1.pdf'
       ],
-      groupedUrls: {
-        images: [],
-        xlsx: [],
-        pdf: [],
-        documents: []
+      grupByTypeFile: {
+        images: { data: [], icon: '' },
+        xlsx: { data: [], icon: '' },
+        pdf: { data: [], icon: '' },
+        documents: { data: [], icon: '' }
       }
     }
   },
@@ -51,17 +51,17 @@ export default {
         case 'jpg':
         case 'jpeg':
         case 'png':
-          this.groupedUrls.images.push(url)
+          this.grupByTypeFile.images.push(url)
           break
         case 'xlsx':
-          this.groupedUrls.xlsx.push(url)
+          this.grupByTypeFile.xlsx.push(url)
           break
         case 'pdf':
-          this.groupedUrls.pdf.push(url)
+          this.grupByTypeFile.pdf.push(url)
           break
         case 'doc':
         case 'docx':
-          this.groupedUrls.documents.push(url)
+          this.grupByTypeFile.documents.push(url)
           break
         default:
           break
