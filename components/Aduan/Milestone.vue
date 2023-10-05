@@ -437,9 +437,8 @@
               showDokumenBukti(milestone.status_aduan) &&
                 milestone.bukti_banding !== null
             "
-
             class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
-            @click="goToPageFile(milestone.bukti_banding)"
+            @click="goToPageDokumenBukti(milestone.bukti_banding)"
           >
             <BaseButtonBodyCustom>
               <BaseIconSvg
@@ -455,9 +454,7 @@
                 "
               >Dokumen Bukti</span>
 
-              <span
-                class="ml-auto font-bold text-green-600"
-              >Lihat</span>
+              <span class="ml-auto font-bold text-green-600">Lihat</span>
             </BaseButtonBodyCustom>
           </BaseButtonCustom>
 
@@ -489,10 +486,10 @@ import StatusText from './Text/StatusText.vue'
 import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
-import { formatDate } from '~/utils'
+import { formatDate, getExtensionFileByUrl } from '~/utils'
 import BaseButtonCustom from '~/components/Base/ButtonCustom/Button.vue'
 import BaseButtonBodyCustom from '~/components/Base/ButtonCustom/BodyButton.vue'
-
+import { fileGroupMixin } from '~/mixins/fileGroupMixin'
 export default {
   name: 'MilestoneAduan',
   components: {
@@ -506,6 +503,7 @@ export default {
     BaseButtonCustom,
     BaseButtonBodyCustom
   },
+  mixins: [fileGroupMixin],
   props: {
     dataMilestone: {
       type: Array,
@@ -520,6 +518,7 @@ export default {
 
   methods: {
     formatDate,
+    getExtensionFileByUrl,
     getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
@@ -702,23 +701,55 @@ export default {
       }
       return false
     },
-    goToPageFile (file) {
-      console.log(file)
-      const dummyFile = [
-        'http://101.50.0.202:12002/trk/img/lim/Book1.xlsx',
-        'http://101.50.0.202:12002/trk/img/lim/Book1.xlsx',
-        'http://101.50.0.202:12002/trk/img/lim/Book1.xlsx',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5714318406876661727/yankes.JPG',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715109954421580499/Screenshot 2023-09-25 145359.png',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715120784429903272/Screenshot 2023-09-25 145340.png',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5597927940986221505/7065e0fc-ff5a-499d-86f6-b420d024c959.jpeg',
-        'blob:https://superapp-admin.staging.digitalservice.id/d4566661-0642-4cf4-bc51-5c1b61d8a7c1',
-        'blob:https://superapp-admin.staging.digitalservice.id/d4566661-0642-4cf4-bc51-5c1b61d8a7c1'
-      ]
+    goToPageDokumenBukti (fileArray) {
+      if (fileArray.length === 1) {
+        const parts = fileArray[0].split('.')
+        const extensionFiles = this.checkExtensionFiles(
+          parts[parts.length - 1]
+        )
 
-      this.$store.commit('setFileDokumenBukti', dummyFile)
-      console.log(this.$store.state.fileDokumenBukti)
-      this.$router.push('/aduan-warga/file-dokumen-bukti')
+        if (extensionFiles === 'images' || extensionFiles === 'pdf') {
+          this.$store.commit('setFileAduan', fileArray)
+          this.$router.push(`/aduan-warga/file-aduan/${extensionFiles}`)
+          return
+        }
+
+        window.location.href = fileArray[0]
+      } else {
+        this.groupingFileByExtension(fileArray)
+
+        const {
+          images: { data: imagesDataArray },
+          xlsx: { data: xlsxDataArray },
+          pdf: { data: pdfDataArray },
+          documents: { data: documentsDataArray }
+        } = this.grupByTypeFile
+
+        if (imagesDataArray.length > 1 && xlsxDataArray.length === 0 && pdfDataArray.length === 0 && documentsDataArray.length === 0) {
+          this.$store.commit('setFileAduan', imagesDataArray)
+          this.$router.push('/aduan-warga/file-aduan/images')
+        } else {
+          this.$store.commit('setFileDokumenBukti', fileArray)
+          this.$router.push('/aduan-warga/page-dokumen-bukti')
+        }
+      }
+    },
+    checkExtensionFiles (typeFile) {
+      switch (typeFile.toLowerCase()) {
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+          return 'images'
+        case 'xlsx':
+          return 'files'
+        case 'pdf':
+          return 'pdf'
+        case 'doc':
+        case 'docx':
+          return 'files'
+        default:
+          return ''
+      }
     }
   }
 }

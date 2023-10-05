@@ -2,8 +2,8 @@
   <div class="h-screen bg-white dark:bg-dark-emphasis-low">
     <div class="w-full h-full">
       <div v-for="(group, groupName) in grupByTypeFile" :key="groupName">
-        <template v-if="groupName === 'images'">
-          <ButtonDokumenBukti @go-to-page="gotPageFile(group.data,'images')">
+        <template v-if="groupName === 'images' && group.data.length > 0">
+          <ButtonDokumenBukti @go-to-page="gotPageFile(group.data, 'images')">
             <div class="flex items-center">
               <div>
                 <BaseIconSvg
@@ -17,13 +17,9 @@
               >Gambar
               </span>
 
-              <div
-                class="dark:bg-dark-emphasis-medium bg-gray-100 flex px-5.5 flex-col items-center gap-10 rounded-xl"
-              >
-                <span
-                  class="text-[12px] font-roboto font-medium leading-[18px] dark:text-dark-text-high text-gray-800 p-1"
-                >{{ group.data.length }} Terlampir</span>
-              </div>
+              <span
+                class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full font-roboto leading-[18px] dark:text-dark-text-high text-gray-800 dark:bg-dark-emphasis-medium bg-gray-100"
+              >{{ group.data.length }} Terlampir</span>
             </div>
           </ButtonDokumenBukti>
         </template>
@@ -31,7 +27,7 @@
           <ButtonDokumenBukti
             v-for="(url, index) in group.data"
             :key="index"
-            @go-to-page="gotPageFile(url,'file')"
+            @go-to-page="gotPageFile(url, 'file')"
           >
             <div class="flex items-center">
               <div>
@@ -54,67 +50,32 @@
 
 <script>
 import ButtonDokumenBukti from '~/components/Aduan/ButtonDokumenBukti'
+import { getExtensionFileByUrl } from '~/utils'
+import { fileGroupMixin } from '~/mixins/fileGroupMixin'
 export default {
-  name: 'FileDokumenBukti',
+  name: 'PageDokumenBukti',
   components: {
     ButtonDokumenBukti
   },
-
-  data () {
-    return {
-      grupByTypeFile: {
-        images: { data: [], icon: '/icon/type-images.png' },
-        xlsx: { data: [], icon: '/icon/type-xls.png' },
-        pdf: { data: [], icon: '/icon/type-pdf.png' },
-        documents: { data: [], icon: '/icon/type-doc.png' }
-      }
-    }
-  },
+  mixins: [fileGroupMixin],
   head () {
     return {
       title: 'File Dokumen Bukti'
     }
   },
   mounted () {
-    this.$store.state.fileDokumenBukti.forEach((url) => {
-      const extension = this.fileExtension(url)
-      switch (extension.toLowerCase()) {
-        case 'jpg':
-        case 'jpeg':
-        case 'png':
-          this.grupByTypeFile.images.data.push(url)
-          break
-        case 'xlsx':
-          this.grupByTypeFile.xlsx.data.push(url)
-          break
-        case 'pdf':
-          this.grupByTypeFile.pdf.data.push(url)
-          break
-        case 'doc':
-        case 'docx':
-          this.grupByTypeFile.documents.data.push(url)
-          break
-        default:
-          break
-      }
-    })
+    this.groupingFileByExtension(this.$store.state.fileDokumenBukti)
   },
   methods: {
-    fileExtension (url) {
-      const parts = url.split('.')
-      return parts[parts.length - 1]
-    },
+    getExtensionFileByUrl,
     getLastSegment (url) {
       const segments = url.split('/')
       return segments[segments.length - 1]
     },
     gotPageFile (file, type) {
-      if (type === 'images') {
+      if (type === 'images' || this.getExtensionFileByUrl(file) === 'pdf') {
         this.$store.commit('setFileAduan', file)
-        this.$router.push('/aduan-warga/file-aduan/images')
-      } else if (this.fileExtension(file) === 'pdf') {
-        this.$store.commit('setFileAduan', file)
-        this.$router.push('/aduan-warga/file-aduan/files')
+        this.$router.push(`/aduan-warga/file-aduan/${type}`)
       } else {
         window.location.href = file
       }
