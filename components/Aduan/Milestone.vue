@@ -456,7 +456,7 @@
               >Dokumen Bukti</span>
 
               <span
-                class="text-end font-bold  text-green-600"
+                class="ml-auto font-bold text-green-600"
               >Lihat</span>
             </BaseButtonBodyCustom>
           </BaseButtonCustom>

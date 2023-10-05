@@ -62,17 +62,6 @@ export default {
 
   data () {
     return {
-      dummyFile: [
-        'http://101.50.0.202:12002/trk/img/lim/Book1.xlsx',
-        'http://101.50.0.202:12002/trk/img/lim/Book1.xlsx',
-        'http://101.50.0.202:12002/trk/img/lim/Book1.doc',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5714318406876661727/yankes.JPG',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715109954421580499/Screenshot 2023-09-25 145359.png',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5715120784429903272/Screenshot 2023-09-25 145340.png',
-        'https://www.jotform.com/uploads/JDS_Digital/230227877098062/5597927940986221505/7065e0fc-ff5a-499d-86f6-b420d024c959.jpeg',
-        'https://www.africau.edu/images/default/sample.pdf',
-        'https://www.africau.edu/images/default/sample.pdf'
-      ],
       grupByTypeFile: {
         images: { data: [], icon: '/icon/type-images.png' },
         xlsx: { data: [], icon: '/icon/type-xls.png' },
@@ -87,9 +76,9 @@ export default {
     }
   },
   mounted () {
-    this.dummyFile.forEach((url) => {
+    this.$store.state.fileDokumenBukti.forEach((url) => {
       const extension = this.fileExtension(url)
-      switch (extension) {
+      switch (extension.toLowerCase()) {
         case 'jpg':
         case 'jpeg':
         case 'png':

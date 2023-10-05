@@ -59,7 +59,6 @@
         </div>
       </button>
     </div>
-    </h1>
   </div>
 </template>
 
