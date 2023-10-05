@@ -1,7 +1,8 @@
 export const state = () => ({
 
   logSpan: [],
-  fileAduan: []
+  fileAduan: [],
+  fileDokumenBukti: []
 })
 
 export const mutations = {
@@ -10,6 +11,9 @@ export const mutations = {
   },
   setFileAduan (state, fileAduan) {
     state.fileAduan = fileAduan
+  },
+  setFileDokumenBukti (state, fileDokumenBukti) {
+    state.fileDokumenBukti = fileDokumenBukti
   }
 
 }

@@ -432,6 +432,32 @@
             </BaseButton>
           </NuxtLink>
 
+          <BaseButtonCustom
+            v-if="
+              showDokumenBukti(milestone.status_aduan) &&
+                milestone.bukti_banding !== null
+            "
+            class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
+            @click="goToPageDokumenBukti(milestone.bukti_banding)"
+          >
+            <BaseButtonBodyCustom>
+              <BaseIconSvg
+                icon="/icon/image-and-document.svg"
+                class="!w-[14px] !h-[14px]"
+                :fill-color="'#757575'"
+              />
+              <span
+                :class="
+                  index > 0
+                    ? 'font-medium text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >Dokumen Bukti</span>
+
+              <span class="ml-auto font-bold text-green-600">Lihat</span>
+            </BaseButtonBodyCustom>
+          </BaseButtonCustom>
+
           <BaseButton
             v-if="
               isditutupOlehSpanOrSelesai(
@@ -460,8 +486,10 @@ import StatusText from './Text/StatusText.vue'
 import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
-import { formatDate } from '~/utils'
-
+import { formatDate, getExtensionFileByUrl } from '~/utils'
+import BaseButtonCustom from '~/components/Base/ButtonCustom/Button.vue'
+import BaseButtonBodyCustom from '~/components/Base/ButtonCustom/BodyButton.vue'
+import { fileGroupMixin } from '~/mixins/fileGroupMixin'
 export default {
   name: 'MilestoneAduan',
   components: {
@@ -471,8 +499,11 @@ export default {
     LabelText,
     StatusText,
     HelperText,
-    TextDitindakLanjuti
+    TextDitindakLanjuti,
+    BaseButtonCustom,
+    BaseButtonBodyCustom
   },
+  mixins: [fileGroupMixin],
   props: {
     dataMilestone: {
       type: Array,
@@ -487,6 +518,7 @@ export default {
 
   methods: {
     formatDate,
+    getExtensionFileByUrl,
     getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
@@ -550,18 +582,27 @@ export default {
           return name
       }
     },
+    showDokumenBukti (status) {
+      const validStatus = [
+        dataStatusMilestone.selesai.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatus.includes(status)
+    },
     showEstimasiPengerjaanAndPenanggungJawab (status) {
-      const validStatuses = [
+      const validStatus = [
         dataStatusMilestone.ditindakLanjuti.status,
         dataStatusMilestone.selesai.status,
         dataStatusMilestone.pengerjaanDitunda.status,
         dataStatusMilestone.pengerjaanDitinjauUlang.status
       ]
 
-      return validStatuses.includes(status)
+      return validStatus.includes(status)
     },
     showCatatanOrKeterangan (status) {
-      const validStatuses = [
+      const validStatus = [
         dataStatusMilestone.ditolak.status,
         dataStatusMilestone.dikoordinasikan.status,
         dataStatusMilestone.dialihkan.status,
@@ -572,7 +613,7 @@ export default {
         dataStatusMilestone.pengerjaanDitinjauUlang.status
       ]
 
-      return validStatuses.includes(status)
+      return validStatus.includes(status)
     },
     isSpanLapor (milestone) {
       return (
@@ -659,6 +700,56 @@ export default {
         return this.isSpanLapor(milestone) && logSpanLapor?.length > 0
       }
       return false
+    },
+    goToPageDokumenBukti (fileArray) {
+      if (fileArray.length === 1) {
+        const parts = fileArray[0].split('.')
+        const extensionFiles = this.checkExtensionFiles(
+          parts[parts.length - 1]
+        )
+
+        if (extensionFiles === 'images' || extensionFiles === 'pdf') {
+          this.$store.commit('setFileAduan', fileArray)
+          this.$router.push(`/aduan-warga/file-aduan/${extensionFiles}`)
+          return
+        }
+
+        window.location.href = fileArray[0]
+      } else {
+        this.groupingFileByExtension(fileArray)
+
+        const {
+          images: { data: imagesDataArray },
+          xlsx: { data: xlsxDataArray },
+          pdf: { data: pdfDataArray },
+          documents: { data: documentsDataArray }
+        } = this.grupByTypeFile
+
+        if (imagesDataArray.length > 1 && xlsxDataArray.length === 0 && pdfDataArray.length === 0 && documentsDataArray.length === 0) {
+          this.$store.commit('setFileAduan', imagesDataArray)
+          this.$router.push('/aduan-warga/file-aduan/images')
+        } else {
+          this.$store.commit('setFileDokumenBukti', fileArray)
+          this.$router.push('/aduan-warga/page-dokumen-bukti')
+        }
+      }
+    },
+    checkExtensionFiles (typeFile) {
+      switch (typeFile.toLowerCase()) {
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+          return 'images'
+        case 'xlsx':
+          return 'files'
+        case 'pdf':
+          return 'pdf'
+        case 'doc':
+        case 'docx':
+          return 'files'
+        default:
+          return ''
+      }
     }
   }
 }

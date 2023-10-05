@@ -42,3 +42,8 @@ export async function fetchAduanData ($aduanAPI, $newrelicSetup, idAduan, config
 
   return null
 }
+
+export function getExtensionFileByUrl (url) {
+  const parts = url.split('.')
+  return parts[parts.length - 1]
+}
