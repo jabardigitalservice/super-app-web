@@ -4,10 +4,9 @@ import id from 'date-fns/locale/id'
 
 export function formatDate (date, format) {
   // check if valid date
-  if (isValid(new Date(date))) {
-    return formatInTimeZone(date, 'Asia/Jakarta', format, { locale: id })
-  }
-  return '-'
+  return date && isValid(new Date(date))
+    ? formatInTimeZone(date, 'Asia/Jakarta', format, { locale: id })
+    : '-'
 }
 
 export async function fetchAduanData ($aduanAPI, $newrelicSetup, idAduan, config) {
