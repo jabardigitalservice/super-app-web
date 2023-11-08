@@ -1,7 +1,7 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
     <div
-      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-black"
+      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-dark-emphasis-low"
     >
       <div class="flex justify-center items-center m-auto">
         <BaseIconSvg
