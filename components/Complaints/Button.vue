@@ -1,5 +1,5 @@
 <template>
-  <BaseButton class="rounded-lg border-2 border-gray-400" :href="config.linkApps.android">
+  <BaseButton class="rounded-lg border-2 border-gray-400" @click="goToLink(link)">
     <BaseIconSvg
       :icon="`/icon/${icon}.svg`"
       mode="image"
@@ -22,9 +22,16 @@ export default {
     textButton: {
       type: String,
       default: ''
+    },
+    link: {
+      type: String,
+      default: ''
+    }
+  },
+  methods: {
+    goToLink (link) {
+      window.location.href = link
     }
   }
 }
 </script>
-
-<style></style>
