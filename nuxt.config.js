@@ -106,7 +106,8 @@ export default {
       }
     },
     googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
-    baseURLAduan: { url: process.env.BASE_URL_ADUAN, username: process.env.USERNAME_URL_ADUAN, password: process.env.PASSWORD_URL_ADUAN }
+    baseURLAduan: { url: process.env.BASE_URL_ADUAN, username: process.env.USERNAME_URL_ADUAN, password: process.env.PASSWORD_URL_ADUAN },
+    linkApps: { android: process.env.LINK_SAPAWARGA_ANDROID, ios: process.env.LINK_SAPAWARGA_IOS }
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
