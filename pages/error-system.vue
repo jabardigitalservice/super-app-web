@@ -41,10 +41,15 @@
 </template>
 
 <script>
-// import Complaints from '~/components/Complaints'
-
 export default {
-  name: 'ErrorSystemPage'
-  //   components: { Complaints }
+  name: 'ErrorSystemPage',
+  data () {
+    return {
+      isDark: false
+    }
+  },
+  mounted () {
+    this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
 }
 </script>
