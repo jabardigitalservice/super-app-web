@@ -52,7 +52,7 @@ export default {
   props: {
     errorMessage: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   data () {
