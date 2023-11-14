@@ -1,6 +1,6 @@
 <template>
   <div
-
+    v-if="dataAduan"
     class="h-screen bg-background dark:bg-dark-emphasis-low"
   >
     <div
@@ -8,7 +8,7 @@
     >
       <div class="p-4">
         <BaseSpinner :show-spinner="loading" />
-        <AduanDetailAduan :data-aduan="dataAduan" />
+        <AduanDetailAduan :data-aduan="dataAduan[0]" />
         <Milestone
           :data-milestone="dataAduan"
           class="mt-[32px]"
@@ -36,6 +36,7 @@
       </BaseDialog>
     </div>
   </div>
+  <ErrorCustom v-else />
 </template>
 
 <script>
@@ -56,11 +57,8 @@ export default {
         $config
       )
 
-      if (data) {
-        dataAduan = data
-      } else {
-        error({ statusCode: 500, message: 'Run Time Error' })
-      }
+      dataAduan = data
+
       loading = false
     } catch (error) {
       $newrelicSetup.noticeError(error)
