@@ -1,36 +1,42 @@
-<template class="h-screen bg-background dark:bg-dark-emphasis-low">
+<template>
   <div
-    class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
+    v-if="dataAduan"
+    class="h-screen bg-background dark:bg-dark-emphasis-low"
   >
-    <div class="p-4">
-      <BaseSpinner :show-spinner="loading" />
-      <AduanDetailAduan :data-aduan="dataAduan" />
-      <Milestone
-        :data-milestone="dataAduan"
-        class="mt-[32px]"
-        @open-dialog="openDialog"
-      />
-    </div>
-
-    <BaseBlurPopup :show-popup="showDialog" />
-
-    <BaseDialog
-      :show-popup="showDialog"
-      title="Konfirmasi Penyelesaian"
-      label-button-approve="Ya, Sangat Membantu"
-      label-button-reject="Tidak, Buat Aduan Baru"
-      :information-message="
-        idSpanLaporIsExists
-          ? `Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR.`
-          : ''
-      "
-      @close="showDialog = false"
-      @submit="backToSearchAduan"
-      @reject="goToCreateAduan"
+    <div
+      class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
     >
-      Apakah penyelesaian dari instansi ini membantu?
-    </BaseDialog>
+      <div class="p-4">
+        <BaseSpinner :show-spinner="loading" />
+        <AduanDetailAduan :data-aduan="dataAduan[0]" />
+        <Milestone
+          :data-milestone="dataAduan"
+          class="mt-[32px]"
+          @open-dialog="openDialog"
+        />
+      </div>
+
+      <BaseBlurPopup :show-popup="showDialog" />
+
+      <BaseDialog
+        :show-popup="showDialog"
+        title="Konfirmasi Penyelesaian"
+        label-button-approve="Ya, Sangat Membantu"
+        label-button-reject="Tidak, Buat Aduan Baru"
+        :information-message="
+          idSpanLaporIsExists
+            ? `Aduan Anda akan ditutup oleh sistem sesuai dengan batas waktu yang ditentukan oleh SP4N LAPOR.`
+            : ''
+        "
+        @close="showDialog = false"
+        @submit="backToSearchAduan"
+        @reject="goToCreateAduan"
+      >
+        Apakah penyelesaian dari instansi ini membantu?
+      </BaseDialog>
+    </div>
   </div>
+  <ErrorCustom v-else />
 </template>
 
 <script>
@@ -52,10 +58,10 @@ export default {
       )
 
       dataAduan = data
+
       loading = false
     } catch (error) {
       $newrelicSetup.noticeError(error)
-
       loading = false
     }
 

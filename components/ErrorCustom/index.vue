@@ -24,13 +24,20 @@
               <h3
                 class="text-gray-900 text-2xl font-bold font-lora dark:text-dark-text-high text-center"
               >
-                Terjadi Gangguan
+                {{
+                  errorMessage?.statusCode === 404
+                    ? "Halaman tidak ditemukan"
+                    : "Terjadi Gangguan"
+                }}
               </h3>
               <span
                 class="text-gray-800 text-sm font-normal font-lato leading-tight dark:text-dark-text-medium text-center"
               >
-                Sedang terjadi gangguan pada sistem, silahkan mencoba kembali
-                dan tunggu beberapa saat.
+                {{
+                  errorMessage?.statusCode === 404
+                    ? "Halaman tidak ditemukan / Anda tidak memiliki akses untuk halaman ini."
+                    : " Sedang terjadi gangguan pada sistem, silahkan mencoba kembali dan tunggu beberapa saat."
+                }}
               </span>
             </div>
           </div>
@@ -39,10 +46,15 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
-  name: 'ErrorSystemPage',
+  name: 'ErrorCustomComponent',
+  props: {
+    errorMessage: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       isDark: false

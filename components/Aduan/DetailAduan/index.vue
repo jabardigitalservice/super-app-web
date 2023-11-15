@@ -8,14 +8,14 @@
     <div class="grid grid-cols-2 mt-3">
       <div class="flex flex-col gap-y-1">
         <TextTitle>No. Aduan</TextTitle>
-        <TextDetail>{{ dataAduan[0]?.id_aduan }}</TextDetail>
+        <TextDetail>{{ dataAduan?.id_aduan }}</TextDetail>
       </div>
       <div class="flex flex-col gap-y-1">
         <TextTitle>Diadukan Pada</TextTitle>
         <TextDetail>
           {{
             formatDate(
-              dataAduan[0]?.tanggal_update,
+              dataAduan?.tanggal_update,
               "EEEE, dd MMMM yyyy - HH:mm"
             )
           }}
@@ -24,13 +24,13 @@
     </div>
     <div class="mt-3 flex flex-col gap-y-1">
       <TextTitle>Judul Aduan</TextTitle>
-      <TextDetail>{{ dataAduan[0]?.judul_aduan || "-" }}</TextDetail>
+      <TextDetail>{{ dataAduan?.judul_aduan || "-" }}</TextDetail>
     </div>
     <div class="mt-3 flex flex-col gap-y-1">
       <TextTitle>Permasalahaan</TextTitle>
 
       <TextDetail>
-        {{ showFullText ? dataAduan[0]?.detail_aduan : truncatedText }}
+        {{ showFullText ? dataAduan?.detail_aduan : truncatedText }}
       </TextDetail>
       <button
         v-if="isTruncated"
@@ -41,13 +41,13 @@
       </button>
     </div>
     <div
-      v-if="dataAduan[0]?.foto_bukti_kejadian_evidence"
+      v-if="dataAduan?.foto_bukti_kejadian_evidence"
       class="mt-3 flex flex-col gap-y-1"
     >
       <TextTitle> Foto Aduan </TextTitle>
       <button
         class="px-4 py-3 flex text-[12px] font-lato text-gray-800 font-bold border border-gray-300 rounded-md p-4 bg-white w-full mt-2 dark:border-0 dark:bg-dark-emphasis-medium dark:text-dark-text-high"
-        @click="goToPageFile(dataAduan[0].foto_bukti_kejadian_evidence.split('\n'))"
+        @click="goToPageFile(dataAduan.foto_bukti_kejadian_evidence.split('\n'))"
       >
         <div class="flex items-center gap-3 w-full justify-center">
           <BaseIconSvg
@@ -74,8 +74,8 @@ export default {
   },
   props: {
     dataAduan: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => ({})
     }
   },
   data () {
@@ -86,13 +86,13 @@ export default {
   },
   computed: {
     isTruncated () {
-      return this.dataAduan[0]?.detail_aduan.length > this.maxCharacters
+      return this.dataAduan?.detail_aduan.length > this.maxCharacters
     },
     truncatedText () {
-      return this.dataAduan[0]?.detail_aduan.length > this.maxCharacters
-        ? this.dataAduan[0]?.detail_aduan.substring(0, this.maxCharacters) +
+      return this.dataAduan?.detail_aduan.length > this.maxCharacters
+        ? this.dataAduan?.detail_aduan.substring(0, this.maxCharacters) +
             '...'
-        : this.dataAduan[0]?.detail_aduan
+        : this.dataAduan?.detail_aduan
     }
   },
   methods: {
