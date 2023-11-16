@@ -13,9 +13,13 @@
             >
               <BaseIconSvg
                 :icon="
-                  isDark
-                    ? '/icon/error-page-dark.svg'
-                    : '/icon/error-page-light.svg'
+                  errorMessage?.statusCode === 404
+                    ? isDark
+                      ? '/icon/not-found-dark.svg'
+                      : '/icon/not-found-light.svg'
+                    : isDark
+                      ? '/icon/error-page-dark.svg'
+                      : '/icon/error-page-light.svg'
                 "
                 mode="image"
                 :height="200"
@@ -26,7 +30,7 @@
               >
                 {{
                   errorMessage?.statusCode === 404
-                    ? "Halaman tidak ditemukan"
+                    ? "Halaman Tidak Ditemukan"
                     : "Terjadi Gangguan"
                 }}
               </h3>
@@ -35,7 +39,7 @@
               >
                 {{
                   errorMessage?.statusCode === 404
-                    ? "Halaman tidak ditemukan / Anda tidak memiliki akses untuk halaman ini."
+                    ? "Mohon maaf halaman yang ingin Anda tuju tidak dapat kami temukan."
                     : " Sedang terjadi gangguan pada sistem, silahkan mencoba kembali dan tunggu beberapa saat."
                 }}
               </span>
