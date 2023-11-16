@@ -20,12 +20,12 @@
               <h3
                 class="text-gray-900 text-2xl font-bold font-lora dark:text-dark-text-high text-center"
               >
-                {{ getTitleError }}
+                {{ getTitleError() }}
               </h3>
               <span
                 class="text-gray-800 text-sm font-normal font-lato leading-tight dark:text-dark-text-medium text-center"
               >
-                {{ getMessageError }}
+                {{ getMessageError() }}
               </span>
             </div>
           </div>
