@@ -12,11 +12,7 @@
               class="flex flex-col gap-[12px] w-full justify-center items-center"
             >
               <BaseIconSvg
-                :icon="
-                  isDark
-                    ? '/icon/error-page-dark.svg'
-                    : '/icon/error-page-light.svg'
-                "
+                :icon="getIcon(errorMessage)"
                 mode="image"
                 :height="200"
                 :width="200"
@@ -24,20 +20,12 @@
               <h3
                 class="text-gray-900 text-2xl font-bold font-lora dark:text-dark-text-high text-center"
               >
-                {{
-                  errorMessage?.statusCode === 404
-                    ? "Halaman tidak ditemukan"
-                    : "Terjadi Gangguan"
-                }}
+                {{ getTitleError }}
               </h3>
               <span
                 class="text-gray-800 text-sm font-normal font-lato leading-tight dark:text-dark-text-medium text-center"
               >
-                {{
-                  errorMessage?.statusCode === 404
-                    ? "Halaman tidak ditemukan / Anda tidak memiliki akses untuk halaman ini."
-                    : " Sedang terjadi gangguan pada sistem, silahkan mencoba kembali dan tunggu beberapa saat."
-                }}
+                {{ getMessageError }}
               </span>
             </div>
           </div>
@@ -62,6 +50,36 @@ export default {
   },
   mounted () {
     this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  },
+  methods: {
+    getIcon () {
+      switch (this.errorMessage?.statusCode) {
+        case 404:
+          return this.isDark
+            ? '/icon/not-found-dark.svg'
+            : '/icon/not-found-light.svg'
+        default:
+          return this.isDark
+            ? '/icon/error-page-dark.svg'
+            : '/icon/error-page-light.svg'
+      }
+    },
+    getTitleError () {
+      switch (this.errorMessage?.statusCode) {
+        case 404:
+          return 'Halaman Tidak Ditemukan'
+        default:
+          return 'Terjadi Gangguan'
+      }
+    },
+    getMessageError () {
+      switch (this.errorMessage?.statusCode) {
+        case 404:
+          return 'Mohon maaf halaman yang ingin Anda tuju tidak dapat kami temukan.'
+        default:
+          return 'Sedang terjadi gangguan pada sistem, silahkan mencoba kembali dan tunggu beberapa saat.'
+      }
+    }
   }
 }
 </script>
