@@ -37,9 +37,11 @@
                   mode="image"
                 />
               </div>
-              <span
-                class="font-lato text-[14px] font-normal leading-5 text-gray-800"
-              >{{ getLastSegment(url) }}</span>
+              <div
+                class="font-lato text-[14px] font-normal leading-5 text-gray-800 truncate"
+              >
+                {{ getLastSegment(url) }}
+              </div>
             </div>
           </ButtonDokumenBukti>
         </template>
