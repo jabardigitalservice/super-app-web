@@ -291,7 +291,9 @@
               <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
               <template
                 v-if="
-                  showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
+                  showEstimasiPengerjaanAndPenanggungJawab(
+                    milestone.status_aduan
+                  )
                 "
               >
                 <TextMilestone>
