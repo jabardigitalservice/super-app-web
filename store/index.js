@@ -1,11 +1,19 @@
 export const state = () => ({
 
-  logSpan: []
+  logSpan: [],
+  fileAduan: [],
+  fileDokumenBukti: []
 })
 
 export const mutations = {
   setLogSpan (state, logSpan) {
     state.logSpan = logSpan
+  },
+  setFileAduan (state, fileAduan) {
+    state.fileAduan = fileAduan
+  },
+  setFileDokumenBukti (state, fileDokumenBukti) {
+    state.fileDokumenBukti = fileDokumenBukti
   }
 
 }

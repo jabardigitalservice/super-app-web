@@ -1,6 +1,11 @@
 <template>
   <div class="w-full">
+    <span
+      class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
+    >Riwayat Aduan</span>
+
     <div v-for="(milestone, index) in dataMilestone" :key="index">
+      <!-- jika log span / history span ada -->
       <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
         <IconAndLine
           :icon="`/icon/${
@@ -21,6 +26,7 @@
           "
           :line-milestone="index !== dataMilestone.length - 1"
         />
+
         <div class="w-full">
           <CardMilestone>
             <TextMilestone>
@@ -47,7 +53,6 @@
           </CardMilestone>
 
           <!-- card milestone for log span lapor -->
-
           <div v-if="showLogSpanLapor(milestone)">
             <div
               v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
@@ -119,6 +124,7 @@
       </div>
 
       <!-- is span lapor -->
+      <!-- hanya ada id number span lapor dan belum ada log span -->
       <div v-if="isSpanLapor(milestone)" class="flex mt-3">
         <IconAndLine
           :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
@@ -154,7 +160,9 @@
               <div>
                 <StatusText
                   :condition-text="isLogSpanLaporExist(milestone)"
-                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                  :text="
+                    getStatusTextAndIcon(milestone.status_aduan).textStatus
+                  "
                 />
 
                 <HelperText
@@ -176,16 +184,19 @@
               </div>
             </TextMilestone>
           </CardMilestone>
+
+          <!-- memunculkan card ketika status dialihkan, ditolak dan dikordinasikan dan terdapat keterangan status dari api -->
           <CardMilestone
             v-if="
-              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
+              showCatatanOrKeterangan(milestone.status_aduan) &&
                 milestone.keterangan_status_aduan
             "
             class="mt-2"
           >
+            <!-- menampilan keterangan ketika status dialihkan ke sp4n lapor -->
             <TextMilestone
               v-if="
-                showKeteranganDikoordinasikanAndDialihkan(
+                showKeteranganStatusAduan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
@@ -252,7 +263,9 @@
               <div>
                 <StatusText
                   :condition-text="index > 0"
-                  :text="getStatusTextAndIcon(milestone.status_aduan).status"
+                  :text="
+                    getStatusTextAndIcon(milestone.status_aduan).textStatus
+                  "
                 />
 
                 <HelperText
@@ -274,8 +287,12 @@
               </div>
             </TextMilestone>
 
-            <!-- text for status ditindaklanjuti -->
-            <template v-if="isditindakLanjutiOrselesai(milestone.status_aduan)">
+            <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
+            <template
+              v-if="
+                showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
+              "
+            >
               <TextMilestone>
                 <LabelText
                   text="Penanggung Jawab"
@@ -290,14 +307,14 @@
 
               <TextMilestone>
                 <LabelText
-                  text="Estimasi Mulai dan Selesai Pengerjaan"
+                  text="Estimasi Pengerjaan"
                   :condition-text="index > 0"
                 />
 
                 <div>
                   <TextDitindakLanjuti
                     :text="
-                      formatDate(milestone.tanggal_instruksi, `dd m-m-m-m yyyy`)
+                      formatDate(milestone.tanggal_instruksi, `dd MMMM yyyy`)
                     "
                     :condition-text="index > 0"
                   />
@@ -306,7 +323,7 @@
 
                   <TextDitindakLanjuti
                     :text="
-                      formatDate(milestone.tanggal_deadline, `dd m-m-m-m yyyy`)
+                      formatDate(milestone.tanggal_deadline, `dd MMMM yyyy`)
                     "
                     :condition-text="index > 0"
                   />
@@ -318,8 +335,9 @@
           <!-- card if catatan and tanggap is exist -->
           <CardMilestone
             v-if="
-              isditolakOrdikoordinasikanAndDialihkan(milestone.status_aduan) &&
-                milestone.keterangan_status_aduan
+              showCatatanOrKeterangan(milestone.status_aduan) &&
+                (milestone.keterangan_status_aduan ||
+                  milestone.keterangan_tambahan)
             "
             class="mt-2"
           >
@@ -344,7 +362,7 @@
 
             <TextMilestone
               v-if="
-                showKeteranganDikoordinasikanAndDialihkan(
+                showKeteranganStatusAduan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
@@ -359,6 +377,44 @@
                     : 'font-medium  text-gray-900 dark:text-dark-text-high'
                 "
               >{{ milestone.keterangan_status_aduan }}</span>
+            </TextMilestone>
+
+            <!-- ditinjau ulang dan ditunda -->
+            <TextMilestone
+              v-if="
+                showKeteranganTambahan(
+                  milestone.status_aduan,
+                  milestone.keterangan_tambahan
+                )
+              "
+            >
+              <LabelText text="Keterangan" :condition-text="index > 0" />
+
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >{{ milestone.keterangan_tambahan }}</span>
+            </TextMilestone>
+          </CardMilestone>
+
+          <CardMilestone
+            v-if="showKeteranganDefault(milestone.status_aduan)"
+            class="mt-2"
+          >
+            <!-- keterangan default/hardcode -->
+            <TextMilestone>
+              <LabelText text="Keterangan" :condition-text="index > 0" />
+
+              <span
+                :class="
+                  index > 0
+                    ? 'text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >{{ generateTextDefault(milestone.status_aduan) }}</span>
             </TextMilestone>
           </CardMilestone>
 
@@ -375,6 +431,32 @@
               Buat Aduan Baru
             </BaseButton>
           </NuxtLink>
+
+          <BaseButtonCustom
+            v-if="
+              showDokumenBukti(milestone.status_aduan) &&
+                milestone.bukti_banding !== null
+            "
+            class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
+            @click="goToPageDokumenBukti(milestone.bukti_banding)"
+          >
+            <BaseButtonBodyCustom>
+              <BaseIconSvg
+                icon="/icon/image-and-document.svg"
+                class="!w-[14px] !h-[14px]"
+                :fill-color="'#757575'"
+              />
+              <span
+                :class="
+                  index > 0
+                    ? 'font-medium text-gray-500 dark:text-dark-text-low'
+                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                "
+              >Dokumen Bukti</span>
+
+              <span class="ml-auto font-bold text-green-600">Lihat</span>
+            </BaseButtonBodyCustom>
+          </BaseButtonCustom>
 
           <BaseButton
             v-if="
@@ -404,8 +486,10 @@ import StatusText from './Text/StatusText.vue'
 import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
-import { formatDate } from '~/utils'
-
+import { formatDate, getExtensionFileByUrl } from '~/utils'
+import BaseButtonCustom from '~/components/Base/ButtonCustom/Button.vue'
+import BaseButtonBodyCustom from '~/components/Base/ButtonCustom/BodyButton.vue'
+import { fileGroupMixin } from '~/mixins/fileGroupMixin'
 export default {
   name: 'MilestoneAduan',
   components: {
@@ -415,8 +499,11 @@ export default {
     LabelText,
     StatusText,
     HelperText,
-    TextDitindakLanjuti
+    TextDitindakLanjuti,
+    BaseButtonCustom,
+    BaseButtonBodyCustom
   },
+  mixins: [fileGroupMixin],
   props: {
     dataMilestone: {
       type: Array,
@@ -431,78 +518,46 @@ export default {
 
   methods: {
     formatDate,
+    getExtensionFileByUrl,
     getStatusTextAndIcon (status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
-          return {
-            status: dataStatusMilestone.menungguVerifikasi.textStatus,
-            icon: dataStatusMilestone.menungguVerifikasi.icon,
-            fillColor: dataStatusMilestone.menungguVerifikasi.fillColor,
-            getNameStatus: dataStatusMilestone.menungguVerifikasi.getNameStatus
-          }
+          return dataStatusMilestone.menungguVerifikasi
         case dataStatusMilestone.ditolak.status:
-          return {
-            status: dataStatusMilestone.ditolak.textStatus,
-            icon: dataStatusMilestone.ditolak.icon,
-            fillColor: dataStatusMilestone.ditolak.fillColor,
-            getNameStatus: dataStatusMilestone.ditolak.getNameStatus
-          }
+          return dataStatusMilestone.ditolak
         case dataStatusMilestone.terverifikasi.status:
-          return {
-            status: dataStatusMilestone.terverifikasi.textStatus,
-            icon: dataStatusMilestone.terverifikasi.icon,
-            fillColor: dataStatusMilestone.terverifikasi.fillColor,
-            getNameStatus: dataStatusMilestone.terverifikasi.getNameStatus
-          }
+          return dataStatusMilestone.terverifikasi
         case dataStatusMilestone.dikoordinasikan.status:
-          return {
-            status: dataStatusMilestone.dikoordinasikan.textStatus,
-            icon: dataStatusMilestone.dikoordinasikan.icon,
-            fillColor: dataStatusMilestone.dikoordinasikan.fillColor,
-            getNameStatus: dataStatusMilestone.dikoordinasikan.getNameStatus
-          }
+          return dataStatusMilestone.dikoordinasikan
         case dataStatusMilestone.ditindakLanjuti.status:
-          return {
-            status: dataStatusMilestone.ditindakLanjuti.textStatus,
-            icon: dataStatusMilestone.ditindakLanjuti.icon,
-            fillColor: dataStatusMilestone.ditindakLanjuti.fillColor,
-            getNameStatus: dataStatusMilestone.ditindakLanjuti.getNameStatus
-          }
+          return dataStatusMilestone.ditindakLanjuti
         case dataStatusMilestone.selesai.status:
-          return {
-            status: dataStatusMilestone.selesai.textStatus,
-            icon: dataStatusMilestone.selesai.icon,
-            fillColor: dataStatusMilestone.selesai.fillColor,
-            getNameStatus: dataStatusMilestone.selesai.getNameStatus
-          }
+          return dataStatusMilestone.selesai
         case dataStatusMilestone.ditutup.status:
-          return {
-            status: dataStatusMilestone.ditutup.textStatus,
-            icon: dataStatusMilestone.ditutup.icon,
-            fillColor: dataStatusMilestone.ditutup.fillColor,
-            getNameStatus: dataStatusMilestone.ditutup.getNameStatus
-          }
+          return dataStatusMilestone.ditutup
         case dataStatusMilestone.dialihkan.status:
           if (
             typeof lastStatusSpan !== 'undefined' &&
             lastStatusSpan.includes('Ditutup')
           ) {
             return {
-              status: dataStatusMilestone.dialihkan.textStatus,
+              textStatus: dataStatusMilestone.dialihkan.textStatus,
               icon: dataStatusMilestone.ditutup.icon,
               fillColor: dataStatusMilestone.ditutup.fillColor,
               getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
             }
           } else {
-            return {
-              status: dataStatusMilestone.dialihkan.textStatus,
-              icon: dataStatusMilestone.dialihkan.icon,
-              fillColor: dataStatusMilestone.dialihkan.fillColor,
-              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
-            }
+            return dataStatusMilestone.dialihkan
           }
+        case dataStatusMilestone.gagalDiverifikasi.status:
+          return dataStatusMilestone.gagalDiverifikasi
+        case dataStatusMilestone.pengerjaanDitunda.status:
+          return dataStatusMilestone.pengerjaanDitunda
+        case dataStatusMilestone.pengerjaanDitinjauUlang.status:
+          return dataStatusMilestone.pengerjaanDitinjauUlang
         default:
           return {
+            textStatus: '',
             status: '',
             icon: '',
             fillColor: ''
@@ -527,18 +582,38 @@ export default {
           return name
       }
     },
-    isditolakOrdikoordinasikanAndDialihkan (status) {
-      return (
-        status === dataStatusMilestone.ditolak.status ||
-        status === dataStatusMilestone.dikoordinasikan.status ||
-        status === dataStatusMilestone.dialihkan.status
-      )
+    showDokumenBukti (status) {
+      const validStatus = [
+        dataStatusMilestone.selesai.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatus.includes(status)
     },
-    isditindakLanjutiOrselesai (status) {
-      return (
-        status === dataStatusMilestone.ditindakLanjuti.status ||
-        status === dataStatusMilestone.selesai.status
-      )
+    showEstimasiPengerjaanAndPenanggungJawab (status) {
+      const validStatus = [
+        dataStatusMilestone.ditindakLanjuti.status,
+        dataStatusMilestone.selesai.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatus.includes(status)
+    },
+    showCatatanOrKeterangan (status) {
+      const validStatus = [
+        dataStatusMilestone.ditolak.status,
+        dataStatusMilestone.dikoordinasikan.status,
+        dataStatusMilestone.dialihkan.status,
+        dataStatusMilestone.menungguVerifikasi.status,
+        dataStatusMilestone.terverifikasi.status,
+        dataStatusMilestone.gagalDiverifikasi.status,
+        dataStatusMilestone.pengerjaanDitunda.status,
+        dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatus.includes(status)
     },
     isSpanLapor (milestone) {
       return (
@@ -564,15 +639,42 @@ export default {
     showCatatanDitolak (status, keterangan) {
       return status === dataStatusMilestone.ditolak.status && keterangan
     },
-    showKeteranganDikoordinasikanAndDialihkan (status, keterangan) {
+    showKeteranganStatusAduan (status, keterangan) {
       return (
         (status === dataStatusMilestone.dikoordinasikan.status ||
           status === dataStatusMilestone.dialihkan.status) &&
         keterangan
       )
     },
+    showKeteranganTambahan (status, keterangan) {
+      return (
+        (status === dataStatusMilestone.pengerjaanDitunda.status ||
+          status === dataStatusMilestone.pengerjaanDitinjauUlang.status) &&
+        keterangan
+      )
+    },
+    showKeteranganDefault (status) {
+      return (
+        status === dataStatusMilestone.menungguVerifikasi.status ||
+        status === dataStatusMilestone.terverifikasi.status ||
+        status === dataStatusMilestone.gagalDiverifikasi.status
+      )
+    },
+    generateTextDefault (status) {
+      switch (status) {
+        case dataStatusMilestone.menungguVerifikasi.status:
+          return 'Terimakasih telah melakukan pengaduan, aduan anda akan segera kami verifikasi.'
+        case dataStatusMilestone.terverifikasi.status:
+          return 'Terimakasih telah melakukan pengaduan, aduan anda akan segera kami tindaklanjuti.'
+        case dataStatusMilestone.gagalDiverifikasi.status:
+          return 'Aduan tidak bisa dianalisis lebih lanjut.'
+      }
+    },
     showButtonBuatAduanBaru (status) {
-      return status === dataStatusMilestone.ditolak.status
+      return (
+        status === dataStatusMilestone.ditolak.status ||
+        status === dataStatusMilestone.gagalDiverifikasi.status
+      )
     },
     openDialog (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
@@ -598,6 +700,56 @@ export default {
         return this.isSpanLapor(milestone) && logSpanLapor?.length > 0
       }
       return false
+    },
+    goToPageDokumenBukti (fileArray) {
+      if (fileArray.length === 1) {
+        const parts = fileArray[0].split('.')
+        const extensionFiles = this.checkExtensionFiles(
+          parts[parts.length - 1]
+        )
+
+        if (extensionFiles === 'images' || extensionFiles === 'pdf') {
+          this.$store.commit('setFileAduan', fileArray)
+          this.$router.push(`/aduan-warga/file-aduan/${extensionFiles}`)
+          return
+        }
+
+        window.location.href = fileArray[0]
+      } else {
+        this.groupingFileByExtension(fileArray)
+
+        const {
+          images: { data: imagesDataArray },
+          xlsx: { data: xlsxDataArray },
+          pdf: { data: pdfDataArray },
+          documents: { data: documentsDataArray }
+        } = this.grupByTypeFile
+
+        if (imagesDataArray.length > 1 && xlsxDataArray.length === 0 && pdfDataArray.length === 0 && documentsDataArray.length === 0) {
+          this.$store.commit('setFileAduan', imagesDataArray)
+          this.$router.push('/aduan-warga/file-aduan/images')
+        } else {
+          this.$store.commit('setFileDokumenBukti', fileArray)
+          this.$router.push('/aduan-warga/page-dokumen-bukti')
+        }
+      }
+    },
+    checkExtensionFiles (typeFile) {
+      switch (typeFile.toLowerCase()) {
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+          return 'images'
+        case 'xlsx':
+          return 'files'
+        case 'pdf':
+          return 'pdf'
+        case 'doc':
+        case 'docx':
+          return 'files'
+        default:
+          return ''
+      }
     }
   }
 }
