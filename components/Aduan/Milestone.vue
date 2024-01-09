@@ -5,472 +5,474 @@
     >Riwayat Aduan</span>
 
     <div v-for="(milestone, index) in dataMilestone" :key="index">
-      <!-- jika log span / history span ada -->
-      <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
-        <IconAndLine
-          :icon="`/icon/${
-            getStatusTextAndIcon(
-              milestone.status_aduan,
-              milestone?.log_span_lapor?.status
-            ).icon
-          }`"
-          :fill-color="
-            index > 0
-              ? '#868C89'
-              : `${
-                getStatusTextAndIcon(
-                  milestone.status_aduan,
-                  milestone?.log_span_lapor?.status
-                ).fillColor
-              }`
-          "
-          :line-milestone="index !== dataMilestone.length - 1"
-        />
-
-        <div class="w-full">
-          <CardMilestone>
-            <TextMilestone>
-              <LabelText
-                text="ID Tracking SP4N LAPOR"
-                :condition-text="index > 0"
-              />
-
-              <div class="mb-1">
-                <StatusText
-                  :condition-text="index > 0"
-                  :text="milestone.id_aduan_span_lapor"
-                />
-              </div>
-
-              <LabelText text="Status" :condition-text="index > 0" />
-              <div>
-                <StatusText
-                  :condition-text="index > 0"
-                  :text="milestone?.log_span_lapor?.status"
-                />
-              </div>
-            </TextMilestone>
-          </CardMilestone>
-
-          <!-- card milestone for log span lapor -->
-          <div v-if="showLogSpanLapor(milestone)">
-            <div
-              v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
-              :key="indexLog"
-            >
-              <CardMilestone v-if="indexLog < 2" class="mt-2">
-                <TextMilestone>
-                  <LabelText
-                    class="!mb-1 !text-[11px]"
-                    :text="logSpan.date"
-                    :condition-text="indexLog > 0"
-                  />
-
-                  <span
-                    class="mb-2 text-[11px]"
-                    :class="
-                      indexLog > 0
-                        ? 'text-gray-500 dark:text-dark-text-low'
-                        : 'text-gray-700 dark:text-dark-text-low'
-                    "
-                  >{{ logSpan.responder }}</span>
-
-                  <div>
-                    <span
-                      class="log-span"
-                      :class="
-                        indexLog > 0
-                          ? 'text-gray-600 dark:text-dark-text-low'
-                          : 'font-medium text-gray-900 dark:text-dark-text-high'
-                      "
-                    >{{ logSpan.keterangan }}</span>
-                  </div>
-                </TextMilestone>
-              </CardMilestone>
-            </div>
-
-            <div
-              v-if="milestone?.log_span_lapor?.log?.length > 2"
-              class="w-full"
-            >
-              <BaseButton
-                class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
-                @click="
-                  setLogSpanLapor(
-                    milestone?.log_span_lapor?.log,
-                    milestone.id_aduan_span_lapor
-                  )
-                "
-              >
-                Lihat Semua Status
-              </BaseButton>
-            </div>
-          </div>
-
-          <BaseButton
-            v-if="
-              isditutupOlehSpanOrSelesai(
+      <div v-if="milestone?.status_aduan !== 'Banding'">
+        <!-- jika log span / history span ada -->
+        <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
+          <IconAndLine
+            :icon="`/icon/${
+              getStatusTextAndIcon(
                 milestone.status_aduan,
-                milestone?.log_span_lapor?.status,
-                index
-              )
+                milestone?.log_span_lapor?.status
+              ).icon
+            }`"
+            :fill-color="
+              index > 0
+                ? '#868C89'
+                : `${
+                  getStatusTextAndIcon(
+                    milestone.status_aduan,
+                    milestone?.log_span_lapor?.status
+                  ).fillColor
+                }`
             "
-            class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-            @click="openDialog(milestone.id_aduan_span_lapor)"
-          >
-            Apakah penyelesaian ini membantu ?
-          </BaseButton>
-        </div>
-      </div>
+            :line-milestone="index !== dataMilestone.length - 1"
+          />
 
-      <!-- is span lapor -->
-      <!-- hanya ada id number span lapor dan belum ada log span -->
-      <div v-if="isSpanLapor(milestone)" class="flex mt-3">
-        <IconAndLine
-          :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
-          :fill-color="
-            isLogSpanLaporExist(milestone)
-              ? '#868C89'
-              : `${dataStatusMilestone.dialihkan.fillColor}`
-          "
-          :line-milestone="index !== dataMilestone.length - 1"
-        />
-        <div class="w-full">
-          <CardMilestone>
-            <TextMilestone>
-              <span
-                class="text-gray-500 mb-1 text-[11px]"
-                :class="
-                  isLogSpanLaporExist(milestone)
-                    ? ' dark:text-dark-text-low dark:text-opacity-60'
-                    : ' dark:text-dark-text-low'
-                "
-              >{{
-                formatDate(
-                  milestone.tanggal_update,
-                  "EEEE, dd MMMM yyyy - HH:mm"
-                )
-              }}</span>
-
-              <LabelText
-                text="Status"
-                :condition-text="isLogSpanLaporExist(milestone)"
-              />
-
-              <div>
-                <StatusText
-                  :condition-text="isLogSpanLaporExist(milestone)"
-                  :text="
-                    getStatusTextAndIcon(milestone.status_aduan).textStatus
-                  "
-                />
-
-                <HelperText
-                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
-                  :condition-text="isLogSpanLaporExist(milestone)"
-                />
-
-                <StatusText
-                  :condition-text="isLogSpanLaporExist(milestone)"
-                  :text="
-                    changeNameStatusByUser(
-                      milestone[
-                        getStatusTextAndIcon(milestone.status_aduan)
-                          .getNameStatus
-                      ]
-                    )
-                  "
-                />
-              </div>
-            </TextMilestone>
-          </CardMilestone>
-
-          <!-- memunculkan card ketika status dialihkan, ditolak dan dikordinasikan dan terdapat keterangan status dari api -->
-          <CardMilestone
-            v-if="
-              showCatatanOrKeterangan(milestone.status_aduan) &&
-                milestone.keterangan_status_aduan
-            "
-            class="mt-2"
-          >
-            <!-- menampilan keterangan ketika status dialihkan ke sp4n lapor -->
-            <TextMilestone
-              v-if="
-                showKeteranganStatusAduan(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan
-                )
-              "
-            >
-              <LabelText
-                text="Keterangan"
-                :condition-text="isLogSpanLaporExist(milestone)"
-              />
-
-              <span
-                :class="
-                  isLogSpanLaporExist(milestone)
-                    ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                "
-              >{{ milestone.keterangan_status_aduan }}</span>
-            </TextMilestone>
-          </CardMilestone>
-        </div>
-      </div>
-
-      <!-- is not span lapor -->
-      <div v-else class="flex mt-3">
-        <IconAndLine
-          :icon="`/icon/${
-            getStatusTextAndIcon(
-              milestone.status_aduan,
-              milestone?.log_span_lapor?.status
-            ).icon
-          }`"
-          :fill-color="
-            index > 0
-              ? '#868C89'
-              : `${
-                getStatusTextAndIcon(
-                  milestone.status_aduan,
-                  milestone?.log_span_lapor?.status
-                ).fillColor
-              }`
-          "
-          :line-milestone="index !== dataMilestone.length - 1"
-        />
-        <div class="w-full">
-          <CardMilestone>
-            <!-- text for status aduan -->
-            <TextMilestone>
-              <span
-                class="text-gray-500 mb-1 text-[11px]"
-                :class="
-                  index > 0
-                    ? ' dark:text-dark-text-low dark:text-opacity-60'
-                    : ' dark:text-dark-text-low'
-                "
-              >{{
-                formatDate(
-                  milestone.tanggal_update,
-                  "EEEE, dd MMMM yyyy - HH:mm"
-                )
-              }}</span>
-
-              <LabelText text="Status" :condition-text="index > 0" />
-
-              <div>
-                <StatusText
-                  :condition-text="index > 0"
-                  :text="
-                    getStatusTextAndIcon(milestone.status_aduan).textStatus
-                  "
-                />
-
-                <HelperText
-                  :text="getHelperTextStatusAduan(milestone.status_aduan)"
-                  :condition-text="index > 0"
-                />
-
-                <StatusText
-                  :condition-text="index > 0"
-                  :text="
-                    changeNameStatusByUser(
-                      milestone[
-                        getStatusTextAndIcon(milestone.status_aduan)
-                          .getNameStatus
-                      ]
-                    )
-                  "
-                />
-              </div>
-            </TextMilestone>
-
-            <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
-            <template
-              v-if="
-                showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
-              "
-            >
+          <div class="w-full">
+            <CardMilestone>
               <TextMilestone>
                 <LabelText
-                  text="Penanggung Jawab"
+                  text="ID Tracking SP4N LAPOR"
                   :condition-text="index > 0"
                 />
 
-                <TextDitindakLanjuti
-                  :text="milestone.nama_kepala_pd"
-                  :condition-text="index > 0"
-                />
-              </TextMilestone>
-
-              <TextMilestone>
-                <LabelText
-                  text="Estimasi Pengerjaan"
-                  :condition-text="index > 0"
-                />
-
-                <div>
-                  <TextDitindakLanjuti
-                    :text="
-                      formatDate(milestone.tanggal_instruksi, `dd MMMM yyyy`)
-                    "
+                <div class="mb-1">
+                  <StatusText
                     :condition-text="index > 0"
+                    :text="milestone.id_aduan_span_lapor"
                   />
+                </div>
 
-                  <HelperText text="sampai" :condition-text="index > 0" />
-
-                  <TextDitindakLanjuti
-                    :text="
-                      formatDate(milestone.tanggal_deadline, `dd MMMM yyyy`)
-                    "
+                <LabelText text="Status" :condition-text="index > 0" />
+                <div>
+                  <StatusText
                     :condition-text="index > 0"
+                    :text="milestone?.log_span_lapor?.status"
                   />
                 </div>
               </TextMilestone>
-            </template>
-          </CardMilestone>
+            </CardMilestone>
 
-          <!-- card if catatan and tanggap is exist -->
-          <CardMilestone
-            v-if="
-              showCatatanOrKeterangan(milestone.status_aduan) &&
-                (milestone.keterangan_status_aduan ||
-                  milestone.keterangan_tambahan)
-            "
-            class="mt-2"
-          >
-            <TextMilestone
-              v-if="
-                showCatatanDitolak(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan
-                )
-              "
-            >
-              <LabelText text="Catatan" :condition-text="index > 0" />
+            <!-- card milestone for log span lapor -->
+            <div v-if="showLogSpanLapor(milestone)">
+              <div
+                v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
+                :key="indexLog"
+              >
+                <CardMilestone v-if="indexLog < 2" class="mt-2">
+                  <TextMilestone>
+                    <LabelText
+                      class="!mb-1 !text-[11px]"
+                      :text="logSpan.date"
+                      :condition-text="indexLog > 0"
+                    />
 
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium text-gray-900 dark:text-dark-text-high'
-                "
-              >{{ milestone.keterangan_status_aduan }}</span>
-            </TextMilestone>
+                    <span
+                      class="mb-2 text-[11px]"
+                      :class="
+                        indexLog > 0
+                          ? 'text-gray-500 dark:text-dark-text-low'
+                          : 'text-gray-700 dark:text-dark-text-low'
+                      "
+                    >{{ logSpan.responder }}</span>
 
-            <TextMilestone
-              v-if="
-                showKeteranganStatusAduan(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan
-                )
-              "
-            >
-              <LabelText text="Keterangan" :condition-text="index > 0" />
+                    <div>
+                      <span
+                        class="log-span"
+                        :class="
+                          indexLog > 0
+                            ? 'text-gray-600 dark:text-dark-text-low'
+                            : 'font-medium text-gray-900 dark:text-dark-text-high'
+                        "
+                      >{{ logSpan.keterangan }}</span>
+                    </div>
+                  </TextMilestone>
+                </CardMilestone>
+              </div>
 
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                "
-              >{{ milestone.keterangan_status_aduan }}</span>
-            </TextMilestone>
+              <div
+                v-if="milestone?.log_span_lapor?.log?.length > 2"
+                class="w-full"
+              >
+                <BaseButton
+                  class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
+                  @click="
+                    setLogSpanLapor(
+                      milestone?.log_span_lapor?.log,
+                      milestone.id_aduan_span_lapor
+                    )
+                  "
+                >
+                  Lihat Semua Status
+                </BaseButton>
+              </div>
+            </div>
 
-            <!-- ditinjau ulang dan ditunda -->
-            <TextMilestone
-              v-if="
-                showKeteranganTambahan(
-                  milestone.status_aduan,
-                  milestone.keterangan_tambahan
-                )
-              "
-            >
-              <LabelText text="Keterangan" :condition-text="index > 0" />
-
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                "
-              >{{ milestone.keterangan_tambahan }}</span>
-            </TextMilestone>
-          </CardMilestone>
-
-          <CardMilestone
-            v-if="showKeteranganDefault(milestone.status_aduan)"
-            class="mt-2"
-          >
-            <!-- keterangan default/hardcode -->
-            <TextMilestone>
-              <LabelText text="Keterangan" :condition-text="index > 0" />
-
-              <span
-                :class="
-                  index > 0
-                    ? 'text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                "
-              >{{ generateTextDefault(milestone.status_aduan) }}</span>
-            </TextMilestone>
-          </CardMilestone>
-
-          <NuxtLink
-            v-if="
-              showButtonBuatAduanBaru(milestone.status_aduan) && index === 0
-            "
-            to="/aduan-warga/redirect-aduan"
-            class="w-full"
-          >
             <BaseButton
+              v-if="
+                isditutupOlehSpanOrSelesai(
+                  milestone.status_aduan,
+                  milestone?.log_span_lapor?.status,
+                  index
+                )
+              "
               class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+              @click="openDialog(milestone.id_aduan_span_lapor)"
             >
-              Buat Aduan Baru
+              Apakah penyelesaian ini membantu ?
             </BaseButton>
-          </NuxtLink>
+          </div>
+        </div>
 
-          <BaseButtonCustom
-            v-if="
-              showDokumenBukti(milestone.status_aduan) &&
-                milestone.bukti_banding !== null
+        <!-- is span lapor -->
+        <!-- hanya ada id number span lapor dan belum ada log span -->
+        <div v-if="isSpanLapor(milestone)" class="flex mt-3">
+          <IconAndLine
+            :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
+            :fill-color="
+              isLogSpanLaporExist(milestone)
+                ? '#868C89'
+                : `${dataStatusMilestone.dialihkan.fillColor}`
             "
-            class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
-            @click="goToPageDokumenBukti(milestone.bukti_banding)"
-          >
-            <BaseButtonBodyCustom>
-              <BaseIconSvg
-                icon="/icon/image-and-document.svg"
-                class="!w-[14px] !h-[14px]"
-                :fill-color="'#757575'"
-              />
-              <span
-                :class="
-                  index > 0
-                    ? 'font-medium text-gray-500 dark:text-dark-text-low'
-                    : 'font-medium  text-gray-900 dark:text-dark-text-high'
+            :line-milestone="index !== dataMilestone.length - 1"
+          />
+          <div class="w-full">
+            <CardMilestone>
+              <TextMilestone>
+                <span
+                  class="text-gray-500 mb-1 text-[11px]"
+                  :class="
+                    isLogSpanLaporExist(milestone)
+                      ? ' dark:text-dark-text-low dark:text-opacity-60'
+                      : ' dark:text-dark-text-low'
+                  "
+                >{{
+                  formatDate(
+                    milestone.tanggal_update,
+                    "EEEE, dd MMMM yyyy - HH:mm"
+                  )
+                }}</span>
+
+                <LabelText
+                  text="Status"
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                />
+
+                <div>
+                  <StatusText
+                    :condition-text="isLogSpanLaporExist(milestone)"
+                    :text="
+                      getStatusTextAndIcon(milestone.status_aduan).textStatus
+                    "
+                  />
+
+                  <HelperText
+                    :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                    :condition-text="isLogSpanLaporExist(milestone)"
+                  />
+
+                  <StatusText
+                    :condition-text="isLogSpanLaporExist(milestone)"
+                    :text="
+                      changeNameStatusByUser(
+                        milestone[
+                          getStatusTextAndIcon(milestone.status_aduan)
+                            .getNameStatus
+                        ]
+                      )
+                    "
+                  />
+                </div>
+              </TextMilestone>
+            </CardMilestone>
+
+            <!-- memunculkan card ketika status dialihkan, ditolak dan dikordinasikan dan terdapat keterangan status dari api -->
+            <CardMilestone
+              v-if="
+                showCatatanOrKeterangan(milestone.status_aduan) &&
+                  milestone.keterangan_status_aduan
+              "
+              class="mt-2"
+            >
+              <!-- menampilan keterangan ketika status dialihkan ke sp4n lapor -->
+              <TextMilestone
+                v-if="
+                  showKeteranganStatusAduan(
+                    milestone.status_aduan,
+                    milestone.keterangan_status_aduan
+                  )
                 "
-              >Dokumen Bukti</span>
+              >
+                <LabelText
+                  text="Keterangan"
+                  :condition-text="isLogSpanLaporExist(milestone)"
+                />
 
-              <span class="ml-auto font-bold text-green-600">Lihat</span>
-            </BaseButtonBodyCustom>
-          </BaseButtonCustom>
+                <span
+                  :class="
+                    isLogSpanLaporExist(milestone)
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ milestone.keterangan_status_aduan }}</span>
+              </TextMilestone>
+            </CardMilestone>
+          </div>
+        </div>
 
-          <BaseButton
-            v-if="
-              isditutupOlehSpanOrSelesai(
+        <!-- is not span lapor -->
+        <div v-else class="flex mt-3">
+          <IconAndLine
+            :icon="`/icon/${
+              getStatusTextAndIcon(
                 milestone.status_aduan,
-                milestone?.log_span_lapor?.status,
-                index
-              )
+                milestone?.log_span_lapor?.status
+              ).icon
+            }`"
+            :fill-color="
+              index > 0
+                ? '#868C89'
+                : `${
+                  getStatusTextAndIcon(
+                    milestone.status_aduan,
+                    milestone?.log_span_lapor?.status
+                  ).fillColor
+                }`
             "
-            class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-            @click="openDialog(milestone.id_aduan_span_lapor)"
-          >
-            Apakah penyelesaian ini membantu ?
-          </BaseButton>
+            :line-milestone="index !== dataMilestone.length - 1"
+          />
+          <div class="w-full">
+            <CardMilestone>
+              <!-- text for status aduan -->
+              <TextMilestone>
+                <span
+                  class="text-gray-500 mb-1 text-[11px]"
+                  :class="
+                    index > 0
+                      ? ' dark:text-dark-text-low dark:text-opacity-60'
+                      : ' dark:text-dark-text-low'
+                  "
+                >{{
+                  formatDate(
+                    milestone.tanggal_update,
+                    "EEEE, dd MMMM yyyy - HH:mm"
+                  )
+                }}</span>
+
+                <LabelText text="Status" :condition-text="index > 0" />
+
+                <div>
+                  <StatusText
+                    :condition-text="index > 0"
+                    :text="
+                      getStatusTextAndIcon(milestone.status_aduan).textStatus
+                    "
+                  />
+
+                  <HelperText
+                    :text="getHelperTextStatusAduan(milestone.status_aduan)"
+                    :condition-text="index > 0"
+                  />
+
+                  <StatusText
+                    :condition-text="index > 0"
+                    :text="
+                      changeNameStatusByUser(
+                        milestone[
+                          getStatusTextAndIcon(milestone.status_aduan)
+                            .getNameStatus
+                        ]
+                      )
+                    "
+                  />
+                </div>
+              </TextMilestone>
+
+              <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
+              <template
+                v-if="
+                  showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
+                "
+              >
+                <TextMilestone>
+                  <LabelText
+                    text="Penanggung Jawab"
+                    :condition-text="index > 0"
+                  />
+
+                  <TextDitindakLanjuti
+                    :text="milestone.nama_kepala_pd"
+                    :condition-text="index > 0"
+                  />
+                </TextMilestone>
+
+                <TextMilestone>
+                  <LabelText
+                    text="Estimasi Pengerjaan"
+                    :condition-text="index > 0"
+                  />
+
+                  <div>
+                    <TextDitindakLanjuti
+                      :text="
+                        formatDate(milestone.tanggal_instruksi, `dd MMMM yyyy`)
+                      "
+                      :condition-text="index > 0"
+                    />
+
+                    <HelperText text="sampai" :condition-text="index > 0" />
+
+                    <TextDitindakLanjuti
+                      :text="
+                        formatDate(milestone.tanggal_deadline, `dd MMMM yyyy`)
+                      "
+                      :condition-text="index > 0"
+                    />
+                  </div>
+                </TextMilestone>
+              </template>
+            </CardMilestone>
+
+            <!-- card if catatan and tanggap is exist -->
+            <CardMilestone
+              v-if="
+                showCatatanOrKeterangan(milestone.status_aduan) &&
+                  (milestone.keterangan_status_aduan ||
+                    milestone.keterangan_tambahan)
+              "
+              class="mt-2"
+            >
+              <TextMilestone
+                v-if="
+                  showCatatanDitolak(
+                    milestone.status_aduan,
+                    milestone.keterangan_status_aduan
+                  )
+                "
+              >
+                <LabelText text="Catatan" :condition-text="index > 0" />
+
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ milestone.keterangan_status_aduan }}</span>
+              </TextMilestone>
+
+              <TextMilestone
+                v-if="
+                  showKeteranganStatusAduan(
+                    milestone.status_aduan,
+                    milestone.keterangan_status_aduan
+                  )
+                "
+              >
+                <LabelText text="Keterangan" :condition-text="index > 0" />
+
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ milestone.keterangan_status_aduan }}</span>
+              </TextMilestone>
+
+              <!-- ditinjau ulang dan ditunda -->
+              <TextMilestone
+                v-if="
+                  showKeteranganTambahan(
+                    milestone.status_aduan,
+                    milestone.keterangan_tambahan
+                  )
+                "
+              >
+                <LabelText text="Keterangan" :condition-text="index > 0" />
+
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ milestone.keterangan_tambahan }}</span>
+              </TextMilestone>
+            </CardMilestone>
+
+            <CardMilestone
+              v-if="showKeteranganDefault(milestone.status_aduan)"
+              class="mt-2"
+            >
+              <!-- keterangan default/hardcode -->
+              <TextMilestone>
+                <LabelText text="Keterangan" :condition-text="index > 0" />
+
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ generateTextDefault(milestone.status_aduan) }}</span>
+              </TextMilestone>
+            </CardMilestone>
+
+            <NuxtLink
+              v-if="
+                showButtonBuatAduanBaru(milestone.status_aduan) && index === 0
+              "
+              to="/aduan-warga/redirect-aduan"
+              class="w-full"
+            >
+              <BaseButton
+                class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+              >
+                Buat Aduan Baru
+              </BaseButton>
+            </NuxtLink>
+
+            <BaseButtonCustom
+              v-if="
+                showDokumenBukti(milestone.status_aduan) &&
+                  milestone.bukti_banding !== null
+              "
+              class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
+              @click="goToPageDokumenBukti(milestone.bukti_banding)"
+            >
+              <BaseButtonBodyCustom>
+                <BaseIconSvg
+                  icon="/icon/image-and-document.svg"
+                  class="!w-[14px] !h-[14px]"
+                  :fill-color="'#757575'"
+                />
+                <span
+                  :class="
+                    index > 0
+                      ? 'font-medium text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >Dokumen Bukti</span>
+
+                <span class="ml-auto font-bold text-green-600">Lihat</span>
+              </BaseButtonBodyCustom>
+            </BaseButtonCustom>
+
+            <BaseButton
+              v-if="
+                isditutupOlehSpanOrSelesai(
+                  milestone.status_aduan,
+                  milestone?.log_span_lapor?.status,
+                  index
+                )
+              "
+              class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+              @click="openDialog(milestone.id_aduan_span_lapor)"
+            >
+              Apakah penyelesaian ini membantu ?
+            </BaseButton>
+          </div>
         </div>
       </div>
     </div>
@@ -725,7 +727,12 @@ export default {
           documents: { data: documentsDataArray }
         } = this.grupByTypeFile
 
-        if (imagesDataArray.length > 1 && xlsxDataArray.length === 0 && pdfDataArray.length === 0 && documentsDataArray.length === 0) {
+        if (
+          imagesDataArray.length > 1 &&
+          xlsxDataArray.length === 0 &&
+          pdfDataArray.length === 0 &&
+          documentsDataArray.length === 0
+        ) {
           this.$store.commit('setFileAduan', imagesDataArray)
           this.$router.push('/aduan-warga/file-aduan/images')
         } else {
