@@ -7,122 +7,6 @@
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
         <!-- jika log span / history span ada -->
-        <div v-if="isLogSpanLaporExist(milestone)" class="flex mt-3">
-          <IconAndLine
-            :icon="`/icon/${
-              getStatusTextAndIcon(
-                milestone.status_aduan,
-                milestone?.log_span_lapor?.status
-              ).icon
-            }`"
-            :fill-color="
-              index > 0
-                ? '#868C89'
-                : `${
-                  getStatusTextAndIcon(
-                    milestone.status_aduan,
-                    milestone?.log_span_lapor?.status
-                  ).fillColor
-                }`
-            "
-            :line-milestone="index !== dataMilestone.length - 1"
-          />
-
-          <div class="w-full">
-            <CardMilestone>
-              <TextMilestone>
-                <LabelText
-                  text="ID Tracking SP4N LAPOR"
-                  :condition-text="index > 0"
-                />
-
-                <div class="mb-1">
-                  <StatusText
-                    :condition-text="index > 0"
-                    :text="milestone.id_aduan_span_lapor"
-                  />
-                </div>
-
-                <LabelText text="Status" :condition-text="index > 0" />
-                <div>
-                  <StatusText
-                    :condition-text="index > 0"
-                    :text="milestone?.log_span_lapor?.status"
-                  />
-                </div>
-              </TextMilestone>
-            </CardMilestone>
-
-            <!-- card milestone for log span lapor -->
-            <div v-if="showLogSpanLapor(milestone)">
-              <div
-                v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
-                :key="indexLog"
-              >
-                <CardMilestone v-if="indexLog < 2" class="mt-2">
-                  <TextMilestone>
-                    <LabelText
-                      class="!mb-1 !text-[11px]"
-                      :text="logSpan.date"
-                      :condition-text="indexLog > 0"
-                    />
-
-                    <span
-                      class="mb-2 text-[11px]"
-                      :class="
-                        indexLog > 0
-                          ? 'text-gray-500 dark:text-dark-text-low'
-                          : 'text-gray-700 dark:text-dark-text-low'
-                      "
-                    >{{ logSpan.responder }}</span>
-
-                    <div>
-                      <span
-                        class="log-span"
-                        :class="
-                          indexLog > 0
-                            ? 'text-gray-600 dark:text-dark-text-low'
-                            : 'font-medium text-gray-900 dark:text-dark-text-high'
-                        "
-                      >{{ logSpan.keterangan }}</span>
-                    </div>
-                  </TextMilestone>
-                </CardMilestone>
-              </div>
-
-              <div
-                v-if="milestone?.log_span_lapor?.log?.length > 2"
-                class="w-full"
-              >
-                <BaseButton
-                  class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
-                  @click="
-                    setLogSpanLapor(
-                      milestone?.log_span_lapor?.log,
-                      milestone.id_aduan_span_lapor
-                    )
-                  "
-                >
-                  Lihat Semua Status
-                </BaseButton>
-              </div>
-            </div>
-
-            <BaseButton
-              v-if="
-                isditutupOlehSpanOrSelesai(
-                  milestone.status_aduan,
-                  milestone?.log_span_lapor?.status,
-                  index
-                )
-              "
-              class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-              @click="openDialog(milestone.id_aduan_span_lapor)"
-            >
-              Apakah penyelesaian ini membantu ?
-            </BaseButton>
-          </div>
-        </div>
 
         <!-- is span lapor -->
         <!-- hanya ada id number span lapor dan belum ada log span -->
@@ -130,7 +14,7 @@
           <IconAndLine
             :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
             :fill-color="
-              isLogSpanLaporExist(milestone)
+              index > 0
                 ? '#868C89'
                 : `${dataStatusMilestone.dialihkan.fillColor}`
             "
@@ -142,7 +26,7 @@
                 <span
                   class="text-gray-500 mb-1 text-[11px]"
                   :class="
-                    isLogSpanLaporExist(milestone)
+                    index > 0
                       ? ' dark:text-dark-text-low dark:text-opacity-60'
                       : ' dark:text-dark-text-low'
                   "
@@ -155,12 +39,12 @@
 
                 <LabelText
                   text="Status"
-                  :condition-text="isLogSpanLaporExist(milestone)"
+                  :condition-text="index > 0"
                 />
 
                 <div>
                   <StatusText
-                    :condition-text="isLogSpanLaporExist(milestone)"
+                    :condition-text="index > 0"
                     :text="
                       getStatusTextAndIcon(milestone.status_aduan).textStatus
                     "
@@ -168,11 +52,11 @@
 
                   <HelperText
                     :text="getHelperTextStatusAduan(milestone.status_aduan)"
-                    :condition-text="isLogSpanLaporExist(milestone)"
+                    :condition-text="index > 0"
                   />
 
                   <StatusText
-                    :condition-text="isLogSpanLaporExist(milestone)"
+                    :condition-text="index > 0"
                     :text="
                       changeNameStatusByUser(
                         milestone[
@@ -205,18 +89,115 @@
               >
                 <LabelText
                   text="Keterangan"
-                  :condition-text="isLogSpanLaporExist(milestone)"
+                  :condition-text="index > 0"
                 />
 
                 <span
                   :class="
-                    isLogSpanLaporExist(milestone)
+                    index > 0
                       ? 'text-gray-500 dark:text-dark-text-low'
                       : 'font-medium  text-gray-900 dark:text-dark-text-high'
                   "
                 >{{ milestone.keterangan_status_aduan }}</span>
               </TextMilestone>
             </CardMilestone>
+
+            <div v-if="isLogSpanLaporExist(milestone)" class="mt-3">
+              <div class="w-full">
+                <CardMilestone>
+                  <TextMilestone>
+                    <LabelText
+                      text="ID Tracking SP4N LAPOR"
+                      :condition-text="index > 0"
+                    />
+
+                    <div class="mb-1">
+                      <StatusText
+                        :condition-text="index > 0"
+                        :text="milestone.id_aduan_span_lapor"
+                      />
+                    </div>
+
+                    <LabelText text="Status" :condition-text="index > 0" />
+                    <div>
+                      <StatusText
+                        :condition-text="index > 0"
+                        :text="milestone?.log_span_lapor?.status"
+                      />
+                    </div>
+                  </TextMilestone>
+                </CardMilestone>
+
+                <!-- card milestone for log span lapor -->
+                <div v-if="showLogSpanLapor(milestone)">
+                  <div
+                    v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
+                    :key="indexLog"
+                  >
+                    <CardMilestone v-if="indexLog < 2" class="mt-2">
+                      <TextMilestone>
+                        <LabelText
+                          class="!mb-1 !text-[11px]"
+                          :text="logSpan.date"
+                          :condition-text="indexLog > 0"
+                        />
+
+                        <span
+                          class="mb-2 text-[11px]"
+                          :class="
+                            indexLog > 0
+                              ? 'text-gray-500 dark:text-dark-text-low'
+                              : 'text-gray-700 dark:text-dark-text-low'
+                          "
+                        >{{ logSpan.responder }}</span>
+
+                        <div>
+                          <span
+                            class="log-span"
+                            :class="
+                              indexLog > 0
+                                ? 'text-gray-600 dark:text-dark-text-low'
+                                : 'font-medium text-gray-900 dark:text-dark-text-high'
+                            "
+                          >{{ logSpan.keterangan }}</span>
+                        </div>
+                      </TextMilestone>
+                    </CardMilestone>
+                  </div>
+
+                  <div
+                    v-if="milestone?.log_span_lapor?.log?.length > 2"
+                    class="w-full"
+                  >
+                    <BaseButton
+                      class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
+                      @click="
+                        setLogSpanLapor(
+                          milestone?.log_span_lapor?.log,
+                          milestone.id_aduan_span_lapor
+                        )
+                      "
+                    >
+                      Lihat Semua Status
+                    </BaseButton>
+                  </div>
+                </div>
+
+                <BaseButton
+                  v-if="
+                    isditutupOlehSpanOrSelesai(
+                      milestone.status_aduan,
+                      milestone?.log_span_lapor?.status,
+                      index
+                    )
+                  "
+                  class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+                  @click="openDialog(milestone.id_aduan_span_lapor)"
+                >
+                  Apakah penyelesaian ini membantu ?
+                </BaseButton>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -581,7 +562,7 @@ export default {
         case 'Sistem':
           return 'Admin'
         case 'Tim Penentu Kewenangan':
-          return 'Dinas Terkait'
+          return 'Admin'
         default:
           return name
       }
