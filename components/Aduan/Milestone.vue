@@ -6,10 +6,7 @@
 
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
-        <!-- jika log span / history span ada -->
-
-        <!-- is span lapor -->
-        <!-- hanya ada id number span lapor dan belum ada log span -->
+        <!-- Card ada id span lapor -->
         <div v-if="isSpanLapor(milestone)" class="flex mt-3">
           <IconAndLine
             :icon="`/icon/${dataStatusMilestone.dialihkan.icon}`"
@@ -185,14 +182,14 @@
 
                 <BaseButton
                   v-if="
-                    isditutupOlehSpanOrSelesai(
+                    isDitutupOlehSpanOrSelesai(
                       milestone.status_aduan,
                       milestone?.log_span_lapor?.status,
                       index
                     )
                   "
                   class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-                  @click="openDialog(milestone.id_aduan_span_lapor)"
+                  @click="openDialogRateAduan(milestone.id_aduan_span_lapor)"
                 >
                   Apakah penyelesaian ini membantu ?
                 </BaseButton>
@@ -418,11 +415,11 @@
 
             <BaseButtonCustom
               v-if="
-                showDokumenBukti(milestone.status_aduan) &&
+                showDokumenBuktiBanding(milestone.status_aduan) &&
                   milestone.bukti_banding !== null
               "
               class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
-              @click="goToPageDokumenBukti(milestone.bukti_banding)"
+              @click="goToPageFile(milestone.bukti_banding)"
             >
               <BaseButtonBodyCustom>
                 <BaseIconSvg
@@ -444,14 +441,14 @@
 
             <BaseButton
               v-if="
-                isditutupOlehSpanOrSelesai(
+                isDitutupOlehSpanOrSelesai(
                   milestone.status_aduan,
                   milestone?.log_span_lapor?.status,
                   index
                 )
               "
               class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
-              @click="openDialog(milestone.id_aduan_span_lapor)"
+              @click="openDialogRateAduan(milestone.id_aduan_span_lapor)"
             >
               Apakah penyelesaian ini membantu ?
             </BaseButton>
@@ -563,13 +560,15 @@ export default {
           return 'Admin'
         case 'Tim Penentu Kewenangan':
           return 'Admin'
+        case 'Tim Hotline':
+          return 'Tim Hotline Jabar'
         default:
           return name
       }
     },
-    showDokumenBukti (status) {
+    showDokumenBuktiBanding (status) {
       const validStatus = [
-        dataStatusMilestone.selesai.status,
+        // dataStatusMilestone.selesai.status,
         dataStatusMilestone.pengerjaanDitunda.status,
         dataStatusMilestone.pengerjaanDitinjauUlang.status
       ]
@@ -613,7 +612,7 @@ export default {
         milestone?.log_span_lapor?.status !== ''
       )
     },
-    isditutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
+    isDitutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
       return (
         (status === dataStatusMilestone.selesai.status && index === 0) ||
         (lastStatusSpan?.includes('Ditutup') &&
@@ -661,7 +660,7 @@ export default {
         status === dataStatusMilestone.gagalDiverifikasi.status
       )
     },
-    openDialog (idSpanLapor) {
+    openDialogRateAduan (idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
     },
 
@@ -686,7 +685,7 @@ export default {
       }
       return false
     },
-    goToPageDokumenBukti (fileArray) {
+    goToPageFile (fileArray) {
       if (fileArray.length === 1) {
         const parts = fileArray[0].split('.')
         const extensionFiles = this.checkExtensionFiles(
