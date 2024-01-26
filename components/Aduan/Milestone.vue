@@ -184,6 +184,28 @@
               </TextMilestone>
             </CardMilestone>
 
+            <CardMilestone
+              v-if="
+                showKeteranganSelesaiTrk(
+                  milestone.status_aduan,
+                  milestone.keterangan_selesai_trk
+                )
+              "
+            >
+              <!-- catatan selesai TRK -->
+              <TextMilestone>
+                <LabelText text="Keterangan" :condition-text="index > 0" />
+
+                <span
+                  :class="
+                    index > 0
+                      ? 'text-gray-500 dark:text-dark-text-low'
+                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
+                  "
+                >{{ milestone.keterangan_selesai_trk }}</span>
+              </TextMilestone>
+            </CardMilestone>
+
             <CardMilestone v-if="showKeteranganDefault(milestone.status_aduan)">
               <!-- keterangan default/hardcode -->
               <TextMilestone>
@@ -293,31 +315,9 @@
               </BaseButton>
             </NuxtLink>
 
-            <BaseButtonCustom
-              v-if="
-                showDokumenBuktiBanding(milestone.status_aduan) &&
-                  milestone.bukti_banding !== null
-              "
-              class="!flex !justify-start bg-[#F9F9F9] text-[12px] font-lato rounded-lg dark:bg-dark-emphasis-medium w-full !px-3 !py-2 mt-2 border-0"
-              @click="goToPageFile(milestone.bukti_banding)"
-            >
-              <BaseButtonBodyCustom>
-                <BaseIconSvg
-                  icon="/icon/image-and-document.svg"
-                  class="!w-[14px] !h-[14px]"
-                  :fill-color="'#757575'"
-                />
-                <span
-                  :class="
-                    index > 0
-                      ? 'font-medium text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                  "
-                >Dokumen Bukti</span>
-
-                <span class="ml-auto font-bold text-green-600">Lihat</span>
-              </BaseButtonBodyCustom>
-            </BaseButtonCustom>
+            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.bukti_banding)" :index="index" @show-file="goToPageFile(milestone.bukti_banding)" />
+            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.attachment_bukti_foto_selesai_trk)" :index="index" @show-file="goToPageFile(milestone.attachment_bukti_foto_selesai_trk)" />
+            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.attachment_hotline)" :index="index" @show-file="goToPageFile(milestone.attachment_hotline)" />
 
             <BaseButton
               v-if="
@@ -347,11 +347,11 @@ import LabelText from './Text/LabelText.vue'
 import StatusText from './Text/StatusText.vue'
 import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
+import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
 import { formatDate, getExtensionFileByUrl } from '~/utils'
-import BaseButtonCustom from '~/components/Base/ButtonCustom/Button.vue'
-import BaseButtonBodyCustom from '~/components/Base/ButtonCustom/BodyButton.vue'
 import { fileGroupMixin } from '~/mixins/fileGroupMixin'
+
 export default {
   name: 'MilestoneAduan',
   components: {
@@ -362,8 +362,7 @@ export default {
     StatusText,
     HelperText,
     TextDitindakLanjuti,
-    BaseButtonCustom,
-    BaseButtonBodyCustom
+    ButtonBuktiAduan
   },
   mixins: [fileGroupMixin],
   props: {
@@ -446,10 +445,23 @@ export default {
           return name
       }
     },
+    showDocumentButton (status, attachment) {
+      return (
+        (this.showDokumenBuktiBanding(status) && attachment !== null) ||
+        (this.showDokumenSelesai(status) && attachment !== null)
+      )
+    },
     showDokumenBuktiBanding (status) {
       const validStatus = [
         dataStatusMilestone.pengerjaanDitunda.status,
         dataStatusMilestone.pengerjaanDitinjauUlang.status
+      ]
+
+      return validStatus.includes(status)
+    },
+    showDokumenSelesai (status) {
+      const validStatus = [
+        dataStatusMilestone.selesai.status
       ]
 
       return validStatus.includes(status)
@@ -497,8 +509,14 @@ export default {
     },
     showKeteranganTambahan (status, keterangan) {
       return (
-        (status === dataStatusMilestone.pengerjaanDitunda.status ||
+        (status === dataStatusMilestone.selesai.status ||
           status === dataStatusMilestone.pengerjaanDitinjauUlang.status) &&
+        keterangan
+      )
+    },
+    showKeteranganSelesaiTrk (status, keterangan) {
+      return (
+        status === dataStatusMilestone.pengerjaanDitunda.status &&
         keterangan
       )
     },
