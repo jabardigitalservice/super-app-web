@@ -497,14 +497,14 @@ export default {
     },
     showKeteranganTambahan (status, keterangan) {
       return (
-        (status === dataStatusMilestone.selesai.status ||
+        (status === dataStatusMilestone.pengerjaanDitunda.status ||
           status === dataStatusMilestone.pengerjaanDitinjauUlang.status) &&
         keterangan
       )
     },
     showKeteranganSelesaiTrk (status, keterangan) {
       return (
-        status === dataStatusMilestone.pengerjaanDitunda.status && keterangan
+        status === dataStatusMilestone.selesai.status && keterangan
       )
     },
     showKeteranganDefault (status) {
