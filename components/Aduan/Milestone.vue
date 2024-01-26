@@ -120,106 +120,60 @@
               </template>
             </CardMilestone>
 
-            <CardMilestone
+            <DetailCardCatatan
               v-if="
                 showCatatanDitolak(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
               "
-            >
-              <TextMilestone>
-                <LabelText text="Catatan" :condition-text="index > 0" />
+              label-text="Catatan"
+              :index="index"
+              :content-text="milestone.keterangan_status_aduan"
+            />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone.keterangan_status_aduan }}</span>
-              </TextMilestone>
-            </CardMilestone>
-
-            <CardMilestone
+            <DetailCardCatatan
               v-if="
                 showKeteranganStatusAduan(
                   milestone.status_aduan,
                   milestone.keterangan_status_aduan
                 )
               "
-            >
-              <TextMilestone>
-                <LabelText text="Keterangan" :condition-text="index > 0" />
+              label-text="Keterangan"
+              :index="index"
+              :content-text="milestone.keterangan_status_aduan"
+            />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone.keterangan_status_aduan }}</span>
-              </TextMilestone>
-            </CardMilestone>
-
-            <CardMilestone
+            <DetailCardCatatan
               v-if="
                 showKeteranganTambahan(
                   milestone.status_aduan,
                   milestone.keterangan_tambahan
                 )
               "
-            >
-              <!-- ditinjau ulang dan ditunda -->
-              <TextMilestone>
-                <LabelText text="Keterangan" :condition-text="index > 0" />
+              label-text="Keterangan"
+              :index="index"
+              :content-text="milestone.keterangan_tambahan"
+            />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone.keterangan_tambahan }}</span>
-              </TextMilestone>
-            </CardMilestone>
-
-            <CardMilestone
+            <DetailCardCatatan
               v-if="
                 showKeteranganSelesaiTrk(
                   milestone.status_aduan,
                   milestone.keterangan_selesai_trk
                 )
               "
-            >
-              <!-- catatan selesai TRK -->
-              <TextMilestone>
-                <LabelText text="Keterangan" :condition-text="index > 0" />
+              label-text="Keterangan"
+              :index="index"
+              :content-text="milestone.keterangan_selesai_trk"
+            />
 
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ milestone.keterangan_selesai_trk }}</span>
-              </TextMilestone>
-            </CardMilestone>
-
-            <CardMilestone v-if="showKeteranganDefault(milestone.status_aduan)">
-              <!-- keterangan default/hardcode -->
-              <TextMilestone>
-                <LabelText text="Keterangan" :condition-text="index > 0" />
-
-                <span
-                  :class="
-                    index > 0
-                      ? 'text-gray-500 dark:text-dark-text-low'
-                      : 'font-medium  text-gray-900 dark:text-dark-text-high'
-                  "
-                >{{ generateTextDefault(milestone.status_aduan) }}</span>
-              </TextMilestone>
-            </CardMilestone>
+            <DetailCardCatatan
+              v-if="showKeteranganDefault(milestone.status_aduan)"
+              label-text="Keterangan"
+              :index="index"
+              :content-text="generateTextDefault(milestone.status_aduan)"
+            />
 
             <CardMilestone v-if="isIdSpanLaporExist(milestone)">
               <TextMilestone>
@@ -309,15 +263,49 @@
               class="w-full"
             >
               <BaseButton
-                class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+                class="button-aduan"
               >
                 Buat Aduan Baru
               </BaseButton>
             </NuxtLink>
 
-            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.bukti_banding)" :index="index" @show-file="goToPageFile(milestone.bukti_banding)" />
-            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.attachment_bukti_foto_selesai_trk)" :index="index" @show-file="goToPageFile(milestone.attachment_bukti_foto_selesai_trk)" />
-            <ButtonBuktiAduan v-if="showDocumentButton(milestone.status_aduan, milestone.attachment_hotline)" :index="index" @show-file="goToPageFile(milestone.attachment_hotline)" />
+            <!-- bukti banding -->
+            <ButtonBuktiAduan
+              v-if="
+                showDocumentButton(
+                  milestone.status_aduan,
+                  milestone.bukti_banding
+                )
+              "
+              :index="index"
+              @show-file="goToPageFile(milestone.bukti_banding)"
+            />
+
+            <!-- bukti trk -->
+            <ButtonBuktiAduan
+              v-if="
+                showDocumentButton(
+                  milestone.status_aduan,
+                  milestone.attachment_bukti_foto_selesai_trk
+                )
+              "
+              :index="index"
+              @show-file="
+                goToPageFile(milestone.attachment_bukti_foto_selesai_trk)
+              "
+            />
+
+            <!-- bukti hotline -->
+            <ButtonBuktiAduan
+              v-if="
+                showDocumentButton(
+                  milestone.status_aduan,
+                  milestone.attachment_hotline
+                )
+              "
+              :index="index"
+              @show-file="goToPageFile(milestone.attachment_hotline)"
+            />
 
             <BaseButton
               v-if="
@@ -327,7 +315,7 @@
                   index
                 )
               "
-              class="text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0"
+              class="button-aduan"
               @click="openDialogRateAduan(milestone.id_aduan_span_lapor)"
             >
               Apakah penyelesaian ini membantu ?
@@ -348,6 +336,7 @@ import StatusText from './Text/StatusText.vue'
 import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
 import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
+import DetailCardCatatan from './DetailCardCatatan.vue'
 import { dataStatusMilestone } from '~/constant/status-milestone'
 import { formatDate, getExtensionFileByUrl } from '~/utils'
 import { fileGroupMixin } from '~/mixins/fileGroupMixin'
@@ -362,7 +351,8 @@ export default {
     StatusText,
     HelperText,
     TextDitindakLanjuti,
-    ButtonBuktiAduan
+    ButtonBuktiAduan,
+    DetailCardCatatan
   },
   mixins: [fileGroupMixin],
   props: {
@@ -460,9 +450,7 @@ export default {
       return validStatus.includes(status)
     },
     showDokumenSelesai (status) {
-      const validStatus = [
-        dataStatusMilestone.selesai.status
-      ]
+      const validStatus = [dataStatusMilestone.selesai.status]
 
       return validStatus.includes(status)
     },
@@ -516,8 +504,7 @@ export default {
     },
     showKeteranganSelesaiTrk (status, keterangan) {
       return (
-        status === dataStatusMilestone.pengerjaanDitunda.status &&
-        keterangan
+        status === dataStatusMilestone.pengerjaanDitunda.status && keterangan
       )
     },
     showKeteranganDefault (status) {
@@ -630,5 +617,9 @@ export default {
 <style scoped>
 .log-span {
   white-space: pre-wrap;
+}
+
+.button-aduan {
+  @apply text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0
 }
 </style>

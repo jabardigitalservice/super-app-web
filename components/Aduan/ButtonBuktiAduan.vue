@@ -27,12 +27,15 @@ export default {
   props: {
     index: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
     }
   },
   computed: {
     textClass () {
-      return this.index > 0 ? 'font-medium text-gray-500 dark:text-dark-text-low' : 'font-medium text-gray-900 dark:text-dark-text-high'
+      return this.index > 0
+        ? 'font-medium text-gray-500 dark:text-dark-text-low'
+        : 'font-medium text-gray-900 dark:text-dark-text-high'
     }
   },
   methods: {
