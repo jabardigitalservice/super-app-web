@@ -120,22 +120,15 @@
               </template>
             </CardMilestone>
 
-            <!-- card if catatan and tanggap is exist -->
             <CardMilestone
               v-if="
-                showCatatanOrKeterangan(milestone.status_aduan) &&
-                  (milestone.keterangan_status_aduan ||
-                    milestone.keterangan_tambahan)
+                showCatatanDitolak(
+                  milestone.status_aduan,
+                  milestone.keterangan_status_aduan
+                )
               "
             >
-              <TextMilestone
-                v-if="
-                  showCatatanDitolak(
-                    milestone.status_aduan,
-                    milestone.keterangan_status_aduan
-                  )
-                "
-              >
+              <TextMilestone>
                 <LabelText text="Catatan" :condition-text="index > 0" />
 
                 <span
@@ -146,15 +139,17 @@
                   "
                 >{{ milestone.keterangan_status_aduan }}</span>
               </TextMilestone>
+            </CardMilestone>
 
-              <TextMilestone
-                v-if="
-                  showKeteranganStatusAduan(
-                    milestone.status_aduan,
-                    milestone.keterangan_status_aduan
-                  )
-                "
-              >
+            <CardMilestone
+              v-if="
+                showKeteranganStatusAduan(
+                  milestone.status_aduan,
+                  milestone.keterangan_status_aduan
+                )
+              "
+            >
+              <TextMilestone>
                 <LabelText text="Keterangan" :condition-text="index > 0" />
 
                 <span
@@ -165,16 +160,18 @@
                   "
                 >{{ milestone.keterangan_status_aduan }}</span>
               </TextMilestone>
+            </CardMilestone>
 
+            <CardMilestone
+              v-if="
+                showKeteranganTambahan(
+                  milestone.status_aduan,
+                  milestone.keterangan_tambahan
+                )
+              "
+            >
               <!-- ditinjau ulang dan ditunda -->
-              <TextMilestone
-                v-if="
-                  showKeteranganTambahan(
-                    milestone.status_aduan,
-                    milestone.keterangan_tambahan
-                  )
-                "
-              >
+              <TextMilestone>
                 <LabelText text="Keterangan" :condition-text="index > 0" />
 
                 <span
@@ -451,7 +448,6 @@ export default {
     },
     showDokumenBuktiBanding (status) {
       const validStatus = [
-        // dataStatusMilestone.selesai.status,
         dataStatusMilestone.pengerjaanDitunda.status,
         dataStatusMilestone.pengerjaanDitinjauUlang.status
       ]
@@ -462,20 +458,6 @@ export default {
       const validStatus = [
         dataStatusMilestone.ditindakLanjuti.status,
         dataStatusMilestone.selesai.status,
-        dataStatusMilestone.pengerjaanDitunda.status,
-        dataStatusMilestone.pengerjaanDitinjauUlang.status
-      ]
-
-      return validStatus.includes(status)
-    },
-    showCatatanOrKeterangan (status) {
-      const validStatus = [
-        dataStatusMilestone.ditolak.status,
-        dataStatusMilestone.dikoordinasikan.status,
-        dataStatusMilestone.dialihkan.status,
-        dataStatusMilestone.menungguVerifikasi.status,
-        dataStatusMilestone.terverifikasi.status,
-        dataStatusMilestone.gagalDiverifikasi.status,
         dataStatusMilestone.pengerjaanDitunda.status,
         dataStatusMilestone.pengerjaanDitinjauUlang.status
       ]
