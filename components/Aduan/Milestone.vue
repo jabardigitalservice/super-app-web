@@ -61,14 +61,7 @@
 
                   <StatusText
                     :condition-text="index > 0"
-                    :text="
-                      changeNameStatusByUser(
-                        milestone[
-                          getStatusTextAndIcon(milestone.status_aduan)
-                            .getNameStatus
-                        ]
-                      )
-                    "
+                    :text="getNameByStatus(milestone)"
                   />
                 </div>
               </TextMilestone>
@@ -262,9 +255,7 @@
               to="/aduan-warga/redirect-aduan"
               class="w-full"
             >
-              <BaseButton
-                class="button-aduan"
-              >
+              <BaseButton class="button-aduan">
                 Buat Aduan Baru
               </BaseButton>
             </NuxtLink>
@@ -423,14 +414,35 @@ export default {
           return 'Oleh'
       }
     },
+    getNameByStatus (milestone) {
+      switch (milestone.status_aduan) {
+        case dataStatusMilestone.selesai.status:
+        case dataStatusMilestone.ditindakLanjuti.status:
+          if (milestone.admin_monitoring_status_aduan === 'Tim Hotline') {
+            return 'Tim Hotline Jabar'
+          } else {
+            return this.changeNameStatusByUser(
+              milestone[
+                this.getStatusTextAndIcon(milestone.status_aduan)
+                  .getNameStatus
+              ]
+            )
+          }
+        default:
+          return this.changeNameStatusByUser(
+            milestone[
+              this.getStatusTextAndIcon(milestone.status_aduan)
+                .getNameStatus
+            ]
+          )
+      }
+    },
     changeNameStatusByUser (name) {
       switch (name) {
         case 'Sistem':
           return 'Admin'
         case 'Tim Penentu Kewenangan':
           return 'Admin'
-        case 'Tim Hotline':
-          return 'Tim Hotline Jabar'
         default:
           return name
       }
@@ -503,9 +515,7 @@ export default {
       )
     },
     showKeteranganSelesaiTrk (status, keterangan) {
-      return (
-        status === dataStatusMilestone.selesai.status && keterangan
-      )
+      return status === dataStatusMilestone.selesai.status && keterangan
     },
     showKeteranganDefault (status) {
       return (
@@ -620,6 +630,6 @@ export default {
 }
 
 .button-aduan {
-  @apply text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0
+  @apply text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0;
 }
 </style>
