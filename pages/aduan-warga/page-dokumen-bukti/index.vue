@@ -1,5 +1,6 @@
 <template>
   <div class="h-screen bg-white dark:bg-dark-emphasis-low">
+    <BaseButtonBack />
     <div class="w-full h-full">
       <div v-for="(group, groupName) in grupByTypeFile" :key="groupName">
         <template v-if="groupName === 'images' && group.data.length > 0">
