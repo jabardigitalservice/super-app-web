@@ -78,7 +78,7 @@ export default {
     gotPageFile (file, type) {
       if (type === 'images' || this.getExtensionFileByUrl(file) === 'pdf') {
         this.$store.commit('setFileAduan', file)
-        this.$router.push(`/aduan-warga/file-aduan/${type}`)
+        this.$router.push({ path: `/aduan-warga/file-aduan/${type}`, query: this.$route.query })
       } else {
         window.location.href = file
       }
