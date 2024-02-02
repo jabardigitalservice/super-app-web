@@ -102,7 +102,7 @@ export default {
     },
     goToPageFile (file) {
       this.$store.commit('setFileAduan', file)
-      this.$router.push('/aduan-warga/file-aduan/images')
+      this.$router.push({ path: '/aduan-warga/file-aduan/images', query: this.$route.query })
     }
   }
 }

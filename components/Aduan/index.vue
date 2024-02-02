@@ -100,7 +100,7 @@ export default {
         )
 
         if (this.data) {
-          this.$router.push(`/aduan-warga/detail/${this.idAduan}`)
+          this.$router.push({ path: `/aduan-warga/detail/${this.idAduan}`, query: this.$route.query })
           this.idAduanNotFound = false
         } else {
           this.idAduanNotFound = true
