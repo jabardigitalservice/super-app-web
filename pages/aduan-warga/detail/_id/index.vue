@@ -3,8 +3,9 @@
     v-if="dataAduan"
     class="h-screen bg-background dark:bg-dark-emphasis-low"
   >
+    <BaseButtonBack />
     <div
-      class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
+      class="bg-white w-full h-screen overflow-y-auto dark:bg-black"
     >
       <div class="p-4">
         <BaseSpinner :show-spinner="loading" />

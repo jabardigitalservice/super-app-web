@@ -250,7 +250,7 @@
 
             <NuxtLink
               v-if="
-                showButtonBuatAduanBaru(milestone.status_aduan) && index === 0
+                showButtonBuatAduanBaru(milestone.status_aduan) && index === 0 && !$route.query.origin
               "
               to="/aduan-warga/redirect-aduan"
               class="w-full"
@@ -304,7 +304,7 @@
                   milestone.status_aduan,
                   milestone?.log_span_lapor?.status,
                   index
-                )
+                ) && !$route.query.origin
               "
               class="button-aduan"
               @click="openDialogRateAduan(milestone.id_aduan_span_lapor)"
