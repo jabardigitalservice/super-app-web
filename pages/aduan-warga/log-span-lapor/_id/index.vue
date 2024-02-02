@@ -1,8 +1,11 @@
-<template class="h-screen bg-background dark:bg-dark-emphasis-low">
-  <div
-    class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
-  >
-    <HistorySpanLapor />
+<template>
+  <div class="h-screen bg-background dark:bg-dark-emphasis-low">
+    <BaseButtonBack />
+    <div
+      class="bg-white w-full h-screen rounded-lg overflow-y-auto dark:bg-black"
+    >
+      <HistorySpanLapor />
+    </div>
   </div>
 </template>
 

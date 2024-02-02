@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen bg-background dark:bg-dark-emphasis-low">
     <div
-      class="h-full block sm:flex sm:flex-col sm:justify-center sm:items-center"
+      class="h-full block sm:flex sm:flex-col sm:justify-center sm:items-center dark:bg-black bg-white"
     >
       <Aduan />
     </div>
