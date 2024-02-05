@@ -89,10 +89,10 @@ export default {
       this.idSpanLaporIsExists = !!idSpanLapor
     },
     backToSearchAduan () {
-      this.$router.push('/aduan-warga')
+      this.$router.push({ path: '/aduan-warga', query: this.$route.query })
     },
     goToCreateAduan () {
-      this.$router.push('/aduan-warga/redirect-aduan')
+      this.$router.push({ path: '/aduan-warga/redirect-aduan', query: this.$route.query })
     }
   }
 }
