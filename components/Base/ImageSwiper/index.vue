@@ -1,21 +1,21 @@
 <template>
   <div
-    class="bg-white w-full h-full p-4 flex justify-center items-center dark:bg-black mt-auto"
+    class="bg-white w-full h-full p-4 flex justify-center items-center dark:bg-black"
   >
     <swiper
       class="absolute transition-transform duration-300 transform h-[450px] align-middle"
-      :slides-per-view="2"
-      :space-between="10"
+      :slides-per-view="1"
       :centered-slides="true"
-      observer
-      observe-parents
+      :mousewheel="{ releaseOnEdges: true }"
+      :direction="'horizontal'"
+      :pagination="{ clickable: true }"
       @swiper="getSwipperRefHandle"
     >
-      <swiper-slide v-for="(item, index) in src" :key="index">
+      <swiper-slide v-for="(item, index) in src" :key="index" class="">
         <img
           :alt="`Foto Aduan - ${index}`"
           :src="item"
-          class="h-full w-auto"
+          class="h-full w-[600px]"
         >
       </swiper-slide>
     </swiper>
@@ -59,7 +59,6 @@ export default {
   width: 100%;
 }
 .swiper-slide {
-  text-align: center;
-  width: 250px;
+  @apply flex justify-center
 }
 </style>

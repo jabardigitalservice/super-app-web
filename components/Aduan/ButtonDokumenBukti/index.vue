@@ -7,7 +7,7 @@
       <slot />
 
       <div class="ml-auto font-bold text-green-600">
-        Lihat
+        {{ getTextButton }}
       </div>
     </BaseButtonBodyCustom>
   </BaseButtonCustom>
@@ -21,6 +21,26 @@ export default {
   components: {
     BaseButtonCustom,
     BaseButtonBodyCustom
+  },
+  props: {
+    typeFile: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    getTextButton () {
+      switch (this.typeFile) {
+        case 'file':
+          return 'Unduh'
+        case 'image':
+          return 'Lihat'
+        case 'youtube':
+          return 'Buka'
+        default:
+          return ''
+      }
+    }
   },
   methods: {
     goToPage () {

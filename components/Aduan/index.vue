@@ -1,7 +1,7 @@
 <template>
   <div class="h-full flex justify-center sm:h-auto">
     <div
-      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[515px] sm:rounded-lg dark:bg-black"
+      class="bg-white w-full h-full p-4 flex flex-col justify-center items-center sm:w-[360px] sm:h-[490px] sm:rounded-lg dark:bg-black"
     >
       <div
         class="flex justify-center items-center bg-gray-100 w-[120px] h-[120px] rounded-full m-auto dark:bg-dark-emphasis-medium"
