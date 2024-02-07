@@ -139,6 +139,19 @@
 
             <DetailCardCatatan
               v-if="
+                showKeteranganTimHotline(
+                  milestone.status_aduan,
+                  milestone.keterangan_status_aduan,
+                  milestone.admin_monitoring_status_aduan
+                )
+              "
+              label-text="Keterangan"
+              :index="index"
+              :content-text="milestone.keterangan_status_aduan"
+            />
+
+            <DetailCardCatatan
+              v-if="
                 showKeteranganTambahan(
                   milestone.status_aduan,
                   milestone.keterangan_tambahan
@@ -516,6 +529,9 @@ export default {
     },
     showKeteranganSelesaiTrk (status, keterangan) {
       return status === dataStatusMilestone.selesai.status && keterangan
+    },
+    showKeteranganTimHotline (status, keterangan, isHotline) {
+      return status === dataStatusMilestone.selesai.status && keterangan && isHotline === 'Tim Hotline'
     },
     showKeteranganDefault (status) {
       return (
