@@ -1,10 +1,10 @@
 <template>
-  <div class="h-screen bg-white dark:bg-dark-emphasis-low">
+  <div class="h-full bg-white dark:bg-dark-emphasis-low">
     <BaseButtonBack />
-    <div class="w-full h-full">
+    <div class="w-full h-screen">
       <div v-for="(group, groupName) in grupByTypeFile" :key="groupName">
         <template v-if="groupName === 'images' && group.data.length > 0">
-          <ButtonDokumenBukti @go-to-page="gotPageFile(group.data, 'images')">
+          <ButtonDokumenBukti type-file="image" @go-to-page="gotPageFile(group.data, 'images')">
             <div class="flex items-center">
               <div>
                 <BaseIconSvg
@@ -28,6 +28,7 @@
           <ButtonDokumenBukti
             v-for="(url, index) in group.data"
             :key="index"
+            type-file="file"
             @go-to-page="gotPageFile(url, 'file')"
           >
             <div class="flex items-center">
@@ -39,7 +40,7 @@
                 />
               </div>
               <div
-                class="font-lato text-[14px] font-normal leading-5 text-gray-800 truncate"
+                class="font-lato text-[14px] font-normal leading-5 text-gray-800 truncate dark:text-dark-text-high mr-3"
               >
                 {{ getLastSegment(url) }}
               </div>
