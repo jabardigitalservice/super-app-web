@@ -11,7 +11,7 @@
       :pagination="{ clickable: true }"
       @swiper="getSwipperRefHandle"
     >
-      <swiper-slide v-for="(item, index) in src" :key="index" class="">
+      <swiper-slide v-for="(item, index) in src" :key="index">
         <img
           :alt="`Foto Aduan - ${index}`"
           :src="item"
