@@ -48,6 +48,7 @@ jobs:
             BASE_URL_ADUAN=${{secrets.BASE_URL_ADUAN}}
             USERNAME_URL_ADUAN=${{secrets.USERNAME_URL_ADUAN}}
             PASSWORD_URL_ADUAN=${{secrets.PASSWORD_URL_ADUAN}}
+            URL_MAIN_SERVICE=${{secrets.URL_MAIN_SERVICE_PROD}}
       # GitOps
       - name: GitOps ArgoCD Setup
         run: |
