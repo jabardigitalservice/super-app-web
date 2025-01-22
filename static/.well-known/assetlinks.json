@@ -1,5 +1,27 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target" : { "namespace": "android_app", "package_name": "com.sapawarga.jds",
-               "sha256_cert_fingerprints": ["8C:61:93:D2:72:1C:56:5F:31:DF:58:D8:E9:9B:C2:F3:14:EC:17:4B:6D:1D:A2:C4:39:F2:BD:F3:43:ED:5B:56"] }
-}]
+[
+
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sapawarga.jds",
+      "sha256_cert_fingerprints": [
+        "8C:61:93:D2:72:1C:56:5F:31:DF:58:D8:E9:9B:C2:F3:14:EC:17:4B:6D:1D:A2:C4:39:F2:BD:F3:43:ED:5B:56"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sapawarga.jds.staging",
+      "sha256_cert_fingerprints": [
+        "8C:61:93:D2:72:1C:56:5F:31:DF:58:D8:E9:9B:C2:F3:14:EC:17:4B:6D:1D:A2:C4:39:F2:BD:F3:43:ED:5B:56"
+      ]
+    }
+  }
+]
