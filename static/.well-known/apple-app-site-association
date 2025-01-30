@@ -1,11 +1,21 @@
 {
-    "applinks": {
-        "apps": [],
-        "details": [
-            {
-                "appID": "3NK73HZKAA.com.sapawarga.jds",
-                "paths": [ "/verify/registration", "/change-password-forgot", "/ticket"]
-            }
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "3NK73HZKAA.com.sapawarga.jds",
+        "paths": [
+          "/verify/registration",
+          "/change-password-forgot"
         ]
-    }
+      },
+      {
+        "appID": "3NK73HZKAA.com.sapawarga.jds.staging",
+        "paths": [
+          "/verify/registration",
+          "/change-password-forgot"
+        ]
+      }
+    ]
+  }
 }
