@@ -1,0 +1,141 @@
+name: 🚀 Jabar Super Apps Web Release Production 🚀
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-push-deploy-production:
+    runs-on: self-hosted
+    steps:
+      - name: 📝 Checkout 
+        uses: actions/checkout@v4
+
+      - name: 🔄 Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+
+      # Configure Docker with Credentials
+      - name: 🐳 Configure Docker
+        run: |
+          docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p '${{ secrets.REGISTRY_PASSWORD }}'
+
+      # Set version dari git tag (hapus prefix 'v')
+      - name: 🏷️ Set version tag
+        id: vars
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
+
+      - name: 🔐 Vault Authentication
+        uses: hashicorp/vault-action@v2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          method: token
+          exportEnv: true
+          secrets: |
+            kv-superapp-service-production/data/web API_KEY | API_KEY ;
+            kv-superapp-service-production/data/web SENTRY_DSN | SENTRY_DSN ;
+            kv-superapp-service-production/data/web SENTRY_ENABLED | SENTRY_ENABLED ;
+            kv-superapp-service-production/data/web SENTRY_SAMPLE_RATE | SENTRY_SAMPLE_RATE ;
+            kv-superapp-service-production/data/web GOOGLE_ANALYTICS_ID_PRODUCTION | GOOGLE_ANALYTICS_ID_PRODUCTION ;
+            kv-superapp-service-production/data/web NEW_RELIC_APP_NAME_PRODUCTION | NEW_RELIC_APP_NAME_PRODUCTION ;
+            kv-superapp-service-production/data/web NEW_RELIC_LICENSE_KEY | NEW_RELIC_LICENSE_KEY ;
+            kv-superapp-service-production/data/web NEW_RELIC_ACCOUNT_ID | NEW_RELIC_ACCOUNT_ID ;
+            kv-superapp-service-production/data/web NEW_RELIC_BROWSER_LICENSE_KEY | NEW_RELIC_BROWSER_LICENSE_KEY ;
+            kv-superapp-service-production/data/web NEW_RELIC_APPLICATION_ID_PRODUCTION | NEW_RELIC_APPLICATION_ID_PRODUCTION ;
+            kv-superapp-service-production/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
+            kv-superapp-service-production/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
+            kv-superapp-service-production/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN
+
+      - name: 🔨 Build and Push 📦
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ secrets.SERVICE_IMAGENAME }}:${{ env.version }}
+          build-args: |
+            API_KEY=${{ env.API_KEY }}
+            SENTRY_DSN=${{ env.SENTRY_DSN }}
+            SENTRY_ENABLED=${{ env.SENTRY_ENABLED }}
+            SENTRY_SAMPLE_RATE=${{ env.SENTRY_SAMPLE_RATE }}
+            GOOGLE_ANALYTICS_ID=${{env.GOOGLE_ANALYTICS_ID_PRODUCTION}}
+            NEW_RELIC_APP_NAME=${{env.NEW_RELIC_APP_NAME_PRODUCTION}}
+            NEW_RELIC_LICENSE_KEY=${{env.NEW_RELIC_LICENSE_KEY}}
+            NEW_RELIC_ACCOUNT_ID=${{env.NEW_RELIC_ACCOUNT_ID}}
+            NEW_RELIC_BROWSER_LICENSE_KEY=${{env.NEW_RELIC_BROWSER_LICENSE_KEY}}
+            NEW_RELIC_APPLICATION_ID=${{env.NEW_RELIC_APPLICATION_ID_PRODUCTION}}
+            BASE_URL_ADUAN=${{env.BASE_URL_ADUAN}}
+            USERNAME_URL_ADUAN=${{env.USERNAME_URL_ADUAN}}
+            PASSWORD_URL_ADUAN=${{env.PASSWORD_URL_ADUAN}}
+
+      ## GitOps
+      - name: ⚙️ GitOps ArgoCD Setup
+        run: |
+          echo "${{ secrets.GITLAB_ARGOCD_KEY }}" > /tmp/gitlab-deploy-ssh-key
+          chmod 600 /tmp/gitlab-deploy-ssh-key
+          export GIT_SSH_COMMAND="ssh -i /tmp/gitlab-deploy-ssh-key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+          git clone ${{ secrets.GITLAB_ARGOCD_REPOSITORY }}
+
+      - name: 🔄 GitOps ArgoCD Update Image Tag
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '.spec.template.spec.containers[0].image = "${{ secrets.SERVICE_IMAGENAME }}:${{ env.version }}"' 'jds-terraform-gke/k8s/superapp/production/web/deployment.yaml'
+
+      - name: 🚀 GitOps ArgoCD Create MR & Release to Production 🚀
+        id: create_mr
+        run: |
+          export GIT_SSH_COMMAND="ssh -i /tmp/gitlab-deploy-ssh-key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+          cd jds-terraform-gke/k8s/superapp/production/web
+          git config user.email "github-action@github.com"
+          git config user.name "Github Action"
+
+          BRANCH_NAME="release-web-${{ env.version }}"
+          git checkout -b $BRANCH_NAME
+          git add .
+          git commit -m "[Release] Superapp Web v${{ env.version }} to production"
+          git push origin $BRANCH_NAME
+          
+          # Create MR Gitlab
+          MR_RESPONSE=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_API_TOKEN }}" \
+            --data-urlencode "source_branch=$BRANCH_NAME" \
+            --data-urlencode "target_branch=master" \
+            --data-urlencode "title=[Release] Superapp Web v${{ env.version }} to production" \
+            --data-urlencode "description=# Overview
+
+              - Web Release v${{ env.version }} to production
+
+              ## Evidence
+
+              - title: Release Superapp Web v${{ env.version }} to production
+              - project: Sapawarga
+              - participants: " \
+                          "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/merge_requests")
+
+          MR_URL=$(echo $MR_RESPONSE | jq -r '.web_url')
+          echo "mr_url=$MR_URL" >> $GITHUB_OUTPUT
+
+      - name: 📣 Send Release Notification to Telegram 📣
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: html
+          message: |
+            🚀 <b>Superapp Web New Release to Production</b>
+            
+            Version: <code>v${{ env.version }}</code>
+            Released by: <b>${{ github.actor }}</b>
+            
+            <b>GitHub Release:</b> https://github.com/${{ github.repository }}/releases/tag/v${{ env.version }}
+            
+            <b>Merge Request:</b> ${{ steps.create_mr.outputs.mr_url }}
+            
+            ⚠️ Please review and merge the deployment MR @feriahmd
