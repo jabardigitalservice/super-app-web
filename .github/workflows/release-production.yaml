@@ -44,12 +44,12 @@ jobs:
             kv-superapp-service-production/data/web SENTRY_DSN | SENTRY_DSN ;
             kv-superapp-service-production/data/web SENTRY_ENABLED | SENTRY_ENABLED ;
             kv-superapp-service-production/data/web SENTRY_SAMPLE_RATE | SENTRY_SAMPLE_RATE ;
-            kv-superapp-service-production/data/web GOOGLE_ANALYTICS_ID_PRODUCTION | GOOGLE_ANALYTICS_ID_PRODUCTION ;
-            kv-superapp-service-production/data/web NEW_RELIC_APP_NAME_PRODUCTION | NEW_RELIC_APP_NAME_PRODUCTION ;
+            kv-superapp-service-production/data/web GOOGLE_ANALYTICS_ID | GOOGLE_ANALYTICS_ID ;
+            kv-superapp-service-production/data/web NEW_RELIC_APP_NAME | NEW_RELIC_APP_NAME ;
             kv-superapp-service-production/data/web NEW_RELIC_LICENSE_KEY | NEW_RELIC_LICENSE_KEY ;
             kv-superapp-service-production/data/web NEW_RELIC_ACCOUNT_ID | NEW_RELIC_ACCOUNT_ID ;
             kv-superapp-service-production/data/web NEW_RELIC_BROWSER_LICENSE_KEY | NEW_RELIC_BROWSER_LICENSE_KEY ;
-            kv-superapp-service-production/data/web NEW_RELIC_APPLICATION_ID_PRODUCTION | NEW_RELIC_APPLICATION_ID_PRODUCTION ;
+            kv-superapp-service-production/data/web NEW_RELIC_APPLICATION_ID | NEW_RELIC_APPLICATION_ID ;
             kv-superapp-service-production/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
             kv-superapp-service-production/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
             kv-superapp-service-production/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN
@@ -66,12 +66,12 @@ jobs:
             SENTRY_DSN=${{ env.SENTRY_DSN }}
             SENTRY_ENABLED=${{ env.SENTRY_ENABLED }}
             SENTRY_SAMPLE_RATE=${{ env.SENTRY_SAMPLE_RATE }}
-            GOOGLE_ANALYTICS_ID=${{env.GOOGLE_ANALYTICS_ID_PRODUCTION}}
-            NEW_RELIC_APP_NAME=${{env.NEW_RELIC_APP_NAME_PRODUCTION}}
+            GOOGLE_ANALYTICS_ID=${{env.GOOGLE_ANALYTICS_ID}}
+            NEW_RELIC_APP_NAME=${{env.NEW_RELIC_APP_NAME}}
             NEW_RELIC_LICENSE_KEY=${{env.NEW_RELIC_LICENSE_KEY}}
             NEW_RELIC_ACCOUNT_ID=${{env.NEW_RELIC_ACCOUNT_ID}}
             NEW_RELIC_BROWSER_LICENSE_KEY=${{env.NEW_RELIC_BROWSER_LICENSE_KEY}}
-            NEW_RELIC_APPLICATION_ID=${{env.NEW_RELIC_APPLICATION_ID_PRODUCTION}}
+            NEW_RELIC_APPLICATION_ID=${{env.NEW_RELIC_APPLICATION_ID}}
             BASE_URL_ADUAN=${{env.BASE_URL_ADUAN}}
             USERNAME_URL_ADUAN=${{env.USERNAME_URL_ADUAN}}
             PASSWORD_URL_ADUAN=${{env.PASSWORD_URL_ADUAN}}
