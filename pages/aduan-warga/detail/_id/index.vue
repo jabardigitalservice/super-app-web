@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import Milestone from '~/components/Aduan/Milestone.vue'
-import { fetchAduanData } from '~/utils'
+import Milestone from '~/components/Aduan/Milestone.vue';
+import { fetchAduanData } from '~/utils';
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
