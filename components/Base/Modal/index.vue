@@ -14,7 +14,7 @@
             class="flex items-center justify-between border-b border-gray-200 px-6 py-4"
           >
             <h3 class="text-xl font-semibold text-gray-900">
-              <slot name="header">Modal Title</slot>
+              <slot name="header" />
             </h3>
 
 
@@ -27,11 +27,11 @@
           </div>
 
           <div class="px-6 py-4">
-            <slot name="content">Modal content goes here</slot>
+            <slot name="content" />
           </div>
 
           <div v-if="$slots.footer" class="border-t border-gray-200 px-6 py-4">
-            <slot name="footer"></slot>
+            <slot name="footer" />
           </div>
         </div>
       </div>
