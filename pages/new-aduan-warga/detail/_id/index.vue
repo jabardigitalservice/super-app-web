@@ -14,6 +14,50 @@
       <hr />
 
       <TrackingComplaintFooter />
+
+      <TrackingComplaintSwitcher
+        class="justify-self-start"
+        :items="tabItems"
+        @click="getSelected($event)"
+      />
+
+      <div>
+        <keep-alive>
+          <component :is="currentTabComponent" />
+        </keep-alive>
+      </div>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  components: {
+    HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
+    DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
+  },
+  data() {
+    return {
+      tabItems: ['Riwayat Aduan', 'Detail Aduan'],
+      selectedTab: 'Riwayat Aduan',
+    }
+  },
+  computed: {
+    currentTabComponent() {
+      switch (this.selectedTab) {
+        case 'Riwayat Aduan':
+          return 'HistoryComplaint'
+        case 'Detail Aduan':
+          return 'DetailComplaint'
+        default:
+          return null
+      }
+    },
+  },
+  methods: {
+    getSelected(value) {
+      this.selectedTab = value
+    },
+  },
+}
+</script>
