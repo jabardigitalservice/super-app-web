@@ -8,7 +8,7 @@
 
       <div class="space-y-3">
 
-        dsasa
+        <!-- TODO: ADD MAP -->
       </div>
 
         <div class="space-y-2">
