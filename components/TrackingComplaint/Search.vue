@@ -13,7 +13,7 @@
       <input
         type="text"
         placeholder="Masukan ID Aduan"
-        class="w-full  pl-12 pr-4 text-gray-700 bg-transparent focus:outline-none text-sm"
+        class="w-full pl-12 pr-4 text-gray-700 bg-transparent focus:outline-none text-sm"
         v-model="search"
       />
     </div>
