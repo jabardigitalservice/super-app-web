@@ -11,7 +11,7 @@
           class="relative w-full max-w-3xl transform overflow-hidden rounded-lg bg-white shadow-xl transition-all"
         >
           <div
-            class="flex items-center justify-between border-b border-gray-200 px-6 py-4"
+            class="flex items-center justify-between border-b border-gray-200 px-6 py-2"
           >
             <h3 class="text-xl font-semibold text-gray-900">
               <slot name="header" />
@@ -30,7 +30,7 @@
             <slot name="content" />
           </div>
 
-          <div v-if="$slots.footer" class="border-t border-gray-200 px-6 py-4">
+          <div v-if="$slots.footer" class="border-t border-gray-200 px-6 py-2">
             <slot name="footer" />
           </div>
         </div>
