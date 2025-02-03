@@ -42,19 +42,13 @@
       <hr class="my-3" />
 
       <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-[12px] leading-[18px] text-gray-500">
-          Kategori Aduan
-        </h3>
-        <p class="font-lato text-[14px] leading-[21px] text-gray-900">
-          Infrastruktur / Jalan
-        </p>
+        <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
+        <p class="font-lato text-sm text-gray-900">Infrastruktur / Jalan</p>
       </div>
 
       <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-[12px] leading-[18px] text-gray-500">
-          Permasalahan
-        </h3>
-        <p class="font-lato text-[14px] leading-[21px] text-gray-900">
+        <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
+        <p class="font-lato text-sm text-gray-900">
           Saya ingin melaporkan kondisi jalan di depan rumah saya yang saat ini
           mengalami kerusakan berupa lubang-lubang yang cukup dalam. Hal ini
           menjadi perhatian serius karena dapat membahayakan keselamatan
@@ -64,14 +58,12 @@
 
       <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
         <div class="flex flex-col gap-1">
-          <h3 class="font-lato text-[12px] leading-[18px] text-gray-500">
-            Lokasi Aduan
-          </h3>
-          <p class="font-lato text-[14px] leading-[21px] text-gray-900">
+          <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+          <p class="font-lato text-sm text-gray-900">
             Situ aksan , Sukahaji, Kec. Babakan Ciparay, Kota Bandung, Jawa
             Barat 40221, Indonesia
           </p>
-          <p class="font-lato text-[12px] leading-[18px] text-gray-500">
+          <p class="font-lato text-xs text-gray-500">
             <span>Lat: -6.816295</span>
             <span>Lang: 107.6177498</span>
           </p>
@@ -87,12 +79,8 @@
       </div>
 
       <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-[12px] leading-[18px] text-gray-500">
-          Lokasi Aduan
-        </h3>
-        <p class="font-lato text-[14px] leading-[21px] text-gray-900">
-          Depan Ruko Merah
-        </p>
+        <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+        <p class="font-lato text-sm text-gray-900">Depan Ruko Merah</p>
       </div>
     </section>
 
@@ -100,7 +88,6 @@
       :is-open="showLocationModal"
       @close="showLocationModal = false"
     />
-
   </div>
 </template>
 
