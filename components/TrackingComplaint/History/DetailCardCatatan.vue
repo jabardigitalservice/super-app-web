@@ -1,5 +1,5 @@
 <template>
-  <CardMilestone>
+  <CardMilestone class="mt-2">
     <TextMilestone>
       <LabelText>
         {{ labelText }}

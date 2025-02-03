@@ -3,6 +3,13 @@
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
         <div class="flex mt-3">
+          <span
+            class="font-lato text-[11px] leading-[18px] text-blue-gray-300 dark:text-dark-text-low"
+          >
+            {{
+              formatDate(milestone.tanggal_update, 'dd MMMM yyyy - HH:mm')
+            }}
+          </span>
           <IconAndLine
             :icon="`/icon/${
               getStatusTextAndIcon(
@@ -26,21 +33,6 @@
             <CardMilestone>
               <!-- text for status aduan -->
               <TextMilestone>
-                <!-- <span
-                  class="text-gray-500 mb-1 text-[11px]"
-                  :class="
-                    index > 0
-                      ? ' dark:text-dark-text-low dark:text-opacity-60'
-                      : ' dark:text-dark-text-low'
-                  "
-                  >{{
-                    formatDate(
-                      milestone.tanggal_update,
-                      'EEEE, dd MMMM yyyy - HH:mm'
-                    )
-                  }}</span
-                > -->
-
                 <LabelText> Aduan Anda telah </LabelText>
 
                 <DetailText>
@@ -210,18 +202,6 @@
               </div>
             </template>
 
-            <NuxtLink
-              v-if="
-                showButtonBuatAduanBaru(milestone.status_aduan) &&
-                index === 0 &&
-                !$route.query.origin
-              "
-              to="/aduan-warga/redirect-aduan"
-              class="w-full"
-            >
-              <BaseButton class="button-aduan"> Buat Aduan Baru </BaseButton>
-            </NuxtLink>
-
             <!-- bukti banding -->
             <ButtonBuktiAduan
               v-if="
@@ -259,20 +239,6 @@
               :index="index"
               @show-file="goToPageFile(milestone.attachment_hotline)"
             />
-
-            <BaseButton
-              v-if="
-                isDitutupOlehSpanOrSelesai(
-                  milestone.status_aduan,
-                  milestone?.log_span_lapor?.status,
-                  index
-                ) && !$route.query.origin
-              "
-              class="button-aduan"
-              @click="openDialogRateAduan(milestone.id_aduan_span_lapor)"
-            >
-              Apakah penyelesaian ini membantu ?
-            </BaseButton>
           </div>
         </div>
       </div>
@@ -284,7 +250,6 @@
 import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
 import CardMilestone from './CardMilestone.vue'
 import DetailCardCatatan from './DetailCardCatatan.vue'
-
 import DetailText from './Text'
 import IconAndLine from './Text/IconAndLine.vue'
 import LabelText from './Text/LabelText.vue'
@@ -596,7 +561,5 @@ export default {
   white-space: pre-wrap;
 }
 
-.button-aduan {
-  @apply text-[12px] font-lato text-white bg-green-700 hover:bg-green-600 w-full !px-3 !py-2 mt-2 dark:border-0;
-}
+
 </style>
