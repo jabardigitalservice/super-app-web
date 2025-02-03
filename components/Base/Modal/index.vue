@@ -16,8 +16,6 @@
             <h3 class="text-xl font-semibold text-gray-900">
               <slot name="header" />
             </h3>
-
-
             <BaseButton
               class="!rounded-full !w-[44px] !h-[44px] border-0 mb-4 ml-auto hover:bg-gray-100"
               @click="close"
@@ -55,20 +53,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.95);
-}
-</style>
