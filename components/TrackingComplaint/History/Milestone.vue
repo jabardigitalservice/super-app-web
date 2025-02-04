@@ -1,14 +1,18 @@
 <template>
   <div class="w-full">
+    <TrackingComplaintAccordion
+      title="Lihat Semua Status"
+      :items="[1, 2, 3, 4, 5]"
+    />
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
-        <div class="flex mt-3">
+        <div
+          class="grid grid-cols-[minmax(50px,max-content),minmax(50px,min-content),1fr] gap-2 mt-3"
+        >
           <span
             class="font-lato text-[11px] leading-[18px] text-blue-gray-300 dark:text-dark-text-low"
           >
-            {{
-              formatDate(milestone.tanggal_update, 'dd MMMM yyyy - HH:mm')
-            }}
+            {{ formatDate(milestone.tanggal_update, 'dd MMMM yyyy - HH:mm') }}
           </span>
           <IconAndLine
             :icon="`/icon/${
@@ -247,6 +251,7 @@
 </template>
 
 <script>
+
 import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
 import CardMilestone from './CardMilestone.vue'
 import DetailCardCatatan from './DetailCardCatatan.vue'
@@ -560,6 +565,4 @@ export default {
 .log-span {
   white-space: pre-wrap;
 }
-
-
 </style>
