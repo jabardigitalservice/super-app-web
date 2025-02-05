@@ -1,6 +1,6 @@
 <template>
   <details
-    class="complaint-accordion bg-green-50 p-4 rounded-[18px]"
+    class="complaint-accordion bg-green-50 p-4 rounded-[18px] mt-2"
     v-bind="$attrs"
     v-on="$listeners"
   >
