@@ -1,213 +1,212 @@
 <template>
   <div class="w-full">
-    <TrackingComplaintAccordion
-      title="Lihat Semua Status"
-      :items="[1, 2, 3, 4, 5]"
-    />
     <div v-for="(milestone, index) in dataMilestone" :key="index">
-      <div v-if="milestone?.status_aduan !== 'Banding'">
-        <div
-          class="grid grid-cols-[minmax(50px,max-content),minmax(50px,min-content),1fr] gap-2 mt-3"
-        >
+      <div
+        v-if="milestone?.status_aduan !== 'Banding'"
+        class="grid grid-cols-[minmax(30px,max-content),minmax(30px,min-content),1fr] gap-2 mt-3"
+      >
+
+        <div class="sm:w-full w-[100px] ">
           <span
-            class="font-lato text-[11px] leading-[18px] text-blue-gray-300 dark:text-dark-text-low"
+            class="font-lato text-xs text-blue-gray-300 dark:text-dark-text-low"
           >
             {{ formatDate(milestone.tanggal_update, 'dd MMMM yyyy - HH:mm') }}
           </span>
-          <IconAndLine
-            :icon="`/icon/${
-              getStatusTextAndIcon(
-                milestone.status_aduan,
-                milestone?.log_span_lapor?.status
-              ).icon
-            }`"
-            :fill-color="
-              index > 0
-                ? '#868C89'
-                : `${
-                    getStatusTextAndIcon(
-                      milestone.status_aduan,
-                      milestone?.log_span_lapor?.status
-                    ).fillColor
-                  }`
-            "
-            :line-milestone="index !== dataMilestone.length - 1"
-          />
-          <div class="w-full">
-            <CardMilestone>
-              <!-- text for status aduan -->
+        </div>
+
+        <IconAndLine
+        class="mt-1"
+          :icon="`/icon/${
+            getStatusTextAndIcon(
+              milestone.status_aduan,
+              milestone?.log_span_lapor?.status
+            ).icon
+          }`"
+          :fill-color="
+            index > 0
+              ? '#868C89'
+              : `${
+                  getStatusTextAndIcon(
+                    milestone.status_aduan,
+                    milestone?.log_span_lapor?.status
+                  ).fillColor
+                }`
+          "
+          :line-milestone="index !== dataMilestone.length - 1"
+        />
+        <div class="w-full mt-1">
+          <CardMilestone>
+            <!-- text for status aduan -->
+            <TextMilestone>
+              <LabelText> Aduan Anda telah </LabelText>
+
+              <DetailText>
+                {{ getStatusTextAndIcon(milestone.status_aduan).textStatus }}
+              </DetailText>
+
+              <DetailText>{{ getNameByStatus(milestone) }} </DetailText>
+            </TextMilestone>
+
+            <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
+            <template
+              v-if="
+                showEstimasiPengerjaanAndPenanggungJawab(milestone.status_aduan)
+              "
+            >
               <TextMilestone>
-                <LabelText> Aduan Anda telah </LabelText>
+                <LabelText> Penanggung Jawab </LabelText>
 
                 <DetailText>
-                  {{ getStatusTextAndIcon(milestone.status_aduan).textStatus }}
+                  {{ milestone.nama_kepala_pd }}
                 </DetailText>
-
-                <DetailText>{{ getNameByStatus(milestone) }} </DetailText>
               </TextMilestone>
 
-              <!-- memunculkan keterangan penanggung jawab dan estimasi pengerjaan pada status ditindak lanjut, selesai, pengerjaan ditunda, dan pengerjaan ditinjau ulang -->
-              <template
-                v-if="
-                  showEstimasiPengerjaanAndPenanggungJawab(
-                    milestone.status_aduan
-                  )
-                "
-              >
-                <TextMilestone>
-                  <LabelText> Penanggung Jawab </LabelText>
+              <TextMilestone>
+                <LabelText text="Estimasi Pengerjaan" />
 
-                  <DetailText>
-                    {{ milestone.nama_kepala_pd }}
-                  </DetailText>
-                </TextMilestone>
-
-                <TextMilestone>
-                  <LabelText text="Estimasi Pengerjaan" />
-
-                  <DetailText>
-                    {{
-                      `
+                <DetailText>
+                  {{
+                    `
                         ${formatDate(
                           milestone.tanggal_instruksi,
                           `dd MMMM yyyy`
                         )} sampai ${formatDate(
-                        milestone.tanggal_deadline,
-                        `dd MMMM yyyy`
-                      )}
+                      milestone.tanggal_deadline,
+                      `dd MMMM yyyy`
+                    )}
                       `
-                    }}
+                  }}
+                </DetailText>
+              </TextMilestone>
+            </template>
+          </CardMilestone>
+
+          <DetailCardCatatan
+            v-if="
+              showCatatanDitolak(
+                milestone.status_aduan,
+                milestone.keterangan_status_aduan
+              )
+            "
+            label-text="Catatan"
+            :index="index"
+            :content-text="milestone.keterangan_status_aduan"
+          />
+
+          <DetailCardCatatan
+            v-if="
+              showKeteranganStatusAduan(
+                milestone.status_aduan,
+                milestone.keterangan_status_aduan
+              )
+            "
+            label-text="Keterangan"
+            :index="index"
+            :content-text="milestone.keterangan_status_aduan"
+          />
+
+          <DetailCardCatatan
+            v-if="
+              showKeteranganTimHotline(
+                milestone.status_aduan,
+                milestone.keterangan_status_aduan,
+                milestone.admin_monitoring_status_aduan
+              )
+            "
+            label-text="Keterangan"
+            :index="index"
+            :content-text="milestone.keterangan_status_aduan"
+          />
+
+          <DetailCardCatatan
+            v-if="
+              showKeteranganTambahan(
+                milestone.status_aduan,
+                milestone.keterangan_tambahan
+              )
+            "
+            label-text="Keterangan"
+            :index="index"
+            :content-text="milestone.keterangan_tambahan"
+          />
+
+          <DetailCardCatatan
+            v-if="
+              showKeteranganSelesaiTrk(
+                milestone.status_aduan,
+                milestone.keterangan_selesai_trk
+              )
+            "
+            label-text="Keterangan"
+            :index="index"
+            :content-text="milestone.keterangan_selesai_trk"
+          />
+
+          <DetailCardCatatan
+            v-if="showKeteranganDefault(milestone.status_aduan)"
+            label-text="Keterangan"
+            :index="index"
+            :content-text="generateTextDefault(milestone.status_aduan)"
+          />
+
+          <CardMilestone v-if="isIdSpanLaporExist(milestone)">
+            <TextMilestone>
+              <LabelText>ID Tracking SP4N LAPOR </LabelText>
+
+              <div class="mb-1">
+                <DetailText> {{ milestone.id_aduan_span_lapor }}</DetailText>
+              </div>
+
+              <template v-if="isStatusSpanLaporExist(milestone)">
+                <LabelText>Status </LabelText>
+
+                <DetailText>
+                  {{ milestone?.log_span_lapor?.status }}
+                </DetailText>
+              </template>
+            </TextMilestone>
+          </CardMilestone>
+
+          <template v-if="showLogSpanLapor(milestone)">
+            <div
+              v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
+              :key="indexLog"
+            >
+              <CardMilestone v-if="indexLog < 2">
+                <TextMilestone>
+                  <LabelText class="!mb-1 !text-[11px]">
+                    {{ logSpan.date }}
+                  </LabelText>
+
+                  <DetailText>{{ logSpan.responder }} </DetailText>
+
+                  <DetailText class="log-span">
+                    {{ logSpan.keterangan }}
                   </DetailText>
                 </TextMilestone>
-              </template>
-            </CardMilestone>
+              </CardMilestone>
+            </div>
 
-            <DetailCardCatatan
-              v-if="
-                showCatatanDitolak(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan
-                )
-              "
-              label-text="Catatan"
-              :index="index"
-              :content-text="milestone.keterangan_status_aduan"
-            />
-
-            <DetailCardCatatan
-              v-if="
-                showKeteranganStatusAduan(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan
-                )
-              "
-              label-text="Keterangan"
-              :index="index"
-              :content-text="milestone.keterangan_status_aduan"
-            />
-
-            <DetailCardCatatan
-              v-if="
-                showKeteranganTimHotline(
-                  milestone.status_aduan,
-                  milestone.keterangan_status_aduan,
-                  milestone.admin_monitoring_status_aduan
-                )
-              "
-              label-text="Keterangan"
-              :index="index"
-              :content-text="milestone.keterangan_status_aduan"
-            />
-
-            <DetailCardCatatan
-              v-if="
-                showKeteranganTambahan(
-                  milestone.status_aduan,
-                  milestone.keterangan_tambahan
-                )
-              "
-              label-text="Keterangan"
-              :index="index"
-              :content-text="milestone.keterangan_tambahan"
-            />
-
-            <DetailCardCatatan
-              v-if="
-                showKeteranganSelesaiTrk(
-                  milestone.status_aduan,
-                  milestone.keterangan_selesai_trk
-                )
-              "
-              label-text="Keterangan"
-              :index="index"
-              :content-text="milestone.keterangan_selesai_trk"
-            />
-
-            <DetailCardCatatan
-              v-if="showKeteranganDefault(milestone.status_aduan)"
-              label-text="Keterangan"
-              :index="index"
-              :content-text="generateTextDefault(milestone.status_aduan)"
-            />
-
-            <CardMilestone v-if="isIdSpanLaporExist(milestone)">
-              <TextMilestone>
-                <LabelText>ID Tracking SP4N LAPOR </LabelText>
-
-                <div class="mb-1">
-                  <DetailText> {{ milestone.id_aduan_span_lapor }}</DetailText>
-                </div>
-
-                <template v-if="isStatusSpanLaporExist(milestone)">
-                  <LabelText>Status </LabelText>
-
-                  <DetailText>
-                    {{ milestone?.log_span_lapor?.status }}
-                  </DetailText>
-                </template>
-              </TextMilestone>
-            </CardMilestone>
-
-            <template v-if="showLogSpanLapor(milestone)">
-              <div
-                v-for="(logSpan, indexLog) in getLogSpanLaporLogs(milestone)"
-                :key="indexLog"
+            <div
+              v-if="milestone?.log_span_lapor?.log?.length > 2"
+              class="w-full"
+            >
+              <BaseButton
+                class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
+                @click="
+                  setLogSpanLapor(
+                    milestone?.log_span_lapor?.log,
+                    milestone.id_aduan_span_lapor
+                  )
+                "
               >
-                <CardMilestone v-if="indexLog < 2">
-                  <TextMilestone>
-                    <LabelText class="!mb-1 !text-[11px]">
-                      {{ logSpan.date }}
-                    </LabelText>
+                Lihat Semua Status
+              </BaseButton>
+            </div>
+          </template>
 
-                    <DetailText>{{ logSpan.responder }} </DetailText>
-
-                    <DetailText class="log-span">
-                      {{ logSpan.keterangan }}
-                    </DetailText>
-                  </TextMilestone>
-                </CardMilestone>
-              </div>
-
-              <div
-                v-if="milestone?.log_span_lapor?.log?.length > 2"
-                class="w-full"
-              >
-                <BaseButton
-                  class="text-[12px] font-lato text-green-600 bg-[#F4F4F4] w-full !px-3 !py-2 mt-2 dark:border-0 dark:bg-dark-emphasis-medium"
-                  @click="
-                    setLogSpanLapor(
-                      milestone?.log_span_lapor?.log,
-                      milestone.id_aduan_span_lapor
-                    )
-                  "
-                >
-                  Lihat Semua Status
-                </BaseButton>
-              </div>
-            </template>
-
-            <!-- bukti banding -->
-            <ButtonBuktiAduan
+          <!-- bukti banding -->
+          <ButtonBuktiAduan
               v-if="
                 showDocumentButton(
                   milestone.status_aduan,
@@ -218,8 +217,8 @@
               @show-file="goToPageFile(milestone.bukti_banding)"
             />
 
-            <!-- bukti trk -->
-            <ButtonBuktiAduan
+          <!-- bukti trk -->
+          <ButtonBuktiAduan
               v-if="
                 showDocumentButton(
                   milestone.status_aduan,
@@ -230,10 +229,10 @@
               @show-file="
                 goToPageFile(milestone.attachment_bukti_foto_selesai_trk)
               "
-            />
+          />
 
-            <!-- bukti hotline -->
-            <ButtonBuktiAduan
+          <!-- bukti hotline -->
+          <ButtonBuktiAduan
               v-if="
                 showDocumentButton(
                   milestone.status_aduan,
@@ -243,7 +242,11 @@
               :index="index"
               @show-file="goToPageFile(milestone.attachment_hotline)"
             />
-          </div>
+
+          <TrackingComplaintAccordion
+              title="Lihat Semua Status"
+              :items="[1, 2, 3, 4, 5]"
+            />
         </div>
       </div>
     </div>
@@ -251,7 +254,6 @@
 </template>
 
 <script>
-
 import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
 import CardMilestone from './CardMilestone.vue'
 import DetailCardCatatan from './DetailCardCatatan.vue'
