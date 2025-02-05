@@ -48,7 +48,6 @@ export default {
     try {
       const data = await fetchAduanData(
         $aduanAPI,
-
         params.id,
         $config
       )
