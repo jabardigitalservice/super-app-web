@@ -9,7 +9,7 @@ export function formatDate (date, format) {
     : '-'
 }
 
-export async function fetchAduanData ($aduanAPI, $newrelicSetup, idAduan, config) {
+export async function fetchAduanData ($aduanAPI, idAduan, config) {
   try {
     const response = await $aduanAPI.post('/aduan/login', {
       username: config.baseURLAduan.username,
@@ -36,7 +36,7 @@ export async function fetchAduanData ($aduanAPI, $newrelicSetup, idAduan, config
       }
     }
   } catch (error) {
-    $newrelicSetup.noticeError(error)
+    console.error('fetch data ', error)
   }
 
   return null

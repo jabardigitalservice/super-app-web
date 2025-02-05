@@ -39,10 +39,10 @@
         >
           {{
             errorMessage && errorCheck && !idAduanNotFound
-              ? "ID Aduan harus diisi"
+              ? 'ID Aduan harus diisi'
               : errorMessage && errorCheck && idAduanNotFound
-                ? "ID Aduan tidak ditemukan"
-                : "Cek Status Aduan"
+              ? 'ID Aduan tidak ditemukan'
+              : 'Cek Status Aduan'
           }}
         </BaseButton>
       </div>
@@ -51,27 +51,27 @@
 </template>
 
 <script>
-import ImageLoudSpeaker from '~/assets/images/loudspeaker.svg?inline'
 import IconLoudSpeaker from '~/assets/icon/loud-speaker.svg?inline'
+import ImageLoudSpeaker from '~/assets/images/loudspeaker.svg?inline'
 import { fetchAduanData } from '~/utils'
 export default {
   name: 'ComponentAduan',
   components: {
     ImageLoudSpeaker,
-    IconLoudSpeaker
+    IconLoudSpeaker,
   },
-  data () {
+  data() {
     return {
       errorCheck: false,
       idAduan: '',
       errorMessage: '',
       data: [],
       idAduanNotFound: false,
-      isLoading: false
+      isLoading: false,
     }
   },
   methods: {
-    onClickCheck () {
+    onClickCheck() {
       if (this.idAduan) {
         if (this.idAduanNotFound) {
           this.errorCheck = false
@@ -89,18 +89,20 @@ export default {
         this.idAduanNotFound = false
       }
     },
-    async fetchData () {
+    async fetchData() {
       this.isLoading = true
       try {
         this.data = await fetchAduanData(
           this.$aduanAPI,
-          this.$newrelicSetup,
           this.idAduan,
           this.$config
         )
 
         if (this.data) {
-          this.$router.push({ path: `/aduan-warga/detail/${this.idAduan}`, query: this.$route.query })
+          this.$router.push({
+            path: `/aduan-warga/detail/${this.idAduan}`,
+            query: this.$route.query,
+          })
           this.idAduanNotFound = false
         } else {
           this.idAduanNotFound = true
@@ -108,12 +110,12 @@ export default {
           this.errorCheck = !this.errorCheck
         }
       } catch (error) {
-        this.$newrelicSetup.noticeError(error)
+        console.error('fetch data ', error)
       }
 
       this.isLoading = false
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -125,7 +127,7 @@ input::-webkit-inner-spin-button {
   margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield; /* Firefox */
 }
 
