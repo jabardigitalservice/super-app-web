@@ -8,7 +8,7 @@
     >
       <div class="flex flex-row justify-between">
         <!-- <TrackingComplaintHeader /> -->
-        <TrackingComplaintBadge class="self-center" status="NONE" />
+        <!-- <TrackingComplaintBadge class="self-center" status="NONE" /> -->
       </div>
 
       <hr />
