@@ -13,7 +13,7 @@
 
       <hr />
 
-      <!-- <TrackingComplaintFooter /> -->
+      <TrackingComplaintFooter />
 
       <TrackingComplaintSwitcher
         class="justify-self-start"
