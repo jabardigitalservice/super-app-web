@@ -15,11 +15,11 @@
 
       <!-- <TrackingComplaintFooter /> -->
 
-      <!-- <TrackingComplaintSwitcher
+      <TrackingComplaintSwitcher
         class="justify-self-start"
         :items="tabItems"
         @click="getSelected($event)"
-      /> -->
+      />
 
       <div>
 
