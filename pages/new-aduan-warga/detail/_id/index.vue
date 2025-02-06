@@ -8,12 +8,12 @@
     >
       <div class="flex flex-row justify-between">
         <div class="flex flex-row gap-1 items-center">
-          <BaseIconSvg
+          <!-- <BaseIconSvg
             icon="/icon/tracking-aduan.svg"
             :width="51"
             :height="51"
             mode="image"
-          />
+          /> -->
           <div>
             <h2 class="font-lato text-sm font-medium text-black">
               Tracking Aduan
