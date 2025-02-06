@@ -22,22 +22,16 @@
       />
 
       <div>
-        <!-- <keep-alive>
-          <component
-            :is="currentTabComponent"
-            :data-aduan="dataAduan"
-            :loading="loading"
-          />
-        </keep-alive> -->
 
-        <keep-alive>
+
+        <!-- <keep-alive>
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
             :data-aduan="dataAduan"
             :loading="loading"
           />
-        </keep-alive>
+        </keep-alive> -->
       </div>
     </div>
   </div>
