@@ -16,7 +16,7 @@ export default {
       default: ''
     }
   },
-  computed: {
+  methods: {
     badgeClass () {
       const statusColors = {
         MENUNGGU: 'text-yellow-500 border-yellow-500 bg-yellow-100',
