@@ -22,9 +22,18 @@
       />
 
       <div>
+        <!-- <keep-alive>
+          <component
+            :is="currentTabComponent"
+            :data-aduan="dataAduan"
+            :loading="loading"
+          />
+        </keep-alive> -->
+
         <keep-alive>
           <component
             :is="currentTabComponent"
+            v-if="currentTabComponent"
             :data-aduan="dataAduan"
             :loading="loading"
           />
@@ -41,36 +50,30 @@ export default {
     HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
     DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
   },
-  async asyncData ({ $aduanAPI, $newrelicSetup, params, $config }) {
+  async asyncData({ $aduanAPI, params, $config }) {
     let loading = true
     let dataAduan = []
 
     try {
-      const data = await fetchAduanData(
-        $aduanAPI,
-        $newrelicSetup,
-        params.id,
-        $config
-      )
+      const data = await fetchAduanData($aduanAPI, params.id, $config)
 
       dataAduan = data
 
       loading = false
     } catch (error) {
-      $newrelicSetup.noticeError(error)
+      console.error('fetch data ', error)
       loading = false
     }
 
     return {
       loading,
-      dataAduan
+      dataAduan,
     }
   },
   data() {
     return {
       tabItems: ['Riwayat Aduan', 'Detail Aduan'],
       selectedTab: 'Riwayat Aduan',
-
     }
   },
   computed: {
@@ -88,7 +91,7 @@ export default {
   methods: {
     getSelected(value) {
       this.selectedTab = value
-    }
+    },
   },
 }
 </script>

@@ -46,14 +46,13 @@ import { fetchAduanData } from '~/utils';
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
-  async asyncData ({ $aduanAPI, $newrelicSetup, params, $config }) {
+  async asyncData ({ $aduanAPI,  params, $config }) {
     let loading = true
     let dataAduan = []
 
     try {
       const data = await fetchAduanData(
         $aduanAPI,
-        $newrelicSetup,
         params.id,
         $config
       )
@@ -62,7 +61,7 @@ export default {
 
       loading = false
     } catch (error) {
-      $newrelicSetup.noticeError(error)
+      console.error('fetch data ', error)
       loading = false
     }
 
