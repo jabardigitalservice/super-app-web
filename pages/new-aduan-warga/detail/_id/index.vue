@@ -7,7 +7,7 @@
       class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px]"
     >
       <div class="flex flex-row justify-between">
-        <!-- <TrackingComplaintHeader /> -->
+        <TrackingComplaintHeader />
         <!-- <TrackingComplaintBadge class="self-center" status="NONE" /> -->
       </div>
 
