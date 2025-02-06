@@ -8,7 +8,7 @@
     >
       <div class="flex flex-row justify-between">
         <div class="flex flex-row gap-1 items-center">
-          <BaseIconSvg
+          <BaseIcbaonSvg
             icon="/icon/tracking-aduan.svg"
             :width="51"
             :height="51"
@@ -21,7 +21,7 @@
             <p class="text-sm font-lato text-green-700">SPW-000055667</p>
           </div>
         </div>
-        <TrackingComplaintBadge class="self-center" status="NONE" />
+        <!-- <TrackingComplaintBadge class="self-center" status="NONE" /> -->
       </div>
 
       <hr />
