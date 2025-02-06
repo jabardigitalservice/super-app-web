@@ -8,7 +8,7 @@
     >
       <div class="flex flex-row justify-between">
         <div class="flex flex-row gap-1 items-center">
-          <BaseIcbaonSvg
+          <BaseIconSvg
             icon="/icon/tracking-aduan.svg"
             :width="51"
             :height="51"
