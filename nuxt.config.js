@@ -36,6 +36,8 @@ export default {
     '~/plugins/newrelic-plugins.server.js',
     '~/plugins/aduan-api.js',
     { src: '~/plugins/dark-mode.js', mode: 'client' },
+    { src: '~/plugins/vee-validate.js', mode: 'client' },
+    '~/plugins/jds-design-system.js',
   ],
 
   render: {
@@ -121,5 +123,7 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: ['@jabardigitalservice/jds-design-system'],
+  },
 }
