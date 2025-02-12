@@ -1,117 +1,118 @@
 <template>
+  <div
+    class="p-3 md:p-4 lg:p-6 xl:py-8 xl:px-10 rounded-xl bg-white dark:bg-dark-emphasis-low min-h-screen"
+  >
+    <TrackingComplaintFormStepper />
     <div
-      class="p-3 md:p-4 lg:p-6 xl:py-8 xl:px-10 rounded-xl bg-white dark:bg-dark-emphasis-low min-h-screen"
+      class="border border-gray-300 rounded-lg max-w-[650px] mx-auto dark:border-dark-emphasis-medium"
     >
-      <TrackingComplaintFormStepper />
-      <div class="border border-gray-300 rounded-lg max-w-[650px] mx-auto dark:border-dark-emphasis-medium">
-        <template v-for="{ title, id } in formTitle">
-          <h3
-            v-if="currentFormStep === id"
-            :key="id + title"
-            class="px-7 py-5 font-bold text-black dark:text-dark-emphasis-high"
-          >
-            {{ title }}
-          </h3>
-        </template>
+      <template v-for="{ title, id } in formTitle">
+        <h3
+          v-if="currentFormStep === id"
+          :key="id + title"
+          class="px-7 py-5 font-bold text-black dark:text-dark-emphasis-high"
+        >
+          {{ title }}
+        </h3>
+      </template>
 
-        <hr class="dark:border-dark-emphasis-medium"/>
+      <hr class="dark:border-dark-emphasis-medium" />
 
-        <!-- TODO: ADD LOADING -->
-        <TrackingComplaintSkeleton v-if="isLoading" />
+      <TrackingComplaintSkeleton v-if="isLoading" />
 
-        <div v-if="!isLoading" class="px-7 py-5">
-          <ValidationObserver ref="form" v-slot="{ invalid }" slim>
-            <form class="citizen__form mb-10" @submit.prevent="">
-              <TrackingComplaintFormStepOne v-if="currentFormStep === 1" />
-              <TrackingComplaintFormStepTwo v-if="currentFormStep === 2" />
-              <TrackingComplaintFormStepThree v-if="currentFormStep === 3" />
-              <TrackingComplaintFormStepFour v-if="currentFormStep === 4" />
+      <div v-if="!isLoading" class="px-7 py-5">
+        <ValidationObserver ref="form" v-slot="{ invalid }" slim>
+          <form class="citizen__form mb-10" @submit.prevent="">
+            <TrackingComplaintFormStepOne v-if="currentFormStep === 1" />
+            <TrackingComplaintFormStepTwo v-if="currentFormStep === 2" />
+            <TrackingComplaintFormStepThree v-if="currentFormStep === 3" />
+            <TrackingComplaintFormStepFour v-if="currentFormStep === 4" />
 
-              <!-- MOBILE -->
-              <div class="grid grid-cols-1 gap-2 md:hidden">
-                <Button
-                  v-if="!isLastStep"
-                  :style="[
-                    (currentFormStep === 3 ? invalidImages : invalid) && {
-                      backgroundColor: '#E0E0E0',
-                      color: '#FFFFFF',
-                    },
-                  ]"
-                  :disabled="currentFormStep === 3 ? invalidImages : invalid"
-                  class="w-full !justify-center"
-                  variant="primary"
-                  type="button"
-                  @click="nextStep"
-                >
-                  Simpan dan Lanjutkan
-                </Button>
-                <Button
-                  v-if="isLastStep"
-                  :style="[
-                    invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
-                  ]"
-                  variant="primary"
-                  :disabled="invalid"
-                  class="w-full !justify-center"
-                  @click="submitComplaint"
-                >
-                  Kirim Aduan
-                </Button>
-                <Button
-                  v-if="!isFirstStep"
-                  class="w-full !justify-center"
-                  variant="secondary"
-                  @click="previousStep"
-                >
-                  Kembali
-                </Button>
-              </div>
+            <!-- MOBILE -->
+            <div class="grid grid-cols-1 gap-2 md:hidden">
+              <Button
+                v-if="!isLastStep"
+                :style="[
+                  (currentFormStep === 3 ? invalidImages : invalid) && {
+                    backgroundColor: '#E0E0E0',
+                    color: '#FFFFFF',
+                  },
+                ]"
+                :disabled="currentFormStep === 3 ? invalidImages : invalid"
+                class="w-full !justify-center"
+                variant="primary"
+                type="button"
+                @click="nextStep"
+              >
+                Simpan dan Lanjutkan
+              </Button>
+              <Button
+                v-if="isLastStep"
+                :style="[
+                  invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
+                ]"
+                variant="primary"
+                :disabled="invalid"
+                class="w-full !justify-center"
+                @click="submitComplaint"
+              >
+                Kirim Aduan
+              </Button>
+              <Button
+                v-if="!isFirstStep"
+                class="w-full !justify-center"
+                variant="secondary"
+                @click="previousStep"
+              >
+                Kembali
+              </Button>
+            </div>
 
-              <!-- DESKTOP -->
-              <div class="hidden md:grid md:grid-cols-2">
-                <Button
-                  v-if="!isFirstStep"
-                  class="w-fit"
-                  variant="secondary"
-                  type="button"
-                  @click="previousStep"
-                >
-                  Kembali
-                </Button>
-                <Button
-                  v-if="!isLastStep"
-                  :style="[
-                    (currentFormStep === 3 ? invalidImages : invalid) && {
-                      backgroundColor: '#E0E0E0',
-                      color: '#FFFFFF',
-                    },
-                  ]"
-                  :disabled="currentFormStep === 3 ? invalidImages : invalid"
-                  class="w-fit col-start-2 col-end-3 justify-self-end"
-                  variant="primary"
-                  type="button"
-                  @click="nextStep"
-                >
-                  Simpan dan Lanjutkan
-                </Button>
-                <Button
-                  v-if="isLastStep"
-                  :style="[
-                    invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
-                  ]"
-                  variant="primary"
-                  :disabled="invalid"
-                  class="w-fit justify-self-end"
-                  @click="submitComplaint"
-                >
-                  Kirim Aduan
-                </Button>
-              </div>
-            </form>
-          </ValidationObserver>
-        </div>
+            <!-- DESKTOP -->
+            <div class="hidden md:grid md:grid-cols-2">
+              <Button
+                v-if="!isFirstStep"
+                class="w-fit"
+                variant="secondary"
+                type="button"
+                @click="previousStep"
+              >
+                Kembali
+              </Button>
+              <Button
+                v-if="!isLastStep"
+                :style="[
+                  (currentFormStep === 3 ? invalidImages : invalid) && {
+                    backgroundColor: '#E0E0E0',
+                    color: '#FFFFFF',
+                  },
+                ]"
+                :disabled="currentFormStep === 3 ? invalidImages : invalid"
+                class="w-fit col-start-2 col-end-3 justify-self-end"
+                variant="primary"
+                type="button"
+                @click="nextStep"
+              >
+                Simpan dan Lanjutkan
+              </Button>
+              <Button
+                v-if="isLastStep"
+                :style="[
+                  invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
+                ]"
+                variant="primary"
+                :disabled="invalid"
+                class="w-fit justify-self-end"
+                @click="submitComplaint"
+              >
+                Kirim Aduan
+              </Button>
+            </div>
+          </form>
+        </ValidationObserver>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
