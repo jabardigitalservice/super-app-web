@@ -239,7 +239,6 @@ export default {
       return citizenComplaint
     },
     async fetchCategories({ commit }, localStorageKey) {
-      console.log(localStorageKey, 'locale storage key')
       try {
         const xApiKey = this.$config.imageUploadApi
 
