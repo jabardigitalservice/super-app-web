@@ -3,7 +3,7 @@
       class="p-3 md:p-4 lg:p-6 xl:py-8 xl:px-10 rounded-xl bg-white dark:bg-dark-emphasis-low min-h-screen"
     >
       <TrackingComplaintFormStepper />
-      <div class="border border-gray-300 rounded-lg max-w-[650px] mx-auto">
+      <div class="border border-gray-300 rounded-lg max-w-[650px] mx-auto dark:border-dark-emphasis-medium">
         <template v-for="{ title, id } in formTitle">
           <h3
             v-if="currentFormStep === id"
@@ -14,7 +14,7 @@
           </h3>
         </template>
 
-        <hr />
+        <hr class="dark:border-dark-emphasis-medium"/>
 
         <!-- TODO: ADD LOADING -->
         <!-- <TrackingComplaintSkeleton v-if="isLoading" /> -->
@@ -29,7 +29,7 @@
 
               <!-- MOBILE -->
               <div class="grid grid-cols-1 gap-2 md:hidden">
-                <BaseButton
+                <Button
                   v-if="!isLastStep"
                   :style="[
                     (currentFormStep === 3 ? invalidImages : invalid) && {
@@ -44,8 +44,8 @@
                   @click="nextStep"
                 >
                   Simpan dan Lanjutkan
-                </BaseButton>
-                <BaseButton
+                </Button>
+                <Button
                   v-if="isLastStep"
                   :style="[
                     invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
@@ -56,20 +56,20 @@
                   @click="submitComplaint"
                 >
                   Kirim Aduan
-                </BaseButton>
-                <BaseButton
+                </Button>
+                <Button
                   v-if="!isFirstStep"
                   class="w-full !justify-center"
                   variant="secondary"
                   @click="previousStep"
                 >
                   Kembali
-                </BaseButton>
+                </Button>
               </div>
 
               <!-- DESKTOP -->
               <div class="hidden md:grid md:grid-cols-2">
-                <BaseButton
+                <Button
                   v-if="!isFirstStep"
                   class="w-fit"
                   variant="secondary"
@@ -77,8 +77,8 @@
                   @click="previousStep"
                 >
                   Kembali
-                </BaseButton>
-                <BaseButton
+                </Button>
+                <Button
                   v-if="!isLastStep"
                   :style="[
                     (currentFormStep === 3 ? invalidImages : invalid) && {
@@ -93,8 +93,8 @@
                   @click="nextStep"
                 >
                   Simpan dan Lanjutkan
-                </BaseButton>
-                <BaseButton
+                </Button>
+                <Button
                   v-if="isLastStep"
                   :style="[
                     invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' },
@@ -105,7 +105,7 @@
                   @click="submitComplaint"
                 >
                   Kirim Aduan
-                </BaseButton>
+                </Button>
               </div>
             </form>
           </ValidationObserver>
