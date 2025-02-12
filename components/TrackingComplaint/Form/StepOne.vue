@@ -66,12 +66,15 @@
       >
         Email <span class="text-red-500">*</span>
       </label>
-      <div class="flex flex-row gap-2 px-2 py-[10px] border rounded-lg">
+      <div
+        class="flex flex-row gap-2 px-2 py-[10px] border rounded-lg dark:border-dark-emphasis-medium"
+      >
         <Icon src="/icon/info-circle-outline.svg" size="16px" />
         <span
           class="font-lato text-[12px] leading-[18px] text-black dark:text-dark-emphasis-high"
-          >Disarankan email sudah terhubung dengan Aplikasi Sapawarga</span
         >
+          Disarankan email sudah terhubung dengan Aplikasi Sapawarga
+        </span>
       </div>
       <JdsInputText
         id="email"
