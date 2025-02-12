@@ -17,7 +17,7 @@
         <hr class="dark:border-dark-emphasis-medium"/>
 
         <!-- TODO: ADD LOADING -->
-        <!-- <TrackingComplaintSkeleton v-if="isLoading" /> -->
+        <TrackingComplaintSkeleton v-if="isLoading" />
 
         <div v-if="!isLoading" class="px-7 py-5">
           <ValidationObserver ref="form" v-slot="{ invalid }" slim>
