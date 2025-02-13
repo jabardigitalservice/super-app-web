@@ -38,6 +38,7 @@ export default {
     { src: '~/plugins/dark-mode.js', mode: 'client' },
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
+    '~/plugins/vue-gmaps.js',
   ],
 
   render: {
@@ -109,6 +110,7 @@ export default {
       username: process.env.USERNAME_URL_ADUAN,
       password: process.env.PASSWORD_URL_ADUAN,
     },
+    gmapsKey: process.env.GOOGLE_MAPS_API,
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
