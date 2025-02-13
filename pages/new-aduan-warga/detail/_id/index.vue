@@ -7,7 +7,7 @@
       class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px]"
     >
       <div class="flex flex-row justify-between">
-        <TrackingComplaintHeader  :id-aduan="complaintData?.complaint_id" />
+        <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
         <TrackingComplaintBadge
           class="self-center"
           :status="complaintData?.complaint_status_id"
@@ -110,8 +110,8 @@ export default {
         this.complaintData = {
           complaint_id: 'SWA202412020001',
           address: {
-            long: '107.5433112680912',
-            lat: '-6.850021397588075',
+            long: 107.5433112680912,
+            lat: -6.850021397588075,
             detail: 'yeyeyeyeyeye',
           },
           complaint_category: 'Ekonomi Dan Keuangan',

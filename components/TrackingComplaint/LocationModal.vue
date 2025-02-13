@@ -8,7 +8,7 @@
 
     <template #content>
       <div class="space-y-3">
-        <!-- TODO: ADD MAP -->
+        <BaseMap :coords="{ lat: lat, lng: lng }" :zoom="16" />
       </div>
 
       <div class="space-y-2">
@@ -38,6 +38,14 @@ export default {
     isOpen: {
       type: Boolean,
       default: false,
+    },
+    lat: {
+      type: Number,
+      default: 0,
+    },
+    lng: {
+      type: Number,
+      default: 0,
     },
   },
   methods: {

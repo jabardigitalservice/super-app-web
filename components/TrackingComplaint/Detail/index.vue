@@ -100,6 +100,8 @@
 
     <TrackingComplaintLocationModal
       :is-open="showLocationModal"
+      :lat="complaintData?.address?.lat"
+      :lng="complaintData?.address?.long"
       @close="showLocationModal = false"
     />
   </div>
@@ -115,8 +117,8 @@ export default {
         complaint_category: '',
         description: '',
         address: {
-          lat: '',
-          long: '',
+          lat: 0,
+          long: 0,
           detail: '',
         },
         photos: [],
