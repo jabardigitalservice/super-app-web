@@ -1,11 +1,14 @@
 <template>
   <div class="w-full h-full p-4 bg-white min-h-screen">
     <div class="mb-5">
-      <TrackingComplaintSearch />
+      <TrackingComplaintSearch @input="onSearch" />
     </div>
     <div
       class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px]"
     >
+      <!-- TODO: ADD CONDITION FIRST RENDER PAGES AND ADD CONDITION IF DATA NOT FOUND -->
+      <!-- <TrackingComplaintNoData v-if="complaintData.length === 0" title="Aduan tidak ditemukan" /> -->
+
       <div class="flex flex-row justify-between">
         <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
         <TrackingComplaintBadge
@@ -52,8 +55,9 @@ export default {
     return {
       tabItems: ['Detail Aduan', 'Riwayat Aduan'],
       selectedTab: 'Detail Aduan',
-      complaintData: null,
+      complaintData: [],
       isLoading: false,
+      search: '',
     }
   },
   computed: {
@@ -80,7 +84,8 @@ export default {
       this.isLoading = true
       try {
         const response = await this.$axios.get(
-          '/v1/aduan/complaints/:id/status'
+          '/v1/aduan/complaints/:id/status',
+          { params: { search: this.search } }
         )
         if (response.status === 200) {
           this.complaintData = {
@@ -143,6 +148,10 @@ export default {
       } finally {
         this.isLoading = false
       }
+    },
+    onSearch(value) {
+      this.search = value
+      this.fetchComplaintData()
     },
   },
 }
