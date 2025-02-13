@@ -8,7 +8,18 @@
     />
     <div>
       <h2 class="font-lato text-sm font-medium text-black"> Tracking Aduan </h2>
-      <p class="text-sm font-lato text-green-700"> SPW-000055667 </p>
+      <p class="text-sm font-lato text-green-700"> {{idAduan}} </p>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    idAduan: {
+      type: String,
+      default: '-',
+    },
+  },
+}
+</script>
