@@ -11,15 +11,15 @@
         />
       </div>
       <input
+        v-model="searchQuery"
         type="text"
         placeholder="Masukan ID Aduan"
         class="w-full pl-12 pr-4 text-gray-700 bg-transparent focus:outline-none text-sm"
-        v-model="search"
       />
     </div>
     <BaseButton
       class="text-base font-bold text-white mr-2 dark:border-0 bg-green-700 hover:bg-green-600"
-      @click="handleSearch"
+      @click="handleInput"
     >
       <BaseIconSvg
         icon="/icon/search.svg"
@@ -34,12 +34,12 @@
 export default {
   data() {
     return {
-      search: '',
+      searchQuery: '',
     }
   },
   methods: {
-    handleSearch() {
-      console.log('test:', this.search)
+    handleInput() {
+      this.$emit('input', this.searchQuery)
     },
   },
 }
