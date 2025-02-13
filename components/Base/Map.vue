@@ -10,9 +10,7 @@ export default {
   props: {
     options: {
       type: Object,
-      default: () => {
-        return {}
-      },
+      default: () => ({}),
     },
     zoom: {
       type: Number,
@@ -20,12 +18,10 @@ export default {
     },
     coords: {
       type: Object,
-      default: () => {
-        return {
-          lat: 0,
-          lng: 0,
-        }
-      },
+      default: () => ({
+        lat: 0,
+        lng: 0,
+      }),
     },
   },
   data() {
@@ -89,22 +85,17 @@ export default {
     this.initMap()
   },
   methods: {
-    /**
-     * Initial load google map
-     */
     async initMap() {
       try {
         const google = await this.$gMaps.load()
         const { PlacesService } = await google.maps.importLibrary('places')
 
-        // Loaded the Map
         const map = await new google.maps.Map(this.$refs.map, {
           center: this.coords,
           zoom: this.zoom,
           ...this.options,
         })
 
-        // Loaded the custom marker
         const markerIcon = '/icon/pin-map.svg'
 
         const marker = await new google.maps.Marker({
@@ -120,6 +111,9 @@ export default {
         this.marker = marker
 
         this.placeService = await new PlacesService(map)
+
+        // Get initial place details
+        this.geocodeLatLng(this.geocoder, this.map, this.coords)
       } catch (e) {
         console.error(e)
       }
@@ -127,9 +121,6 @@ export default {
       this.setMapEvent()
       this.setMarkerEvent()
     },
-    /**
-     * Set event map
-     */
     setMapEvent() {
       this.events.forEach((event) => {
         this.map.addListener(event, (e) => {
@@ -146,9 +137,6 @@ export default {
         })
       })
     },
-    /**
-     * Set event marker
-     */
     setMarkerEvent() {
       this.markerEvents.forEach((event) => {
         this.marker.addListener(event, (e) => {
@@ -161,9 +149,6 @@ export default {
         })
       })
     },
-    /**
-     * @function: to get location
-     */
     geocodeLatLng(geocoder, map, coords) {
       geocoder
         .geocode({ location: coords })
@@ -179,9 +164,6 @@ export default {
           console.log(error)
         })
     },
-    /**
-     * @function: to get Place Detail
-     */
     getPlaceDetail(placeId) {
       const request = {
         placeId,
