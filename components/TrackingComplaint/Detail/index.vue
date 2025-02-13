@@ -7,17 +7,14 @@
     </div>
 
     <template v-else>
-      <!-- TODO: FIX CONDITION AFTER API READY -->
       <TrackingComplaintNoData
         v-if="!complaintData || complaintData.complaint_id === ''"
       />
 
-      <!-- Detail Complaint -->
       <section v-else class="flex flex-col gap-3">
-        <!-- Image -->
+        <!-- Image section -->
         <div class="flex flex-col gap-3">
           <div class="max-w-[900px] max-h-fit self-center">
-            <!-- Image Preview -->
             <img
               v-if="complaintData.photos.length > 0"
               loading="eager"
@@ -69,10 +66,8 @@
         <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
           <div class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
-            <!-- TODO: GET DATA LOCATION WITH GOOGLE MAP (Lat, Long) -->
             <p class="font-lato text-sm text-gray-900">
-              Situ aksan , Sukahaji, Kec. Babakan Ciparay, Kota Bandung, Jawa
-              Barat 40221, Indonesia
+              {{ location.address }}
             </p>
             <p class="font-lato text-xs text-gray-500">
               <span>Lat: {{ complaintData.address.lat }}</span>
@@ -100,10 +95,27 @@
 
     <TrackingComplaintLocationModal
       :is-open="showLocationModal"
-      :lat="complaintData?.address?.lat"
-      :lng="complaintData?.address?.long"
+      title="Lokasi Aduan"
       @close="showLocationModal = false"
-    />
+    >
+      <div class="space-y-3">
+        <BaseMap
+          :coords="{
+            lat: complaintData?.address?.lat,
+            lng: complaintData?.address?.long,
+          }"
+          :zoom="16"
+          @set:place="getPlaceDetail"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <h5 class="text-base text-black font-bold">{{ location.name }}</h5>
+        <p class="text-sm text-gray-500">
+          {{ location.address }}
+        </p>
+      </div>
+    </TrackingComplaintLocationModal>
   </div>
 </template>
 
@@ -134,6 +146,10 @@ export default {
     return {
       selectedImage: null,
       showLocationModal: false,
+      location: {
+        name: '',
+        address: '',
+      },
     }
   },
   watch: {
@@ -144,6 +160,25 @@ export default {
           this.selectedImage = newData.photos[0].url
         }
       },
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (
+        this.complaintData?.address?.lat &&
+        this.complaintData?.address?.long
+      ) {
+        this.getPlaceDetail({
+          lat: this.complaintData?.address?.lat,
+          lng: this.complaintData?.address?.long,
+        })
+      }
+    })
+  },
+  methods: {
+    getPlaceDetail(place) {
+      this.location.name = place.name ?? ''
+      this.location.address = place.formatted_address ?? ''
     },
   },
 }
