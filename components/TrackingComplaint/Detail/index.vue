@@ -7,6 +7,7 @@
     </div>
 
     <template v-else>
+      <!-- TODO: FIX CONDITION AFTER API READY -->
       <TrackingComplaintNoData
         v-if="!complaintData || complaintData.complaint_id === ''"
       />

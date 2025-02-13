@@ -85,6 +85,7 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'verfication.svg',
     fillColor: '#FF7500',
     phase: 'authorization',
+    // TODO: CONFIRMATION THIS VALUE FOR WHAT IN STATUS
     non_prov_alias: '',
     is_prov_responsibility: '',
     order: '',
@@ -183,11 +184,12 @@ export const newDataStatusMilestone = Object.freeze({
     id: 'directed_to_hotline_jabar',
     textStatus: 'Dialihkan ke Hotline Jabar',
     phase: 'verification',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
     // TODO: CONFIRMATION FOR ICON AND COLOR THIS STATUS
     icon: 'closed.svg',
     fillColor: '#16A75C',
+    // END TODO
+    non_prov_alias: '',
+    is_prov_responsibility: '',
+    order: '',
   },
 })
