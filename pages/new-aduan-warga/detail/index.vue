@@ -160,7 +160,6 @@ export default {
         console.log(response)
       } catch (error) {
         console.error(error)
-        // TODO :  REMOVE THIS AFTER API READ (EXAMPLE READY DATA NO REAL)
       } finally {
         this.isLoading = false
       }
