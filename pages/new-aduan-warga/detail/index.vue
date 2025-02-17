@@ -34,8 +34,9 @@
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
-            :complaint-data="complaintData || []"
+            :complaint-data="complaintData || {}"
             :is-loading="isLoading"
+            :data-tracking="trackingData"
           />
         </keep-alive>
       </div>
@@ -56,6 +57,7 @@ export default {
       tabItems: ['Detail Aduan', 'Riwayat Aduan'],
       selectedTab: 'Detail Aduan',
       complaintData: {},
+      trackingData: [],
       isLoading: false,
       search: '',
     }
@@ -117,11 +119,13 @@ export default {
       this.isLoading = true
 
       try {
-        const response = await this.$authAxios.get(
+        const { data, status } = await this.$authAxios.get(
           `/v1/aduan/complaints/${this.search}/status`
         )
-        if (response.status === 200) {
-          console.log(response.data.data, 'tracking')
+
+        const trackingData = data.data
+        if (status === 200) {
+          this.trackingData = trackingData
         }
       } catch (error) {
         console.error(error)
