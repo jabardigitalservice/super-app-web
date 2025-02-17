@@ -3,15 +3,17 @@
     <div v-if="loading">Loading...</div>
 
     <div v-else>
-      <Milestone :data-milestone="dataAduan" class="mt-[32px]" />
+      <MilestoneNew :data-milestone="exampleData.data" class="mt-[32px]" />
     </div>
   </div>
 </template>
 
 <script>
-import Milestone from '~/components/TrackingComplaint/History/Milestone.vue'
+import MilestoneNew from '~/components/TrackingComplaint/History/MilestoneNew.vue'
+import { exampleData } from '~/constant/mock-api-aduan'
+
 export default {
-  components: { Milestone },
+  components: { MilestoneNew },
   props: {
     dataAduan: { type: Array, default: () => [] },
 
@@ -19,6 +21,11 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  data() {
+    return {
+      exampleData,
+    }
   },
 }
 </script>
