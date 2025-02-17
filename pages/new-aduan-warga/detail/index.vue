@@ -80,28 +80,29 @@ export default {
     async getDetailComplaint() {
       this.isLoading = true
       try {
-        // TODO: CHANGES THIS URL API FI READY
-        const response = await this.$authAxios.get(
+        const { data, status } = await this.$authAxios.get(
           `/v1/aduan/complaints/${this.search}`
         )
-        if (response.status === 200) {
+
+        const detailData = data.data
+        if (status === 200) {
           this.complaintData = {
-            complaint_id: response.data.complaint_id,
-            description: response.data.description,
-            complaint_category: response.data.complaint_category.name,
+            complaint_id: detailData.complaint_id,
+            description: detailData.description,
+            complaint_category: detailData.complaint_category.name,
             address: {
-              long: response.data.longitude,
-              lat: response.data.latitude,
-              detail: response.data.address_detail,
+              long: Number(detailData.longitude),
+              lat: Number(detailData.latitude),
+              detail: detailData.address_detail,
             },
-            photos: response.data.photos,
-            complaint_status_id: response.data.complaint_status_id,
+            photos: detailData.photos,
+            complaint_status_id: detailData.complaint_status_id,
             updated_at: formatDate(
-              response?.data?.updated_at,
+              detailData?.updated_at,
               'EEEE, dd MMMM yyyy - HH:mm'
             ),
             created_at: formatDate(
-              response?.data?.created_at,
+              detailData?.created_at,
               'EEEE, dd MMMM yyyy - HH:mm'
             ),
           }
@@ -119,8 +120,9 @@ export default {
         const response = await this.$authAxios.get(
           `/v1/aduan/complaints/${this.search}/status`
         )
-        // TODO: FIX AFTER API READY
-        console.log(response.data)
+        if (response.status === 200) {
+          console.log(response.data.data, 'tracking')
+        }
       } catch (error) {
         console.error(error)
       } finally {
@@ -130,6 +132,7 @@ export default {
     onSearch(value) {
       this.search = value
       this.getDetailComplaint()
+      this.getTrackingComplaint()
     },
   },
 }
