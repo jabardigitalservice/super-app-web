@@ -1,3 +1,4 @@
+// TODO: REMOVE THIS EXAMPLE DATA IF API READY
 export const exampleData = {
   status: null,
   message: null,
