@@ -30,14 +30,14 @@
         @click="getSelected($event)"
       />
       <div>
-        <!-- <keep-alive>
+        <keep-alive>
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
             :complaint-data="complaintData || {}"
             :is-loading="isLoading"
           />
-        </keep-alive> -->
+        </keep-alive>
       </div>
     </div>
   </div>
@@ -48,8 +48,8 @@ import { formatDate } from '~/utils'
 
 export default {
   components: {
-    // HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
-    // DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
+    HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
+    DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
   },
   data() {
     return {
