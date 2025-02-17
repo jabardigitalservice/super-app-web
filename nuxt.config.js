@@ -117,6 +117,8 @@ export default {
       keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
       baseUrl: process.env.URL_ADUAN_PARTNER,
+      xPartnerId: process.env.X_PARTNER_ID,
+      apiKeyUrlAduan: process.env.API_KEY_URL_ADUAN_PARTNER,
     },
   },
 
