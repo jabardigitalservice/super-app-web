@@ -84,6 +84,7 @@ export default {
     async getDetailComplaint() {
       this.isLoading = true
       try {
+        // TODO: CHANGES THIS URL API FI READY
         const response = await this.$axios.get('/v1/aduan/complaints/:id', {
           params: { search: this.search },
         })
