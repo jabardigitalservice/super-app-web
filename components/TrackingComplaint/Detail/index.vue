@@ -11,7 +11,7 @@
       <div class="flex flex-col gap-3">
         <div class="max-w-[900px] max-h-fit self-center">
           <img
-            v-if="complaintData.photos.length > 0"
+            v-if="complaintData?.photos?.length > 0"
             loading="eager"
             :src="selectedImage"
             width="900"
@@ -22,7 +22,7 @@
         </div>
         <div class="w-full overflow-x-auto flex flex-row gap-1">
           <button
-            v-for="(image, index) in complaintData.photos"
+            v-for="(image, index) in complaintData?.photos"
             :key="'gambar' + index"
             @click="selectedImage = image.url"
           >
@@ -47,14 +47,14 @@
       <div class="flex flex-col gap-1">
         <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
         <p class="font-lato text-sm text-gray-900">
-          {{ complaintData.complaint_category }}
+          {{ complaintData.complaint_category || '-' }}
         </p>
       </div>
 
       <div class="flex flex-col gap-1">
         <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
         <p class="font-lato text-sm text-gray-900">
-          {{ complaintData.description }}
+          {{ complaintData.description || '-' }}
         </p>
       </div>
 
@@ -62,11 +62,11 @@
         <div class="flex flex-col gap-1">
           <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
           <p class="font-lato text-sm text-gray-900">
-            {{ location.address }}
+            {{ location.address || '-' }}
           </p>
           <p class="font-lato text-xs text-gray-500">
-            <span>Lat: {{ complaintData.address.lat }}</span>
-            <span>Long: {{ complaintData.address.long }}</span>
+            <span>Lat: {{ complaintData?.address?.lat || '-' }}</span>
+            <span>Long: {{ complaintData?.address?.long || '-' }}</span>
           </p>
         </div>
         <button @click="showLocationModal = true">
@@ -82,7 +82,7 @@
       <div class="flex flex-col gap-1">
         <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
         <p class="font-lato text-sm text-gray-900">
-          {{ complaintData.address.detail }}
+          {{ complaintData?.address?.detail || '-' }}
         </p>
       </div>
     </section>
@@ -102,9 +102,11 @@
       </div>
 
       <div class="space-y-2 mt-2">
-        <h5 class="text-base text-black font-bold">{{ location.name }}</h5>
+        <h5 class="text-base text-black font-bold">
+          {{ location.name || '-' }}
+        </h5>
         <p class="text-sm text-gray-500">
-          {{ location.address }}
+          {{ location.address || '-' }}
         </p>
       </div>
     </TrackingComplaintLocationModal>

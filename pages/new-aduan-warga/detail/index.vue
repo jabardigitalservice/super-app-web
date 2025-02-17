@@ -34,7 +34,7 @@
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
-            :complaint-data="complaintData || {}"
+            :complaint-data="complaintData || []"
             :is-loading="isLoading"
           />
         </keep-alive>
@@ -72,10 +72,6 @@ export default {
       }
     },
   },
-  mounted() {
-    this.getDetailComplaint()
-    this.getTrackingComplaint()
-  },
   methods: {
     formatDate,
     getSelected(value) {
@@ -85,9 +81,9 @@ export default {
       this.isLoading = true
       try {
         // TODO: CHANGES THIS URL API FI READY
-        const response = await this.$axios.get('/v1/aduan/complaints/:id', {
-          params: { search: this.search },
-        })
+        const response = await this.$authAxios.get(
+          `/v1/aduan/complaints/${this.search}`
+        )
         if (response.status === 200) {
           this.complaintData = {
             complaint_id: response.data.complaint_id,
@@ -112,40 +108,6 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        // TODO :  REMOVE THIS AFTER API READ (EXAMPLE READY DATA NO REAL)
-        this.complaintData = {
-          complaint_id: 'SWA202412020001',
-          address: {
-            long: 107.5433112680912,
-            lat: -6.850021397588075,
-            detail: 'yeyeyeyeyeye',
-          },
-          complaint_category: 'Ekonomi Dan Keuangan',
-          description: 'okelah',
-          photos: [
-            {
-              url: 'https://file.digitalservice.id/superapp-utilities-public/utilities/files/AhtD9VX9QpadQjs2.jpg',
-            },
-            {
-              url: 'https://randomwordgenerator.com/img/picture-generator/57e0d4474354ae14f1dc8460962e33791c3ad6e04e5074417d2e72d1964dc6_640.jpg',
-            },
-            {
-              url: 'https://randomwordgenerator.com/img/picture-generator/55e1d14b4a5aac14f1dc8460962e33791c3ad6e04e507440752f72d39748c1_640.jpg',
-            },
-            {
-              url: 'https://randomwordgenerator.com/img/picture-generator/57e3d14b4b5aa514f1dc8460962e33791c3ad6e04e507440702d79d39748cd_640.jpg',
-            },
-          ],
-          complaint_status_id: 'finished',
-          updated_at: formatDate(
-            '2024-12-12T12:50:00.363565Z',
-            'EEEE, dd MMMM yyyy - HH:mm'
-          ),
-          created_at: formatDate(
-            '2024-12-12T12:50:00.363565Z',
-            'EEEE, dd MMMM yyyy - HH:mm'
-          ),
-        }
       } finally {
         this.isLoading = false
       }
@@ -155,10 +117,10 @@ export default {
 
       try {
         const response = await this.$authAxios.get(
-          '/v1/aduan/complaints/SWA202412020001'
+          `/v1/aduan/complaints/${this.search}/status`
         )
         // TODO: FIX AFTER API READY
-        console.log(response)
+        console.log(response.data)
       } catch (error) {
         console.error(error)
       } finally {
