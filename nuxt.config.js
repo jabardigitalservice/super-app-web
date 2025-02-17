@@ -39,6 +39,7 @@ export default {
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
+    '~/plugins/aduan-api-new.js',
   ],
 
   render: {
@@ -111,6 +112,12 @@ export default {
       password: process.env.PASSWORD_URL_ADUAN,
     },
     gmapsKey: process.env.GOOGLE_MAPS_API,
+    apiAduanIdeal: {
+      keycloakUrl: process.env.KEYCLOAK_URL,
+      keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
+      keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
+      baseUrl: process.env.URL_ADUAN_PARTNER,
+    },
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

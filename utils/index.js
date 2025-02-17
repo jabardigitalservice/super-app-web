@@ -1,19 +1,19 @@
-import { formatInTimeZone } from 'date-fns-tz'
 import { isValid } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import id from 'date-fns/locale/id'
 
-export function formatDate (date, format) {
+export function formatDate(date, format) {
   // check if valid date
   return date && isValid(new Date(date))
     ? formatInTimeZone(date, 'Asia/Jakarta', format, { locale: id })
     : '-'
 }
 
-export async function fetchAduanData ($aduanAPI, idAduan, config) {
+export async function fetchAduanData($aduanAPI, idAduan, config) {
   try {
     const response = await $aduanAPI.post('/aduan/login', {
       username: config.baseURLAduan.username,
-      password: config.baseURLAduan.password
+      password: config.baseURLAduan.password,
     })
 
     const token = response.data.access_token
@@ -22,12 +22,12 @@ export async function fetchAduanData ($aduanAPI, idAduan, config) {
       const dataResponse = await $aduanAPI.post(
         '/aduan/id_aduan',
         {
-          id_aduan: idAduan
+          id_aduan: idAduan,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       )
 
@@ -42,7 +42,7 @@ export async function fetchAduanData ($aduanAPI, idAduan, config) {
   return null
 }
 
-export function getExtensionFileByUrl (url) {
+export function getExtensionFileByUrl(url) {
   const parts = url.split('.')
   return parts[parts.length - 1]
 }

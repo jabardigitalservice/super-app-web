@@ -30,14 +30,14 @@
         @click="getSelected($event)"
       />
       <div>
-        <keep-alive>
+        <!-- <keep-alive>
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
-            :complaint-data="complaintData"
+            :complaint-data="complaintData || {}"
             :is-loading="isLoading"
           />
-        </keep-alive>
+        </keep-alive> -->
       </div>
     </div>
   </div>
@@ -48,14 +48,14 @@ import { formatDate } from '~/utils'
 
 export default {
   components: {
-    HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
-    DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
+    // HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
+    // DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
   },
   data() {
     return {
       tabItems: ['Detail Aduan', 'Riwayat Aduan'],
       selectedTab: 'Detail Aduan',
-      complaintData: [],
+      complaintData: {},
       isLoading: false,
       search: '',
     }
@@ -73,20 +73,20 @@ export default {
     },
   },
   mounted() {
-    this.fetchComplaintData()
+    this.getDetailComplaint()
+    this.getTrackingComplaint()
   },
   methods: {
     formatDate,
     getSelected(value) {
       this.selectedTab = value
     },
-    async fetchComplaintData() {
+    async getDetailComplaint() {
       this.isLoading = true
       try {
-        const response = await this.$axios.get(
-          '/v1/aduan/complaints/:id/status',
-          { params: { search: this.search } }
-        )
+        const response = await this.$axios.get('/v1/aduan/complaints/:id', {
+          params: { search: this.search },
+        })
         if (response.status === 200) {
           this.complaintData = {
             complaint_id: response.data.complaint_id,
@@ -149,9 +149,25 @@ export default {
         this.isLoading = false
       }
     },
+    async getTrackingComplaint() {
+      this.isLoading = true
+
+      try {
+        const response = await this.$authAxios.get(
+          '/v1/aduan/complaints/SWA202412020001'
+        )
+        // TODO: FIX AFTER API READY
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+        // TODO :  REMOVE THIS AFTER API READ (EXAMPLE READY DATA NO REAL)
+      } finally {
+        this.isLoading = false
+      }
+    },
     onSearch(value) {
       this.search = value
-      this.fetchComplaintData()
+      this.getDetailComplaint()
     },
   },
 }
