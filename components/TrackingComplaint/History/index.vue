@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full min-h-[400px]">
     <TrackingComplaintLoading v-if="isLoading" />
 
     <div v-else>
