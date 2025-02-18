@@ -1,11 +1,6 @@
 <template>
   <div>
-    <!-- TODO: ADD LOADING -->
-    <div v-if="isLoading" class="flex items-center justify-center">
-      <div
-        class="border-t-transparent border-solid animate-spin rounded-full border-green-600 border-8 h-14 w-14"
-      />
-    </div>
+    <TrackingComplaintLoading v-if="isLoading" />
 
     <div v-else>
       <TrackingComplaintNoData
