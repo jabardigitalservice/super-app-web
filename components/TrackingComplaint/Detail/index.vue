@@ -7,84 +7,91 @@
     </div>
 
     <section v-else class="flex flex-col gap-3">
-      <!-- Image section -->
-      <div class="flex flex-col gap-3">
-        <div class="max-w-[900px] max-h-fit self-center">
-          <img
-            v-if="complaintData?.photos?.length > 0"
-            loading="eager"
-            :src="selectedImage"
-            width="900"
-            height="290"
-            class="rounded-lg mx-auto object-cover"
-            alt="gambar aduan"
-          />
-        </div>
-        <div class="w-full overflow-x-auto flex flex-row gap-1">
-          <button
-            v-for="(image, index) in complaintData?.photos"
-            :key="'gambar' + index"
-            @click="selectedImage = image.url"
-          >
+      <TrackingComplaintNoData
+        v-if="!complaintData.complaint_id"
+        title="Aduan tidak ditemukan"
+      />
+
+      <template v-else>
+        <!-- Image section -->
+        <div class="flex flex-col gap-3">
+          <div class="max-w-[900px] max-h-fit self-center">
             <img
+              v-if="complaintData?.photos?.length > 0"
               loading="eager"
-              :src="image.url"
-              width="105"
-              height="65"
-              class="rounded-md max-w-[105px] max-h-[65px] object-cover"
-              :class="{
-                'opacity-50 transition-opacity duration-300':
-                  selectedImage === image.url,
-              }"
+              :src="selectedImage"
+              width="900"
+              height="290"
+              class="rounded-lg mx-auto object-cover"
               alt="gambar aduan"
+            />
+          </div>
+          <div class="w-full overflow-x-auto flex flex-row gap-1">
+            <button
+              v-for="(image, index) in complaintData?.photos"
+              :key="'gambar' + index"
+              @click="selectedImage = image.url"
+            >
+              <img
+                loading="eager"
+                :src="image.url"
+                width="105"
+                height="65"
+                class="rounded-md max-w-[105px] max-h-[65px] object-cover"
+                :class="{
+                  'opacity-50 transition-opacity duration-300':
+                    selectedImage === image.url,
+                }"
+                alt="gambar aduan"
+              />
+            </button>
+          </div>
+        </div>
+
+        <hr class="my-3" />
+
+        <div class="flex flex-col gap-1">
+          <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
+          <p class="font-lato text-sm text-gray-900">
+            {{ complaintData.complaint_category || '-' }}
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
+          <p class="font-lato text-sm text-gray-900">
+            {{ complaintData.description || '-' }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
+          <div class="flex flex-col gap-1">
+            <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+            <p class="font-lato text-sm text-gray-900">
+              {{ location.address || '-' }}
+            </p>
+            <p class="font-lato text-xs text-gray-500">
+              <span>Lat: {{ complaintData?.address?.lat || '-' }}</span>
+              <span>Long: {{ complaintData?.address?.long || '-' }}</span>
+            </p>
+          </div>
+          <button @click="showLocationModal = true">
+            <img
+              src="/images/see-map.webp"
+              width="55"
+              height="45"
+              alt="gambar lihat peta"
             />
           </button>
         </div>
-      </div>
 
-      <hr class="my-3" />
-
-      <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
-        <p class="font-lato text-sm text-gray-900">
-          {{ complaintData.complaint_category || '-' }}
-        </p>
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
-        <p class="font-lato text-sm text-gray-900">
-          {{ complaintData.description || '-' }}
-        </p>
-      </div>
-
-      <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
         <div class="flex flex-col gap-1">
-          <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+          <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
           <p class="font-lato text-sm text-gray-900">
-            {{ location.address || '-' }}
-          </p>
-          <p class="font-lato text-xs text-gray-500">
-            <span>Lat: {{ complaintData?.address?.lat || '-' }}</span>
-            <span>Long: {{ complaintData?.address?.long || '-' }}</span>
+            {{ complaintData?.address?.detail || '-' }}
           </p>
         </div>
-        <button @click="showLocationModal = true">
-          <img
-            src="/images/see-map.webp"
-            width="55"
-            height="45"
-            alt="gambar lihat peta"
-          />
-        </button>
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
-        <p class="font-lato text-sm text-gray-900">
-          {{ complaintData?.address?.detail || '-' }}
-        </p>
-      </div>
+      </template>
     </section>
 
     <TrackingComplaintLocationModal
