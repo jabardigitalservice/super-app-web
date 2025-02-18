@@ -38,7 +38,8 @@
             <div class="text-milestone">
               <div class="label-text">
                 {{
-                  milestone.status === 'Menunggu Verifikasi'
+                  milestone.status ===
+                  newDataStatusMilestone.unverified.textStatus
                     ? 'Aduan Anda sedang'
                     : 'Aduan Anda telah'
                 }}
@@ -51,7 +52,9 @@
             </div>
 
             <div
-              v-if="milestone.status === 'Selesai Dikerjakan'"
+              v-if="
+                milestone.status === newDataStatusMilestone.finished.textStatus
+              "
               class="text-milestone"
             >
               <div class="label-text">Penanggung Jawab</div>
@@ -72,6 +75,30 @@
               <div class="detail-text">{{ milestone.note }}</div>
             </div>
           </div>
+
+          <div
+            v-if="
+              milestone.status ===
+                newDataStatusMilestone.diverted_to_span.textStatus &&
+              milestone.sp4n_id
+            "
+            class="card-milestone mt-2"
+          >
+            <div class="text-milestone">
+              <div class="label-text">ID Tracking SP4N LAPOR</div>
+              <div class="detail-text">{{ milestone.sp4n_id }}</div>
+            </div>
+          </div>
+
+          <TrackingComplaintAccordion
+            v-if="
+              milestone?.sp4n_histories?.length > 0 &&
+              milestone.status ===
+                newDataStatusMilestone.diverted_to_span.textStatus
+            "
+            title="Lihat Semua Status"
+            :log-span="milestone.sp4n_histories"
+          />
         </div>
       </div>
     </div>
@@ -117,7 +144,10 @@ export default {
     },
     showEstimation(milestone) {
       return (
-        ['Selesai Dikerjakan', 'Ditindaklanjuti'].includes(milestone.status) &&
+        [
+          newDataStatusMilestone.finished.textStatus,
+          newDataStatusMilestone.followup.textStatus,
+        ].includes(milestone.status) &&
         (milestone.start_date || milestone.end_date)
       )
     },
