@@ -2,7 +2,7 @@
   <div class="max-w-xl lg:max-w-2xl w-full flex items-center">
     <ValidationObserver
       v-slot="{ invalid }"
-      class="flex items-center w-full max-w-xl"
+      class="flex items-start w-full max-w-xl"
     >
       <ValidationProvider
         v-slot="{ errors }"
@@ -24,7 +24,7 @@
         </JdsInputText>
       </ValidationProvider>
       <BaseButton
-        class="text-base font-bold text-white ml-2 dark:border-0 bg-green-700 hover:bg-green-600"
+        class="text-base font-bold text-white ml-2 h-[40px] dark:border-0 bg-green-700 hover:bg-green-600"
         :disabled="invalid"
         @click="handleInput"
       >
