@@ -130,6 +130,8 @@ export default {
         }
       } catch (error) {
         console.error(error)
+        this.trackingData = []
+        this.errorMessage = error.response.data.message || ''
       } finally {
         this.isLoading = false
       }

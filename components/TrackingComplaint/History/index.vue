@@ -5,9 +5,13 @@
     <div v-else>
       <TrackingComplaintNoData
         v-if="dataTracking.length === 0"
-        title="Aduan tidak ditemukan"
+        :title="
+          errorMessage
+            ? 'Data aduan tidak ditemukan'
+            : `Cari aduan terlebih dahulu`
+        "
       />
-      <MilestoneNew :data-milestone="dataTracking" class="mt-[32px]" />
+      <MilestoneNew v-else :data-milestone="dataTracking" class="mt-[32px]" />
     </div>
   </div>
 </template>
@@ -22,6 +26,10 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    errorMessage: {
+      type: String,
+      default: '',
     },
   },
 }
