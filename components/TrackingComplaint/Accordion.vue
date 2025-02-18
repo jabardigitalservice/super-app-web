@@ -17,14 +17,12 @@
       <div
         class="complaint-accordion__icon--background flex-shrink-0 w-6 h-6 flex items-center justify-center ml-auto self-center cursor-pointer"
       >
-        <client-only>
-          <Icon
-            name="chevron-down"
-            size="18px"
-            class="text-green-700 transition-transform duration-300"
-            :class="{ 'transform rotate-180': isOpen }"
-          />
-        </client-only>
+        <Icon
+          name="chevron-down"
+          size="18px"
+          class="text-green-700 transition-transform duration-300"
+          :class="{ 'transform rotate-180': isOpen }"
+        />
       </div>
     </summary>
 
