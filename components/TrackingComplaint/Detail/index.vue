@@ -9,7 +9,7 @@
     <section v-else class="flex flex-col gap-3">
       <TrackingComplaintNoData
         v-if="!complaintData.complaint_id"
-        title="Aduan tidak ditemukan"
+        title="Cari aduan terlebih dahulu"
       />
 
       <template v-else>

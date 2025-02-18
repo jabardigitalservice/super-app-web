@@ -85,6 +85,7 @@ export default {
 
         const detailData = data.data
         if (status === 200) {
+          console.log(detailData, 'detail data')
           this.complaintData = {
             complaint_id: detailData.complaint_id,
             description: detailData.description,
