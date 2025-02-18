@@ -36,71 +36,56 @@
         <div class="w-full mt-1">
           <div class="card-milestone">
             <div class="text-milestone">
-              <div class="label-text">
+              <p class="label-text">
                 {{
                   milestone.status ===
                   newDataStatusMilestone.unverified.textStatus
                     ? 'Aduan Anda sedang'
                     : 'Aduan Anda telah'
                 }}
-              </div>
-              <div class="detail-text">
-                {{ milestone.status }}
-                <div class="label-text">oleh</div>
-                {{ milestone.pic }}
-              </div>
+              </p>
+              <p class="detail-text flex flex-col gap-y-1">
+                <span>{{ milestone.status }}</span>
+                <span class="label-text">oleh</span>
+                <span>{{ milestone.pic }}</span>
+              </p>
             </div>
 
-            <div
-              v-if="
-                milestone.status ===
-                  newDataStatusMilestone.finished.textStatus ||
-                milestone.status === newDataStatusMilestone.followup.textStatus
-              "
-              class="text-milestone"
-            >
-              <div class="label-text">Penanggung Jawab</div>
-              <div class="detail-text">{{ milestone.pic_name }}</div>
+            <div v-if="showPic(milestone)" class="text-milestone">
+              <p class="label-text">Penanggung Jawab</p>
+              <p class="detail-text">{{ milestone.pic_name }}</p>
             </div>
 
             <div v-if="showEstimation(milestone)" class="text-milestone">
-              <div class="label-text">Estimasi Pengerjaan</div>
-              <div class="detail-text">
+              <p class="label-text">Estimasi Pengerjaan</p>
+              <p class="detail-text">
                 {{ getEstimationPeriod(milestone) }}
-              </div>
+              </p>
             </div>
           </div>
 
           <div v-if="milestone.note" class="card-milestone mt-2">
             <div class="text-milestone">
-              <div class="label-text">Keterangan</div>
-              <div class="detail-text">{{ milestone.note }}</div>
+              <p class="label-text">Keterangan</p>
+              <p class="detail-text">{{ milestone.note }}</p>
             </div>
           </div>
 
-          <div
-            v-if="
-              milestone.status ===
-                newDataStatusMilestone.diverted_to_span.textStatus &&
-              milestone.sp4n_id
-            "
-            class="card-milestone mt-2"
-          >
+          <div v-if="showIdSpanLapor(milestone)" class="card-milestone mt-2">
             <div class="text-milestone">
-              <div class="label-text">ID Tracking SP4N LAPOR</div>
-              <div class="detail-text">{{ milestone.sp4n_id }}</div>
+              <p class="label-text">ID Tracking SP4N LAPOR</p>
+              <p class="detail-text">{{ milestone.sp4n_id }}</p>
             </div>
           </div>
 
           <TrackingComplaintAccordion
-            v-if="
-              milestone?.sp4n_histories?.length > 0 &&
-              milestone.status ===
-                newDataStatusMilestone.diverted_to_span.textStatus
-            "
+            v-if="showLogSpanLapor(milestone)"
             title="Lihat Semua Status"
             :log-span="milestone.sp4n_histories"
           />
+
+          <!-- TODO: EVIDENCE FOR STATUS SELESAI, DITINJAU ULANG, PENGERJAAN DITUNDA -->
+          <div v-if="showEvidence(milestone)">isinya file</div>
         </div>
       </div>
     </div>
@@ -149,8 +134,38 @@ export default {
         [
           newDataStatusMilestone.finished.textStatus,
           newDataStatusMilestone.followup.textStatus,
+          newDataStatusMilestone.postponed.textStatus,
+          newDataStatusMilestone.review.textStatus,
         ].includes(milestone.status) &&
         (milestone.start_date || milestone.end_date)
+      )
+    },
+    showEvidence(milestone) {
+      return [
+        newDataStatusMilestone.postponed.textStatus,
+        newDataStatusMilestone.review.textStatus,
+        newDataStatusMilestone.finished.textStatus,
+      ].includes(milestone.status)
+    },
+    showPic(milestone) {
+      return [
+        newDataStatusMilestone.finished.textStatus,
+        newDataStatusMilestone.followup.textStatus,
+        newDataStatusMilestone.postponed.textStatus,
+        newDataStatusMilestone.review.textStatus,
+      ].includes(milestone.status)
+    },
+    showIdSpanLapor(milestone) {
+      return (
+        milestone.status ===
+          newDataStatusMilestone.diverted_to_span.textStatus &&
+        milestone.sp4n_id
+      )
+    },
+    showLogSpanLapor(milestone) {
+      return (
+        milestone?.sp4n_histories?.length > 0 &&
+        milestone.status === newDataStatusMilestone.diverted_to_span.textStatus
       )
     },
     getEstimationPeriod(milestone) {
