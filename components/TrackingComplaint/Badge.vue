@@ -6,7 +6,6 @@
     ]"
     :style="{
       borderColor: statusData.fillColor || '',
-      backgroundColor: statusData.fillColor ? `${statusData.fillColor}1A` : '',
     }"
   >
     {{ statusText }}
