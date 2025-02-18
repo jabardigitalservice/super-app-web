@@ -53,7 +53,9 @@
 
             <div
               v-if="
-                milestone.status === newDataStatusMilestone.finished.textStatus
+                milestone.status ===
+                  newDataStatusMilestone.finished.textStatus ||
+                milestone.status === newDataStatusMilestone.followup.textStatus
               "
               class="text-milestone"
             >
