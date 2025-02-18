@@ -177,7 +177,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .card-milestone {
   @apply p-2 bg-gray-50 border rounded-lg flex flex-col w-full dark:bg-dark-emphasis-medium;
 }
