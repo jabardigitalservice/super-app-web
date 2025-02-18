@@ -34,6 +34,7 @@
             :complaint-data="complaintData || {}"
             :is-loading="isLoading"
             :data-tracking="trackingData"
+            :error-message="errorMessage"
           />
         </keep-alive>
       </div>
@@ -57,6 +58,7 @@ export default {
       trackingData: [],
       isLoading: false,
       search: '',
+      errorMessage: '',
     }
   },
   computed: {
@@ -85,7 +87,6 @@ export default {
 
         const detailData = data.data
         if (status === 200) {
-          console.log(detailData, 'detail data')
           this.complaintData = {
             complaint_id: detailData.complaint_id,
             description: detailData.description,
@@ -109,6 +110,8 @@ export default {
         }
       } catch (error) {
         console.error(error)
+        this.complaintData = {}
+        this.errorMessage = error.response.data.message || ''
       } finally {
         this.isLoading = false
       }

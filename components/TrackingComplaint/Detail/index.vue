@@ -5,7 +5,11 @@
     <section v-else class="flex flex-col gap-3">
       <TrackingComplaintNoData
         v-if="!complaintData.complaint_id"
-        title="Cari aduan terlebih dahulu"
+        :title="
+          errorMessage
+            ? 'Data aduan tidak ditemukan'
+            : `Cari aduan terlebih dahulu`
+        "
       />
 
       <template v-else>
@@ -137,6 +141,10 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    errorMessage: {
+      type: String,
+      default: '',
     },
   },
   data() {
