@@ -1,6 +1,6 @@
 <template>
-  <section
-    class="w-full min-h-screen flex flex-col gap-6 justify-center items-center"
+  <div
+    class="w-full min-h-[500px] flex flex-col gap-6 justify-center items-center"
   >
     <img
       loading="eager"
@@ -12,7 +12,7 @@
     <p class="text-gray-500 text-[16px] leading-[26px] font-lato">
       {{ title }}
     </p>
-  </section>
+  </div>
 </template>
 
 <script>
