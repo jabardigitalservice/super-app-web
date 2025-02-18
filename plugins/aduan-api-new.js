@@ -35,8 +35,10 @@ export default ({ $config }, inject) => {
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
-        config.headers['x-partner-id'] = 'portaljabar'
       }
+
+      config.headers['x-partner-id'] = $config.apiAduanIdeal.xPartnerId
+      config.headers['api-key'] = $config.apiAduanIdeal.apiKeyUrlAduan
       return config
     },
     (error) => {
