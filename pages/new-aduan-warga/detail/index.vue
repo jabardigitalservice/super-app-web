@@ -6,9 +6,6 @@
     <div
       class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px]"
     >
-      <!-- TODO: ADD CONDITION FIRST RENDER PAGES AND ADD CONDITION IF DATA NOT FOUND -->
-      <!-- <TrackingComplaintNoData v-if="complaintData.length === 0" title="Aduan tidak ditemukan" /> -->
-
       <div class="flex flex-row justify-between">
         <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
         <TrackingComplaintBadge
@@ -54,8 +51,8 @@ export default {
   },
   data() {
     return {
-      tabItems: ['Detail Aduan', 'Riwayat Aduan'],
-      selectedTab: 'Detail Aduan',
+      tabItems: ['Riwayat Aduan', 'Detail Aduan'],
+      selectedTab: 'Riwayat Aduan',
       complaintData: {},
       trackingData: [],
       isLoading: false,
