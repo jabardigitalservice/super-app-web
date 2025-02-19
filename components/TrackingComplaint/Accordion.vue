@@ -1,9 +1,5 @@
 <template>
-  <details
-    class="complaint-accordion bg-green-50 p-4 rounded-[18px] mt-2"
-    v-bind="$attrs"
-    v-on="$listeners"
-  >
+  <details class="complaint-accordion bg-green-50 p-4 rounded-[18px] mt-2" open>
     <summary
       class="complaint-accordion__summary min-w-0 w-full flex justify-between"
     >
@@ -15,14 +11,18 @@
       <div
         class="complaint-accordion__icon--background flex-shrink-0 w-6 h-6 flex items-center justify-center ml-auto self-center cursor-pointer"
       >
-        <!-- TODO: ADD ARROW RIGHT -->
+        <Icon
+          id="icon-span"
+          name="chevron-down"
+          size="18px"
+          class="text-green-700 transition-transform duration-300"
+        />
       </div>
     </summary>
 
     <ol class="complaint-accordion__description list-none">
-      <!-- @TODO: Update the  list item when API Ready -->
       <li
-        v-for="(item, index) in items"
+        v-for="(item, index) in logSpan"
         :key="index"
         class="font-lato font-normal text-[14px] leading-[20px] text-gray-800 grid grid-cols-[minmax(50px,min-content),1fr] gap-2 mb-2"
       >
@@ -40,19 +40,24 @@
           <div
             class="ml-2 border border-y-0 border-r-0 border-solid h-full sm:min-h-[70px] border-gray-300"
             :class="{
-              hidden: index === items.length - 1,
+              hidden: index === logSpan.length - 1,
             }"
           />
         </div>
 
         <div>
-          <p class="font-lato text-[11px] leading-[20px] text-blue-gray-300">
-            Rabu, 13 Mar 2024 - 18:00
+          <p class="text-helper">
+            {{
+              item.tracking_at
+                ? formatDate(item.tracking_at, 'EEEE, dd MMMM yyyy - HH:mm')
+                : '-'
+            }}
           </p>
-          <p class="font-lato text-[12px] leading-[18px] text-blue-gray-800">
-            Ditutup <span class="text-blue-gray-300"> oleh </span> <br />
-            Dinas Bina Marga Kota Bandung
+          <p class="text-detail">
+            {{ item.tracking_by || '-' }}
           </p>
+          <p class="text-helper">Keterangan</p>
+          <div class="text-detail" v-html="formattedNote(item.tracking_note)" />
         </div>
       </li>
     </ol>
@@ -60,6 +65,8 @@
 </template>
 
 <script>
+import { formatDate } from '~/utils'
+
 export default {
   props: {
     title: {
@@ -70,9 +77,21 @@ export default {
       type: String,
       default: '',
     },
-    items: {
+    logSpan: {
       type: Array,
       default: () => [],
+    },
+  },
+  methods: {
+    formatDate,
+
+    formattedNote(trackingNote) {
+      if (!trackingNote) return '-'
+
+      return trackingNote
+        .replace(/\r\n/g, '<br>')
+        .replace(/\n/g, '<br>')
+        .replace(/\r/g, '<br>')
     },
   },
 }
@@ -81,11 +100,6 @@ export default {
 <style scoped>
 .complaint-accordion__summary::-webkit-details-marker {
   display: none;
-}
-
-.complaint-accordion[open] .complaint-accordion__toggle-icon {
-  transform: rotate(90deg);
-  color: #16a75c;
 }
 
 @keyframes details-show {
@@ -97,5 +111,17 @@ export default {
 
 .complaint-accordion[open] > *:not(summary) {
   animation: details-show 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+details[open] #icon-span {
+  @apply transform rotate-180;
+}
+
+.text-helper {
+  @apply font-lato text-[11px] leading-[20px] text-blue-gray-300;
+}
+
+.text-detail {
+  @apply font-lato text-[12px] leading-[18px] text-blue-gray-800;
 }
 </style>

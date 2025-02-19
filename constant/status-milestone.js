@@ -184,10 +184,8 @@ export const newDataStatusMilestone = Object.freeze({
     id: 'directed_to_hotline_jabar',
     textStatus: 'Dialihkan ke Hotline Jabar',
     phase: 'verification',
-    // TODO: CONFIRMATION FOR ICON AND COLOR THIS STATUS
-    icon: 'closed.svg',
-    fillColor: '#16A75C',
-    // END TODO
+    icon: 'headset.svg',
+    fillColor: '#1E88E5',
     non_prov_alias: '',
     is_prov_responsibility: '',
     order: '',

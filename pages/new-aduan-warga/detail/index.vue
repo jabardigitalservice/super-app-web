@@ -10,7 +10,7 @@
         <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
         <TrackingComplaintBadge
           class="self-center"
-          :status="complaintData?.complaint_status_id"
+          :status="lastStatus || ''"
         />
       </div>
 
@@ -59,6 +59,7 @@ export default {
       isLoading: false,
       search: '',
       errorMessage: '',
+      lastStatus: '',
     }
   },
   computed: {
@@ -127,9 +128,12 @@ export default {
         const trackingData = data.data
         if (status === 200) {
           this.trackingData = trackingData
+          this.lastStatus = trackingData[0].current_status
         }
       } catch (error) {
         console.error(error)
+        this.trackingData = []
+        this.errorMessage = error.response.data.message || ''
       } finally {
         this.isLoading = false
       }

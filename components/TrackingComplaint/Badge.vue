@@ -1,9 +1,11 @@
 <template>
   <span
-    :class="[
-      'px-4 py-1 text-sm font-lato font-bold rounded-full border w-fit h-fit',
-      badgeClass
-    ]"
+    class="px-4 py-1 text-sm font-lato font-bold rounded-full border w-fit h-fit"
+    :style="{
+      borderColor: statusData.fillColor || '',
+      backgroundColor: statusData.fillColor ? `${statusData.fillColor}1A` : '',
+      color: statusData.fillColor || '#868C89',
+    }"
   >
     {{ statusText }}
   </span>
@@ -26,9 +28,6 @@ export default {
     statusText() {
       return this.statusData.textStatus || '-'
     },
-    badgeClass() {
-      return this.statusData.fillColor ? `text-[${this.statusData.fillColor}]` : 'text-gray-500'
-    }
-  }
+  },
 }
 </script>
