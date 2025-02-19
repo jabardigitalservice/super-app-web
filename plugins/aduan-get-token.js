@@ -25,26 +25,5 @@ export default ({ $config }, inject) => {
     }
   }
 
-  const authAxios = axios.create({
-    baseURL: $config.apiAduanIdeal.baseUrl,
-  })
-
-  authAxios.interceptors.request.use(
-    async (config) => {
-      const token = await getToken()
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-
-      config.headers['x-partner-id'] = $config.apiAduanIdeal.xPartnerId
-      config.headers['api-key'] = $config.apiAduanIdeal.apiKeyUrlAduan
-      return config
-    },
-    (error) => {
-      return Promise.reject(error)
-    }
-  )
-
-  inject('authAxios', authAxios)
+  inject('getToken', getToken)
 }
