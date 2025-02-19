@@ -84,11 +84,51 @@
             :log-span="milestone.sp4n_histories"
           />
 
-          <!-- TODO: EVIDENCE FOR STATUS SELESAI, DITINJAU ULANG, PENGERJAAN DITUNDA -->
-          <div v-if="showEvidence(milestone)">isinya file</div>
+          <BaseButton
+            v-if="showEvidence(milestone)"
+            class="text-xs font-bold text-white mt-2 dark:border-0 bg-green-700 hover:bg-green-600 !p-2"
+            @click="openModalEvidence(milestone.evidences)"
+          >
+            <BaseIconSvg
+              icon="/icon/image-and-document.svg"
+              class="!w-3 !h-3"
+              fill-color="#FFFFFF"
+            />
+            Dokumen Bukti
+          </BaseButton>
         </div>
       </div>
     </div>
+
+    <BaseModal :is-open="isOpen" @close="isOpen = false">
+      <template #header>
+        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+          Dokumen Bukti
+        </h4>
+      </template>
+      <template #content>
+        <TrackingComplaintHistoryFileBukti
+          :file-dokumen-bukti="evidencesFile"
+          @show-file="openModalImages"
+        />
+      </template>
+    </BaseModal>
+
+    <BaseModal
+      :is-open="isOpenImage"
+      height="600px"
+      width="900px"
+      @close="isOpenImage = false"
+    >
+      <template #header>
+        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+          Dokumen File Gambar
+        </h4>
+      </template>
+      <template #content>
+        <BaseImageSwiper :src="fileImages" />
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -107,6 +147,10 @@ export default {
   data() {
     return {
       newDataStatusMilestone,
+      isOpen: false,
+      isOpenImage: false,
+      evidencesFile: [],
+      fileImages: [],
     }
   },
   methods: {
@@ -141,11 +185,13 @@ export default {
       )
     },
     showEvidence(milestone) {
-      return [
-        newDataStatusMilestone.postponed.textStatus,
-        newDataStatusMilestone.review.textStatus,
-        newDataStatusMilestone.finished.textStatus,
-      ].includes(milestone.status)
+      return (
+        [
+          newDataStatusMilestone.postponed.textStatus,
+          newDataStatusMilestone.review.textStatus,
+          newDataStatusMilestone.finished.textStatus,
+        ].includes(milestone.status) && milestone.evidences.length > 0
+      )
     },
     showPic(milestone) {
       return [
@@ -172,6 +218,14 @@ export default {
       const start = milestone.start_date || '-'
       const end = milestone.end_date || '-'
       return `${start} sampai ${end}`
+    },
+    openModalEvidence(evidences) {
+      this.isOpen = true
+      this.evidencesFile = evidences
+    },
+    openModalImages(images) {
+      this.isOpenImage = true
+      this.fileImages = images
     },
   },
 }
