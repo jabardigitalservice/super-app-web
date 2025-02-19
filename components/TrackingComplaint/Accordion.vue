@@ -1,13 +1,7 @@
 <template>
-  <details
-    class="complaint-accordion bg-green-50 p-4 rounded-[18px] mt-2"
-    v-bind="$attrs"
-    :open="isOpen"
-    v-on="$listeners"
-  >
+  <details class="complaint-accordion bg-green-50 p-4 rounded-[18px] mt-2" open>
     <summary
       class="complaint-accordion__summary min-w-0 w-full flex justify-between"
-      @click.prevent="toggleAccordion"
     >
       <h4
         class="complaint-accordion__title mr-4 font-roboto text-[12px] leading-[20px] font-bold text-green-700 cursor-pointer transition-colors ease-brand duration-200"
@@ -18,10 +12,10 @@
         class="complaint-accordion__icon--background flex-shrink-0 w-6 h-6 flex items-center justify-center ml-auto self-center cursor-pointer"
       >
         <Icon
+          id="icon-span"
           name="chevron-down"
           size="18px"
           class="text-green-700 transition-transform duration-300"
-          :class="{ 'transform rotate-180': isOpen }"
         />
       </div>
     </summary>
@@ -88,17 +82,9 @@ export default {
       default: () => [],
     },
   },
-  data() {
-    return {
-      isOpen: true,
-    }
-  },
-
   methods: {
     formatDate,
-    toggleAccordion() {
-      this.isOpen = !this.isOpen
-    },
+
     formattedNote(trackingNote) {
       if (!trackingNote) return '-'
 
@@ -125,6 +111,10 @@ export default {
 
 .complaint-accordion[open] > *:not(summary) {
   animation: details-show 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+details[open] #icon-span {
+  @apply transform rotate-180;
 }
 
 .text-helper {
