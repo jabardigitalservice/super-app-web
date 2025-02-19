@@ -126,7 +126,6 @@ export default {
         console.error(error)
         this.complaintData = {}
         this.errorMessage = error.response.data.message || ''
-        console.log(error.response)
         if (error.response.data.code === '4011400') {
           this.getToken()
         }
