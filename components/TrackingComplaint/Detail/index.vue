@@ -146,6 +146,7 @@ export default {
       immediate: true,
       handler(newData) {
         if (newData && newData.photos && newData.photos.length > 0) {
+          this.imagesArray = []
           newData.photos.forEach((image) => {
             this.imagesArray.push(image.url)
           })
