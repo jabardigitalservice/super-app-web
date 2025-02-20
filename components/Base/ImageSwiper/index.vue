@@ -9,6 +9,7 @@
       :mousewheel="{ releaseOnEdges: true }"
       :direction="'horizontal'"
       :pagination="{ clickable: true }"
+      :navigation="true"
       @swiper="getSwipperRefHandle"
     >
       <swiper-slide v-for="(item, index) in src" :key="index">
@@ -16,15 +17,15 @@
           :alt="`Foto Aduan - ${index}`"
           :src="item"
           class="h-full w-[600px]"
-        >
+        />
       </swiper-slide>
     </swiper>
   </div>
 </template>
 
 <script>
-import { Navigation, Pagination, Autoplay } from 'swiper'
-import { SwiperCore, Swiper, SwiperSlide } from 'swiper-vue2'
+import { Autoplay, Navigation, Pagination } from 'swiper'
+import { Swiper, SwiperCore, SwiperSlide } from 'swiper-vue2'
 import 'swiper/swiper-bundle.css'
 
 SwiperCore.use([Navigation, Pagination, Autoplay])
@@ -32,25 +33,25 @@ export default {
   name: 'BaseImageSwiper',
   components: {
     Swiper,
-    SwiperSlide
+    SwiperSlide,
   },
   props: {
     src: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
-      swiperRef: null
+      swiperRef: null,
     }
   },
 
   methods: {
-    getSwipperRefHandle (swiper) {
+    getSwipperRefHandle(swiper) {
       this.swiperRef = swiper
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -59,6 +60,6 @@ export default {
   width: 100%;
 }
 .swiper-slide {
-  @apply flex justify-center
+  @apply flex justify-center;
 }
 </style>

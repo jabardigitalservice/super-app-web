@@ -8,7 +8,8 @@
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative w-full max-w-3xl transform overflow-hidden rounded-lg bg-white shadow-xl transition-all"
+          class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all"
+          :style="{ width: modalWidth, height: modalHeight }"
         >
           <div
             class="flex items-center justify-between border-b border-gray-200 px-6 py-2"
@@ -24,7 +25,7 @@
             </BaseButton>
           </div>
 
-          <div class="px-6 py-4">
+          <div class="px-6 py-4 overflow-y-auto">
             <slot name="content" />
           </div>
 
@@ -44,6 +45,22 @@ export default {
     isOpen: {
       type: Boolean,
       default: false,
+    },
+    width: {
+      type: String,
+      default: '600px',
+    },
+    height: {
+      type: String,
+      default: 'auto',
+    },
+  },
+  computed: {
+    modalWidth() {
+      return this.width
+    },
+    modalHeight() {
+      return this.height
     },
   },
   methods: {

@@ -60,6 +60,7 @@ export default {
       search: '',
       errorMessage: '',
       lastStatus: '',
+      token: null,
     }
   },
   computed: {
@@ -74,16 +75,28 @@ export default {
       }
     },
   },
+  mounted() {
+    this.getToken()
+  },
   methods: {
     formatDate,
     getSelected(value) {
       this.selectedTab = value
     },
+    async getToken() {
+      if (!this.token) {
+        this.token = await this.$getToken()
+      }
+      return this.token
+    },
     async getDetailComplaint() {
       this.isLoading = true
       try {
-        const { data, status } = await this.$authAxios.get(
-          `/v1/aduan/complaints/${this.search}`
+        const { data, status } = await this.$axiosNewAduan.get(
+          `/v1/aduan/complaints/${this.search}`,
+          {
+            headers: { Authorization: `Bearer ${this.token}` },
+          }
         )
 
         const detailData = data.data
@@ -113,6 +126,9 @@ export default {
         console.error(error)
         this.complaintData = {}
         this.errorMessage = error.response.data.message || ''
+        if (error.response.data.code === '4011400') {
+          this.getToken()
+        }
       } finally {
         this.isLoading = false
       }
@@ -121,8 +137,11 @@ export default {
       this.isLoading = true
 
       try {
-        const { data, status } = await this.$authAxios.get(
-          `/v1/aduan/complaints/${this.search}/status`
+        const { data, status } = await this.$axiosNewAduan.get(
+          `/v1/aduan/complaints/${this.search}/status`,
+          {
+            headers: { Authorization: `Bearer ${this.token}` },
+          }
         )
 
         const trackingData = data.data

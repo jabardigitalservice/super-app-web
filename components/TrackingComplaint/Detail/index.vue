@@ -13,40 +13,10 @@
       />
 
       <template v-else>
-        <!-- Image section -->
-        <div class="flex flex-col gap-3">
-          <div class="max-w-[900px] max-h-fit self-center">
-            <img
-              v-if="complaintData?.photos?.length > 0"
-              loading="eager"
-              :src="selectedImage"
-              width="900"
-              height="290"
-              class="rounded-lg mx-auto object-cover"
-              alt="gambar aduan"
-            />
-          </div>
-          <div class="w-full overflow-x-auto flex flex-row gap-1">
-            <button
-              v-for="(image, index) in complaintData?.photos"
-              :key="'gambar' + index"
-              @click="selectedImage = image.url"
-            >
-              <img
-                loading="eager"
-                :src="image.url"
-                width="105"
-                height="65"
-                class="rounded-md max-w-[105px] max-h-[65px] object-cover"
-                :class="{
-                  'opacity-50 transition-opacity duration-300':
-                    selectedImage === image.url,
-                }"
-                alt="gambar aduan"
-              />
-            </button>
-          </div>
-        </div>
+        <BaseSelectImages
+          v-if="imagesArray.length > 0"
+          :images-array="imagesArray"
+        />
 
         <hr class="my-3" />
 
@@ -149,12 +119,12 @@ export default {
   },
   data() {
     return {
-      selectedImage: null,
       showLocationModal: false,
       location: {
         name: '',
         address: '',
       },
+      imagesArray: [],
     }
   },
   computed: {
@@ -176,7 +146,10 @@ export default {
       immediate: true,
       handler(newData) {
         if (newData && newData.photos && newData.photos.length > 0) {
-          this.selectedImage = newData.photos[0].url
+          this.imagesArray = []
+          newData.photos.forEach((image) => {
+            this.imagesArray.push(image.url)
+          })
         }
       },
     },

@@ -39,7 +39,8 @@ export default {
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
-    '~/plugins/aduan-api-new.js',
+    '~/plugins/aduan-get-token.js',
+    '~/plugins/axios-new-aduan.js',
   ],
 
   render: {
