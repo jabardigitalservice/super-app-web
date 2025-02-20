@@ -603,8 +603,7 @@ export default {
             path: `/aduan-warga/file-aduan/${extensionFiles}`,
             query: this.$route.query,
           })
-          window.location.href = fileArray[0]
-        } else if (extensionFiles === 'pdf') {
+        } else {
           window.open(fileArray[0], '_blank')
         }
       } else {
