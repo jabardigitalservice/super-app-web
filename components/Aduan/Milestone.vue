@@ -2,7 +2,9 @@
   <div class="w-full">
     <span
       class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
-    >Riwayat Aduan</span>
+    >
+      Riwayat Aduan
+    </span>
 
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
@@ -18,11 +20,11 @@
               index > 0
                 ? '#868C89'
                 : `${
-                  getStatusTextAndIcon(
-                    milestone.status_aduan,
-                    milestone?.log_span_lapor?.status
-                  ).fillColor
-                }`
+                    getStatusTextAndIcon(
+                      milestone.status_aduan,
+                      milestone?.log_span_lapor?.status
+                    ).fillColor
+                  }`
             "
             :line-milestone="index !== dataMilestone.length - 1"
           />
@@ -37,12 +39,13 @@
                       ? ' dark:text-dark-text-low dark:text-opacity-60'
                       : ' dark:text-dark-text-low'
                   "
-                >{{
-                  formatDate(
-                    milestone.tanggal_update,
-                    "EEEE, dd MMMM yyyy - HH:mm"
-                  )
-                }}</span>
+                  >{{
+                    formatDate(
+                      milestone.tanggal_update,
+                      'EEEE, dd MMMM yyyy - HH:mm'
+                    )
+                  }}</span
+                >
 
                 <LabelText text="Status" :condition-text="index > 0" />
 
@@ -227,7 +230,8 @@
                           ? 'text-gray-500 dark:text-dark-text-low'
                           : 'text-gray-700 dark:text-dark-text-low'
                       "
-                    >{{ logSpan.responder }}</span>
+                      >{{ logSpan.responder }}</span
+                    >
 
                     <div>
                       <span
@@ -237,7 +241,8 @@
                             ? 'text-gray-600 dark:text-dark-text-low'
                             : 'font-medium text-gray-900 dark:text-dark-text-high'
                         "
-                      >{{ logSpan.keterangan }}</span>
+                        >{{ logSpan.keterangan }}</span
+                      >
                     </div>
                   </TextMilestone>
                 </CardMilestone>
@@ -263,14 +268,14 @@
 
             <NuxtLink
               v-if="
-                showButtonBuatAduanBaru(milestone.status_aduan) && index === 0 && !$route.query.origin
+                showButtonBuatAduanBaru(milestone.status_aduan) &&
+                index === 0 &&
+                !$route.query.origin
               "
               to="/aduan-warga/redirect-aduan"
               class="w-full"
             >
-              <BaseButton class="button-aduan">
-                Buat Aduan Baru
-              </BaseButton>
+              <BaseButton class="button-aduan"> Buat Aduan Baru </BaseButton>
             </NuxtLink>
 
             <!-- bukti banding -->
@@ -332,18 +337,19 @@
 </template>
 
 <script>
+import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
 import CardMilestone from './CardMilestone.vue'
-import TextMilestone from './Text/TextMilestone.vue'
+import DetailCardCatatan from './DetailCardCatatan.vue'
+import HelperText from './Text/HelperText.vue'
 import IconAndLine from './Text/IconAndLine.vue'
 import LabelText from './Text/LabelText.vue'
 import StatusText from './Text/StatusText.vue'
-import HelperText from './Text/HelperText.vue'
 import TextDitindakLanjuti from './Text/TextDitindakLanjuti.vue'
-import ButtonBuktiAduan from './ButtonBuktiAduan.vue'
-import DetailCardCatatan from './DetailCardCatatan.vue'
+import TextMilestone from './Text/TextMilestone.vue'
+
 import { dataStatusMilestone } from '~/constant/status-milestone'
-import { formatDate, getExtensionFileByUrl } from '~/utils'
 import { fileGroupMixin } from '~/mixins/fileGroupMixin'
+import { formatDate, getExtensionFileByUrl } from '~/utils'
 
 export default {
   name: 'MilestoneAduan',
@@ -356,25 +362,25 @@ export default {
     HelperText,
     TextDitindakLanjuti,
     ButtonBuktiAduan,
-    DetailCardCatatan
+    DetailCardCatatan,
   },
   mixins: [fileGroupMixin],
   props: {
     dataMilestone: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
-      dataStatusMilestone
+      dataStatusMilestone,
     }
   },
 
   methods: {
     formatDate,
     getExtensionFileByUrl,
-    getStatusTextAndIcon (status, lastStatusSpan) {
+    getStatusTextAndIcon(status, lastStatusSpan) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
           return dataStatusMilestone.menungguVerifikasi
@@ -399,7 +405,7 @@ export default {
               textStatus: dataStatusMilestone.dialihkan.textStatus,
               icon: dataStatusMilestone.ditutup.icon,
               fillColor: dataStatusMilestone.ditutup.fillColor,
-              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus
+              getNameStatus: dataStatusMilestone.dialihkan.getNameStatus,
             }
           } else {
             return dataStatusMilestone.dialihkan
@@ -415,11 +421,11 @@ export default {
             textStatus: '',
             status: '',
             icon: '',
-            fillColor: ''
+            fillColor: '',
           }
       }
     },
-    getHelperTextStatusAduan (status) {
+    getHelperTextStatusAduan(status) {
       switch (status) {
         case dataStatusMilestone.dikoordinasikan.status:
           return 'Ke'
@@ -427,7 +433,7 @@ export default {
           return 'Oleh'
       }
     },
-    getNameByStatus (milestone) {
+    getNameByStatus(milestone) {
       switch (milestone.status_aduan) {
         case dataStatusMilestone.selesai.status:
         case dataStatusMilestone.ditindakLanjuti.status:
@@ -436,21 +442,19 @@ export default {
           } else {
             return this.changeNameStatusByUser(
               milestone[
-                this.getStatusTextAndIcon(milestone.status_aduan)
-                  .getNameStatus
+                this.getStatusTextAndIcon(milestone.status_aduan).getNameStatus
               ]
             )
           }
         default:
           return this.changeNameStatusByUser(
             milestone[
-              this.getStatusTextAndIcon(milestone.status_aduan)
-                .getNameStatus
+              this.getStatusTextAndIcon(milestone.status_aduan).getNameStatus
             ]
           )
       }
     },
-    changeNameStatusByUser (name) {
+    changeNameStatusByUser(name) {
       switch (name) {
         case 'Sistem':
           return 'Admin'
@@ -460,49 +464,49 @@ export default {
           return name
       }
     },
-    showDocumentButton (status, attachment) {
+    showDocumentButton(status, attachment) {
       return (
         (this.showDokumenBuktiBanding(status) && attachment !== null) ||
         (this.showDokumenSelesai(status) && attachment !== null)
       )
     },
-    showDokumenBuktiBanding (status) {
+    showDokumenBuktiBanding(status) {
       const validStatus = [
         dataStatusMilestone.pengerjaanDitunda.status,
-        dataStatusMilestone.pengerjaanDitinjauUlang.status
+        dataStatusMilestone.pengerjaanDitinjauUlang.status,
       ]
 
       return validStatus.includes(status)
     },
-    showDokumenSelesai (status) {
+    showDokumenSelesai(status) {
       const validStatus = [dataStatusMilestone.selesai.status]
 
       return validStatus.includes(status)
     },
-    showEstimasiPengerjaanAndPenanggungJawab (status) {
+    showEstimasiPengerjaanAndPenanggungJawab(status) {
       const validStatus = [
         dataStatusMilestone.ditindakLanjuti.status,
         dataStatusMilestone.selesai.status,
         dataStatusMilestone.pengerjaanDitunda.status,
-        dataStatusMilestone.pengerjaanDitinjauUlang.status
+        dataStatusMilestone.pengerjaanDitinjauUlang.status,
       ]
 
       return validStatus.includes(status)
     },
-    isIdSpanLaporExist (milestone) {
+    isIdSpanLaporExist(milestone) {
       return (
         milestone.status_aduan === dataStatusMilestone.dialihkan.status &&
         milestone.id_aduan_span_lapor
       )
     },
-    isStatusSpanLaporExist (milestone) {
+    isStatusSpanLaporExist(milestone) {
       return (
         milestone.status_aduan === dataStatusMilestone.dialihkan.status &&
         milestone.id_aduan_span_lapor !== '' &&
         milestone?.log_span_lapor?.status !== ''
       )
     },
-    isDitutupOlehSpanOrSelesai (status, lastStatusSpan, index) {
+    isDitutupOlehSpanOrSelesai(status, lastStatusSpan, index) {
       return (
         (status === dataStatusMilestone.selesai.status && index === 0) ||
         (lastStatusSpan?.includes('Ditutup') &&
@@ -510,37 +514,41 @@ export default {
           index === 0)
       )
     },
-    showCatatanDitolak (status, keterangan) {
+    showCatatanDitolak(status, keterangan) {
       return status === dataStatusMilestone.ditolak.status && keterangan
     },
-    showKeteranganStatusAduan (status, keterangan) {
+    showKeteranganStatusAduan(status, keterangan) {
       return (
         (status === dataStatusMilestone.dikoordinasikan.status ||
           status === dataStatusMilestone.dialihkan.status) &&
         keterangan
       )
     },
-    showKeteranganTambahan (status, keterangan) {
+    showKeteranganTambahan(status, keterangan) {
       return (
         (status === dataStatusMilestone.pengerjaanDitunda.status ||
           status === dataStatusMilestone.pengerjaanDitinjauUlang.status) &&
         keterangan
       )
     },
-    showKeteranganSelesaiTrk (status, keterangan) {
+    showKeteranganSelesaiTrk(status, keterangan) {
       return status === dataStatusMilestone.selesai.status && keterangan
     },
-    showKeteranganTimHotline (status, keterangan, isHotline) {
-      return status === dataStatusMilestone.selesai.status && keterangan && isHotline === 'Tim Hotline'
+    showKeteranganTimHotline(status, keterangan, isHotline) {
+      return (
+        status === dataStatusMilestone.selesai.status &&
+        keterangan &&
+        isHotline === 'Tim Hotline'
+      )
     },
-    showKeteranganDefault (status) {
+    showKeteranganDefault(status) {
       return (
         status === dataStatusMilestone.menungguVerifikasi.status ||
         status === dataStatusMilestone.terverifikasi.status ||
         status === dataStatusMilestone.gagalDiverifikasi.status
       )
     },
-    generateTextDefault (status) {
+    generateTextDefault(status) {
       switch (status) {
         case dataStatusMilestone.menungguVerifikasi.status:
           return 'Terimakasih telah melakukan pengaduan, aduan anda akan segera kami verifikasi.'
@@ -550,21 +558,24 @@ export default {
           return 'Aduan tidak bisa dianalisis lebih lanjut.'
       }
     },
-    showButtonBuatAduanBaru (status) {
+    showButtonBuatAduanBaru(status) {
       return (
         status === dataStatusMilestone.ditolak.status ||
         status === dataStatusMilestone.gagalDiverifikasi.status
       )
     },
-    openDialogRateAduan (idSpanLapor) {
+    openDialogRateAduan(idSpanLapor) {
       this.$emit('open-dialog', idSpanLapor)
     },
 
-    setLogSpanLapor (logSpan, idAduanSpanLapor) {
+    setLogSpanLapor(logSpan, idAduanSpanLapor) {
       this.$store.commit('setLogSpan', logSpan?.reverse())
-      this.$router.push({ path: `/aduan-warga/log-span-lapor/${idAduanSpanLapor}`, query: this.$route.query })
+      this.$router.push({
+        path: `/aduan-warga/log-span-lapor/${idAduanSpanLapor}`,
+        query: this.$route.query,
+      })
     },
-    getLogSpanLaporLogs (milestone) {
+    getLogSpanLaporLogs(milestone) {
       if (
         milestone &&
         milestone.log_span_lapor &&
@@ -574,27 +585,27 @@ export default {
       }
       return []
     },
-    showLogSpanLapor (milestone) {
+    showLogSpanLapor(milestone) {
       if (milestone) {
         const logSpanLapor = milestone?.log_span_lapor?.log
         return this.isIdSpanLaporExist(milestone) && logSpanLapor?.length > 0
       }
       return false
     },
-    goToPageFile (fileArray) {
+    goToPageFile(fileArray) {
       if (fileArray.length === 1) {
         const parts = fileArray[0].split('.')
-        const extensionFiles = this.checkExtensionFiles(
-          parts[parts.length - 1]
-        )
+        const extensionFiles = this.checkExtensionFiles(parts[parts.length - 1])
 
-        if (extensionFiles === 'images' || extensionFiles === 'pdf') {
+        if (extensionFiles === 'images') {
           this.$store.commit('setFileAduan', fileArray)
-          this.$router.push({ path: `/aduan-warga/file-aduan/${extensionFiles}`, query: this.$route.query })
-          return
+          this.$router.push({
+            path: `/aduan-warga/file-aduan/${extensionFiles}`,
+            query: this.$route.query,
+          })
+        } else {
+          window.open(fileArray[0], '_blank')
         }
-
-        window.location.href = fileArray[0]
       } else {
         this.groupingFileByExtension(fileArray)
 
@@ -602,7 +613,7 @@ export default {
           images: { data: imagesDataArray },
           xlsx: { data: xlsxDataArray },
           pdf: { data: pdfDataArray },
-          documents: { data: documentsDataArray }
+          documents: { data: documentsDataArray },
         } = this.grupByTypeFile
 
         if (
@@ -612,14 +623,20 @@ export default {
           documentsDataArray.length === 0
         ) {
           this.$store.commit('setFileAduan', imagesDataArray)
-          this.$router.push({ path: '/aduan-warga/file-aduan/images', query: this.$route.query })
+          this.$router.push({
+            path: '/aduan-warga/file-aduan/images',
+            query: this.$route.query,
+          })
         } else {
           this.$store.commit('setFileDokumenBukti', fileArray)
-          this.$router.push({ path: '/aduan-warga/page-dokumen-bukti', query: this.$route.query })
+          this.$router.push({
+            path: '/aduan-warga/page-dokumen-bukti',
+            query: this.$route.query,
+          })
         }
       }
     },
-    checkExtensionFiles (typeFile) {
+    checkExtensionFiles(typeFile) {
       switch (typeFile.toLowerCase()) {
         case 'jpg':
         case 'jpeg':
@@ -635,8 +652,8 @@ export default {
         default:
           return ''
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
