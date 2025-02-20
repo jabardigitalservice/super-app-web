@@ -1,17 +1,21 @@
 <template>
   <div class="w-full min-h-[400px]">
-    <TrackingComplaintLoading v-if="isLoading" />
+    <TrackingComplaintLoading v-show="isLoadingTracking" />
 
-    <div v-else>
+    <div v-show="!isLoadingTracking">
       <TrackingComplaintNoData
-        v-if="dataTracking.length === 0"
+        v-show="dataTracking.length === 0"
         :title="
           errorMessage
             ? 'Data aduan tidak ditemukan'
             : `Cari aduan terlebih dahulu`
         "
       />
-      <MilestoneNew v-else :data-milestone="dataTracking" class="mt-[32px]" />
+      <MilestoneNew
+        v-show="dataTracking.length > 0"
+        :data-milestone="dataTracking"
+        class="mt-[32px]"
+      />
     </div>
   </div>
 </template>
@@ -23,7 +27,7 @@ export default {
   components: { MilestoneNew },
   props: {
     dataTracking: { type: Array, default: () => [] },
-    isLoading: {
+    isLoadingTracking: {
       type: Boolean,
       default: false,
     },

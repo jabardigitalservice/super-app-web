@@ -28,7 +28,7 @@
           </div>
 
           <div
-            v-if="index !== dataMilestone.length - 1"
+            v-show="index !== dataMilestone.length - 1"
             class="w-px h-full bg-gray-300 dark:bg-dark-emphasis-medium"
           />
         </div>
@@ -51,12 +51,12 @@
               </p>
             </div>
 
-            <div v-if="showPic(milestone)" class="text-milestone">
+            <div v-show="showPic(milestone)" class="text-milestone">
               <p class="label-text">Penanggung Jawab</p>
               <p class="detail-text">{{ milestone.pic_name }}</p>
             </div>
 
-            <div v-if="showEstimation(milestone)" class="text-milestone">
+            <div v-show="showEstimation(milestone)" class="text-milestone">
               <p class="label-text">Estimasi Pengerjaan</p>
               <p class="detail-text">
                 {{ getEstimationPeriod(milestone) }}
@@ -64,14 +64,14 @@
             </div>
           </div>
 
-          <div v-if="milestone.note" class="card-milestone mt-2">
+          <div v-show="milestone.note" class="card-milestone mt-2">
             <div class="text-milestone">
               <p class="label-text">Keterangan</p>
               <p class="detail-text">{{ milestone.note }}</p>
             </div>
           </div>
 
-          <div v-if="showIdSpanLapor(milestone)" class="card-milestone mt-2">
+          <div v-show="showIdSpanLapor(milestone)" class="card-milestone mt-2">
             <div class="text-milestone">
               <p class="label-text">ID Tracking SP4N LAPOR</p>
               <p class="detail-text">{{ milestone.sp4n_id }}</p>
@@ -79,13 +79,13 @@
           </div>
 
           <TrackingComplaintAccordion
-            v-if="showLogSpanLapor(milestone)"
+            v-show="showLogSpanLapor(milestone)"
             title="Lihat Semua Status"
             :log-span="milestone.sp4n_histories"
           />
 
           <BaseButton
-            v-if="showEvidence(milestone)"
+            v-show="showEvidence(milestone)"
             class="text-xs font-bold text-white mt-2 dark:border-0 bg-green-700 hover:bg-green-600 !p-2"
             @click="openModalEvidence(milestone.evidences)"
           >
