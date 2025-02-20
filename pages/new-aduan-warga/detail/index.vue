@@ -31,9 +31,10 @@
           <component
             :is="currentTabComponent"
             v-if="currentTabComponent"
-            :complaint-data="complaintData || {}"
-            :is-loading="isLoading"
+            :is-loading-detail="isLoadingDetail"
+            :is-loading-tracking="isLoadingTracking"
             :data-tracking="trackingData"
+            :complaint-data="complaintData || {}"
             :error-message="errorMessage"
           />
         </keep-alive>
@@ -56,7 +57,8 @@ export default {
       selectedTab: 'Riwayat Aduan',
       complaintData: {},
       trackingData: [],
-      isLoading: false,
+      isLoadingDetail: false,
+      isLoadingTracking: false,
       search: '',
       errorMessage: '',
       lastStatus: '',
@@ -90,7 +92,7 @@ export default {
       return this.token
     },
     async getDetailComplaint() {
-      this.isLoading = true
+      this.isLoadingDetail = true
       try {
         const { data, status } = await this.$axiosNewAduan.get(
           `/v1/aduan/complaints/${this.search}`,
@@ -130,11 +132,11 @@ export default {
           this.getToken()
         }
       } finally {
-        this.isLoading = false
+        this.isLoadingDetail = false
       }
     },
     async getTrackingComplaint() {
-      this.isLoading = true
+      this.isLoadingTracking = true
 
       try {
         const { data, status } = await this.$axiosNewAduan.get(
@@ -154,13 +156,19 @@ export default {
         this.trackingData = []
         this.errorMessage = error.response.data.message || ''
       } finally {
-        this.isLoading = false
+        this.isLoadingTracking = false
       }
     },
     onSearch(value) {
       this.search = value
+      this.resetDataDetailAndTracking()
+
       this.getDetailComplaint()
       this.getTrackingComplaint()
+    },
+    resetDataDetailAndTracking() {
+      this.complaintData = {}
+      this.trackingData = []
     },
   },
 }

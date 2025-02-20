@@ -1,8 +1,8 @@
 <template>
   <div class="w-full min-h-[400px]">
-    <TrackingComplaintLoading v-show="isLoading" />
+    <TrackingComplaintLoading v-show="isLoadingTracking" />
 
-    <div v-show="!isLoading">
+    <div v-show="!isLoadingTracking">
       <TrackingComplaintNoData
         v-show="dataTracking.length === 0"
         :title="
@@ -27,7 +27,7 @@ export default {
   components: { MilestoneNew },
   props: {
     dataTracking: { type: Array, default: () => [] },
-    isLoading: {
+    isLoadingTracking: {
       type: Boolean,
       default: false,
     },

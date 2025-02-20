@@ -1,8 +1,8 @@
 <template>
   <div class="w-full">
-    <TrackingComplaintLoading v-show="isLoading" />
+    <TrackingComplaintLoading v-show="isLoadingDetail" />
 
-    <section v-show="!isLoading" class="flex flex-col gap-3">
+    <section v-show="!isLoadingDetail" class="flex flex-col gap-3">
       <TrackingComplaintNoData
         v-show="!complaintData.complaint_id"
         :title="
@@ -108,7 +108,7 @@ export default {
         complaint_status_id: '',
       }),
     },
-    isLoading: {
+    isLoadingDetail: {
       type: Boolean,
       default: false,
     },
