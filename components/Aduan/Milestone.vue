@@ -2,8 +2,9 @@
   <div class="w-full">
     <span
       class="font-bold text-[16px] text-gray-900 dark:text-dark-text-high leading-5 font-roboto mb-4"
-      >Riwayat Aduan</span
     >
+      Riwayat Aduan
+    </span>
 
     <div v-for="(milestone, index) in dataMilestone" :key="index">
       <div v-if="milestone?.status_aduan !== 'Banding'">
