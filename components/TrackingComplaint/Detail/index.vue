@@ -1,10 +1,10 @@
 <template>
   <div class="w-full">
-    <TrackingComplaintLoading v-if="isLoading" />
+    <TrackingComplaintLoading v-show="isLoading" />
 
-    <section v-else class="flex flex-col gap-3">
+    <section v-show="!isLoading" class="flex flex-col gap-3">
       <TrackingComplaintNoData
-        v-if="!complaintData.complaint_id"
+        v-show="!complaintData.complaint_id"
         :title="
           errorMessage
             ? 'Data aduan tidak ditemukan'
@@ -12,9 +12,9 @@
         "
       />
 
-      <template v-else>
+      <div v-show="complaintData.complaint_id">
         <BaseSelectImages
-          v-if="imagesArray.length > 0"
+          v-show="imagesArray.length > 0"
           :images-array="imagesArray"
         />
 
@@ -61,7 +61,7 @@
             {{ complaintData?.address?.detail || '-' }}
           </p>
         </div>
-      </template>
+      </div>
     </section>
 
     <TrackingComplaintLocationModal
@@ -71,7 +71,7 @@
     >
       <div class="space-y-3">
         <BaseMap
-          v-if="coordsLocation"
+          v-show="coordsLocation"
           :coords="coordsLocation"
           :zoom="16"
           @set:place="getPlaceDetail"
