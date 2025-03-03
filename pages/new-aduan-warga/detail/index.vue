@@ -95,7 +95,7 @@ export default {
       this.isLoadingDetail = true
       try {
         const { data, status } = await this.$axiosNewAduan.get(
-          `/v1/aduan/complaints/${this.search}`,
+          `/aduan/complaints/${this.search}`,
           {
             headers: { Authorization: `Bearer ${this.token}` },
           }
@@ -140,7 +140,7 @@ export default {
 
       try {
         const { data, status } = await this.$axiosNewAduan.get(
-          `/v1/aduan/complaints/${this.search}/status`,
+          `/aduan/complaints/${this.search}/status`,
           {
             headers: { Authorization: `Bearer ${this.token}` },
           }
