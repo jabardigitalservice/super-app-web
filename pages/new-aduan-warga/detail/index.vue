@@ -94,7 +94,7 @@ export default {
     async getDetailComplaint() {
       this.isLoadingDetail = true
       try {
-        const { data, status } = await this.$axiosNewAduan.get(
+        const { data, status } = await this.$axios.get(
           `/aduan/complaints/${this.search}`,
           {
             headers: { Authorization: `Bearer ${this.token}` },
@@ -139,7 +139,7 @@ export default {
       this.isLoadingTracking = true
 
       try {
-        const { data, status } = await this.$axiosNewAduan.get(
+        const { data, status } = await this.$axios.get(
           `/aduan/complaints/${this.search}/status`,
           {
             headers: { Authorization: `Bearer ${this.token}` },

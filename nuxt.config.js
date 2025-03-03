@@ -40,7 +40,6 @@ export default {
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
     '~/plugins/aduan-get-token.js',
-    '~/plugins/axios-new-aduan.js',
   ],
 
   render: {
@@ -116,8 +115,6 @@ export default {
       keycloakUrl: process.env.KEYCLOAK_URL,
       keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
-      xPartnerId: process.env.X_PARTNER_ID,
-      apiKey: process.env.API_KEY,
     },
   },
 
@@ -128,6 +125,7 @@ export default {
     headers: {
       common: {
         'Api-Key': process.env.API_KEY,
+        'x-partner-id': process.env.X_PARTNER_ID,
       },
     },
   },
