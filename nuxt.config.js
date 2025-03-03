@@ -98,8 +98,7 @@ export default {
   // Public runtime config
   publicRuntimeConfig: {
     axios: {
-      browserBaseURL:
-        process.env.BROWSER_BASE_URL + '/' + process.env.VERSION_ENDPOINT,
+      browserBaseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT,
     },
     sentry: {
       config: {
@@ -117,9 +116,8 @@ export default {
       keycloakUrl: process.env.KEYCLOAK_URL,
       keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
-      baseUrl: process.env.URL_ADUAN_PARTNER,
       xPartnerId: process.env.X_PARTNER_ID,
-      apiKeyUrlAduan: process.env.API_KEY_URL_ADUAN_PARTNER,
+      apiKey: process.env.API_KEY,
     },
   },
 
