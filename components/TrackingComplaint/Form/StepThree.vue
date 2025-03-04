@@ -40,11 +40,9 @@
           :status="file.image_upload_status"
           @delete="deleteImage(file.id)"
         />
-        <span
-          v-show="!!file.errors"
-          class="font-lato text-[13px] text-red-700"
-          >{{ file.errors[0] }}</span
-        >
+        <span v-show="!!file.errors" class="font-lato text-[13px] text-red-700"
+          >{{ file.errors[0] }}
+        </span>
       </div>
     </transition-group>
   </section>
