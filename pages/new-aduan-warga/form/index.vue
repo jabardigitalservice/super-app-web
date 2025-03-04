@@ -210,6 +210,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: black;
 }
 
 .citizen__form .jds-popover__content {
