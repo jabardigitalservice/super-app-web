@@ -96,7 +96,7 @@
           readonly
         >
           <template #prefix-icon>
-            <Icon src="/icon/location-picker.svg" size="15px" />
+            <Icon src="/icons/location-picker.svg" size="15px" />
           </template>
           <template #suffix-icon>
             <svg
