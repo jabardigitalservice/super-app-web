@@ -1,5 +1,5 @@
 import { isValid } from 'date-fns'
-import { formatInTimeZone } from 'date-fns-tz'
+import { format as formatDateFns, formatInTimeZone } from 'date-fns-tz'
 import id from 'date-fns/locale/id'
 
 export function formatDate(date, format) {
@@ -7,6 +7,10 @@ export function formatDate(date, format) {
   return date && isValid(new Date(date))
     ? formatInTimeZone(date, 'Asia/Jakarta', format, { locale: id })
     : '-'
+}
+
+export function convertToLocaleDate(date, format) {
+  return formatDateFns(new Date(date), format, { locale: id })
 }
 
 export async function fetchAduanData($aduanAPI, idAduan, config) {

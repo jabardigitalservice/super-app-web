@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
 import { isEqual } from 'lodash'
-import { formatDate } from '~/utils'
+import { convertToLocaleDate } from '~/utils'
 
 // define the default state for reset purposes
 const IMAGE_UPLOAD_STATUS = Object.freeze({
@@ -240,24 +240,16 @@ export default {
     },
     async fetchCategories({ commit }, localStorageKey) {
       try {
-        const xApiKey = this.$config.imageUploadApi
-
-        const response = await this.$axios.$get(
-          '/v1/public/complaints/categories',
-          {
-            headers: {
-              'x-api-key': xApiKey,
-            },
-          }
+        const response = await this.$authAxiosAduan.get(
+          '/aduan/complaints/categories'
         )
 
-        commit('SET_INFORMASI_ADUAN_CATEGORY_OPTION', response.data)
-
+        commit('SET_INFORMASI_ADUAN_CATEGORY_OPTION', response.data.data)
         if (localStorageKey) {
           localStorage.setItem(`${localStorageKey}Date`, new Date())
           localStorage.setItem(
             `${localStorageKey}Data`,
-            JSON.stringify(response.data)
+            JSON.stringify(response.data.data)
           )
         }
       } catch (error) {
@@ -266,20 +258,16 @@ export default {
     },
     async fetchSubCategories({ commit }, params) {
       try {
-        const xApiKey = this.$config.imageUploadApi
-        const response = await this.$axios.$get(
-          '/v1/public/complaints/subcategories',
+        const response = await this.$authAxiosAduan.get(
+          '/aduan/complaints/subcategories',
           {
-            headers: {
-              'x-api-key': xApiKey,
-            },
             params: {
               ...params,
             },
           }
         )
 
-        commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION', response.data)
+        commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION', response.data.data)
       } catch (error) {
         console.error(error)
       }
@@ -289,16 +277,13 @@ export default {
      */
     setCategoriesOption({ state, dispatch }, localStorageKey = null) {
       const timeStamp = localStorage.getItem(`${localStorageKey}Date`)
-        ? formatDate(
+        ? convertToLocaleDate(
             localStorage.getItem(`${localStorageKey}Date`),
-            'dd/MM/yyyy',
-            { locale: 'id' }
+            'dd/MM/yyyy'
           )
         : ''
       const categories = localStorage.getItem(`${localStorageKey}Data`) ?? []
-      const nowDate = formatDate(new Date(), 'dd/MM/yyyy', {
-        locale: 'id',
-      })
+      const nowDate = convertToLocaleDate(new Date(), 'dd/MM/yyyy')
 
       if (isEqual(timeStamp, nowDate)) {
         state.informasi_aduan.category_option = JSON.parse(categories)
@@ -316,7 +301,7 @@ export default {
         )
 
         const params = {
-          category_id: filteredCategory[0].id,
+          complaint_category_id: filteredCategory[0].id,
         }
 
         dispatch('fetchSubCategories', params)
@@ -595,20 +580,14 @@ export default {
         domain: 'aduan-warga',
         is_set_alias_url: true,
       }
-      const xApiKey = this.$config.imageUploadApi
 
       const uploadPromises = files.map(async (file) => {
         const formData = new FormData()
         formData.append('file', file.image_file)
 
-        const response = await this.$axios.$post(
-          '/v1/public/media/upload',
+        const response = await this.$authAxiosAduan.post(
+          '/aduan/media/upload',
           formData,
-          {
-            headers: {
-              'x-api-key': xApiKey,
-            },
-          },
           params
         )
 
@@ -626,7 +605,6 @@ export default {
     },
     async submitForm({ state, dispatch }) {
       try {
-        const xApiKey = this.$config.imageUploadApi
         state.statusSubmitForm.status = FORM_SUBMIT_STATUS.LOADING
         await dispatch('updateSubmitProgress', { progress: 25, delay: 200 })
         await dispatch('updateSubmitProgress', { progress: 50, delay: 200 })
@@ -636,14 +614,9 @@ export default {
         }
 
         const citizenComplaintForm = await dispatch('generateFormData')
-        const response = await this.$axios.$post(
-          '/v1/public/complaints',
-          citizenComplaintForm,
-          {
-            headers: {
-              'x-api-key': xApiKey,
-            },
-          }
+        const response = await this.$authAxiosAduan.post(
+          '/aduan/complaints',
+          citizenComplaintForm
         )
 
         if (response) {
@@ -664,15 +637,8 @@ export default {
     },
     async handleCheckEmail({ state, getters }) {
       try {
-        const xApiKey = this.$config.imageUploadApi
-
-        const response = await this.$axios.$get(
-          `/v1/public/complaints/email/${getters.email}`,
-          {
-            headers: {
-              'x-api-key': xApiKey,
-            },
-          }
+        const response = await this.$authAxiosAduan.get(
+          `/aduan/complaints/email/${getters.email}`
         )
 
         state.data_wargi.is_email_valid = response.data.is_exists
