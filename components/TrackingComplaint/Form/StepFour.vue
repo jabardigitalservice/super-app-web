@@ -8,7 +8,10 @@
         tag="section"
         name="Kota/Kabupaten"
       >
-        <label for="city" class="font-roboto font-medium text-black text-[14px] leading-[20px]">
+        <label
+          for="city"
+          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        >
           Kota/Kabupaten <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -29,7 +32,10 @@
         tag="section"
         name="Kecamatan"
       >
-        <label for="subdistrict" class="font-roboto font-medium text-black text-[14px] leading-[20px]">
+        <label
+          for="subdistrict"
+          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        >
           Kecamatan <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -51,7 +57,10 @@
         tag="section"
         name="Kelurahan/Desa"
       >
-        <label for="village" class="font-roboto font-medium text-black text-[14px] leading-[20px]">
+        <label
+          for="village"
+          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        >
           Kelurahan/Desa <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -72,7 +81,10 @@
         class="flex flex-col gap-2"
         name="Lokasi Aduan"
       >
-        <label for="location" class="font-roboto font-medium text-black text-[14px] leading-[20px]">
+        <label
+          for="location"
+          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        >
           Lokasi Aduan <span class="text-red-500">*</span>
         </label>
         <JdsInputText
@@ -84,13 +96,16 @@
           readonly
         >
           <template #prefix-icon>
-            <Icon
-              src="/icons/location-picker.svg"
-              size="15px"
-            />
+            <Icon src="/icon/location-picker.svg" size="15px" />
           </template>
           <template #suffix-icon>
-            <svg v-if="false" class="animate-spin  h-5 w-5 text-green-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg
+              v-if="false"
+              class="animate-spin h-5 w-5 text-green-700"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -99,7 +114,11 @@
                 stroke="#424242"
                 stroke-width="4"
               />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
             <button
               v-else
@@ -112,11 +131,11 @@
         </JdsInputText>
       </ValidationProvider>
 
-      <ValidationProvider
-        class="flex flex-col gap-2"
-        name="Detail Lokasi"
-      >
-        <label for="additionalLocation" class="font-roboto font-medium text-black text-[14px] leading-[20px]">
+      <ValidationProvider class="flex flex-col gap-2" name="Detail Lokasi">
+        <label
+          for="additionalLocation"
+          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        >
           Detail lokasi tambahan <span class="text-gray-300"> (opsional) </span>
         </label>
         <textarea
@@ -125,27 +144,22 @@
           :value="setValueAddressDetail"
           rows="3"
           maxlength="1000"
-          class="w-full border border-gray-500 rounded-lg px-2 py-1 bg-gray-50 mb-1 hover:bg-white disabled:bg-gray-200 disabled:border-gray-500
-            hover:border-green-600 focus:outline-none focus:border-green-500 focus:outline-1 focus:outline-offset-[-2px] focus:outline-yellow-500 text-black"
+          class="w-full border border-gray-500 rounded-lg px-2 py-1 bg-gray-50 mb-1 hover:bg-white disabled:bg-gray-200 disabled:border-gray-500 hover:border-green-600 focus:outline-none focus:border-green-500 focus:outline-1 focus:outline-offset-[-2px] focus:outline-yellow-500 text-black"
           @input="setAddressDetail($event.target.value)"
         />
-        <p
-          class="text-xs text-left text-gray-600"
-        >
+        <p class="text-xs text-left text-gray-600">
           Tersisa {{ 1000 - setValueAddressDetail.length }} karakter
         </p>
       </ValidationProvider>
     </section>
 
     <!-- Pick Location by Google Maps -->
-    <BaseModal
-      :show="open"
-      button-label="Pilih Lokasi ini"
-      @close="closeMaps"
-    >
+    <BaseModal :show="open" button-label="Pilih Lokasi ini" @close="closeMaps">
       <template #header>
         <div class="w-full flex flex-row justify-between px-7 py-6">
-          <h4 class="font-roboto font-medium text-[21px] leading-[34px] text-green-700">
+          <h4
+            class="font-roboto font-medium text-[21px] leading-[34px] text-green-700"
+          >
             Tentukan Pinpoint
           </h4>
 
@@ -190,7 +204,9 @@
       </div>
 
       <template #footer>
-        <div class="bg-gray-100 flex w-full items-center justify-end p-4 z-[100] mt-auto">
+        <div
+          class="bg-gray-100 flex w-full items-center justify-end p-4 z-[100] mt-auto"
+        >
           <Button
             type="button"
             class="w-full md:w-auto !justify-center"
@@ -210,111 +226,123 @@ import { cloneDeep } from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  data () {
+  data() {
     return {
       open: false,
-      cloneLocation: cloneDeep(this.$store.state.citizenComplaintForm.lokasi_aduan)
+      cloneLocation: cloneDeep(
+        this.$store.state.citizenComplaintForm.lokasi_aduan
+      ),
     }
   },
   computed: {
     ...mapGetters('location', [
       'citiesOption',
       'subDitrictsOption',
-      'villagesOption'
+      'villagesOption',
     ]),
-    getCitiesOption () {
+    getCitiesOption() {
       return this.citiesOption
     },
-    getSubDitrictsOption () {
+    getSubDitrictsOption() {
       return this.subDitrictsOption
     },
-    getVillagesOption () {
+    getVillagesOption() {
       return this.villagesOption
     },
     // Clone Deep lokasi aduan state
-    cloneLoc () {
+    cloneLoc() {
       return this.cloneLocation.location
     },
-    clonePlace () {
+    clonePlace() {
       return this.cloneLocation.place
     },
-    place () {
+    place() {
       return this.$store.state.citizenComplaintForm.lokasi_aduan.place
     },
-    address () {
+    address() {
       return this.$store.state.citizenComplaintForm.lokasi_aduan.place.address
     },
-    setValueAddressDetail () {
+    setValueAddressDetail() {
       return this.$store.state.citizenComplaintForm.lokasi_aduan.address_detail
     },
     setValueCity: {
-      get () {
+      get() {
         return this.$store.state.citizenComplaintForm.lokasi_aduan.city_name
       },
-      set (value) {
-        this.$store.commit('citizenComplaintForm/SET_LOKASI_ADUAN_CITY_NAME', value)
+      set(value) {
+        this.$store.commit(
+          'citizenComplaintForm/SET_LOKASI_ADUAN_CITY_NAME',
+          value
+        )
         this.handleCitySelected()
-      }
+      },
     },
     setValueSubDistrict: {
-      get () {
+      get() {
         return this.$store.state.citizenComplaintForm.lokasi_aduan.district_name
       },
-      set (value) {
-        this.$store.commit('citizenComplaintForm/SET_LOKASI_ADUAN_DISTRICT_NAME', value)
+      set(value) {
+        this.$store.commit(
+          'citizenComplaintForm/SET_LOKASI_ADUAN_DISTRICT_NAME',
+          value
+        )
         this.handleSubdistrictSelected()
-      }
+      },
     },
     setValueVillage: {
-      get () {
+      get() {
         return this.$store.state.citizenComplaintForm.lokasi_aduan.village_name
       },
-      set (value) {
-        this.$store.commit('citizenComplaintForm/SET_LOKASI_ADUAN_VILLAGE_NAME', value)
+      set(value) {
+        this.$store.commit(
+          'citizenComplaintForm/SET_LOKASI_ADUAN_VILLAGE_NAME',
+          value
+        )
         this.handleVillageSelected()
-      }
-    }
+      },
+    },
   },
-  created () {
+  created() {
     this.setCitiesOption('cities')
   },
-  mounted () {
+  mounted() {
     this.setCurrentLocation()
   },
   methods: {
-    ...mapActions('location', [
-      'setCitiesOption'
-    ]),
+    ...mapActions('location', ['setCitiesOption']),
     ...mapActions('citizenComplaintForm', [
       'handleCitySelected',
       'handleSubdistrictSelected',
       'handleVillageSelected',
-      'handleLocationComplaint'
+      'handleLocationComplaint',
     ]),
-    setAddressDetail (value) {
-      this.$store.commit('citizenComplaintForm/SET_LOKASI_ADUAN_ADDRESS_DETAIL', value)
+    setAddressDetail(value) {
+      this.$store.commit(
+        'citizenComplaintForm/SET_LOKASI_ADUAN_ADDRESS_DETAIL',
+        value
+      )
     },
-    getPlaceDetail (place) {
+    getPlaceDetail(place) {
       this.cloneLocation.place.name = place.name ?? ''
       this.cloneLocation.place.address = place.formatted_address ?? ''
     },
-    setCoords ({ position, map, event }) {
+    setCoords({ position, map, event }) {
       this.cloneLocation.location.lat = event.latLng.lat()
       this.cloneLocation.location.lng = event.latLng.lng()
     },
-    handleLocation () {
+    handleLocation() {
       this.handleLocationComplaint(this.cloneLocation)
       setTimeout(() => {
         this.closeMaps()
       }, 2000)
     },
-    closeMaps () {
+    closeMaps() {
       this.open = false
     },
     /**
      *  @function: to get current location if the props coords not defined
      */
-    setCurrentLocation () {
+    setCurrentLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           // Success Callback
@@ -335,8 +363,8 @@ export default {
       } else {
         throw new Error('Geolocation is not supported by this browser')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -344,6 +372,6 @@ export default {
 textarea:focus {
   border: 1px solid white;
   outline: none;
-  box-shadow: inset 0px 0px 0px 1px #069550, inset 0px 0px 0px 2px #FFC800;
+  box-shadow: inset 0px 0px 0px 1px #069550, inset 0px 0px 0px 2px #ffc800;
 }
 </style>
