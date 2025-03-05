@@ -347,11 +347,10 @@ export default {
         )
         const params = {
           depth: 3,
-          parent_code_kemendagri: filteredCity[0].code_kemendagri,
-          per_page: 30,
+          cityId: filteredCity[0].id,
         }
 
-        if (filteredCity[0].code_kemendagri !== state.lokasi_aduan.city_id) {
+        if (filteredCity[0].id !== state.lokasi_aduan.city_id) {
           commit('SET_LOKASI_ADUAN_DISTRICT_NAME', '')
           commit('SET_LOKASI_ADUAN_DISTRICT_ID', null)
 
@@ -360,7 +359,7 @@ export default {
           commit('SET_LOKASI_ADUAN_VILLAGE_ID', null)
         }
 
-        commit('SET_LOKASI_ADUAN_CITY_ID', filteredCity[0].code_kemendagri)
+        commit('SET_LOKASI_ADUAN_CITY_ID', filteredCity[0].id)
         dispatch('location/fetchAreas', { params }, { root: true })
       }
 
@@ -387,21 +386,15 @@ export default {
         )
         const params = {
           depth: 4,
-          parent_code_kemendagri: filteredDistrict[0].code_kemendagri,
-          per_page: 30,
+          districtId: filteredDistrict[0].id,
         }
 
-        if (
-          filteredDistrict[0].code_kemendagri !== state.lokasi_aduan.district_id
-        ) {
+        if (filteredDistrict[0].id !== state.lokasi_aduan.district_id) {
           commit('SET_LOKASI_ADUAN_VILLAGE_NAME', '')
           commit('SET_LOKASI_ADUAN_VILLAGE_ID', null)
         }
 
-        commit(
-          'SET_LOKASI_ADUAN_DISTRICT_ID',
-          filteredDistrict[0].code_kemendagri
-        )
+        commit('SET_LOKASI_ADUAN_DISTRICT_ID', filteredDistrict[0].id)
         dispatch('location/fetchAreas', { params }, { root: true })
       }
 
@@ -422,10 +415,7 @@ export default {
             (village) => village.name === state.lokasi_aduan.village_name
           ) ?? []
 
-        commit(
-          'SET_LOKASI_ADUAN_VILLAGE_ID',
-          filteredVillage[0].code_kemendagri
-        )
+        commit('SET_LOKASI_ADUAN_VILLAGE_ID', filteredVillage[0].id)
       }
 
       if (state.lokasi_aduan.village_name === undefined) {

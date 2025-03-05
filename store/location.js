@@ -3,9 +3,7 @@ import { convertToLocaleDate } from '~/utils'
 
 const state = () => ({
   params: {
-    depth: 2,
-    parent_code_kemendagri: 32,
-    per_page: 30,
+    provinceId: 32,
   },
   cities: [],
   subDistricts: [],
@@ -13,6 +11,14 @@ const state = () => ({
 })
 
 const getters = {
+  /** ***********  ✨ Codeium Command ⭐  *************/
+  /**
+   * Get an array of cities as options for a JdsSelect component
+   *
+   * @param {Object} state - Vuex state
+   * @returns {Array} - an array of options for JdsSelect
+   */
+  /** ****  34c00a31-2441-4cb5-bf40-6878c4cb6f0b  *******/
   citiesOption(state) {
     return state.cities.length
       ? state.cities.map((area) => ({ label: area.name, value: area.name }))
@@ -51,24 +57,30 @@ const mutations = {
 const actions = {
   async fetchAreas({ commit }, { params, localStorageKey }) {
     try {
-      const response = await this.$axios.$get('/areas', { params })
-
-      if (params.depth === 2) {
-        commit('SET_CITIES', response.data)
+      if (params.provinceId === 32) {
+        const responseKotKab = await this.$axios.get('/area/city', { params })
+        commit('SET_CITIES', responseKotKab.data.data)
+        if (localStorageKey) {
+          localStorage.setItem(`${localStorageKey}Date`, new Date())
+          localStorage.setItem(
+            `${localStorageKey}Data`,
+            JSON.stringify(responseKotKab.data)
+          )
+        }
       }
       if (params.depth === 3) {
-        commit('SET_SUB_DISTRICT', response.data)
+        const responseSubDistrict = await this.$axios.get('/area/district', {
+          params,
+        })
+
+        commit('SET_SUB_DISTRICT', responseSubDistrict.data.data)
       }
       if (params.depth === 4) {
-        commit('SET_VILLAGES', response.data)
-      }
+        const respnsoeVilages = await this.$axios.get('/area/village', {
+          params,
+        })
 
-      if (localStorageKey) {
-        localStorage.setItem(`${localStorageKey}Date`, new Date())
-        localStorage.setItem(
-          `${localStorageKey}Data`,
-          JSON.stringify(response.data)
-        )
+        commit('SET_VILLAGES', respnsoeVilages.data.data)
       }
     } catch (error) {
       console.error(error)
