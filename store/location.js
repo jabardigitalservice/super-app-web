@@ -3,6 +3,7 @@ import { convertToLocaleDate } from '~/utils'
 
 const state = () => ({
   params: {
+    depth: 2,
     provinceId: 32,
   },
   cities: [],
@@ -57,35 +58,31 @@ const mutations = {
 const actions = {
   async fetchAreas({ commit }, { params, localStorageKey }) {
     try {
-      if (params.provinceId === 32) {
-        const responseKotKab = await this.$axios.get('/area/city', { params })
-        commit('SET_CITIES', responseKotKab.data.data)
-        if (localStorageKey) {
+      const endpoints = {
+        2: { url: '/area/city', mutation: 'SET_CITIES' },
+        3: { url: '/area/district', mutation: 'SET_SUB_DISTRICT' },
+        4: { url: '/area/village', mutation: 'SET_VILLAGES' },
+      }
+
+      if (endpoints[params.depth]) {
+        const { url, mutation } = endpoints[params.depth]
+        const response = await this.$axios.get(url, { params })
+
+        commit(mutation, response.data.data)
+
+        if (params.depth === 2 && localStorageKey) {
           localStorage.setItem(`${localStorageKey}Date`, new Date())
           localStorage.setItem(
             `${localStorageKey}Data`,
-            JSON.stringify(responseKotKab.data)
+            JSON.stringify(response.data.data)
           )
         }
       }
-      if (params.depth === 3) {
-        const responseSubDistrict = await this.$axios.get('/area/district', {
-          params,
-        })
-
-        commit('SET_SUB_DISTRICT', responseSubDistrict.data.data)
-      }
-      if (params.depth === 4) {
-        const respnsoeVilages = await this.$axios.get('/area/village', {
-          params,
-        })
-
-        commit('SET_VILLAGES', respnsoeVilages.data.data)
-      }
     } catch (error) {
-      console.error(error)
+      console.error('Error fetching areas:', error)
     }
   },
+
   /**
    * @function: To get Kota/Kabupaten data
    */
