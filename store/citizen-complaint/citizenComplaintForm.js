@@ -576,7 +576,7 @@ export default {
         formData.append('file', file.image_file)
 
         const response = await this.$authAxiosAduan.post(
-          '/aduan/media/upload',
+          '/file/upload',
           formData,
           params
         )
@@ -628,10 +628,10 @@ export default {
     async handleCheckEmail({ state, getters }) {
       try {
         const response = await this.$authAxiosAduan.get(
-          `/aduan/complaints/email/${getters.email}`
+          `/user/profile/email/${getters.email}`
         )
 
-        state.data_wargi.is_email_valid = response.data.is_exists
+        state.data_wargi.is_email_valid = response.data.status
       } catch (error) {
         console.error(error)
       }
