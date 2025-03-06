@@ -2,9 +2,7 @@
   <section class="grid grid-cols-1 gap-x-8 gap-y-6 mb-4">
     <div class="flex flex-col gap-2" name="Tipe Aduan">
       <div class="flex flex-col gap-2">
-        <h4
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        >
+        <h4 class="font-roboto font-medium text-black text-sm">
           Tipe Aduan <span class="text-red-500">*</span>
         </h4>
         <ValidationProvider
@@ -92,10 +90,7 @@
       tag="section"
       name="Kategori"
     >
-      <label
-        for="category"
-        class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-      >
+      <label for="category" class="font-roboto font-medium text-black text-sm">
         Kategori Aduan <span class="text-red-500">*</span>
       </label>
       <JdsSelect
@@ -119,7 +114,7 @@
     >
       <label
         for="subCategory"
-        class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black text-sm"
       >
         Sub Kategori <span class="text-red-500">*</span>
       </label>
@@ -144,7 +139,7 @@
     >
       <label
         for="otherSubCategoy"
-        class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black text-sm"
       >
         Sub Kategori <span class="text-red-500">*</span>
       </label>
@@ -165,10 +160,7 @@
       rules="required"
       name="Judul"
     >
-      <label
-        class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        for="title"
-      >
+      <label class="font-roboto font-medium text-black text-sm" for="title">
         Judul <span class="text-red-500">*</span>
       </label>
       <JdsInputText
@@ -189,7 +181,7 @@
     >
       <label
         for="experience"
-        class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black text-sm"
       >
         Ceritakan Pengalaman Anda <span class="text-red-500">*</span>
       </label>

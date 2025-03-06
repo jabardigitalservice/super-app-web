@@ -8,10 +8,7 @@
         tag="section"
         name="Kota/Kabupaten"
       >
-        <label
-          for="city"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        >
+        <label for="city" class="font-roboto font-medium text-black text-sm">
           Kota/Kabupaten <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -34,7 +31,7 @@
       >
         <label
           for="subdistrict"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Kecamatan <span class="text-red-500">*</span>
         </label>
@@ -57,10 +54,7 @@
         tag="section"
         name="Kelurahan/Desa"
       >
-        <label
-          for="village"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        >
+        <label for="village" class="font-roboto font-medium text-black text-sm">
           Kelurahan/Desa <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -83,7 +77,7 @@
       >
         <label
           for="location"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Lokasi Aduan <span class="text-red-500">*</span>
         </label>
@@ -134,7 +128,7 @@
       <ValidationProvider class="flex flex-col gap-2" name="Detail Lokasi">
         <label
           for="additionalLocation"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Detail lokasi tambahan <span class="text-gray-300"> (opsional) </span>
         </label>
