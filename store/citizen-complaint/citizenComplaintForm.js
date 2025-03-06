@@ -565,33 +565,47 @@ export default {
     closeConfirmation({ state }) {
       state.statusSubmitForm.status = FORM_SUBMIT_STATUS.NONE
     },
-    async handleImage({ state }, files) {
-      const params = {
-        domain: 'aduan-warga',
-        is_set_alias_url: true,
-      }
-
+    async handleImage({ state, dispatch }, files) {
       const uploadPromises = files.map(async (file) => {
-        const formData = new FormData()
-        formData.append('file', file.image_file)
+        const base64Data = await dispatch(
+          'convertFileToBase64',
+          file.image_file
+        )
+
+        const formData = {
+          name: file.image_file.name,
+          isConfidental: false,
+          mimeType: file.image_file.type,
+          roles: ['admin', 'rw'],
+          data: base64Data,
+        }
 
         const response = await this.$authAxiosAduan.post(
           '/file/upload',
-          formData,
-          params
+          formData
         )
 
         if (response) {
           return {
-            file_name: response.file_name,
-            file_download_uri: response.file_download_uri,
-            size: response.size,
+            file_download_uri: response.data.data.path,
           }
         }
       })
 
       const results = await Promise.all(uploadPromises)
       state.foto_aduan.images.push(...results)
+    },
+
+    convertFileToBase64(_, file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64Data = reader.result.split(',')[1]
+          resolve(base64Data)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
     },
     async submitForm({ state, dispatch }) {
       try {

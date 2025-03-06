@@ -217,7 +217,6 @@ export default {
       this.closeConfirmation()
     },
     submitComplaintForm() {
-      console.log('test submit form')
       this.submitForm()
     },
     retrySubmitComplaintForm() {
