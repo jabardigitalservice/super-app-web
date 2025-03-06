@@ -196,7 +196,7 @@ export default {
     },
   },
   actions: {
-    generateFormData({ state }, status) {
+    generateFormData({ state }) {
       const {
         category,
         is_anonymous,
