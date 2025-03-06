@@ -83,6 +83,7 @@
       </div>
     </div>
 
+    <!-- TODO: FLOWNYA JIKA MEMILIH KATEGORI LAINNYA, MAKA MUNCUL CATEGORY_CHILD_ID FREETEXT -->
     <ValidationProvider
       v-slot="{ errors }"
       rules="required"
@@ -104,6 +105,7 @@
       />
     </ValidationProvider>
 
+    <!-- TODO: FLOWNYA JIKA MEMILIH KATEGORI LAINNYA, MAKA MUNCUL SUB_CATEGORY_CHILD_ID FREETEXT -->
     <ValidationProvider
       v-if="!isSubcategory"
       v-slot="{ errors }"
