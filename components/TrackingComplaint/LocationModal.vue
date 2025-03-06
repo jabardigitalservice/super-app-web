@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :is-open="isOpen" @close="closeModal">
+  <BaseModal :is-open="isOpen" with-close-button @close="closeModal">
     <template #header>
       <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
         {{ title }}
