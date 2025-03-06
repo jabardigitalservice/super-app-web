@@ -8,10 +8,7 @@
         tag="section"
         name="Kota/Kabupaten"
       >
-        <label
-          for="city"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        >
+        <label for="city" class="font-roboto font-medium text-black text-sm">
           Kota/Kabupaten <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -34,7 +31,7 @@
       >
         <label
           for="subdistrict"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Kecamatan <span class="text-red-500">*</span>
         </label>
@@ -57,10 +54,7 @@
         tag="section"
         name="Kelurahan/Desa"
       >
-        <label
-          for="village"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
-        >
+        <label for="village" class="font-roboto font-medium text-black text-sm">
           Kelurahan/Desa <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -83,7 +77,7 @@
       >
         <label
           for="location"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Lokasi Aduan <span class="text-red-500">*</span>
         </label>
@@ -96,7 +90,7 @@
           readonly
         >
           <template #prefix-icon>
-            <Icon src="/icons/location-picker.svg" size="15px" />
+            <Icon src="/icon/location-picker.svg" size="15px" />
           </template>
           <template #suffix-icon>
             <svg
@@ -134,7 +128,7 @@
       <ValidationProvider class="flex flex-col gap-2" name="Detail Lokasi">
         <label
           for="additionalLocation"
-          class="font-roboto font-medium text-black text-[14px] leading-[20px]"
+          class="font-roboto font-medium text-black text-sm"
         >
           Detail lokasi tambahan <span class="text-gray-300"> (opsional) </span>
         </label>
@@ -154,70 +148,47 @@
     </section>
 
     <!-- Pick Location by Google Maps -->
-    <BaseModal :show="open" button-label="Pilih Lokasi ini" @close="closeMaps">
-      <template #header>
-        <div class="w-full flex flex-row justify-between px-7 py-6">
-          <h4
-            class="font-roboto font-medium text-[21px] leading-[34px] text-green-700"
-          >
-            Tentukan Pinpoint
-          </h4>
-
-          <button
-            class="h-10 w-10 bg-white md:flex md:items-center border border-gray-300 justify-center rounded-full hidden"
-            tabindex="1"
-            aria-label="Tutup Pop Up"
-            @click="closeMaps"
-          >
-            <Icon
-              name="times"
-              size="22px"
-              class="text-gray-800"
-              aria-hidden="true"
-            />
-          </button>
-        </div>
-      </template>
-
-      <div class="h-full overflow-y-auto min-w-[375px] max-w-[500px]">
+    <!-- add v-if for delay get location -->
+    <TrackingComplaintLocationModal
+      v-if="open"
+      :is-open="open"
+      title="Tentukan Pinpoint"
+      @close="closeMaps"
+    >
+      <div class="space-y-3">
         <BaseMap
+          v-show="cloneLoc"
           :coords="cloneLoc"
           :zoom="16"
           @set:place="getPlaceDetail"
           @dragend:marker="setCoords"
           @click:map="setCoords"
         />
+      </div>
 
-        <div class="py-4 px-6 flex flex-col gap-2">
-          <h5 class="text-base font-lato font-semibold">
-            {{ clonePlace.name || '-' }}
-          </h5>
-          <p class="text-sm font-lato text-gray-500">
-            {{ clonePlace.address || '-' }}
-          </p>
-          <p class="text-sm font-lato text-gray-400">
-            <span>{{ cloneLoc.lat || '-' }}</span>
-            ,
-            <span>{{ cloneLoc.lng || '-' }}</span>
-          </p>
-        </div>
+      <div class="py-4 px-6 flex flex-col gap-2">
+        <h5 class="text-base text-black font-lato font-semibold">
+          {{ clonePlace.name || '-' }}
+        </h5>
+        <p class="text-sm font-lato text-gray-500">
+          {{ clonePlace.address || '-' }}
+        </p>
+        <p class="text-sm font-lato text-gray-400">
+          <span>{{ cloneLoc.lat || '-' }}</span>
+          ,
+          <span>{{ cloneLoc.lng || '-' }}</span>
+        </p>
       </div>
 
       <template #footer>
-        <div
-          class="bg-gray-100 flex w-full items-center justify-end p-4 z-[100] mt-auto"
+        <BaseButton
+          class="text-sm font-bold text-white mr-2 dark:border-0 bg-green-700 hover:bg-green-600 ml-auto"
+          @click="handleLocation"
         >
-          <Button
-            type="button"
-            class="w-full md:w-auto !justify-center"
-            tabindex="-1"
-            @click="handleLocation"
-          >
-            Pilih Lokasi ini
-          </Button>
-        </div>
+          Pilih Lokasi ini
+        </BaseButton>
       </template>
-    </BaseModal>
+    </TrackingComplaintLocationModal>
   </section>
 </template>
 

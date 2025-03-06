@@ -16,7 +16,7 @@
         loading="eager"
       />
       <label
-        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
         for="nik"
       >
         NIK <span class="text-red-500">*</span>
@@ -38,7 +38,7 @@
       rules="required"
     >
       <label
-        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
         for="name"
       >
         Nama <span class="text-red-500">*</span>
@@ -61,7 +61,7 @@
       rules="required|email"
     >
       <label
-        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-[14px] leading-[20px]"
+        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
         for="email"
       >
         Email <span class="text-red-500">*</span>
@@ -134,8 +134,8 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from 'vuex'
 import debounce from 'lodash/debounce'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import delay from '~/utils/delay'
 
 export default {

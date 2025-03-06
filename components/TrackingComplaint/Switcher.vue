@@ -9,9 +9,9 @@
             'text-gray-500': selectedTab !== tab,
             'bg-white rounded-xl text-black font-semibold': selectedTab === tab,
             'rounded-l-lg': index === 0,
-            'rounded-r-lg': index === items.length - 1
+            'rounded-r-lg': index === items.length - 1,
           }"
-          class="w-full p-2 rounded-l-lg text-[14px] leading-[20px]"
+          class="w-full p-2 rounded-l-lg text-sm"
           @click="switchTab(tab)"
         >
           {{ tab }}
@@ -26,20 +26,19 @@ export default {
   props: {
     items: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
-      selectedTab: this.items[0]
+      selectedTab: this.items[0],
     }
   },
   methods: {
-    switchTab (tab) {
+    switchTab(tab) {
       this.selectedTab = tab
       this.$emit('click', this.selectedTab)
-    }
-  }
+    },
+  },
 }
-
 </script>

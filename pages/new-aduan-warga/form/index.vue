@@ -112,6 +112,50 @@
         </ValidationObserver>
       </div>
     </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'SUBMIT_CONFIRMATION'"
+      label-primary-button="Iya, Kirim"
+      label-secondary-button="Batalkan"
+      header-close-button
+      src-icon="/icon/sent-message.svg"
+      size="48px"
+      title="Kirim Aduan"
+      description="Apakah anda yakin ingin Mengirimkan Aduan ?"
+      @close="cancelSubmit"
+      @click="submitComplaintForm"
+    />
+
+    <!-- PROGRESS MODAL -->
+    <BaseProgressModal
+      :open="statusSubmitForm.status === 'LOADING'"
+      :value="statusSubmitForm.progress"
+    />
+
+    <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'SUCCESS'"
+      header="Berhasil!"
+      label-primary-button="Check Email"
+      label-secondary-button="kembali ke form aduan"
+      name-icon="check-mark-circle"
+      size="16px"
+      description="Aduan berhasil dikirim. Silakan cek email Anda untuk informasi lebih lanjut."
+      @close="backToAduanPage"
+      @click="openEmail"
+    />
+
+    <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'ERROR'"
+      header="Gagal Mengirim Aduan!"
+      label-primary-button="Coba lagi"
+      label-secondary-button="Tutup"
+      name-icon="warning"
+      size="16px"
+      description="Kami mengalami kendala dalam mengirim aduan Anda. Silakan coba lagi nanti atau periksa koneksi internet Anda."
+      @close="cancelSubmit"
+      @click="retrySubmitComplaintForm"
+    />
   </div>
 </template>
 

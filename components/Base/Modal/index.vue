@@ -14,9 +14,8 @@
           <div
             class="flex items-center justify-between border-b border-gray-200 px-6 py-2"
           >
-            <h3 class="text-xl font-semibold text-gray-900">
-              <slot name="header" />
-            </h3>
+            <slot name="header" />
+
             <BaseButton
               class="!rounded-full !w-[44px] !h-[44px] border-0 mb-4 ml-auto hover:bg-gray-100"
               @click="close"

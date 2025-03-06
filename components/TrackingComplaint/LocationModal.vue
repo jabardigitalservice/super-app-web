@@ -10,15 +10,9 @@
       <slot />
     </template>
 
-    <!-- TODO: USED THIS BUTTON IF FORM ADUAN READY -->
-    <!-- <template #footer>
-      <BaseButton
-        class="text-sm font-bold text-white mr-2 dark:border-0 bg-green-700 hover:bg-green-600 ml-auto"
-        @click="selectLocation"
-      >
-        Pilih Lokasi ini
-      </BaseButton>
-    </template> -->
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
+    </template>
   </BaseModal>
 </template>
 

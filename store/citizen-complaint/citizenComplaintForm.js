@@ -347,11 +347,10 @@ export default {
         )
         const params = {
           depth: 3,
-          parent_code_kemendagri: filteredCity[0].code_kemendagri,
-          per_page: 30,
+          cityId: filteredCity[0].id,
         }
 
-        if (filteredCity[0].code_kemendagri !== state.lokasi_aduan.city_id) {
+        if (filteredCity[0].id !== state.lokasi_aduan.city_id) {
           commit('SET_LOKASI_ADUAN_DISTRICT_NAME', '')
           commit('SET_LOKASI_ADUAN_DISTRICT_ID', null)
 
@@ -360,7 +359,7 @@ export default {
           commit('SET_LOKASI_ADUAN_VILLAGE_ID', null)
         }
 
-        commit('SET_LOKASI_ADUAN_CITY_ID', filteredCity[0].code_kemendagri)
+        commit('SET_LOKASI_ADUAN_CITY_ID', filteredCity[0].id)
         dispatch('location/fetchAreas', { params }, { root: true })
       }
 
@@ -387,21 +386,15 @@ export default {
         )
         const params = {
           depth: 4,
-          parent_code_kemendagri: filteredDistrict[0].code_kemendagri,
-          per_page: 30,
+          districtId: filteredDistrict[0].id,
         }
 
-        if (
-          filteredDistrict[0].code_kemendagri !== state.lokasi_aduan.district_id
-        ) {
+        if (filteredDistrict[0].id !== state.lokasi_aduan.district_id) {
           commit('SET_LOKASI_ADUAN_VILLAGE_NAME', '')
           commit('SET_LOKASI_ADUAN_VILLAGE_ID', null)
         }
 
-        commit(
-          'SET_LOKASI_ADUAN_DISTRICT_ID',
-          filteredDistrict[0].code_kemendagri
-        )
+        commit('SET_LOKASI_ADUAN_DISTRICT_ID', filteredDistrict[0].id)
         dispatch('location/fetchAreas', { params }, { root: true })
       }
 
@@ -422,10 +415,7 @@ export default {
             (village) => village.name === state.lokasi_aduan.village_name
           ) ?? []
 
-        commit(
-          'SET_LOKASI_ADUAN_VILLAGE_ID',
-          filteredVillage[0].code_kemendagri
-        )
+        commit('SET_LOKASI_ADUAN_VILLAGE_ID', filteredVillage[0].id)
       }
 
       if (state.lokasi_aduan.village_name === undefined) {
@@ -575,33 +565,47 @@ export default {
     closeConfirmation({ state }) {
       state.statusSubmitForm.status = FORM_SUBMIT_STATUS.NONE
     },
-    async handleImage({ state }, files) {
-      const params = {
-        domain: 'aduan-warga',
-        is_set_alias_url: true,
-      }
-
+    async handleImage({ state, dispatch }, files) {
       const uploadPromises = files.map(async (file) => {
-        const formData = new FormData()
-        formData.append('file', file.image_file)
+        const base64Data = await dispatch(
+          'convertFileToBase64',
+          file.image_file
+        )
+
+        const formData = {
+          name: file.image_file.name,
+          isConfidental: false,
+          mimeType: file.image_file.type,
+          roles: ['admin', 'rw'],
+          data: base64Data,
+        }
 
         const response = await this.$authAxiosAduan.post(
-          '/aduan/media/upload',
-          formData,
-          params
+          '/file/upload',
+          formData
         )
 
         if (response) {
           return {
-            file_name: response.file_name,
-            file_download_uri: response.file_download_uri,
-            size: response.size,
+            file_download_uri: response.data.data.path,
           }
         }
       })
 
       const results = await Promise.all(uploadPromises)
       state.foto_aduan.images.push(...results)
+    },
+
+    convertFileToBase64(_, file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64Data = reader.result.split(',')[1]
+          resolve(base64Data)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
     },
     async submitForm({ state, dispatch }) {
       try {
@@ -638,10 +642,10 @@ export default {
     async handleCheckEmail({ state, getters }) {
       try {
         const response = await this.$authAxiosAduan.get(
-          `/aduan/complaints/email/${getters.email}`
+          `/user/profile/email/${getters.email}`
         )
 
-        state.data_wargi.is_email_valid = response.data.is_exists
+        state.data_wargi.is_email_valid = response.data.status
       } catch (error) {
         console.error(error)
       }

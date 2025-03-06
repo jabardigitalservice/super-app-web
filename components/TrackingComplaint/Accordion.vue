@@ -24,7 +24,7 @@
       <li
         v-for="(item, index) in logSpan"
         :key="index"
-        class="font-lato font-normal text-[14px] leading-[20px] text-gray-800 grid grid-cols-[minmax(50px,min-content),1fr] gap-2 mb-2"
+        class="font-lato font-normal text-sm text-gray-800 grid grid-cols-[minmax(50px,min-content),1fr] gap-2 mb-2"
       >
         <div class="flex flex-col gap-2">
           <div class="w-4 h-4">
