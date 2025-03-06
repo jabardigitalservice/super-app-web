@@ -12,14 +12,6 @@ const state = () => ({
 })
 
 const getters = {
-  /** ***********  ✨ Codeium Command ⭐  *************/
-  /**
-   * Get an array of cities as options for a JdsSelect component
-   *
-   * @param {Object} state - Vuex state
-   * @returns {Array} - an array of options for JdsSelect
-   */
-  /** ****  34c00a31-2441-4cb5-bf40-6878c4cb6f0b  *******/
   citiesOption(state) {
     return state.cities.length
       ? state.cities.map((area) => ({ label: area.name, value: area.name }))
