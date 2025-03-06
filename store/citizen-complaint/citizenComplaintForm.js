@@ -43,6 +43,9 @@ const getDefaultState = () => ({
     sub_category_option: [],
     title: '',
     reason: '',
+    // TODO: TAMBAHKAN FLOW UNTUK VALUE LAINNYA
+    category_child_id: '',
+    subcategory_child_id: '',
   },
   // foto_aduan as step-three
   foto_aduan: {
@@ -159,9 +162,7 @@ export default {
     },
     ADD_FOTO_ADUAN(state) {
       state.foto_aduan.images.push({
-        file_name: '',
-        file_download_uri: '',
-        size: 0,
+        url: '',
       })
     },
     SET_LOKASI_ADUAN_CITY_NAME(state, payload) {
@@ -196,47 +197,66 @@ export default {
   },
   actions: {
     generateFormData({ state }, status) {
-      const { is_email_valid, ...restStateDataWargi } = state.data_wargi
       const {
-        category_option,
-        sub_category_option,
         category,
+        is_anonymous,
+        reason,
         sub_category,
         sub_category_other,
-        ...restStateInformasiAduan
+        title,
+        type,
       } = state.informasi_aduan
+
       const subCategory = category.includes('lainnya')
         ? sub_category_other
         : sub_category
+
       const {
-        place: { name, address },
-        location: { lat: latitude, lng: longitude },
-        ...restStateLokasiAduan
+        place: { address },
+        location: { lat, lng },
+        address_detail,
+        city_id,
+        city_name,
+        district_id,
+        district_name,
+        province_id,
+        province_name,
+        village_id,
+        village_name,
       } = state.lokasi_aduan
 
-      const citizenComplaint = {
-        data_wargi: {
-          ...restStateDataWargi,
-        },
-        informasi_aduan: {
-          category,
-          sub_category: subCategory,
-          ...restStateInformasiAduan,
-        },
-        foto_aduan: {
-          images: [...state.foto_aduan.images],
-        },
-        lokasi_aduan: {
-          address,
-          location: {
-            latitude,
-            longitude,
-          },
-          ...restStateLokasiAduan,
-        },
+      const formComplaint = {
+        source_id: 'sapawarga', // jotform, sp4n, sapawarga, portaljabar
+        user_name: state.data_wargi.name, // Nama Lengkap Pelapor
+        // TODO: FU terkait data yg dikirim NIK atau NO TLP
+        user_phone: state.data_wargi.nik, // Nomor Kontak
+        user_email: state.data_wargi.email, // Email Pelapor
+        title, // Judul Aduan
+        description: reason, // Detail Aduan
+        category_id: category, // kategori aduan
+        sub_category_id: subCategory,
+        is_secret: type !== 'public', // true, jika ingin tidak terpublish di sapawarga. default false
+        is_anonymous,
+        province_id, // provinsi ID menggunakan kemendagri
+        province_name,
+        city_id, // kota ID menggunakan kemendagri
+        city_name,
+        district_id, // kecamatan ID menggunakan kemendagri
+        district_name, // kecamatan ID menggunakan kemendagri
+        village_id, // desa/kelurahan ID menggunakan kemendagri
+        village_name, // desa/kelurahan ID menggunakan kemendagri
+        address, // alamat aduan
+        longitude: `${lng}`, // longitude aduan
+        latitude: `${lat}`, // latitude aduan
+        address_detail, // detail lokasi kejadian
+        // TODO: TAMBAHKAN VALUE UNTUK FORM STEP TWO
+        category_child_id: '',
+        subcategory_child_id: '',
+        // TODO: KONFIRMASI TERKAIT URL IMAGES, yg disimpan bukan URL nya saat ini , hanya url tempat penyimpanan
+        photos: [...state.foto_aduan.images],
       }
 
-      return citizenComplaint
+      return formComplaint
     },
     async fetchCategories({ commit }, localStorageKey) {
       try {
@@ -587,7 +607,7 @@ export default {
 
         if (response) {
           return {
-            file_download_uri: response.data.data.path,
+            url: response.data.data.path,
           }
         }
       })
