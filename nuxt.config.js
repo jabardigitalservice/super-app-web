@@ -40,7 +40,6 @@ export default {
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
     '~/plugins/aduan-get-token.js',
-    '~/plugins/aduan-axios-token.js',
   ],
 
   render: {
