@@ -24,6 +24,7 @@ const FORM_SUBMIT_STATUS = Object.freeze({
 })
 
 const getDefaultState = () => ({
+  authToken: null,
   currentFormStep: 1,
   // data_wargi as step-one
   data_wargi: {
@@ -83,6 +84,12 @@ export default {
   namespaced: true,
   state: getDefaultState(),
   getters: {
+    authToken(state) {
+      return state.authToken
+    },
+    hasAuthToken(state) {
+      return !!state.authToken
+    },
     email(state) {
       return state.data_wargi.email
     },
@@ -121,6 +128,9 @@ export default {
     },
   },
   mutations: {
+    SET_AUTH_TOKEN(state, token) {
+      state.authToken = token
+    },
     SET_CURRENT_FORM_STEP(state, payload) {
       state.currentFormStep = payload
     },
@@ -196,6 +206,9 @@ export default {
     },
   },
   actions: {
+    setAuthToken({ commit }, token) {
+      commit('SET_AUTH_TOKEN', token)
+    },
     generateFormData({ state }) {
       const infoAduan = state.informasi_aduan
       const lokasiAduan = state.lokasi_aduan
@@ -233,11 +246,13 @@ export default {
         photos: [...state.foto_aduan.images],
       }
     },
-    async fetchCategories({ commit }, localStorageKey) {
+    async fetchCategories({ commit, state }, localStorageKey) {
       try {
-        const response = await this.$authAxiosAduan.get(
-          '/aduan/complaints/categories'
-        )
+        const response = await this.$axios.get('/aduan/complaints/categories', {
+          headers: {
+            Authorization: `Bearer ${state.authToken}`,
+          },
+        })
 
         commit('SET_INFORMASI_ADUAN_CATEGORY_OPTION', response.data.data)
         if (localStorageKey) {
@@ -251,11 +266,14 @@ export default {
         console.error(error)
       }
     },
-    async fetchSubCategories({ commit }, params) {
+    async fetchSubCategories({ commit, state }, params) {
       try {
-        const response = await this.$authAxiosAduan.get(
+        const response = await this.$axios.get(
           '/aduan/complaints/subcategories',
           {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
             params: {
               ...params,
             },
@@ -575,10 +593,11 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$authAxiosAduan.post(
-          '/file/upload',
-          formData
-        )
+        const response = await this.$axios.post('/file/upload', formData, {
+          headers: {
+            Authorization: `Bearer ${state.authToken}`,
+          },
+        })
 
         if (response) {
           return {
@@ -613,9 +632,14 @@ export default {
         }
 
         const citizenComplaintForm = await dispatch('generateFormData')
-        const response = await this.$authAxiosAduan.post(
+        const response = await this.$axios.post(
           '/aduan/complaints',
-          citizenComplaintForm
+          citizenComplaintForm,
+          {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          }
         )
 
         if (response) {
@@ -636,8 +660,13 @@ export default {
     },
     async handleCheckEmail({ state, getters }) {
       try {
-        const response = await this.$authAxiosAduan.get(
-          `/user/profile/email/${getters.email}`
+        const response = await this.$axios.get(
+          `/user/profile/email/${getters.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          }
         )
 
         state.data_wargi.is_email_valid = response.data.status
