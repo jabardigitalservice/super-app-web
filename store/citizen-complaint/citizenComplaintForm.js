@@ -24,6 +24,7 @@ const FORM_SUBMIT_STATUS = Object.freeze({
 })
 
 const getDefaultState = () => ({
+  authToken: null,
   currentFormStep: 1,
   // data_wargi as step-one
   data_wargi: {
@@ -83,6 +84,12 @@ export default {
   namespaced: true,
   state: getDefaultState(),
   getters: {
+    authToken(state) {
+      return state.authToken
+    },
+    hasAuthToken(state) {
+      return !!state.authToken
+    },
     email(state) {
       return state.data_wargi.email
     },
@@ -121,6 +128,9 @@ export default {
     },
   },
   mutations: {
+    SET_AUTH_TOKEN(state, token) {
+      state.authToken = token
+    },
     SET_CURRENT_FORM_STEP(state, payload) {
       state.currentFormStep = payload
     },
@@ -196,73 +206,53 @@ export default {
     },
   },
   actions: {
+    setAuthToken({ commit }, token) {
+      commit('SET_AUTH_TOKEN', token)
+    },
     generateFormData({ state }) {
-      const {
-        category,
-        is_anonymous,
-        reason,
-        sub_category,
-        sub_category_other,
-        title,
-        type,
-      } = state.informasi_aduan
+      const infoAduan = state.informasi_aduan
+      const lokasiAduan = state.lokasi_aduan
+      const user = state.data_wargi
 
-      const subCategory = category.includes('lainnya')
-        ? sub_category_other
-        : sub_category
-
-      const {
-        place: { address },
-        location: { lat, lng },
-        address_detail,
-        city_id,
-        city_name,
-        district_id,
-        district_name,
-        province_id,
-        province_name,
-        village_id,
-        village_name,
-      } = state.lokasi_aduan
-
-      const formComplaint = {
-        source_id: 'sapawarga', // jotform, sp4n, sapawarga, portaljabar
-        user_name: state.data_wargi.name, // Nama Lengkap Pelapor
-        // TODO: FU terkait data yg dikirim NIK atau NO TLP
-        user_phone: state.data_wargi.nik, // Nomor Kontak
-        user_email: state.data_wargi.email, // Email Pelapor
-        title, // Judul Aduan
-        description: reason, // Detail Aduan
-        category_id: category, // kategori aduan
-        sub_category_id: subCategory,
-        is_secret: type !== 'public', // true, jika ingin tidak terpublish di sapawarga. default false
-        is_anonymous,
-        province_id, // provinsi ID menggunakan kemendagri
-        province_name,
-        city_id, // kota ID menggunakan kemendagri
-        city_name,
-        district_id, // kecamatan ID menggunakan kemendagri
-        district_name, // kecamatan ID menggunakan kemendagri
-        village_id, // desa/kelurahan ID menggunakan kemendagri
-        village_name, // desa/kelurahan ID menggunakan kemendagri
-        address, // alamat aduan
-        longitude: `${lng}`, // longitude aduan
-        latitude: `${lat}`, // latitude aduan
-        address_detail, // detail lokasi kejadian
+      return {
+        source_id: 'sapawarga',
+        user_name: user.name,
+        user_phone: user.nik,
+        user_email: user.email,
+        title: infoAduan.title,
+        description: infoAduan.reason,
+        category_id: infoAduan.category,
+        sub_category_id: infoAduan.category.includes('lainnya')
+          ? infoAduan.sub_category_other
+          : infoAduan.sub_category,
+        is_secret: infoAduan.type !== 'public',
+        is_anonymous: infoAduan.is_anonymous,
+        province_id: lokasiAduan.province_id,
+        province_name: lokasiAduan.province_name,
+        city_id: lokasiAduan.city_id,
+        city_name: lokasiAduan.city_name,
+        district_id: lokasiAduan.district_id,
+        district_name: lokasiAduan.district_name,
+        village_id: lokasiAduan.village_id,
+        village_name: lokasiAduan.village_name,
+        address: lokasiAduan.place.address,
+        longitude: `${lokasiAduan.location.lng}`,
+        latitude: `${lokasiAduan.location.lat}`,
+        address_detail: lokasiAduan.address_detail,
         // TODO: TAMBAHKAN VALUE UNTUK FORM STEP TWO
         category_child_id: '',
         subcategory_child_id: '',
         // TODO: KONFIRMASI TERKAIT URL IMAGES, yg disimpan bukan URL nya saat ini , hanya url tempat penyimpanan
         photos: [...state.foto_aduan.images],
       }
-
-      return formComplaint
     },
-    async fetchCategories({ commit }, localStorageKey) {
+    async fetchCategories({ commit, state }, localStorageKey) {
       try {
-        const response = await this.$authAxiosAduan.get(
-          '/aduan/complaints/categories'
-        )
+        const response = await this.$axios.get('/aduan/complaints/categories', {
+          headers: {
+            Authorization: `Bearer ${state.authToken}`,
+          },
+        })
 
         commit('SET_INFORMASI_ADUAN_CATEGORY_OPTION', response.data.data)
         if (localStorageKey) {
@@ -276,11 +266,14 @@ export default {
         console.error(error)
       }
     },
-    async fetchSubCategories({ commit }, params) {
+    async fetchSubCategories({ commit, state }, params) {
       try {
-        const response = await this.$authAxiosAduan.get(
+        const response = await this.$axios.get(
           '/aduan/complaints/subcategories',
           {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
             params: {
               ...params,
             },
@@ -600,10 +593,11 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$authAxiosAduan.post(
-          '/file/upload',
-          formData
-        )
+        const response = await this.$axios.post('/file/upload', formData, {
+          headers: {
+            Authorization: `Bearer ${state.authToken}`,
+          },
+        })
 
         if (response) {
           return {
@@ -638,9 +632,14 @@ export default {
         }
 
         const citizenComplaintForm = await dispatch('generateFormData')
-        const response = await this.$authAxiosAduan.post(
+        const response = await this.$axios.post(
           '/aduan/complaints',
-          citizenComplaintForm
+          citizenComplaintForm,
+          {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          }
         )
 
         if (response) {
@@ -661,8 +660,13 @@ export default {
     },
     async handleCheckEmail({ state, getters }) {
       try {
-        const response = await this.$authAxiosAduan.get(
-          `/user/profile/email/${getters.email}`
+        const response = await this.$axios.get(
+          `/user/profile/email/${getters.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          }
         )
 
         state.data_wargi.is_email_valid = response.data.status

@@ -184,6 +184,8 @@ export default {
       'currentFormStep',
       'isFirstStep',
       'isLastStep',
+      'authToken',
+      'hasAuthToken',
     ]),
     /**
      * Function to check if the foto aduan form step is invalid or not
@@ -198,8 +200,12 @@ export default {
   created() {
     this.resetForm()
   },
-  mounted() {
+  async mounted() {
     this.showLoadingSkeleton()
+    if (!this.hasAuthToken) {
+      const token = await this.$getToken()
+      this.setAuthToken(token)
+    }
   },
   methods: {
     ...mapActions('citizenComplaintForm', [
@@ -209,6 +215,7 @@ export default {
       'closeConfirmation',
       'submitForm',
       'resetForm',
+      'setAuthToken',
     ]),
     submitComplaint() {
       this.submitConfirmation()
