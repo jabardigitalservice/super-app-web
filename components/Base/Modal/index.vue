@@ -1,10 +1,7 @@
 <template>
   <transition name="modal">
     <div v-show="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
-      <div
-        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        @click="close"
-      />
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div
@@ -17,6 +14,7 @@
             <slot name="header" />
 
             <BaseButton
+              v-if="withCloseButton"
               class="!rounded-full !w-[44px] !h-[44px] border-0 mb-4 ml-auto hover:bg-gray-100"
               @click="close"
             >
@@ -52,6 +50,10 @@ export default {
     height: {
       type: String,
       default: 'auto',
+    },
+    withCloseButton: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

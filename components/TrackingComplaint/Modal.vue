@@ -1,5 +1,9 @@
 <template>
-  <BaseModal :is-open="open" @close="$emit('close')">
+  <BaseModal
+    :is-open="open"
+    :with-close-button="headerCloseButton"
+    @close="$emit('close')"
+  >
     <template #header>
       <h4 class="font-roboto text-[21px] font-bold leading-8 text-green-800">
         {{ header }}
