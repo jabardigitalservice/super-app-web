@@ -266,7 +266,10 @@ export default {
     },
     isSubCategorySelectLainnya() {
       if (this.informasi_aduan?.sub_category) {
-        return this.informasi_aduan?.sub_category?.includes('lainnya')
+        return (
+          this.informasi_aduan?.sub_category?.includes('lainnya') &&
+          !this.informasi_aduan?.category?.includes('lainnya')
+        )
       }
       return false
     },
