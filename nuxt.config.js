@@ -116,6 +116,7 @@ export default {
       keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
     },
+    urlFile: process.env.URL_FILE,
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
