@@ -215,7 +215,7 @@ export default {
       const user = state.data_wargi
 
       return {
-        source_id: 'sapawarga',
+        source_id: 'sapawarga', // jotform, sp4n, sapawarga, portaljabar
         user_name: user.name,
         user_phone: user.nik,
         user_email: user.email,
@@ -601,7 +601,7 @@ export default {
 
         if (response) {
           return {
-            url: response.data.data.path,
+            url: `${this.$config.urlFile}/` + response.data.data.path,
           }
         }
       })
