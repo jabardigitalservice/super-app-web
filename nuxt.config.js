@@ -1,3 +1,13 @@
+let newRelic = {}
+if (process.env.NODE_ENV === 'production') {
+  newRelic = {
+    src: '/newrelic-script.js',
+    'data-account-id': `${process.env.NEW_RELIC_ACCOUNT_ID}`,
+    'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
+    'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`,
+  }
+}
+
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -16,14 +26,7 @@ export default {
       { name: 'supported-color-schemes', content: 'light dark' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
-    script: [
-      {
-        src: '/newrelic-script.js',
-        'data-account-id': `${process.env.NEW_RELIC_ACCOUNT_ID}`,
-        'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
-        'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`,
-      },
-    ],
+    script: [newRelic],
     __dangerouslyDisableSanitizers: ['script'],
   },
 
