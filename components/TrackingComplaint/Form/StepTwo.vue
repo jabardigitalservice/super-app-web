@@ -25,7 +25,7 @@
               class="hidden"
             />
             <div
-              class="max-w-[328px] h-full rounded-xl border bg-white grid grid-cols-[1fr,16px] gap-2 py-4 px-3"
+              class="md:max-w-[328px] w-full h-full rounded-xl border bg-white grid grid-cols-[1fr,16px] gap-2 py-4 px-3"
               :class="{
                 'border-gray-300': !errors[0],
                 'border-red-600': errors[0],
