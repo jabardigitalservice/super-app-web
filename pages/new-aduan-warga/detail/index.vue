@@ -1,10 +1,12 @@
 <template>
-  <div class="w-full h-full p-4 bg-white min-h-screen">
+  <div
+    class="w-full h-full p-4 bg-white min-h-screen dark:bg-dark-emphasis-low"
+  >
     <div class="mb-5">
       <TrackingComplaintSearch @input="onSearch" />
     </div>
     <div
-      class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px]"
+      class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px] dark:border-dark-emphasis-medium"
     >
       <div class="flex flex-row justify-between">
         <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
@@ -14,7 +16,7 @@
         />
       </div>
 
-      <hr />
+      <hr class="dark:border-dark-emphasis-medium" />
 
       <TrackingComplaintFooter
         :updated-at="complaintData?.updated_at"

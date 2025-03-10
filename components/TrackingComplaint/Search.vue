@@ -14,7 +14,7 @@
         <JdsInputText
           id="search"
           v-model="searchQuery"
-          class="w-full text-gray-700 bg-transparent focus:outline-none text-sm"
+          class="w-full text-gray-700 bg-transparent focus:outline-none text-sm dark:border-dark-emphasis-medium"
           :error-message="errors[0]"
           placeholder="Masukan ID Aduan"
         >

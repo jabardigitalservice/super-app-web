@@ -1,6 +1,6 @@
 <template>
   <span
-    class="px-4 py-1 text-sm font-lato font-bold rounded-full border w-fit h-fit"
+    class="px-4 py-1 text-sm font-lato font-bold rounded-full border w-fit h-fit dark:border-dark-emphasis-high"
     :style="{
       borderColor: statusData.fillColor || '',
       backgroundColor: statusData.fillColor ? `${statusData.fillColor}1A` : '',

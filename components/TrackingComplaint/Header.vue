@@ -7,8 +7,12 @@
       mode="image"
     />
     <div>
-      <h2 class="font-lato text-sm font-medium text-black"> Tracking Aduan </h2>
-      <p class="text-sm font-lato text-green-700"> {{idAduan}} </p>
+      <h2
+        class="font-lato text-sm font-medium text-black dark:text-dark-emphasis-high"
+      >
+        Tracking Aduan
+      </h2>
+      <p class="text-sm font-lato text-green-700">{{ idAduan }}</p>
     </div>
   </div>
 </template>

@@ -233,7 +233,7 @@ export default {
 
 <style scoped>
 .card-milestone {
-  @apply p-2 bg-gray-50 border rounded-lg flex flex-col w-full dark:bg-dark-emphasis-medium;
+  @apply p-2 bg-gray-50 border rounded-lg flex flex-col w-full dark:bg-dark-emphasis-medium dark:border-dark-emphasis-medium;
 }
 
 .label-text {
