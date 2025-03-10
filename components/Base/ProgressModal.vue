@@ -7,13 +7,17 @@
     </template>
     <template #content>
       <div class="w-full p-4 min-h-[80px] flex items-center justify-center">
-        <p class="text-sm leading-6 text-blue-gray-800 text-center">
+        <p
+          class="text-sm leading-6 text-blue-gray-800 text-center dark:text-dark-emphasis-high"
+        >
           {{ message }}
         </p>
       </div>
     </template>
     <template #footer>
-      <div class="bg-gray-50 p-4 min-h-[80px] flex justify-center items-center">
+      <div
+        class="bg-gray-50 p-4 min-h-[80px] flex justify-center items-center dark:bg-dark-emphasis-low"
+      >
         <progress max="100" :value="value" />
       </div>
     </template>

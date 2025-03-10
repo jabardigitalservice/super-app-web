@@ -37,12 +37,12 @@
         </div>
         <div>
           <h3
-            class="pb-1 font-roboto text-[20px] leading-7 text-center font-semibold text-gray-900 md:text-left"
+            class="pb-1 font-roboto text-[20px] leading-7 text-center font-semibold text-gray-900 md:text-left dark:text-dark-emphasis-high"
           >
             {{ title }}
           </h3>
           <p
-            class="font-lato text-[14px] leading-[23px] text-gray-600 text-left"
+            class="font-lato text-[14px] leading-[23px] text-gray-600 text-left dark:text-dark-emphasis-high"
           >
             {{ description }}
           </p>

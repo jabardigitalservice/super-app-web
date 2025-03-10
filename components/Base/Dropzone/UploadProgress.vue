@@ -3,7 +3,7 @@
     <section>
       <div
         :class="{
-          'min-h-[110px] overflow-auto w-full rounded-md px-5 py-4 border border-gray-400': true,
+          'min-h-[110px] overflow-auto w-full rounded-md px-5 py-4 border border-gray-400 dark:border-dark-emphasis-medium': true,
           'border-red-600': status === 'ERROR',
         }"
         :data-cy="

@@ -18,33 +18,41 @@
           :images-array="imagesArray"
         />
 
-        <hr class="my-3" />
+        <hr class="my-3 dark:border-dark-emphasis-medium" />
 
         <div class="flex flex-col gap-y-3">
           <div class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Judul Aduan</h3>
-            <p class="font-lato text-sm text-gray-900">
+            <p
+              class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+            >
               {{ complaintData.title || '-' }}
             </p>
           </div>
 
           <div class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
-            <p class="font-lato text-sm text-gray-900">
+            <p
+              class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+            >
               {{ getCategoryName() }}
             </p>
           </div>
 
           <div v-if="getSubCategoryName() !== ''" class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Sub Kategori Aduan</h3>
-            <p class="font-lato text-sm text-gray-900">
+            <p
+              class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+            >
               {{ getSubCategoryName() }}
             </p>
           </div>
 
           <div class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
-            <p class="font-lato text-sm text-gray-900">
+            <p
+              class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+            >
               {{ complaintData.description || '-' }}
             </p>
           </div>
@@ -52,7 +60,9 @@
           <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
             <div class="flex flex-col gap-1">
               <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
-              <p class="font-lato text-sm text-gray-900">
+              <p
+                class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+              >
                 {{ location.address || '-' }}
               </p>
               <p class="font-lato text-xs text-gray-500">
@@ -72,7 +82,9 @@
 
           <div class="flex flex-col gap-1">
             <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
-            <p class="font-lato text-sm text-gray-900">
+            <p
+              class="font-lato text-sm text-gray-900 dark:text-dark-emphasis-high"
+            >
               {{ complaintData?.address?.detail || '-' }}
             </p>
           </div>
@@ -95,10 +107,10 @@
       </div>
 
       <div class="space-y-2 mt-2">
-        <h5 class="text-base text-black font-bold">
+        <h5 class="text-base text-black font-bold dark:text-dark-emphasis-high">
           {{ location.name || '-' }}
         </h5>
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 dark:text-dark-emphasis-high">
           {{ location.address || '-' }}
         </p>
       </div>
