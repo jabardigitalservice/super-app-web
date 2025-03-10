@@ -2,7 +2,9 @@
   <section class="grid grid-cols-1 gap-x-8 gap-y-6 mb-4">
     <div class="flex flex-col gap-2" name="Tipe Aduan">
       <div class="flex flex-col gap-2">
-        <h4 class="font-roboto font-medium text-black text-sm">
+        <h4
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+        >
           Tipe Aduan <span class="text-red-500">*</span>
         </h4>
         <ValidationProvider
@@ -75,7 +77,7 @@
       >
         <label
           for="anonymousId"
-          class="font-roboto text-gray-700 text-[12px] leading-[18px]"
+          class="font-roboto text-gray-700 text-[12px] leading-[18px] dark:text-dark-emphasis-high"
         >
           Sembunyikan identitas Anda <b>(Anonim)</b>
         </label>
@@ -90,7 +92,10 @@
       tag="section"
       name="Kategori"
     >
-      <label for="category" class="font-roboto font-medium text-black text-sm">
+      <label
+        for="category"
+        class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+      >
         Kategori Aduan <span class="text-red-500">*</span>
       </label>
       <JdsSelect
@@ -131,7 +136,7 @@
     >
       <label
         for="subCategory"
-        class="font-roboto font-medium text-black text-sm"
+        class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
       >
         Sub Kategori <span class="text-red-500">*</span>
       </label>
@@ -171,7 +176,10 @@
       rules="required"
       name="Judul"
     >
-      <label class="font-roboto font-medium text-black text-sm" for="title">
+      <label
+        class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+        for="title"
+      >
         Judul <span class="text-red-500">*</span>
       </label>
       <JdsInputText
@@ -192,11 +200,13 @@
     >
       <label
         for="experience"
-        class="font-roboto font-medium text-black text-sm"
+        class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
       >
         Ceritakan Pengalaman Anda <span class="text-red-500">*</span>
       </label>
-      <p class="font-lato text-[12px] leading-[18px] text-gray-600">
+      <p
+        class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high"
+      >
         Detail permasalahan dapat memuat info berupa waktu kejadian, jenis
         pelanggaran, dsb. <br />
         Ceritakan aduan yang ingin disampaikan dengan detail.

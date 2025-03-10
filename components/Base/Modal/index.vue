@@ -5,20 +5,23 @@
 
       <div class="flex min-h-full items-center justify-center p-4">
         <div
-          class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all"
+          class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all dark:bg-dark-emphasis-low"
           :style="{ width: modalWidth, height: modalHeight }"
         >
           <div
-            class="flex items-center justify-between border-b border-gray-200 px-6 py-2"
+            class="flex items-center justify-between border-b border-gray-200 px-6 py-2 dark:border-dark-emphasis-medium"
           >
             <slot name="header" />
 
             <BaseButton
               v-if="withCloseButton"
-              class="!rounded-full !w-[44px] !h-[44px] border-0 mb-4 ml-auto hover:bg-gray-100"
+              class="!rounded-full !w-[44px] !h-[44px] border-0 mb-4 ml-auto hover:bg-gray-100 dark:border-dark-emphasis-medium dark:hover:bg-dark-emphasis-medium"
               @click="close"
             >
-              <BaseIconSvg :icon="`/icon/close-button.svg`" class="!bg-black" />
+              <BaseIconSvg
+                :icon="`/icon/close-button.svg`"
+                class="!bg-black dark:!bg-white"
+              />
             </BaseButton>
           </div>
 
@@ -26,7 +29,10 @@
             <slot name="content" />
           </div>
 
-          <div v-if="$slots.footer" class="border-t border-gray-200 px-6 py-2">
+          <div
+            v-if="$slots.footer"
+            class="border-t border-gray-200 px-6 py-2 dark:border-dark-emphasis-medium"
+          >
             <slot name="footer" />
           </div>
         </div>

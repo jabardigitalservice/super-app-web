@@ -1,9 +1,11 @@
 <template>
   <section class="grid grid-cols-1 gap-x-8 gap-y-6 mb-4">
-    <h3 class="font-roboto font-medium text-black text-sm">
+    <h3
+      class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+    >
       Upload File <span class="text-red-500">*</span> <br />
       <span
-        class="font-lato text-[12px] leading-[18px] text-gray-600 text-left"
+        class="font-lato text-[12px] leading-[18px] text-gray-600 text-left dark:text-dark-emphasis-high"
       >
         Ukuran Maksimal file upload 1 Mb. File yang didukung adalah .jpg dan.png
       </span>

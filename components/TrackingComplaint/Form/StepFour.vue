@@ -8,7 +8,10 @@
         tag="section"
         name="Kota/Kabupaten"
       >
-        <label for="city" class="font-roboto font-medium text-black text-sm">
+        <label
+          for="city"
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+        >
           Kota/Kabupaten <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -31,7 +34,7 @@
       >
         <label
           for="subdistrict"
-          class="font-roboto font-medium text-black text-sm"
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
         >
           Kecamatan <span class="text-red-500">*</span>
         </label>
@@ -54,7 +57,10 @@
         tag="section"
         name="Kelurahan/Desa"
       >
-        <label for="village" class="font-roboto font-medium text-black text-sm">
+        <label
+          for="village"
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+        >
           Kelurahan/Desa <span class="text-red-500">*</span>
         </label>
         <JdsSelect
@@ -77,7 +83,7 @@
       >
         <label
           for="location"
-          class="font-roboto font-medium text-black text-sm"
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
         >
           Lokasi Aduan <span class="text-red-500">*</span>
         </label>
@@ -128,9 +134,12 @@
       <ValidationProvider class="flex flex-col gap-2" name="Detail Lokasi">
         <label
           for="additionalLocation"
-          class="font-roboto font-medium text-black text-sm"
+          class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
         >
-          Detail lokasi tambahan <span class="text-gray-300"> (opsional) </span>
+          Detail lokasi tambahan
+          <span class="text-gray-300 dark:text-dark-emphasis-high">
+            (opsional)
+          </span>
         </label>
         <textarea
           id="additionalLocation"
@@ -167,13 +176,15 @@
       </div>
 
       <div class="py-4 px-6 flex flex-col gap-2">
-        <h5 class="text-base text-black font-lato font-semibold">
+        <h5
+          class="text-base text-black font-lato font-semibold dark:text-dark-emphasis-high"
+        >
           {{ clonePlace.name || '-' }}
         </h5>
-        <p class="text-sm font-lato text-gray-500">
+        <p class="text-sm font-lato text-gray-500 dark:text-dark-emphasis-high">
           {{ clonePlace.address || '-' }}
         </p>
-        <p class="text-sm font-lato text-gray-400">
+        <p class="text-sm font-lato text-gray-400 dark:text-dark-emphasis-high">
           <span>{{ cloneLoc.lat || '-' }}</span>
           ,
           <span>{{ cloneLoc.lng || '-' }}</span>

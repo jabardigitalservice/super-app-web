@@ -95,10 +95,10 @@
       </div>
 
       <div class="space-y-2 mt-2">
-        <h5 class="text-base text-black font-bold">
+        <h5 class="text-base text-black font-bold dark:text-dark-emphasis-high">
           {{ location.name || '-' }}
         </h5>
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 dark:text-dark-emphasis-high">
           {{ location.address || '-' }}
         </p>
       </div>
