@@ -317,6 +317,7 @@ export default {
         }
 
         dispatch('fetchSubCategories', params)
+        dispatch('handleSubCategorySelected')
       }
 
       if (state.informasi_aduan.category === undefined) {
@@ -327,11 +328,15 @@ export default {
         commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION', '')
       }
     },
-    handleSubCategorySelected({ state, commit }) {
-      if (state.lokasi_aduan.sub_category === undefined) {
-        commit('SET_INFORMASI_ADUAN_SUB_CATEGORY', '')
-        commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
-      }
+    handleSubCategorySelected({ commit }) {
+      commit('SET_INFORMASI_ADUAN_SUB_CATEGORY', '')
+      commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
+    },
+    resetCategoryOthers({ commit }) {
+      commit('SET_INFORMASI_ADUAN_CATEGORY_CHILD_ID', '')
+    },
+    resetSubCategoryOthers({ commit }) {
+      commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
     },
     previousStep({ commit, state }) {
       const { currentFormStep } = state
@@ -450,14 +455,7 @@ export default {
         }, delay)
       })
     },
-    updateSubmitProgress({ state }, { progress, delay }) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          state.statusSubmitForm.progress = progress
-          resolve()
-        }, delay)
-      })
-    },
+    updateSubmitProgress({ state }, { progress, delay }) {},
     async handleImagesFile({ state, getters, dispatch }, files) {
       for (const file of files) {
         // Validate Image
@@ -629,6 +627,14 @@ export default {
 
         if (state.foto_aduan.images.length === 0) {
           await dispatch('handleImage', state.foto_aduan.raw_image)
+        }
+
+        if (!state.informasi_aduan.category.includes('lainnya')) {
+          await dispatch('resetCategoryOthers')
+        }
+
+        if (!state.informasi_aduan.sub_category.includes('lainnya')) {
+          await dispatch('resetSubCategoryOthers')
         }
 
         const citizenComplaintForm = await dispatch('generateFormData')
