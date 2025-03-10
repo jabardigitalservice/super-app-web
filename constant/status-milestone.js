@@ -85,10 +85,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'verfication.svg',
     fillColor: '#FF7500',
     phase: 'authorization',
-    // TODO: CONFIRMATION THIS VALUE FOR WHAT IN STATUS
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   failed: {
     id: 'failed',
@@ -96,9 +92,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'failed-verification.svg',
     fillColor: '#F44336',
     phase: 'verification',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   diverted_to_span: {
     id: 'diverted_to_span',
@@ -106,9 +99,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'cordination.svg',
     fillColor: '#1E88E5',
     phase: 'authorization',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   rejected: {
     id: 'rejected',
@@ -116,9 +106,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'rejected.svg',
     fillColor: '#F44336',
     phase: 'authorization',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   followup: {
     id: 'followup',
@@ -126,9 +113,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'follow-up.svg',
     fillColor: '#FF7500',
     phase: 'coordination',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   postponed: {
     id: 'postponed',
@@ -136,9 +120,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'delayed.svg',
     fillColor: '#AB47BC',
     phase: 'coordination',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   review: {
     id: 'review',
@@ -146,9 +127,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'review.svg',
     fillColor: '#FF7500',
     phase: 'coordination',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   finished: {
     id: 'finished',
@@ -156,9 +134,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'done.svg',
     fillColor: '#1E88E5',
     phase: 'coordination',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   coordinated: {
     id: 'coordinated',
@@ -166,9 +141,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'cordination.svg',
     fillColor: '#1E88E5',
     phase: 'coordination',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   unverified: {
     id: 'unverified',
@@ -176,9 +148,6 @@ export const newDataStatusMilestone = Object.freeze({
     icon: 'waiting.svg',
     fillColor: '#FF7500',
     phase: 'verification',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
   directed_to_hotline_jabar: {
     id: 'directed_to_hotline_jabar',
@@ -186,8 +155,5 @@ export const newDataStatusMilestone = Object.freeze({
     phase: 'verification',
     icon: 'headset.svg',
     fillColor: '#1E88E5',
-    non_prov_alias: '',
-    is_prov_responsibility: '',
-    order: '',
   },
 })
