@@ -43,6 +43,7 @@ export default {
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
     '~/plugins/aduan-get-token.js',
+    '~/plugins/unleash.client.js',
   ],
 
   render: {
@@ -120,6 +121,10 @@ export default {
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
     },
     urlFile: process.env.URL_FILE,
+    unleash: {
+      unleashURL: process.env.UNLEASH_URL,
+      unleashToken: process.env.UNLEASH_TOKEN,
+    },
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
