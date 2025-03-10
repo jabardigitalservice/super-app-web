@@ -25,7 +25,7 @@
               class="hidden"
             />
             <div
-              class="max-w-[328px] h-full rounded-xl border bg-white grid grid-cols-[1fr,16px] gap-2 py-4 px-3"
+              class="md:max-w-[328px] w-full h-full rounded-xl border bg-white grid grid-cols-[1fr,16px] gap-2 py-4 px-3"
               :class="{
                 'border-gray-300': !errors[0],
                 'border-red-600': errors[0],
@@ -83,7 +83,6 @@
       </div>
     </div>
 
-    <!-- TODO: FLOWNYA JIKA MEMILIH KATEGORI LAINNYA, MAKA MUNCUL CATEGORY_CHILD_ID FREETEXT -->
     <ValidationProvider
       v-slot="{ errors }"
       rules="required"
@@ -105,11 +104,27 @@
       />
     </ValidationProvider>
 
-    <!-- TODO: FLOWNYA JIKA MEMILIH KATEGORI LAINNYA, MAKA MUNCUL SUB_CATEGORY_CHILD_ID FREETEXT -->
     <ValidationProvider
-      v-if="!isSubcategory"
+      v-if="isCategorySelectLainnya"
       v-slot="{ errors }"
-      :rules="isSubcategory ? '' : 'required'"
+      :rules="isCategorySelectLainnya ? 'required|max:50' : ''"
+      class="flex flex-col gap-2 z-10"
+      name="Kategori lainnya"
+    >
+      <JdsInputText
+        id="categoryLainnya"
+        v-model="setValueCategoryChildId"
+        name="categoryLainnya"
+        class="cursor-pointer w-full"
+        :error-message="errors[0]"
+        placeholder="Masukkan disini"
+      />
+    </ValidationProvider>
+
+    <ValidationProvider
+      v-if="!isCategorySelectLainnya"
+      v-slot="{ errors }"
+      :rules="isCategorySelectLainnya ? '' : 'required'"
       tag="section"
       class="flex flex-col gap-2"
       name="Sub Kategori"
@@ -126,29 +141,23 @@
         filterable
         filter-type="contain"
         placeholder="Pilih sub kategori"
-        :disabled="isSubcategory"
+        :disabled="isCategorySelectLainnya"
         :error-message="errors[0]"
         :options="subCategoriesOption"
       />
     </ValidationProvider>
 
     <ValidationProvider
-      v-if="isSubcategory"
+      v-if="isSubCategorySelectLainnya"
       v-slot="{ errors }"
-      :rules="isSubcategory ? 'required' : ''"
+      :rules="isSubCategorySelectLainnya ? 'required|max:50' : ''"
       class="flex flex-col gap-2 z-10"
-      name="Sub Kategori - lainnya"
+      name="Sub Kategori lainnya"
     >
-      <label
-        for="otherSubCategoy"
-        class="font-roboto font-medium text-black text-sm"
-      >
-        Sub Kategori <span class="text-red-500">*</span>
-      </label>
       <JdsInputText
-        id="otherSubCategoy"
-        v-model="setValueOtherSubCategory"
-        name="otherSubCategoy"
+        id="subCategoryLainnya"
+        v-model="setValueSubCategoryChildId"
+        name="subCategoryLainnya"
         class="cursor-pointer w-full"
         :error-message="errors[0]"
         placeholder="Masukkan disini"
@@ -249,9 +258,18 @@ export default {
       'categoriesOption',
       'subCategoriesOption',
     ]),
-    isSubcategory() {
+    isCategorySelectLainnya() {
       if (this.informasi_aduan?.category) {
         return this.informasi_aduan?.category?.includes('lainnya')
+      }
+      return false
+    },
+    isSubCategorySelectLainnya() {
+      if (this.informasi_aduan?.sub_category) {
+        return (
+          this.informasi_aduan?.sub_category?.includes('lainnya') &&
+          !this.informasi_aduan?.category?.includes('lainnya')
+        )
       }
       return false
     },
@@ -314,13 +332,24 @@ export default {
         )
       },
     },
-    setValueOtherSubCategory: {
+    setValueCategoryChildId: {
       get() {
-        return this.informasi_aduan.sub_category_other
+        return this.informasi_aduan.category_child_id
       },
       set(value) {
         this.$store.commit(
-          'citizenComplaintForm/SET_INFORMASI_ADUAN_SUB_CATEGORY_OTHER',
+          'citizenComplaintForm/SET_INFORMASI_ADUAN_CATEGORY_CHILD_ID',
+          value
+        )
+      },
+    },
+    setValueSubCategoryChildId: {
+      get() {
+        return this.informasi_aduan.subcategory_child_id
+      },
+      set(value) {
+        this.$store.commit(
+          'citizenComplaintForm/SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID',
           value
         )
       },

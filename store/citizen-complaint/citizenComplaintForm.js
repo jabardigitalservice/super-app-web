@@ -40,11 +40,9 @@ const getDefaultState = () => ({
     category: '',
     category_option: [],
     sub_category: '',
-    sub_category_other: '',
     sub_category_option: [],
     title: '',
     reason: '',
-    // TODO: TAMBAHKAN FLOW UNTUK VALUE LAINNYA
     category_child_id: '',
     subcategory_child_id: '',
   },
@@ -158,8 +156,11 @@ export default {
     SET_INFORMASI_ADUAN_SUB_CATEGORY(state, payload) {
       state.informasi_aduan.sub_category = payload
     },
-    SET_INFORMASI_ADUAN_SUB_CATEGORY_OTHER(state, payload) {
-      state.informasi_aduan.sub_category_other = payload
+    SET_INFORMASI_ADUAN_CATEGORY_CHILD_ID(state, payload) {
+      state.informasi_aduan.category_child_id = payload
+    },
+    SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID(state, payload) {
+      state.informasi_aduan.subcategory_child_id = payload
     },
     SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION(state, payload) {
       state.informasi_aduan.sub_category_option = payload
@@ -214,7 +215,7 @@ export default {
       const lokasiAduan = state.lokasi_aduan
       const user = state.data_wargi
 
-      return {
+      const formComplaint = {
         source_id: 'sapawarga', // jotform, sp4n, sapawarga, portaljabar
         user_name: user.name,
         user_phone: user.nik,
@@ -222,9 +223,7 @@ export default {
         title: infoAduan.title,
         description: infoAduan.reason,
         category_id: infoAduan.category,
-        sub_category_id: infoAduan.category.includes('lainnya')
-          ? infoAduan.sub_category_other
-          : infoAduan.sub_category,
+        sub_category_id: infoAduan.sub_category,
         is_secret: infoAduan.type !== 'public',
         is_anonymous: infoAduan.is_anonymous,
         province_id: lokasiAduan.province_id,
@@ -239,12 +238,12 @@ export default {
         longitude: `${lokasiAduan.location.lng}`,
         latitude: `${lokasiAduan.location.lat}`,
         address_detail: lokasiAduan.address_detail,
-        // TODO: TAMBAHKAN VALUE UNTUK FORM STEP TWO
-        category_child_id: '',
-        subcategory_child_id: '',
-        // TODO: KONFIRMASI TERKAIT URL IMAGES, yg disimpan bukan URL nya saat ini , hanya url tempat penyimpanan
+        category_child_id: infoAduan.category_child_id,
+        subcategory_child_id: infoAduan.subcategory_child_id,
         photos: [...state.foto_aduan.images],
       }
+
+      return formComplaint
     },
     async fetchCategories({ commit, state }, localStorageKey) {
       try {
@@ -318,20 +317,26 @@ export default {
         }
 
         dispatch('fetchSubCategories', params)
+        dispatch('handleSubCategorySelected')
       }
 
       if (state.informasi_aduan.category === undefined) {
         commit('SET_INFORMASI_ADUAN_CATEGORY', '')
-
         commit('SET_INFORMASI_ADUAN_SUB_CATEGORY', '')
-        commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OTHER', '')
+        commit('SET_INFORMASI_ADUAN_CATEGORY_CHILD_ID', '')
+        commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
         commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION', '')
       }
     },
-    handleSubCategorySelected({ state, commit }) {
-      if (state.lokasi_aduan.sub_category === undefined) {
-        commit('SET_INFORMASI_ADUAN_SUB_CATEGORY', '')
-      }
+    handleSubCategorySelected({ commit }) {
+      commit('SET_INFORMASI_ADUAN_SUB_CATEGORY', '')
+      commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
+    },
+    resetCategoryOthers({ commit }) {
+      commit('SET_INFORMASI_ADUAN_CATEGORY_CHILD_ID', '')
+    },
+    resetSubCategoryOthers({ commit }) {
+      commit('SET_INFORMASI_ADUAN_SUBCATEGORY_CHILD_ID', '')
     },
     previousStep({ commit, state }) {
       const { currentFormStep } = state
@@ -450,14 +455,7 @@ export default {
         }, delay)
       })
     },
-    updateSubmitProgress({ state }, { progress, delay }) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          state.statusSubmitForm.progress = progress
-          resolve()
-        }, delay)
-      })
-    },
+    updateSubmitProgress({ state }, { progress, delay }) {},
     async handleImagesFile({ state, getters, dispatch }, files) {
       for (const file of files) {
         // Validate Image
@@ -629,6 +627,14 @@ export default {
 
         if (state.foto_aduan.images.length === 0) {
           await dispatch('handleImage', state.foto_aduan.raw_image)
+        }
+
+        if (!state.informasi_aduan.category.includes('lainnya')) {
+          await dispatch('resetCategoryOthers')
+        }
+
+        if (!state.informasi_aduan.sub_category.includes('lainnya')) {
+          await dispatch('resetSubCategoryOthers')
         }
 
         const citizenComplaintForm = await dispatch('generateFormData')

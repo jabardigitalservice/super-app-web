@@ -107,6 +107,11 @@ export default {
             complaint_id: detailData.complaint_id,
             description: detailData.description,
             complaint_category: detailData.complaint_category.name,
+            complaint_sub_category: detailData.complaint_subcategory.name,
+            complaint_category_child_name:
+              detailData.complaint_category_child.name,
+            complaint_subcategory_child_name:
+              detailData.complaint_subcategory_child.name,
             address: {
               long: Number(detailData.longitude),
               lat: Number(detailData.latitude),
@@ -114,6 +119,7 @@ export default {
             },
             photos: detailData.photos,
             complaint_status_id: detailData.complaint_status_id,
+            title: detailData.title,
             updated_at: formatDate(
               detailData?.updated_at,
               'EEEE, dd MMMM yyyy - HH:mm'
@@ -126,7 +132,7 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        this.complaintData = {}
+        this.resetDataDetailAndTracking()
         this.errorMessage = error.response.data.message || ''
         if (error.response.data.code === '4011400') {
           this.getToken()
@@ -153,7 +159,7 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        this.trackingData = []
+        this.resetDataDetailAndTracking()
         this.errorMessage = error.response.data.message || ''
       } finally {
         this.isLoadingTracking = false
@@ -169,6 +175,7 @@ export default {
     resetDataDetailAndTracking() {
       this.complaintData = {}
       this.trackingData = []
+      this.lastStatus = ''
     },
   },
 }
