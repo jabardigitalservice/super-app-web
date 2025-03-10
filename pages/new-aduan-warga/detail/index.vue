@@ -53,6 +53,10 @@ export default {
     HistoryComplaint: () => import('@/components/TrackingComplaint/History'),
     DetailComplaint: () => import('@/components/TrackingComplaint/Detail'),
   },
+  middleware: 'unleash',
+  meta: {
+    featureFlag: 'SAPAWARGA-WEB__ADUAN--ADUAN-TRACKING',
+  },
   data() {
     return {
       tabItems: ['Riwayat Aduan', 'Detail Aduan'],

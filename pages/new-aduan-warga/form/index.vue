@@ -167,6 +167,10 @@ export default {
     this.resetForm()
     next()
   },
+  middleware: 'unleash',
+  meta: {
+    featureFlag: 'SAPAWARGA-WEB__ADUAN--ADUAN-FORM',
+  },
   data() {
     return {
       isLoading: true,
