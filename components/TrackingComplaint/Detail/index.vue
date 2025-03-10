@@ -20,46 +20,62 @@
 
         <hr class="my-3" />
 
-        <div class="flex flex-col gap-1">
-          <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
-          <p class="font-lato text-sm text-gray-900">
-            {{ complaintData.complaint_category || '-' }}
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
-          <p class="font-lato text-sm text-gray-900">
-            {{ complaintData.description || '-' }}
-          </p>
-        </div>
-
-        <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
+        <div class="flex flex-col gap-y-3">
           <div class="flex flex-col gap-1">
-            <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+            <h3 class="font-lato text-xs text-gray-500">Judul Aduan</h3>
             <p class="font-lato text-sm text-gray-900">
-              {{ location.address || '-' }}
-            </p>
-            <p class="font-lato text-xs text-gray-500">
-              <span>Lat: {{ complaintData?.address?.lat || '-' }}</span>
-              <span>Long: {{ complaintData?.address?.long || '-' }}</span>
+              {{ complaintData.title || '-' }}
             </p>
           </div>
-          <button @click="showLocationModal = true">
-            <img
-              src="/images/see-map.webp"
-              width="55"
-              height="45"
-              alt="gambar lihat peta"
-            />
-          </button>
-        </div>
 
-        <div class="flex flex-col gap-1">
-          <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
-          <p class="font-lato text-sm text-gray-900">
-            {{ complaintData?.address?.detail || '-' }}
-          </p>
+          <div class="flex flex-col gap-1">
+            <h3 class="font-lato text-xs text-gray-500">Kategori Aduan</h3>
+            <p class="font-lato text-sm text-gray-900">
+              {{ getCategoryName() }}
+            </p>
+          </div>
+
+          <div v-if="getSubCategoryName() !== ''" class="flex flex-col gap-1">
+            <h3 class="font-lato text-xs text-gray-500">Sub Kategori Aduan</h3>
+            <p class="font-lato text-sm text-gray-900">
+              {{ getSubCategoryName() }}
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <h3 class="font-lato text-xs text-gray-500">Permasalahan</h3>
+            <p class="font-lato text-sm text-gray-900">
+              {{ complaintData.description || '-' }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-[1fr,60px] gap-3 justify-between">
+            <div class="flex flex-col gap-1">
+              <h3 class="font-lato text-xs text-gray-500">Lokasi Aduan</h3>
+              <p class="font-lato text-sm text-gray-900">
+                {{ location.address || '-' }}
+              </p>
+              <p class="font-lato text-xs text-gray-500">
+                <span>Lat: {{ complaintData?.address?.lat || '-' }}</span>
+                <span>Long: {{ complaintData?.address?.long || '-' }}</span>
+              </p>
+            </div>
+            <button @click="showLocationModal = true">
+              <img
+                src="/images/see-map.webp"
+                width="55"
+                height="45"
+                alt="gambar lihat peta"
+              />
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <h3 class="font-lato text-xs text-gray-500">Detail Lokasi</h3>
+            <p class="font-lato text-sm text-gray-900">
+              {{ complaintData?.address?.detail || '-' }}
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -98,6 +114,7 @@ export default {
       default: () => ({
         complaint_id: '',
         complaint_category: '',
+        complaint_sub_category: '',
         description: '',
         address: {
           lat: 0,
@@ -106,6 +123,9 @@ export default {
         },
         photos: [],
         complaint_status_id: '',
+        title: '',
+        complaint_category_child_name: '',
+        complaint_subcategory_child_name: '',
       }),
     },
     isLoadingDetail: {
@@ -158,6 +178,27 @@ export default {
     getPlaceDetail(place) {
       this.location.name = place.name ?? ''
       this.location.address = place.formatted_address ?? ''
+    },
+    getCategoryName() {
+      const category = this.complaintData?.complaint_category || '-'
+      if (this.complaintData?.complaint_category_child_name) {
+        return `${category} - ${this.complaintData?.complaint_category_child_name}`
+      }
+      return category
+    },
+    getSubCategoryName() {
+      let subCategory = ''
+      if (this.complaintData?.complaint_sub_category) {
+        subCategory = this.complaintData?.complaint_sub_category
+        subCategory = subCategory
+          .replace(this.complaintData?.complaint_category, ' ')
+          .trim()
+      }
+
+      if (this.complaintData?.complaint_subcategory_child_name) {
+        return `${subCategory} - ${this.complaintData?.complaint_subcategory_child_name}`
+      }
+      return subCategory
     },
   },
 }
