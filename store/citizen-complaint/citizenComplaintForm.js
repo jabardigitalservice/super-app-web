@@ -28,7 +28,7 @@ const getDefaultState = () => ({
   currentFormStep: 1,
   // data_wargi as step-one
   data_wargi: {
-    nik: '',
+    phone: '',
     name: '',
     email: '',
     is_email_valid: false,
@@ -132,8 +132,8 @@ export default {
     SET_CURRENT_FORM_STEP(state, payload) {
       state.currentFormStep = payload
     },
-    SET_DATA_WARGI_NIK(state, payload) {
-      state.data_wargi.nik = payload
+    SET_DATA_WARGI_PHONE(state, payload) {
+      state.data_wargi.phone = payload
     },
     SET_DATA_WARGI_NAME(state, payload) {
       state.data_wargi.name = payload
@@ -218,7 +218,7 @@ export default {
       const formComplaint = {
         source_id: 'sapawarga', // jotform, sp4n, sapawarga, portaljabar
         user_name: user.name,
-        user_phone: user.nik,
+        user_phone: user.phone,
         user_email: user.email,
         title: infoAduan.title,
         description: infoAduan.reason,

@@ -2,41 +2,19 @@
   <section class="grid grid-cols-1 gap-x-8 gap-y-4 mb-4">
     <ValidationProvider
       v-slot="{ errors }"
-      rules="required|numeric|length:16"
-      tag="div"
-      class="flex flex-col gap-2 mb-5"
-      name="NIK"
-    >
-      <img
-        src="/images/ilustrasi-ktp.webp"
-        alt="Pria dengan NIK"
-        width="120px"
-        height="120px"
-        class="mb-4"
-        loading="eager"
-      />
-      <label
-        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
-        for="nik"
-      >
-        NIK <span class="text-red-500">*</span>
-      </label>
-      <JdsInputText
-        id="nik"
-        v-model="setNik"
-        class="cursor-pointer w-full"
-        :error-message="errors[0]"
-        placeholder="Masukkan NIK"
-      />
-    </ValidationProvider>
-
-    <ValidationProvider
-      v-slot="{ errors }"
       tag="div"
       class="flex flex-col gap-2 mb-5"
       name="Nama"
       rules="required"
     >
+      <img
+        src="/images/ilustrasi-ktp.webp"
+        alt="Icon User"
+        width="120px"
+        height="120px"
+        class="mb-4"
+        loading="eager"
+      />
       <label
         class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
         for="name"
@@ -49,6 +27,28 @@
         class="cursor-pointer w-full"
         :error-message="errors[0]"
         placeholder="Masukkan nama sesuai KTP"
+      />
+    </ValidationProvider>
+
+    <ValidationProvider
+      v-slot="{ errors }"
+      rules="required|phoneNumber|numeric|min:10"
+      tag="div"
+      class="flex flex-col gap-2 mb-5"
+      name="No Kontak"
+    >
+      <label
+        class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm"
+        for="phone"
+      >
+        No Kontak <span class="text-red-500">*</span>
+      </label>
+      <JdsInputText
+        id="phone"
+        v-model="setPhone"
+        class="cursor-pointer w-full"
+        :error-message="errors[0]"
+        placeholder="Masukkan No Kontak"
       />
     </ValidationProvider>
 
@@ -148,12 +148,12 @@ export default {
   computed: {
     ...mapState('citizenComplaintForm', ['data_wargi']),
     ...mapGetters('citizenComplaintForm', ['email', 'isEmailValid']),
-    setNik: {
+    setPhone: {
       get() {
-        return this.data_wargi.nik
+        return this.data_wargi.phone
       },
       set(value) {
-        this.$store.commit('citizenComplaintForm/SET_DATA_WARGI_NIK', value)
+        this.$store.commit('citizenComplaintForm/SET_DATA_WARGI_PHONE', value)
       },
     },
     setName: {
