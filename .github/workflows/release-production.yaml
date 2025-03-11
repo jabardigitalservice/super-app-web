@@ -52,7 +52,16 @@ jobs:
             kv-superapp-service-production/data/web NEW_RELIC_APPLICATION_ID | NEW_RELIC_APPLICATION_ID ;
             kv-superapp-service-production/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
             kv-superapp-service-production/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
-            kv-superapp-service-production/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN
+            kv-superapp-service-production/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN ;
+            kv-superapp-service-production/data/web KEYCLOAK_URL | KEYCLOAK_URL ;
+            kv-superapp-service-production/data/web KEYCLOAK_CLIENT_ID_PARTNER | KEYCLOAK_CLIENT_ID_PARTNER ;
+            kv-superapp-service-production/data/web KEYCLOAK_CLIENT_SECRET_PARTNER | KEYCLOAK_CLIENT_SECRET_PARTNER ;
+            kv-superapp-service-production/data/web X_PARTNER_ID | X_PARTNER_ID ;
+            kv-superapp-service-production/data/web GOOGLE_MAPS_API | GOOGLE_MAPS_API ;
+            kv-superapp-service-production/data/web URL_FILE | URL_FILE ;
+            kv-superapp-service-production/data/web NODE_ENV | NODE_ENV ;
+            kv-superapp-service-production/data/web UNLEASH_URL | UNLEASH_URL ;
+            kv-superapp-service-production/data/web UNLEASH_TOKEN | UNLEASH_TOKEN
 
       - name: 🔨 Build and Push 📦
         uses: docker/build-push-action@v4
@@ -75,6 +84,16 @@ jobs:
             BASE_URL_ADUAN=${{env.BASE_URL_ADUAN}}
             USERNAME_URL_ADUAN=${{env.USERNAME_URL_ADUAN}}
             PASSWORD_URL_ADUAN=${{env.PASSWORD_URL_ADUAN}}
+            KEYCLOAK_URL=${{env.KEYCLOAK_URL}}
+            KEYCLOAK_CLIENT_ID_PARTNER=${{env.KEYCLOAK_CLIENT_ID_PARTNER}}
+            KEYCLOAK_CLIENT_SECRET_PARTNER=${{env.KEYCLOAK_CLIENT_SECRET_PARTNER}}
+            X_PARTNER_ID=${{env.X_PARTNER_ID}}
+            GOOGLE_MAPS_API=${{env.GOOGLE_MAPS_API}}
+            URL_FILE=${{env.URL_FILE}}
+            NODE_ENV=${{env.NODE_ENV}}
+            UNLEASH_URL=${{env.UNLEASH_URL}}
+            UNLEASH_TOKEN=${{env.UNLEASH_TOKEN}}
+
 
       ## GitOps
       - name: ⚙️ GitOps ArgoCD Setup
@@ -117,7 +136,8 @@ jobs:
               - title: Release Superapp Web v${{ env.version }} to production
               - project: Sapawarga
               - participants: " \
-                          "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/merge_requests")
+            --data-urlencode "labels=CES-superapp-web" \
+            "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/merge_requests")
 
           MR_URL=$(echo $MR_RESPONSE | jq -r '.web_url')
           echo "mr_url=$MR_URL" >> $GITHUB_OUTPUT
