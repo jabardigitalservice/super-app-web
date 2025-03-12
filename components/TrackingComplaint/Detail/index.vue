@@ -99,7 +99,7 @@
     >
       <div class="space-y-3">
         <BaseMap
-          v-show="coordsLocation"
+          v-if="coordsLocation"
           :coords="coordsLocation"
           :zoom="16"
           @set:place="getPlaceDetail"
