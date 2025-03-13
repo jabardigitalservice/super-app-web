@@ -2,9 +2,9 @@
   <div class="w-full">
     <div v-for="(milestone, index) in dataMilestone" :key="`history-${index}`">
       <div
-        class="grid grid-cols-[minmax(30px,max-content),minmax(30px,min-content),1fr] gap-2 mt-3"
+        class="flex flex-row md:grid md:grid-cols-[minmax(30px,max-content),minmax(30px,min-content),1fr] gap-2 mt-3"
       >
-        <div class="sm:w-full w-[100px]">
+        <div class="w-[150px] mr-3 md:flex hidden">
           <span
             class="font-lato text-xs text-blue-gray-300 dark:text-dark-text-low"
           >
@@ -34,19 +34,21 @@
         </div>
 
         <div class="w-full mt-1">
+          <span
+            class="font-lato text-xs text-blue-gray-300 dark:text-dark-text-low float-right mb-2 md:hidden"
+          >
+            {{ formatDate(milestone.date, 'dd MMMM yyyy - HH:mm') }}
+          </span>
           <div class="card-milestone">
             <div class="text-milestone">
               <p class="label-text">
-                {{
-                  milestone.status ===
-                  newDataStatusMilestone.unverified.textStatus
-                    ? 'Aduan Anda sedang'
-                    : 'Aduan Anda telah'
-                }}
+                {{ getHelperText(milestone.status) }}
               </p>
-              <p class="detail-text flex flex-col gap-y-1">
+              <p class="detail-text flex flex-col md:flex-row gap-x-1">
                 <span>{{ milestone.status }}</span>
-                <span class="label-text">oleh</span>
+                <span class="label-text">
+                  {{ getVerbText(milestone.status) }}</span
+                >
                 <span>{{ milestone.pic }}</span>
               </p>
             </div>
@@ -226,6 +228,19 @@ export default {
     openModalImages(images) {
       this.isOpenImage = true
       this.fileImages = images
+    },
+    getHelperText(status) {
+      return [
+        newDataStatusMilestone.unverified.textStatus,
+        newDataStatusMilestone.followup.textStatus,
+      ].includes(status)
+        ? 'Aduan Anda sedang'
+        : 'Aduan Anda telah'
+    },
+    getVerbText(status) {
+      return [newDataStatusMilestone.coordinated.textStatus].includes(status)
+        ? 'ke'
+        : 'oleh'
     },
   },
 }
