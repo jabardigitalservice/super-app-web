@@ -37,16 +37,13 @@
           <div class="card-milestone">
             <div class="text-milestone">
               <p class="label-text">
-                {{
-                  milestone.status ===
-                  newDataStatusMilestone.unverified.textStatus
-                    ? 'Aduan Anda sedang'
-                    : 'Aduan Anda telah'
-                }}
+                {{ getHelperText(milestone.status) }}
               </p>
-              <p class="detail-text flex flex-col gap-y-1">
+              <p class="detail-text flex flex-row gap-x-1">
                 <span>{{ milestone.status }}</span>
-                <span class="label-text">oleh</span>
+                <span class="label-text">
+                  {{ getVerbText(milestone.status) }}</span
+                >
                 <span>{{ milestone.pic }}</span>
               </p>
             </div>
@@ -226,6 +223,19 @@ export default {
     openModalImages(images) {
       this.isOpenImage = true
       this.fileImages = images
+    },
+    getHelperText(status) {
+      return [
+        newDataStatusMilestone.unverified.textStatus,
+        newDataStatusMilestone.followup.textStatus,
+      ].includes(status)
+        ? 'Aduan Anda sedang'
+        : 'Aduan Anda telah'
+    },
+    getVerbText(status) {
+      return [newDataStatusMilestone.coordinated.textStatus].includes(status)
+        ? 'ke'
+        : 'oleh'
     },
   },
 }
