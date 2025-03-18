@@ -8,7 +8,7 @@
           <span
             class="font-lato text-xs text-blue-gray-300 dark:text-dark-text-low"
           >
-            {{ formatDate(milestone.date, 'dd MMMM yyyy - HH:mm') }}
+            {{ formatDate(milestone?.date, 'dd MMMM yyyy - HH:mm') }}
           </span>
         </div>
 
@@ -17,12 +17,12 @@
             class="mt-1 flex items-center justify-center border dark:border-dark-emphasis-medium w-[26px] h-[26px] bg-gray-50 rounded-lg dark:bg-dark-emphasis-medium"
           >
             <BaseIconSvg
-              :icon="`/icon/${getIconAndFillColor(milestone.status).icon}`"
+              :icon="`/icon/${getIconAndFillColor(milestone?.status).icon}`"
               class="!shadow-lg !w-[14px] !h-[14px]"
               :fill-color="
                 index > 0
                   ? '#868C89'
-                  : getIconAndFillColor(milestone.status).fillColor
+                  : getIconAndFillColor(milestone?.status).fillColor
               "
             />
           </div>
@@ -37,25 +37,25 @@
           <span
             class="font-lato text-xs text-blue-gray-300 dark:text-dark-text-low float-right mb-2 md:hidden"
           >
-            {{ formatDate(milestone.date, 'dd MMMM yyyy - HH:mm') }}
+            {{ formatDate(milestone?.date, 'dd MMMM yyyy - HH:mm') }}
           </span>
           <div class="card-milestone">
             <div class="text-milestone">
               <p class="label-text">
-                {{ getHelperText(milestone.status) }}
+                {{ getHelperText(milestone?.status) }}
               </p>
               <p class="detail-text flex flex-col md:flex-row gap-x-1">
-                <span>{{ milestone.status }}</span>
+                <span>{{ milestone?.status }}</span>
                 <span class="label-text">
-                  {{ getVerbText(milestone.status) }}</span
+                  {{ getVerbText(milestone?.status) }}</span
                 >
-                <span>{{ milestone.pic }}</span>
+                <span>{{ milestone?.pic }}</span>
               </p>
             </div>
 
             <div v-show="showPic(milestone)" class="text-milestone">
               <p class="label-text">Penanggung Jawab</p>
-              <p class="detail-text">{{ milestone.pic_name }}</p>
+              <p class="detail-text">{{ milestone?.pic_name }}</p>
             </div>
 
             <div v-show="showEstimation(milestone)" class="text-milestone">
@@ -66,30 +66,30 @@
             </div>
           </div>
 
-          <div v-show="milestone.note" class="card-milestone mt-2">
+          <div v-show="milestone?.note" class="card-milestone mt-2">
             <div class="text-milestone">
               <p class="label-text">Keterangan</p>
-              <p class="detail-text">{{ milestone.note }}</p>
+              <p class="detail-text">{{ milestone?.note }}</p>
             </div>
           </div>
 
           <div v-show="showIdSpanLapor(milestone)" class="card-milestone mt-2">
             <div class="text-milestone">
               <p class="label-text">ID Tracking SP4N LAPOR</p>
-              <p class="detail-text">{{ milestone.sp4n_id }}</p>
+              <p class="detail-text">{{ milestone?.sp4n_id }}</p>
             </div>
           </div>
 
           <TrackingComplaintAccordion
             v-show="showLogSpanLapor(milestone)"
             title="Lihat Semua Status"
-            :log-span="milestone.sp4n_histories"
+            :log-span="milestone?.sp4n_histories"
           />
 
           <BaseButton
             v-show="showEvidence(milestone)"
             class="text-xs font-bold text-white mt-2 dark:border-0 bg-green-700 hover:bg-green-600 !p-2"
-            @click="openModalEvidence(milestone.evidences)"
+            @click="openModalEvidence(milestone?.evidences)"
           >
             <BaseIconSvg
               icon="/icon/image-and-document.svg"
@@ -182,8 +182,8 @@ export default {
           newDataStatusMilestone.followup.textStatus,
           newDataStatusMilestone.postponed.textStatus,
           newDataStatusMilestone.review.textStatus,
-        ].includes(milestone.status) &&
-        (milestone.start_date || milestone.end_date)
+        ].includes(milestone?.status) &&
+        (milestone?.start_date || milestone?.end_date)
       )
     },
     showEvidence(milestone) {
@@ -192,7 +192,7 @@ export default {
           newDataStatusMilestone.postponed.textStatus,
           newDataStatusMilestone.review.textStatus,
           newDataStatusMilestone.finished.textStatus,
-        ].includes(milestone.status) && milestone.evidences.length > 0
+        ].includes(milestone?.status) && milestone?.evidences?.length > 0
       )
     },
     showPic(milestone) {
@@ -201,24 +201,24 @@ export default {
         newDataStatusMilestone.followup.textStatus,
         newDataStatusMilestone.postponed.textStatus,
         newDataStatusMilestone.review.textStatus,
-      ].includes(milestone.status)
+      ].includes(milestone?.status)
     },
     showIdSpanLapor(milestone) {
       return (
-        milestone.status ===
+        milestone?.status ===
           newDataStatusMilestone.diverted_to_span.textStatus &&
-        milestone.sp4n_id
+        milestone?.sp4n_id
       )
     },
     showLogSpanLapor(milestone) {
       return (
         milestone?.sp4n_histories?.length > 0 &&
-        milestone.status === newDataStatusMilestone.diverted_to_span.textStatus
+        milestone?.status === newDataStatusMilestone.diverted_to_span.textStatus
       )
     },
     getEstimationPeriod(milestone) {
-      const start = milestone.start_date || '-'
-      const end = milestone.end_date || '-'
+      const start = milestone?.start_date || '-'
+      const end = milestone?.end_date || '-'
       return `${start} sampai ${end}`
     },
     openModalEvidence(evidences) {
