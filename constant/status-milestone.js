@@ -81,6 +81,7 @@ export const dataStatusMilestone = Object.freeze({
 export const newDataStatusMilestone = Object.freeze({
   verified: {
     id: 'verified',
+    name: 'Terverifikasi',
     textStatus: 'Terverifikasi',
     icon: 'verfication.svg',
     fillColor: '#FF7500',
@@ -88,6 +89,7 @@ export const newDataStatusMilestone = Object.freeze({
   },
   failed: {
     id: 'failed',
+    name: 'Gagal Diverifikasi',
     textStatus: 'Gagal Diverifikasi',
     icon: 'failed-verification.svg',
     fillColor: '#F44336',
@@ -95,13 +97,15 @@ export const newDataStatusMilestone = Object.freeze({
   },
   diverted_to_span: {
     id: 'diverted_to_span',
+    name: 'Dialihkan ke SP4N Lapor',
     textStatus: 'Dialihkan ke SP4N Lapor',
     icon: 'cordination.svg',
-    fillColor: '#1E88E5',
+    fillColor: '#069550',
     phase: 'authorization',
   },
   rejected: {
     id: 'rejected',
+    name: 'Ditolak',
     textStatus: 'Ditolak',
     icon: 'rejected.svg',
     fillColor: '#F44336',
@@ -109,13 +113,15 @@ export const newDataStatusMilestone = Object.freeze({
   },
   followup: {
     id: 'followup',
+    name: 'Ditindaklanjuti',
     textStatus: 'Ditindaklanjuti',
     icon: 'follow-up.svg',
-    fillColor: '#FF7500',
+    fillColor: '#1E88E5',
     phase: 'coordination',
   },
   postponed: {
     id: 'postponed',
+    name: 'Pengerjaan Ditunda',
     textStatus: 'Pengerjaan Ditunda',
     icon: 'delayed.svg',
     fillColor: '#AB47BC',
@@ -123,6 +129,7 @@ export const newDataStatusMilestone = Object.freeze({
   },
   review: {
     id: 'review',
+    name: 'Ditinjau Ulang',
     textStatus: 'Pengerjaan Ditinjau Ulang',
     icon: 'review.svg',
     fillColor: '#FF7500',
@@ -130,13 +137,15 @@ export const newDataStatusMilestone = Object.freeze({
   },
   finished: {
     id: 'finished',
+    name: 'Selesai',
     textStatus: 'Selesai Dikerjakan',
     icon: 'done.svg',
-    fillColor: '#1E88E5',
+    fillColor: '#069550',
     phase: 'coordination',
   },
   coordinated: {
     id: 'coordinated',
+    name: 'Dikoordinasikan',
     textStatus: 'Dikoordinasikan',
     icon: 'cordination.svg',
     fillColor: '#1E88E5',
@@ -144,6 +153,7 @@ export const newDataStatusMilestone = Object.freeze({
   },
   unverified: {
     id: 'unverified',
+    name: 'Menunggu Verifikasi',
     textStatus: 'Menunggu Verifikasi',
     icon: 'waiting.svg',
     fillColor: '#FF7500',
@@ -151,9 +161,10 @@ export const newDataStatusMilestone = Object.freeze({
   },
   directed_to_hotline_jabar: {
     id: 'directed_to_hotline_jabar',
+    name: 'Dialihkan ke Hotline Jabar',
     textStatus: 'Dialihkan ke Hotline Jabar',
     phase: 'verification',
     icon: 'headset.svg',
-    fillColor: '#1E88E5',
+    fillColor: '#691B9A',
   },
 })

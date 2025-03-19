@@ -26,7 +26,7 @@ export default {
       return newDataStatusMilestone[this.status] || '-'
     },
     statusText() {
-      return this.statusData.textStatus || '-'
+      return this.statusData.name || '-'
     },
   },
 }
