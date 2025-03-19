@@ -132,7 +132,7 @@ export const newDataStatusMilestone = Object.freeze({
     name: 'Ditinjau Ulang',
     textStatus: 'Pengerjaan Ditinjau Ulang',
     icon: 'review.svg',
-    fillColor: '#FF7500',
+    fillColor: '#1A4373',
     phase: 'coordination',
   },
   finished: {
