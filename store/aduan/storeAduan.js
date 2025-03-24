@@ -2,6 +2,7 @@ const state = () => ({
   logSpan: [],
   fileAduan: [],
   fileDokumenBukti: [],
+  refreshTokenKeycloak: '',
 })
 
 const mutations = {
@@ -14,9 +15,13 @@ const mutations = {
   setFileDokumenBukti(state, fileDokumenBukti) {
     state.fileDokumenBukti = fileDokumenBukti
   },
+  setRefreshTokenKeycloak(state, refreshTokenKeycloak) {
+    state.refreshTokenKeycloak = refreshTokenKeycloak
+  },
 }
 
 export default {
+  namespaced: true,
   state,
   mutations,
 }
