@@ -69,6 +69,7 @@ export default {
       errorMessage: '',
       lastStatus: '',
       token: null,
+      grantType: 'client_credentials',
     }
   },
   computed: {
@@ -83,8 +84,8 @@ export default {
       }
     },
   },
-  mounted() {
-    this.getToken()
+  async mounted() {
+    await this.getToken()
   },
   methods: {
     formatDate,
@@ -93,7 +94,7 @@ export default {
     },
     async getToken() {
       if (!this.token) {
-        this.token = await this.$getToken()
+        this.token = await this.$getToken(this.grantType)
       }
       return this.token
     },
@@ -140,9 +141,7 @@ export default {
         console.error(error)
         this.resetDataDetailAndTracking()
         this.errorMessage = error.response.data.message || ''
-        if (error.response.data.code === '4011400') {
-          this.getToken()
-        }
+        throw error
       } finally {
         this.isLoadingDetail = false
       }
@@ -166,17 +165,30 @@ export default {
       } catch (error) {
         console.error(error)
         this.resetDataDetailAndTracking()
-        this.errorMessage = error.response.data.message || ''
+        this.errorMessage = error.response?.data?.message || ''
+        throw error
       } finally {
         this.isLoadingTracking = false
       }
     },
-    onSearch(value) {
+    async refreshTokenHandle() {
+      this.token = ''
+      this.grantType = 'refresh_token'
+      await this.getToken()
+    },
+    async onSearch(value) {
       this.search = value
       this.resetDataDetailAndTracking()
-
-      this.getDetailComplaint()
-      this.getTrackingComplaint()
+      try {
+        await this.getTrackingComplaint()
+        await this.getDetailComplaint()
+      } catch (error) {
+        if (error.response?.data?.code === '4011400') {
+          await this.refreshTokenHandle()
+          await this.getTrackingComplaint()
+          await this.getDetailComplaint()
+        }
+      }
     },
     resetDataDetailAndTracking() {
       this.complaintData = {}
