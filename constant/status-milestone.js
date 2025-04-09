@@ -100,7 +100,7 @@ export const newDataStatusMilestone = Object.freeze({
     name: 'Dialihkan ke SP4N Lapor',
     textStatus: 'Dialihkan ke SP4N Lapor',
     icon: 'cordination.svg',
-    fillColor: '#069550',
+    fillColor: '#1E88E5',
     phase: 'authorization',
   },
   rejected: {
@@ -116,7 +116,7 @@ export const newDataStatusMilestone = Object.freeze({
     name: 'Ditindaklanjuti',
     textStatus: 'Ditindaklanjuti',
     icon: 'follow-up.svg',
-    fillColor: '#1E88E5',
+    fillColor: '#FF7500',
     phase: 'coordination',
   },
   postponed: {
@@ -132,7 +132,7 @@ export const newDataStatusMilestone = Object.freeze({
     name: 'Ditinjau Ulang',
     textStatus: 'Pengerjaan Ditinjau Ulang',
     icon: 'review.svg',
-    fillColor: '#1A4373',
+    fillColor: '#FF7500',
     phase: 'coordination',
   },
   finished: {
@@ -165,6 +165,6 @@ export const newDataStatusMilestone = Object.freeze({
     textStatus: 'Dialihkan ke Hotline Jabar',
     phase: 'verification',
     icon: 'headset.svg',
-    fillColor: '#691B9A',
+    fillColor: '#FF7500',
   },
 })
