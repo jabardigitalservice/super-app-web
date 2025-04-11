@@ -98,6 +98,12 @@
             />
             Dokumen Bukti
           </BaseButton>
+          <BaseButton
+            v-show="showFormComplaint(milestone)"
+            class="text-xs font-bold text-white mt-2 dark:border-0 bg-green-700 hover:bg-green-600 !p-2"
+            @click="goToForm()"
+            >Buat Aduan Baru</BaseButton
+          >
         </div>
       </div>
     </div>
@@ -175,6 +181,12 @@ export default {
         textStatus: 'Unknown Status',
       }
     },
+    showFormComplaint(milestone) {
+      return [
+        newDataStatusMilestone.failed.textStatus,
+        newDataStatusMilestone.rejected.textStatus,
+      ].includes(milestone?.status)
+    },
     showEstimation(milestone) {
       return (
         [
@@ -241,6 +253,12 @@ export default {
       return [newDataStatusMilestone.coordinated.textStatus].includes(status)
         ? 'ke'
         : 'oleh'
+    },
+    goToForm() {
+      window.open(
+        `${this.$config.urlPortalJabar}/aduan-warga/new/buat-aduan`,
+        '_blank'
+      )
     },
   },
 }
