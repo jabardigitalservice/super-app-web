@@ -115,6 +115,7 @@ export default {
       username: process.env.USERNAME_URL_ADUAN,
       password: process.env.PASSWORD_URL_ADUAN,
     },
+    urlPortalJabar: process.env.LINK_PORTAL_JABAR,
     gmapsKey: process.env.GOOGLE_MAPS_API,
     apiAduanIdeal: {
       keycloakUrl: process.env.KEYCLOAK_URL,
