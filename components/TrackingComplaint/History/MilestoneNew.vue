@@ -217,8 +217,8 @@ export default {
       )
     },
     getEstimationPeriod(milestone) {
-      const start = formatDate(milestone?.start_date, 'dd MMM yyyy') || '-'
-      const end = formatDate(milestone?.end_date, 'dd MMM yyyy') || '-'
+      const start = formatDate(milestone?.start_date, 'dd MMM yyyy')
+      const end = formatDate(milestone?.end_date, 'dd MMM yyyy')
       return `${start} sampai ${end}`
     },
     openModalEvidence(evidences) {
