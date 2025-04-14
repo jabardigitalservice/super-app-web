@@ -1,7 +1,7 @@
 <template>
-  <div v-if="$store.state.logSpan.length > 0" class="w-full">
+  <div v-if="$store.state.aduan.logSpan.length > 0" class="w-full">
     <div
-      v-for="(log, index) in $store.state.logSpan"
+      v-for="(log, index) in $store.state.aduan.logSpan"
       :key="index"
       class="flex my-5"
     >
@@ -15,7 +15,8 @@
             />
             <span
               class="text-gray-800 mb-1 text-xs dark:text-dark-text-low ml-2"
-            >{{ log.date }}</span>
+              >{{ log.date }}</span
+            >
           </div>
         </CardLogSpan>
         <div class="font-lato mt-3 ml-8 bg-white dark:bg-black flex flex-col">
@@ -28,7 +29,8 @@
           </span>
           <span
             class="log-span text-sm text-gray-900 dark:text-dark-text-high"
-          >{{ log.keterangan }}</span>
+            >{{ log.keterangan }}</span
+          >
         </div>
       </div>
     </div>
@@ -39,7 +41,7 @@
 import CardLogSpan from './CardLogSpan.vue'
 export default {
   name: 'HistorySpanLapor',
-  components: { CardLogSpan }
+  components: { CardLogSpan },
 }
 </script>
 <style>

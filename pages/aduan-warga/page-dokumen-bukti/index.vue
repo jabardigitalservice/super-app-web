@@ -72,7 +72,7 @@ export default {
     }
   },
   mounted() {
-    this.groupingFileByExtension(this.$store.state.fileDokumenBukti)
+    this.groupingFileByExtension(this.$store.state.aduan.fileDokumenBukti)
   },
   methods: {
     getExtensionFileByUrl,
@@ -82,7 +82,7 @@ export default {
     },
     gotPageFile(file, type) {
       if (type === 'images') {
-        this.$store.commit('setFileAduan', file)
+        this.$store.commit('aduan/setFileAduan', file)
         this.$router.push({
           path: `/aduan-warga/file-aduan/${type}`,
           query: this.$route.query,
