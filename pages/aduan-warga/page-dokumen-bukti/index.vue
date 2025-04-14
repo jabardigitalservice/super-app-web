@@ -72,7 +72,7 @@ export default {
     }
   },
   mounted() {
-    this.groupingFileByExtension(this.$store.state.fileDokumenBukti)
+    this.groupingFileByExtension(this.$store.state.aduan.fileDokumenBukti)
   },
   methods: {
     getExtensionFileByUrl,
