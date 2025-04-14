@@ -24,7 +24,7 @@ export default ({ store, $config }, inject) => {
         }
       )
 
-      store.commit('aduan/setRefreshTokenKeycloak', response.data.refresh_token)
+      store.commit('setRefreshTokenKeycloak', response.data.refresh_token)
 
       return response.data.access_token
     } catch (error) {
