@@ -569,7 +569,7 @@ export default {
     },
 
     setLogSpanLapor(logSpan, idAduanSpanLapor) {
-      this.$store.commit('setLogSpan', logSpan?.reverse())
+      this.$store.commit('aduan/setLogSpan', logSpan?.reverse())
       this.$router.push({
         path: `/aduan-warga/log-span-lapor/${idAduanSpanLapor}`,
         query: this.$route.query,
@@ -598,7 +598,7 @@ export default {
         const extensionFiles = this.checkExtensionFiles(parts[parts.length - 1])
 
         if (extensionFiles === 'images') {
-          this.$store.commit('setFileAduan', fileArray)
+          this.$store.commit('aduan/setFileAduan', fileArray)
           this.$router.push({
             path: `/aduan-warga/file-aduan/${extensionFiles}`,
             query: this.$route.query,
@@ -622,13 +622,13 @@ export default {
           pdfDataArray.length === 0 &&
           documentsDataArray.length === 0
         ) {
-          this.$store.commit('setFileAduan', imagesDataArray)
+          this.$store.commit('aduan/setFileAduan', imagesDataArray)
           this.$router.push({
             path: '/aduan-warga/file-aduan/images',
             query: this.$route.query,
           })
         } else {
-          this.$store.commit('setFileDokumenBukti', fileArray)
+          this.$store.commit('aduan/setFileDokumenBukti', fileArray)
           this.$router.push({
             path: '/aduan-warga/page-dokumen-bukti',
             query: this.$route.query,

@@ -14,17 +14,14 @@
         <TextTitle>Diadukan Pada</TextTitle>
         <TextDetail>
           {{
-            formatDate(
-              dataAduan?.tanggal_update,
-              "EEEE, dd MMMM yyyy - HH:mm"
-            )
+            formatDate(dataAduan?.tanggal_update, 'EEEE, dd MMMM yyyy - HH:mm')
           }}
         </TextDetail>
       </div>
     </div>
     <div class="mt-3 flex flex-col gap-y-1">
       <TextTitle>Judul Aduan</TextTitle>
-      <TextDetail>{{ dataAduan?.judul_aduan || "-" }}</TextDetail>
+      <TextDetail>{{ dataAduan?.judul_aduan || '-' }}</TextDetail>
     </div>
     <div class="mt-3 flex flex-col gap-y-1">
       <TextTitle>Permasalahaan</TextTitle>
@@ -37,7 +34,7 @@
         class="text-green-600 font-bold leading-4 mt-2 text-left text-[12px]"
         @click="toggleTruncate"
       >
-        {{ showFullText ? "Lihat lebih sedikit" : "Lihat selengkapnya" }}
+        {{ showFullText ? 'Lihat lebih sedikit' : 'Lihat selengkapnya' }}
       </button>
     </div>
     <div
@@ -47,7 +44,9 @@
       <TextTitle> Foto Aduan </TextTitle>
       <button
         class="px-4 py-3 flex text-[12px] font-lato text-gray-800 font-bold border border-gray-300 rounded-md p-4 bg-white w-full mt-2 dark:border-0 dark:bg-dark-emphasis-medium dark:text-dark-text-high"
-        @click="goToPageFile(dataAduan.foto_bukti_kejadian_evidence.split('\n'))"
+        @click="
+          goToPageFile(dataAduan.foto_bukti_kejadian_evidence.split('\n'))
+        "
       >
         <div class="flex items-center gap-3 w-full justify-center">
           <BaseIconSvg
@@ -63,47 +62,50 @@
 </template>
 
 <script>
-import TextTitle from './TextTitle.vue'
 import TextDetail from './TextDetail.vue'
+import TextTitle from './TextTitle.vue'
+
 import { formatDate } from '~/utils'
 export default {
   name: 'DetailAduan',
   components: {
     TextTitle,
-    TextDetail
+    TextDetail,
   },
   props: {
     dataAduan: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
-  data () {
+  data() {
     return {
       maxCharacters: 250,
-      showFullText: false
+      showFullText: false,
     }
   },
   computed: {
-    isTruncated () {
+    isTruncated() {
       return this.dataAduan?.detail_aduan.length > this.maxCharacters
     },
-    truncatedText () {
+    truncatedText() {
       return this.dataAduan?.detail_aduan.length > this.maxCharacters
-        ? this.dataAduan?.detail_aduan.substring(0, this.maxCharacters) +
-            '...'
+        ? this.dataAduan?.detail_aduan.substring(0, this.maxCharacters) + '...'
         : this.dataAduan?.detail_aduan
-    }
+    },
   },
   methods: {
     formatDate,
-    toggleTruncate () {
+    toggleTruncate() {
       this.showFullText = !this.showFullText
     },
-    goToPageFile (file) {
-      this.$store.commit('setFileAduan', file)
-      this.$router.push({ path: '/aduan-warga/file-aduan/images', query: this.$route.query })
-    }
-  }
+    goToPageFile(file) {
+      this.$store.commit('aduan/setFileAduan', file)
+      this.$router.push({
+        path: '/aduan-warga/file-aduan/images',
+        query: this.$route.query,
+      })
+    },
+  },
 }
 </script>
