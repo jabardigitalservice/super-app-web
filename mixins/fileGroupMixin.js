@@ -1,17 +1,17 @@
-
 export const fileGroupMixin = {
-  data () {
+  data() {
     return {
       grupByTypeFile: {
-        images: { data: [], icon: '/icon/type-images.png' },
-        xlsx: { data: [], icon: '/icon/type-xls.png' },
-        pdf: { data: [], icon: '/icon/type-pdf.png' },
-        documents: { data: [], icon: '/icon/type-doc.png' }
-      }
+        images: { data: [], icon: '/icon/file-image.svg' },
+        xlsx: { data: [], icon: '/icon/file-excel.svg' },
+        pdf: { data: [], icon: '/icon/file-pdf.svg' },
+        documents: { data: [], icon: '/icon/file-doc.svg' },
+        powerpoint: { data: [], icon: '/icon/file-ppt.svg' },
+      },
     }
   },
   methods: {
-    groupingFileByExtension (fileArray) {
+    groupingFileByExtension(fileArray) {
       fileArray.forEach((url) => {
         const extension = this.getExtensionFileByUrl(url)
         switch (extension.toLowerCase()) {
@@ -21,6 +21,7 @@ export const fileGroupMixin = {
             this.grupByTypeFile.images.data.push(url)
             break
           case 'xlsx':
+          case 'xls':
             this.grupByTypeFile.xlsx.data.push(url)
             break
           case 'pdf':
@@ -30,10 +31,14 @@ export const fileGroupMixin = {
           case 'docx':
             this.grupByTypeFile.documents.data.push(url)
             break
+          case 'ppt':
+          case 'pptx':
+            this.grupByTypeFile.powerpoint.data.push(url)
+            break
           default:
             break
         }
       })
-    }
-  }
+    },
+  },
 }
