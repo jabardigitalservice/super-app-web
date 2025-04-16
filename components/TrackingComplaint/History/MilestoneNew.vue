@@ -110,9 +110,18 @@
 
     <BaseModal :is-open="isOpen" @close="isOpen = false">
       <template #header>
-        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-          Dokumen Bukti
-        </h4>
+        <div class="flex justify-between items-center w-full">
+          <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+            Dokumen Bukti
+          </h4>
+          <BaseButton class="p-2 border border-none" @click="isOpen = false">
+            <BaseIconSvg
+              :icon="`/icon/close-button.svg`"
+              class="!h-5 !w-5"
+              fill-color="#212121"
+            />
+          </BaseButton>
+        </div>
       </template>
       <template #content>
         <TrackingComplaintHistoryFileBukti
@@ -129,9 +138,21 @@
       @close="isOpenImage = false"
     >
       <template #header>
-        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-          Dokumen File Gambar
-        </h4>
+        <div class="flex justify-between items-center w-full">
+          <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+            Dokumen File Gambar
+          </h4>
+          <BaseButton
+            class="p-2 border border-none"
+            @click="isOpenImage = false"
+          >
+            <BaseIconSvg
+              :icon="`/icon/close-button.svg`"
+              class="!h-5 !w-5"
+              fill-color="#212121"
+            />
+          </BaseButton>
+        </div>
       </template>
       <template #content>
         <BaseImageSwiper :src="fileImages" />
