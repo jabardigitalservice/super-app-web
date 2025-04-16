@@ -217,6 +217,7 @@ export default {
           newDataStatusMilestone.postponed.name,
           newDataStatusMilestone.review.name,
         ].includes(this.getComplaintStatus(milestone?.status)) &&
+        milestone?.is_prov_responsibility &&
         (milestone?.start_date || milestone?.end_date)
       )
     },
