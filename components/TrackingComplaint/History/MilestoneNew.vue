@@ -110,9 +110,18 @@
 
     <BaseModal :is-open="isOpen" @close="isOpen = false">
       <template #header>
-        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-          Dokumen Bukti
-        </h4>
+        <div class="flex justify-between items-center w-full">
+          <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+            Dokumen Bukti
+          </h4>
+          <BaseButton class="p-2 border border-none" @click="isOpen = false">
+            <BaseIconSvg
+              :icon="`/icon/close-button.svg`"
+              class="!h-5 !w-5"
+              fill-color="#212121"
+            />
+          </BaseButton>
+        </div>
       </template>
       <template #content>
         <TrackingComplaintHistoryFileBukti
@@ -129,9 +138,21 @@
       @close="isOpenImage = false"
     >
       <template #header>
-        <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-          Dokumen File Gambar
-        </h4>
+        <div class="flex justify-between items-center w-full">
+          <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
+            Dokumen File Gambar
+          </h4>
+          <BaseButton
+            class="p-2 border border-none"
+            @click="isOpenImage = false"
+          >
+            <BaseIconSvg
+              :icon="`/icon/close-button.svg`"
+              class="!h-5 !w-5"
+              fill-color="#212121"
+            />
+          </BaseButton>
+        </div>
       </template>
       <template #content>
         <BaseImageSwiper :src="fileImages" />
@@ -164,8 +185,9 @@ export default {
   methods: {
     formatDate,
     getIconAndFillColor(textStatus) {
+      textStatus = textStatus === 'Ditunda' ? 'Pengerjaan Ditunda' : textStatus
       const statusEntry = Object.values(newDataStatusMilestone).find(
-        (status) => status.textStatus === textStatus
+        (status) => status.name === textStatus
       )
 
       if (statusEntry) {
@@ -183,37 +205,39 @@ export default {
     },
     showFormComplaint(milestone) {
       return [
-        newDataStatusMilestone.failed.textStatus,
-        newDataStatusMilestone.rejected.textStatus,
-      ].includes(milestone?.status)
+        newDataStatusMilestone.failed.name,
+        newDataStatusMilestone.rejected.name,
+      ].includes(this.getComplaintStatus(milestone?.status))
     },
     showEstimation(milestone) {
       return (
         [
-          newDataStatusMilestone.finished.textStatus,
-          newDataStatusMilestone.followup.textStatus,
-          newDataStatusMilestone.postponed.textStatus,
-          newDataStatusMilestone.review.textStatus,
-        ].includes(milestone?.status) &&
+          newDataStatusMilestone.finished.name,
+          newDataStatusMilestone.followup.name,
+          newDataStatusMilestone.postponed.name,
+          newDataStatusMilestone.review.name,
+        ].includes(this.getComplaintStatus(milestone?.status)) &&
+        milestone?.is_prov_responsibility &&
         (milestone?.start_date || milestone?.end_date)
       )
     },
     showEvidence(milestone) {
       return (
         [
-          newDataStatusMilestone.postponed.textStatus,
-          newDataStatusMilestone.review.textStatus,
-          newDataStatusMilestone.finished.textStatus,
-        ].includes(milestone?.status) && milestone?.evidences?.length > 0
+          newDataStatusMilestone.postponed.name,
+          newDataStatusMilestone.review.name,
+          newDataStatusMilestone.finished.name,
+        ].includes(this.getComplaintStatus(milestone?.status)) &&
+        milestone?.evidences?.length > 0
       )
     },
     showPic(milestone) {
       return [
-        newDataStatusMilestone.finished.textStatus,
-        newDataStatusMilestone.followup.textStatus,
-        newDataStatusMilestone.postponed.textStatus,
-        newDataStatusMilestone.review.textStatus,
-      ].includes(milestone?.status)
+        newDataStatusMilestone.finished.name,
+        newDataStatusMilestone.followup.name,
+        newDataStatusMilestone.postponed.name,
+        newDataStatusMilestone.review.name,
+      ].includes(this.getComplaintStatus(milestone?.status))
     },
     showIdSpanLapor(milestone) {
       return (
@@ -227,6 +251,9 @@ export default {
         milestone?.sp4n_histories?.length > 0 &&
         milestone?.status === newDataStatusMilestone.diverted_to_span.textStatus
       )
+    },
+    getComplaintStatus(status) {
+      return status === 'Ditunda' ? 'Pengerjaan Ditunda' : status
     },
     getEstimationPeriod(milestone) {
       const start = formatDate(milestone?.start_date, 'dd MMM yyyy')
@@ -243,14 +270,16 @@ export default {
     },
     getHelperText(status) {
       return [
-        newDataStatusMilestone.unverified.textStatus,
-        newDataStatusMilestone.followup.textStatus,
-      ].includes(status)
+        newDataStatusMilestone.unverified.name,
+        newDataStatusMilestone.followup.name,
+      ].includes(this.getComplaintStatus(status))
         ? 'Aduan Anda sedang'
         : 'Aduan Anda telah'
     },
     getVerbText(status) {
-      return [newDataStatusMilestone.coordinated.textStatus].includes(status)
+      return [newDataStatusMilestone.coordinated.name].includes(
+        this.getComplaintStatus(status)
+      )
         ? 'ke'
         : 'oleh'
     },
