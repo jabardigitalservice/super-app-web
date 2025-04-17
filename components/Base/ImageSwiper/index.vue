@@ -12,11 +12,15 @@
       :navigation="true"
       @swiper="getSwipperRefHandle"
     >
-      <swiper-slide v-for="(item, index) in src" :key="index">
+      <swiper-slide
+        v-for="(item, index) in src"
+        :key="index"
+        class="!px-[43px] !py-[26px]"
+      >
         <img
           :alt="`Foto Aduan - ${index}`"
           :src="item"
-          class="h-full w-[600px]"
+          class="h-full w-[600px] object-contain"
         />
       </swiper-slide>
     </swiper>
