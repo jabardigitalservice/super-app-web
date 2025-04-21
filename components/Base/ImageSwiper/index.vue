@@ -8,8 +8,9 @@
       :centered-slides="true"
       :mousewheel="{ releaseOnEdges: true }"
       :direction="'horizontal'"
-      :pagination="{ clickable: true }"
-      :navigation="true"
+      observer
+      observe-parents
+      navigation
       @swiper="getSwipperRefHandle"
     >
       <swiper-slide v-for="(item, index) in src" :key="index">
