@@ -12,6 +12,7 @@ export const fileGroupMixin = {
   },
   methods: {
     groupingFileByExtension(fileArray) {
+      this.resetDataFile()
       fileArray.forEach((url) => {
         const extension = this.getExtensionFileByUrl(url)
         switch (extension.toLowerCase()) {
@@ -38,6 +39,11 @@ export const fileGroupMixin = {
           default:
             break
         }
+      })
+    },
+    resetDataFile() {
+      Object.keys(this.grupByTypeFile).forEach((typeFile) => {
+        this.grupByTypeFile[typeFile].data = []
       })
     },
   },
