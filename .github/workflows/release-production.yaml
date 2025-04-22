@@ -61,7 +61,7 @@ jobs:
             kv-superapp-service-production/data/web URL_FILE | URL_FILE ;
             kv-superapp-service-production/data/web NODE_ENV | NODE_ENV ;
             kv-superapp-service-production/data/web UNLEASH_URL | UNLEASH_URL ;
-            kv-superapp-service-production/data/web UNLEASH_TOKEN | UNLEASH_TOKEN
+            kv-superapp-service-production/data/web UNLEASH_TOKEN | UNLEASH_TOKEN ;
             kv-superapp-service-production/data/web LINK_PORTAL_JABAR | LINK_PORTAL_JABAR
 
       - name: 🔨 Build and Push 📦
