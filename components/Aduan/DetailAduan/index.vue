@@ -65,7 +65,7 @@
 import TextDetail from './TextDetail.vue'
 import TextTitle from './TextTitle.vue'
 
-import { formatDate } from '~/utils'
+import { formatDate, getExtensionFileByUrl } from '~/utils'
 export default {
   name: 'DetailAduan',
   components: {
@@ -101,10 +101,16 @@ export default {
     },
     goToPageFile(file) {
       this.$store.commit('aduan/setFileAduan', file)
-      this.$router.push({
-        path: '/aduan-warga/file-aduan/images',
-        query: this.$route.query,
-      })
+      const typeFile = getExtensionFileByUrl(file[0])
+      const imageType = ['jpg', 'jpeg', 'png']
+      if (imageType.includes(typeFile.toLowerCase())) {
+        this.$router.push({
+          path: '/aduan-warga/file-aduan/images',
+          query: this.$route.query,
+        })
+      } else {
+        window.open(file[0], '_blank')
+      }
     },
   },
 }
