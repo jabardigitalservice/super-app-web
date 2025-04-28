@@ -8,12 +8,16 @@
     <div
       class="border px-[26px] py-7 border-gray-300 rounded-lg mx-auto flex flex-col gap-[16px] dark:border-dark-emphasis-medium"
     >
-      <div class="flex flex-row justify-between">
+      <div class="tracking-header">
         <TrackingComplaintHeader :id-aduan="complaintData?.complaint_id" />
-        <TrackingComplaintBadge
-          class="self-center"
-          :status="lastStatus || ''"
-        />
+        <div class="tracking-badge-wrapper">
+          <TrackingComplaintBadge
+            v-for="status in lastStatus"
+            :key="status"
+            class="self-start tracking-badge"
+            :status="status || ''"
+          />
+        </div>
       </div>
 
       <hr class="dark:border-dark-emphasis-medium" />
@@ -67,7 +71,7 @@ export default {
       isLoadingTracking: false,
       search: '',
       errorMessage: '',
-      lastStatus: '',
+      lastStatus: [],
       token: null,
       grantType: 'client_credentials',
     }
@@ -160,7 +164,17 @@ export default {
         const trackingData = data.data
         if (status === 200) {
           this.trackingData = trackingData
-          this.lastStatus = trackingData[0].current_status
+          this.lastStatus = [trackingData[0].current_status]
+          if (
+            trackingData.length > 1 &&
+            trackingData[1]?.current_status === 'directed_to_hotline_jabar' &&
+            trackingData[0]?.current_status === 'finished'
+          ) {
+            this.lastStatus = [
+              trackingData[1].current_status,
+              trackingData[0].current_status,
+            ]
+          }
         }
       } catch (error) {
         console.error(error)
@@ -198,3 +212,27 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.tracking-badge-wrapper {
+  @apply flex flex-col mt-2;
+}
+
+.tracking-badge {
+  @apply mb-3 ml-2;
+}
+
+@media (min-width: 464px) {
+  .tracking-header {
+    @apply flex flex-row justify-between items-center;
+  }
+
+  .tracking-badge-wrapper {
+    @apply mt-0 flex flex-row justify-end items-center;
+  }
+
+  .tracking-badge {
+    @apply mb-0;
+  }
+}
+</style>
