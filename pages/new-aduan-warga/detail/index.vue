@@ -88,28 +88,16 @@ export default {
       }
     },
   },
-  async mounted() {
-    await this.getToken()
-  },
   methods: {
     formatDate,
     getSelected(value) {
       this.selectedTab = value
     },
-    async getToken() {
-      if (!this.token) {
-        this.token = await this.$getToken(this.grantType)
-      }
-      return this.token
-    },
     async getDetailComplaint() {
       this.isLoadingDetail = true
       try {
         const { data, status } = await this.$axios.get(
-          `/aduan/complaints/${this.search}`,
-          {
-            headers: { Authorization: `Bearer ${this.token}` },
-          }
+          `/complaints/${this.search}`
         )
 
         const detailData = data.data
@@ -155,10 +143,7 @@ export default {
 
       try {
         const { data, status } = await this.$axios.get(
-          `/aduan/complaints/${this.search}/status`,
-          {
-            headers: { Authorization: `Bearer ${this.token}` },
-          }
+          `/complaints/status/${this.search}`
         )
 
         const trackingData = data.data
