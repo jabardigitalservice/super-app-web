@@ -42,7 +42,6 @@ export default {
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
     '~/plugins/vue-gmaps.js',
-    '~/plugins/aduan-get-token.js',
     '~/plugins/unleash.client.js',
   ],
 
