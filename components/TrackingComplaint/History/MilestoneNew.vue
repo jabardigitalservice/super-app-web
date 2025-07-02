@@ -86,7 +86,7 @@
               class="!w-3 !h-3"
               fill-color="#FFFFFF"
             />
-            Dokumen Bukti
+            Dokumen Bukti Penyelesaian
           </BaseButton>
           <BaseButton
             v-show="showFormComplaint(milestone)"
@@ -102,7 +102,7 @@
       <template #header>
         <div class="flex justify-between items-center w-full">
           <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-            Dokumen Bukti
+            Dokumen Bukti Penyelesaian
           </h4>
           <BaseButton class="p-2 border border-none" @click="isOpen = false">
             <BaseIconSvg
