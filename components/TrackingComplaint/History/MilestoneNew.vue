@@ -40,30 +40,20 @@
             {{ formatDate(milestone?.date, 'dd MMMM yyyy - HH:mm') }}
           </span>
           <div class="card-milestone">
-            <div class="text-milestone">
-              <p class="label-text">
-                {{ getHelperText(milestone?.status) }}
-              </p>
-              <p class="detail-text flex flex-col md:flex-row gap-x-1">
-                <span>{{ milestone?.status }}</span>
-                <span class="label-text">
-                  {{ getVerbText(milestone?.status) }}</span
-                >
-                <span>{{ milestone?.pic }}</span>
-              </p>
-            </div>
-
-            <div v-show="showPic(milestone)" class="text-milestone">
-              <p class="label-text">Penanggung Jawab</p>
-              <p class="detail-text">{{ milestone?.pic_name }}</p>
-            </div>
-
-            <div v-show="showEstimation(milestone)" class="text-milestone">
-              <p class="label-text">Estimasi Pengerjaan</p>
-              <p class="detail-text">
-                {{ getEstimationPeriod(milestone) }}
-              </p>
-            </div>
+            <div
+              class="text-milestone content"
+              v-html="milestone?.tracking_status_content"
+            />
+            <div
+              v-show="showPic(milestone)"
+              class="text-milestone content"
+              v-html="milestone?.tracking_pic_content"
+            />
+            <div
+              v-show="showEstimation(milestone)"
+              class="text-milestone content"
+              v-html="milestone?.tracking_deadline_content"
+            />
           </div>
 
           <div v-show="milestone?.note" class="card-milestone mt-2">
@@ -96,7 +86,7 @@
               class="!w-3 !h-3"
               fill-color="#FFFFFF"
             />
-            Dokumen Bukti
+            Dokumen Bukti Penyelesaian
           </BaseButton>
           <BaseButton
             v-show="showFormComplaint(milestone)"
@@ -112,7 +102,7 @@
       <template #header>
         <div class="flex justify-between items-center w-full">
           <h4 class="font-bold text-[21px] leading-[34px] text-green-700">
-            Dokumen Bukti
+            Dokumen Bukti Penyelesaian
           </h4>
           <BaseButton class="p-2 border border-none" @click="isOpen = false">
             <BaseIconSvg
@@ -216,6 +206,7 @@ export default {
           newDataStatusMilestone.followup.name,
           newDataStatusMilestone.postponed.name,
           newDataStatusMilestone.review.name,
+          newDataStatusMilestone.coordinated.name,
         ].includes(this.getComplaintStatus(milestone?.status)) &&
         milestone?.is_prov_responsibility &&
         (milestone?.start_date || milestone?.end_date)
@@ -299,7 +290,7 @@ export default {
 }
 
 .label-text {
-  @apply text-blue-gray-300 dark:text-dark-text-low dark:text-opacity-60;
+  @apply text-blue-gray-300 text-[11px] dark:text-dark-text-low dark:text-opacity-60;
 }
 
 .detail-text {
@@ -308,5 +299,12 @@ export default {
 
 .text-milestone {
   @apply font-lato flex flex-col text-xs mt-2 gap-y-1;
+}
+
+.text-milestone::v-deep.content p {
+  @apply text-blue-gray-300 dark:text-dark-text-low dark:text-opacity-60;
+}
+.text-milestone::v-deep.content strong {
+  @apply text-blue-gray-800 font-normal text-xs dark:text-dark-text-high;
 }
 </style>
