@@ -20,7 +20,6 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "eslint-config-prettier": "^10.0.1",
-    "newrelic": "^9.9.0",
     "nuxt": "^2.15.8",
     "swiper-vue2": "^1.0.10",
     "unleash-proxy-client": "^3.7.3",
