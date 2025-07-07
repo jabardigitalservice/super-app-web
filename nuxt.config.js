@@ -1,13 +1,3 @@
-let newRelic = {}
-if (process.env.NODE_ENV === 'production') {
-  newRelic = {
-    src: '/newrelic-script.js',
-    'data-account-id': `${process.env.NEW_RELIC_ACCOUNT_ID}`,
-    'data-browser-license-key': `${process.env.NEW_RELIC_BROWSER_LICENSE_KEY}`,
-    'data-application-id': `${process.env.NEW_RELIC_APPLICATION_ID}`,
-  }
-}
-
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -26,7 +16,6 @@ export default {
       { name: 'supported-color-schemes', content: 'light dark' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
-    script: [newRelic],
     __dangerouslyDisableSanitizers: ['script'],
   },
 
@@ -36,7 +25,6 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/vue-gtag.js',
-    '~/plugins/newrelic-plugins.server.js',
     '~/plugins/aduan-api.js',
     { src: '~/plugins/dark-mode.js', mode: 'client' },
     { src: '~/plugins/vee-validate.js', mode: 'client' },
