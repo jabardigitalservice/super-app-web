@@ -6,25 +6,52 @@
           <Breadcumbs :title="dataJson.name" :link="dataJson.link" />
         </div>
         <component :is="dataJson.icon" class="icon" />
-        <h1 class="uppercase font-roboto font-bold mt-[16px] text-[20px] dark:text-[#E9E9E9]">
+        <h1
+          class="uppercase font-roboto font-bold mt-[16px] text-[20px] dark:text-[#E9E9E9]"
+        >
           {{ dataJson.name }}
         </h1>
-        <div class="flex items-center rounded-lg bg-gray-50 dark:bg-[#292C2A] mt-[16px] w-fit h-fit py-[8px] pl-[10px] pr-[8px]">
+        <div
+          v-if="version"
+          class="flex items-center rounded-lg bg-gray-50 dark:bg-[#292C2A] mt-[16px] w-fit h-fit py-[8px] pl-[10px] pr-[8px]"
+        >
+          <p class="text-[12px] min-w-0 flex-1 dark:text[#AAB0B7]">
+            Versi:
+            <strong class="text-[12px] dark:text-[#E9E9E9]">
+              {{ version }}
+            </strong>
+          </p>
+        </div>
+        <div
+          class="flex items-center rounded-lg bg-gray-50 dark:bg-[#292C2A] mt-[16px] w-fit h-fit py-[8px] pl-[10px] pr-[8px]"
+        >
           <div class="flex-shrink-0">
             <IconCalendar />
           </div>
           <p class="ml-2 text-[12px] min-w-0 flex-1 dark:text[#AAB0B7]">
-            Diperbaharui per tanggal <strong class="text-[12px] dark:text-[#E9E9E9]">{{ dataJson.updated }}</strong>
+            Diperbaharui per tanggal
+            <strong class="text-[12px] dark:text-[#E9E9E9]">
+              {{ updatedAt ? updatedAt : dataJson.updated }}
+            </strong>
           </p>
         </div>
         <!-- eslint-disable vue/no-v-html -->
-        <div class="mt-[16px] mb-[24px] text-[14px] font-lato text-[#424242] dark:text-[#AAB0B7]" v-html="dataJson.description" />
-        <div v-show="dataJson.requirement" class=" bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]">
+        <div
+          class="mt-[16px] mb-[24px] text-[14px] font-lato text-[#424242] dark:text-[#AAB0B7]"
+          v-html="dataJson.description"
+        />
+        <div
+          v-show="dataJson.requirement"
+          class="bg-gray-50 py-[8px] rounded-lg w-full h-fit dark:bg-[#292C2A] mb-[24px] lg:w-fit pl-[10px] pr-[8px]"
+        >
           <div class="flex lg:items-center">
             <div class="flex-shrink-0 mt-1 lg:mt-0">
               <IconWarningCircle />
             </div>
-            <div class="ml-2 text-gray-700 font-[400] text-[14px] dark:text-[#AAB0B7]" v-html="dataJson.requirement" />
+            <div
+              class="ml-2 text-gray-700 font-[400] text-[14px] dark:text-[#AAB0B7]"
+              v-html="dataJson.requirement"
+            />
           </div>
         </div>
       </div>
@@ -32,7 +59,10 @@
     <div class="container mx-auto">
       <div class="md:mx-10">
         <div v-for="detail in dataJson.details" :key="detail.title">
-          <AccordionDetail :title="detail.title" :description="detail.description" />
+          <AccordionDetail
+            :title="detail.title"
+            :description="detail.description"
+          />
         </div>
       </div>
     </div>
@@ -48,30 +78,44 @@ import IconWarningCircle from '~/assets/icon/warning-circle.svg?inline'
 import AccordionDetail from '~/components/KebijakanPrivasiKetentuanPengguna/AccordionDetail.vue'
 
 export default {
-  components: { IconKebijakanPrivasi, IconKetentuanPengguna, IconCalendar, IconWarningCircle, AccordionDetail, Breadcumbs },
+  components: {
+    IconKebijakanPrivasi,
+    IconKetentuanPengguna,
+    IconCalendar,
+    IconWarningCircle,
+    AccordionDetail,
+    Breadcumbs,
+  },
   props: {
     dataJson: {
       type: Object,
-      default: () => {}
-    }
-  }
+      default: () => {},
+    },
+    updatedAt: {
+      type: String,
+      default: '',
+    },
+    version: {
+      type: String,
+      default: '',
+    },
+  },
 }
 </script>
 
 <style scoped>
-p{
-  color:#424242;
+p {
+  color: #424242;
 }
 @media (prefers-color-scheme: dark) {
-  p{
-    color:#AAB0B7;
+  p {
+    color: #aab0b7;
   }
-  .icon rect{
-    fill: #292C2A;
+  .icon rect {
+    fill: #292c2a;
   }
-  .header-arrow line{
-    stroke: #D7D7D7;
+  .header-arrow line {
+    stroke: #d7d7d7;
   }
 }
-
 </style>
