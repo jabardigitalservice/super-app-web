@@ -7,6 +7,7 @@
 </template>
 <script>
 import dataKebijakanPrivasi from '~/data/kebijakan-privasi.json'
+import dataKebijakanPrivasiUpdated from '~/data/kebijakan-privasi-updated.json'
 import ContentDetail from '~/components/KebijakanPrivasiKetentuanPengguna/ContentDetail.vue'
 
 export default {
@@ -14,7 +15,16 @@ export default {
   components: { ContentDetail },
   layout: 'DetailKebijakanPrivasiKetentuanPengguna',
   data() {
-    return { dataJson: dataKebijakanPrivasi, updatedAt: '', version: '' }
+    return { updatedAt: '', version: '' }
+  },
+  computed: {
+    dataJson() {
+      if (this.$unleash.isEnabled('SAPAWARGA__KEBIJAKAN-PRIVASI')) {
+        return dataKebijakanPrivasiUpdated
+      }
+
+      return dataKebijakanPrivasi
+    },
   },
   async mounted() {
     try {
