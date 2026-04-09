@@ -18,7 +18,9 @@
       <div class="px-7 py-5">
         <div>
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
-          <!-- Other steps will be added later -->
+          <ImahAingFormStepTwo v-if="currentFormStep === 2" />
+          <ImahAingFormStepThree v-if="currentFormStep === 3" />
+          <ImahAingFormStepFour v-if="currentFormStep === 4" />
         </div>
 
         <div class="mt-6 flex justify-between">
@@ -50,17 +52,23 @@
 import { mapGetters, mapActions } from 'vuex'
 import ImahAingFormStepper from '~/components/ImahAing/Form/Stepper.vue'
 import ImahAingFormStepOne from '~/components/ImahAing/Form/StepOne.vue'
+import ImahAingFormStepTwo from '~/components/ImahAing/Form/StepTwo.vue'
+import ImahAingFormStepThree from '~/components/ImahAing/Form/StepThree.vue'
+import ImahAingFormStepFour from '~/components/ImahAing/Form/StepFour.vue'
 
 export default {
   components: {
     ImahAingFormStepper,
     ImahAingFormStepOne,
+    ImahAingFormStepTwo,
+    ImahAingFormStepThree,
+    ImahAingFormStepFour,
   },
   beforeRouteLeave(to, from, next) {
     this.resetForm()
     next()
   },
-  middleware: 'unleash',
+  // middleware: 'unleash',
   meta: {
     featureFlag: 'SAPAWARGA-WEB__IMAH-AING--FORM',
   },
