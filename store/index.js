@@ -6,6 +6,7 @@ import Vuex from 'vuex'
 import aduan from './aduan/storeAduan'
 import citizenComplaintForm from './citizen-complaint/citizenComplaintForm'
 import location from './location'
+import imahAingForm from './imah-aing/imahAingForm'
 Vue.use(Vuex)
 
 // Define the module
@@ -13,6 +14,7 @@ const modules = {
   aduan,
   citizenComplaintForm,
   location,
+  imahAingForm,
 }
 
 export default () =>
