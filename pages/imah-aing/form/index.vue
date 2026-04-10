@@ -20,7 +20,7 @@
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
           <ImahAingFormStepTwo v-if="currentFormStep === 2" ref="stepTwo" />
           <ImahAingFormStepThree v-if="currentFormStep === 3" />
-          <ImahAingFormStepFour v-if="currentFormStep === 4" />
+          <ImahAingFormStepFour v-if="currentFormStep === 4" ref="stepFour" />
         </div>
         <div v-else class="flex justify-center items-center py-10">
           <p class="text-gray-500 italic">Initializing form...</p>
@@ -39,11 +39,20 @@
           <button
             v-if="!isLastStep"
             class="jds-button jds-button--primary ml-auto"
-            :disabled="currentFormStep === 1 ? !isConsentValid : false"
+            :disabled="nextButtonDisabled"
             type="button"
             @click="handleNext"
           >
             Simpan dan Lanjutkan
+          </button>
+
+          <button
+            v-if="isLastStep"
+            class="jds-button jds-button--primary ml-auto"
+            type="button"
+            @click="handleSubmit"
+          >
+            Kirim
           </button>
         </div>
       </div>
@@ -87,7 +96,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('imahAingForm', ['currentFormStep', 'isFirstStep', 'isLastStep', 'startStep', 'isConsentValid']),
+    ...mapGetters('imahAingForm', ['currentFormStep', 'isFirstStep', 'isLastStep', 'startStep', 'isConsentValid', 'isAllDocumentsUploaded']),
+    nextButtonDisabled() {
+      if (this.currentFormStep === 1) return !this.isConsentValid
+      if (this.currentFormStep === 3) return !this.isAllDocumentsUploaded
+      return false
+    },
   },
   async mounted() {
     const token = this.$route.query.token || ''
@@ -103,7 +117,15 @@ export default {
         const isValid = await this.$refs.stepTwo?.validate()
         if (!isValid) return
       }
+      if (this.currentFormStep === 3) {
+        if (!this.isAllDocumentsUploaded) return
+      }
       this.nextStep()
+    },
+    async handleSubmit() {
+      const isValid = await this.$refs.stepFour?.validate()
+      if (!isValid) return
+      this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'SUBMIT_CONFIRMATION')
     },
   },
 }

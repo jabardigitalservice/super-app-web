@@ -1,4 +1,5 @@
 <template>
+  <ValidationObserver ref="observer">
   <section class="grid grid-cols-1 gap-y-4 mb-4">
     <h4 class="font-roboto font-medium text-black dark:text-dark-emphasis-high text-sm mb-4">
       Lokasi Tanah untuk Pembangunan/Perbaikan Rumah
@@ -128,6 +129,7 @@
       </template>
     </TrackingComplaintLocationModal>
   </section>
+  </ValidationObserver>
 </template>
 
 <script>
@@ -274,8 +276,11 @@ export default {
     setAddressDetail(val) {
       this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'address_detail', value: val })
     },
+
+    async validate() {
+      return await this.$refs.observer.validate()
+    },
   },
-  
 }
 </script>
 
