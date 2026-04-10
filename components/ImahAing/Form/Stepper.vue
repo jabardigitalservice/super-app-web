@@ -35,7 +35,7 @@ export default {
       formTitle: [
         { id: 1, title: 'Perhatian' },
         { id: 2, title: 'Data Pengusul' },
-        { id: 3, title: 'Dokumen' },
+        { id: 3, title: 'Dokumen Yang Diperlukan' },
         { id: 4, title: 'Lokasi' },
       ],
     }

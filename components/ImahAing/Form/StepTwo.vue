@@ -2,20 +2,20 @@
   <ValidationObserver ref="observer">
     <section class="grid grid-cols-1 gap-x-8 gap-y-4 mb-4">
     <!-- Foto Profil (tidak bisa diedit) -->
-    <div class="flex flex-col items-center mb-4">
+    <div class="flex flex-col items-left mb-4">
       <img :src="avatarUrl || '/images/ilustrasi-ktp.webp'" alt="avatar" class="w-24 h-24 rounded-full object-cover" />
     </div>
 
     <!-- Nama Pengusul — READ ONLY -->
     <div class="flex flex-col gap-2 mb-5">
       <label>Nama Pengusul <span class="text-red-500">*</span></label>
-      <JdsInputText :value="name" readonly />
+      <JdsInputText :value="name" />
     </div>
 
     <!-- No HP Pengusul — READ ONLY -->
     <div class="flex flex-col gap-2 mb-5">
       <label>No HP Pengusul <span class="text-red-500">*</span></label>
-      <JdsInputText :value="phone" readonly />
+      <JdsInputText :value="phone" />
     </div>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->

@@ -18,8 +18,11 @@ const getDefaultState = () => ({
   },
 
   dokumen: {
-    files: null,
-    // Post-MVP: ktp, kk, suratMiskin, suratTanah, fotoTanah (5 upload terpisah)
+    ktp: null,
+    kk: null,
+    suratMiskin: null,
+    suratTanah: null,
+    fotoTanah: null,
   },
 
   lokasiTanah: {
@@ -58,8 +61,12 @@ export default {
     isConsentValid: (state) =>
       state.consent.hasReadPrivacyPolicy && state.consent.isBeneficiaryCandidate,
     isAllDocumentsUploaded: (state) => {
-      const { files } = state.dokumen
-      return files !== null && files.status === 'SUCCESS'
+      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+      return keys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
+    },
+    documentSlotsOrdered: (state) => {
+      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+      return keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
     },
   },
   mutations: {
@@ -276,8 +283,12 @@ export default {
     async submitForm({ commit, state }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
-        // MVP: single upload field; post-MVP expand to per-document array
-        const photos = state.dokumen.files ? [{ url: state.dokumen.files.url || '' }] : []
+        // Build photos from the five document slots in fixed order
+        const docKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+        const photos = docKeys
+          .map((k) => state.dokumen[k]?.url || '')
+          .filter((u) => !!u)
+          .map((url) => ({ url }))
 
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
