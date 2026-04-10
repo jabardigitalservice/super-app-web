@@ -163,7 +163,7 @@ export default {
   },
   computed: {
     isShowRetryButton() {
-      return this.status === 'ERROR' && this.ShowRetryButton
+      return this.status === 'ERROR' && this.showRetryButton
     },
     fileName() {
       return this.file ? this.file.name : ''

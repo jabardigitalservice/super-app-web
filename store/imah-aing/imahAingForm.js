@@ -216,20 +216,62 @@ export default {
       }
     },
     // Placeholder upload action - real upload implementation should be added
-    uploadDocument({ commit }, { key, file, url }) {
-      // store initial slot with UPLOADING status
+    convertFileToBase64(_, file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64Data = reader.result.split(',')[1]
+          resolve(base64Data)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    },
+
+    async uploadDocument({ commit, state, dispatch }, { key, file }) {
       const payload = {
         file,
-        url: url || '',
+        url: '',
         progress: 0,
         status: 'UPLOADING',
         errors: [],
       }
+
       commit('SET_DOKUMEN_SLOT', { key, payload })
-      // Caller should replace this with real upload logic.
-      // For now mark as ERROR to indicate no upload was performed.
-      commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, status: 'ERROR', progress: 0, errors: ['not_implemented'] } })
-      return Promise.reject(new Error('uploadDocument not implemented in imahAingForm store'))
+
+      try {
+        // simulate progress
+        commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 20 } })
+
+        const base64Data = await dispatch('convertFileToBase64', file)
+
+        commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 50 } })
+
+        const formData = {
+          name: file.name,
+          isConfidental: false,
+          mimeType: file.type,
+          roles: ['admin', 'rw'],
+          data: base64Data,
+        }
+
+        const response = await this.$axios.post('/file/upload', formData, {
+          headers: { Authorization: `Bearer ${state.authToken}` },
+        })
+
+        const fileUrl = `${this.$config.urlFile}/${response.data.data.path}`
+
+        commit('SET_DOKUMEN_SLOT', {
+          key,
+          payload: { file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] },
+        })
+
+        return fileUrl
+      } catch (error) {
+        const errMsg = error?.response?.data?.message || error.message || 'upload_failed'
+        commit('SET_DOKUMEN_SLOT', { key, payload: { file, url: '', progress: 0, status: 'ERROR', errors: [errMsg] } })
+        throw error
+      }
     },
     async submitForm({ commit, state }, axiosInstance) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
