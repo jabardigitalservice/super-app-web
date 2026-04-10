@@ -156,6 +156,65 @@ export default {
         commit('SET_CURRENT_FORM_STEP', state.currentFormStep - 1)
       }
     },
+    // Cascading location handlers (mirror citizenComplaintForm patterns)
+    handleCitySelected({ state, commit, dispatch, rootState }) {
+      const cityName = state.lokasiTanah.cityName
+      if (rootState.location.cities.length && cityName) {
+        const city = rootState.location.cities.find((c) => c.name === cityName)
+        if (city) {
+          if (city.id !== state.lokasiTanah.cityId) {
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'district_name', value: '' })
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: '' })
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'village_name', value: '' })
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: '' })
+            commit('location/SET_VILLAGES', [], { root: true })
+          }
+          commit('SET_LOKASI_TANAH_FIELD', { field: 'city_id', value: city.id })
+          dispatch('location/fetchAreas', { params: { depth: 3, cityId: city.id } }, { root: true })
+        }
+      } else {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'city_id', value: '' })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'district_name', value: '' })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: '' })
+        commit('location/SET_SUB_DISTRICT', [], { root: true })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'village_name', value: '' })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: '' })
+        commit('location/SET_VILLAGES', [], { root: true })
+      }
+    },
+
+    handleSubdistrictSelected({ state, commit, dispatch, rootState }) {
+      const districtName = state.lokasiTanah.districtName
+      if (rootState.location.subDistricts.length && districtName) {
+        const district = rootState.location.subDistricts.find((d) => d.name === districtName)
+        if (district) {
+          if (district.id !== state.lokasiTanah.districtId) {
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'village_name', value: '' })
+            commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: '' })
+            commit('location/SET_VILLAGES', [], { root: true })
+          }
+          commit('SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: district.id })
+          dispatch('location/fetchAreas', { params: { depth: 4, districtId: district.id } }, { root: true })
+        }
+      } else {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: '' })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'village_name', value: '' })
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: '' })
+        commit('location/SET_VILLAGES', [], { root: true })
+      }
+    },
+
+    handleVillageSelected({ state, commit, rootState }) {
+      const villageName = state.lokasiTanah.villageName
+      if (rootState.location.villages.length && villageName) {
+        const village = rootState.location.villages.find((v) => v.name === villageName)
+        if (village) {
+          commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: village.id })
+        }
+      } else {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: '' })
+      }
+    },
     // Placeholder upload action - real upload implementation should be added
     uploadDocument({ commit }, { key, file, url }) {
       // store initial slot with UPLOADING status

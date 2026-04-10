@@ -6,11 +6,52 @@
 
     <!-- Show selected village summary -->
     <div class="mb-4 text-sm text-gray-700 dark:text-dark-emphasis-medium">
-      <div class="mb-1">Kecamatan / Kelurahan: <strong class="text-black dark:text-dark-emphasis-high">{{ lokasiTanah.district_name || '-' }} / {{ lokasiTanah.village_name || '-' }}</strong></div>
+      <div class="mb-1">Kecamatan / Kelurahan: <strong class="text-black dark:text-dark-emphasis-high">{{ lokasiTanah.districtName || '-' }} / {{ lokasiTanah.villageName || '-' }}</strong></div>
       <div class="mb-1">Titik tengah desa: <strong class="text-black dark:text-dark-emphasis-high">{{ villageCenterCoordsText }}</strong></div>
     </div>
 
     <!-- Dusun (optional) -->
+    <!-- Kota / Kecamatan / Kelurahan (cascading) -->
+    <section class="grid grid-cols-1 gap-y-4 mb-4">
+      <ValidationProvider v-slot="{ errors }" rules="required" class="flex flex-col gap-2 w-full" tag="section" name="Kota/Kabupaten">
+        <label class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">Kota/Kabupaten <span class="text-red-500">*</span></label>
+        <JdsSelect
+          v-model="setValueCity"
+          filterable
+          filter-type="contain"
+          placeholder="Pilih kota/kabupaten"
+          :error-message="errors[0]"
+          :options="citiesOption"
+        />
+      </ValidationProvider>
+
+      <ValidationProvider v-slot="{ errors }" rules="required" class="flex flex-col gap-2 w-full" tag="section" name="Kecamatan">
+        <label class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">Kecamatan <span class="text-red-500">*</span></label>
+        <JdsSelect
+          v-model="setValueSubDistrict"
+          filterable
+          filter-type="contain"
+          placeholder="Pilih kecamatan"
+          :error-message="errors[0]"
+          :options="subDitrictsOption"
+          :disabled="subDitrictsOption.length === 0"
+        />
+      </ValidationProvider>
+
+      <ValidationProvider v-slot="{ errors }" rules="required" class="flex flex-col gap-2" tag="section" name="Kelurahan/Desa">
+        <label class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">Kelurahan/Desa <span class="text-red-500">*</span></label>
+        <JdsSelect
+          v-model="setValueVillage"
+          filterable
+          filter-type="contain"
+          placeholder="Pilih kelurahan/desa"
+          :error-message="errors[0]"
+          :options="villagesOption"
+          :disabled="villagesOption.length === 0"
+        />
+      </ValidationProvider>
+    </section>
+
     <div class="flex flex-col gap-2 mb-4">
       <label class="text-sm font-medium text-black dark:text-dark-emphasis-high">Dusun</label>
       <JdsInputText :value="dusun" @input="setDusun($event)" placeholder="Masukkan nama dusun (opsional)" />
@@ -62,12 +103,36 @@
       </div>
     </div>
 
-    <TrackingComplaintLocationModal v-if="showLocationModal" @close="showLocationModal = false" @select="onLocationSelected" />
+    <TrackingComplaintLocationModal v-if="showLocationModal" :is-open="showLocationModal" title="Tentukan Titik Lokasi Tanah" @close="showLocationModal = false">
+      <div class="space-y-3">
+        <BaseMap
+          v-show="cloneLocation"
+          :coords="cloneLocation.location"
+          :zoom="16"
+          @set:place="getPlaceDetail"
+          @dragend:marker="setCoords"
+          @click:map="setCoords"
+        />
+      </div>
+
+      <div class="py-4 px-6 flex flex-col gap-2">
+        <h5 class="text-base text-black font-lato font-semibold dark:text-dark-emphasis-high">{{ cloneLocation.place.name || '-' }}</h5>
+        <p class="text-sm font-lato text-gray-500 dark:text-dark-emphasis-high">{{ cloneLocation.place.address || '-' }}</p>
+        <p class="text-sm font-lato text-gray-400 dark:text-dark-emphasis-high">
+          <span>{{ cloneLocation.location.lat || '-' }}</span>, <span>{{ cloneLocation.location.lng || '-' }}</span>
+        </p>
+      </div>
+
+      <template #footer>
+        <button class="jds-button jds-button--primary ml-auto" @click="handleLocation">Pilih Lokasi ini</button>
+      </template>
+    </TrackingComplaintLocationModal>
   </section>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
+import { cloneDeep } from 'lodash'
 import BaseMap from '~/components/Base/Map.vue'
 import TrackingComplaintLocationModal from '~/components/TrackingComplaint/LocationModal.vue'
 
@@ -79,6 +144,7 @@ export default {
   data() {
     return {
       showLocationModal: false,
+      cloneLocation: cloneDeep(this.$store.state.imahAingForm.lokasiTanah),
     }
   },
   computed: {
@@ -86,16 +152,18 @@ export default {
       lokasiTanah: (s) => s.lokasiTanah,
     }),
 
+    ...mapGetters('location', ['citiesOption', 'subDitrictsOption', 'villagesOption']),
+
     isMapEnabled() {
-      return !!(this.lokasiTanah && this.lokasiTanah.village_id)
+      return !!(this.lokasiTanah && this.lokasiTanah.villageId)
     },
 
     defaultMapCoords() {
-      return (this.lokasiTanah && this.lokasiTanah.village_center_coords) || { lat: -6.914744, lng: 107.60981 }
+      return (this.lokasiTanah && this.lokasiTanah.villageCenterCoords) || { lat: -6.914744, lng: 107.60981 }
     },
 
     villageCenterCoordsText() {
-      const c = this.lokasiTanah?.village_center_coords
+      const c = this.lokasiTanah?.villageCenterCoords
       return c ? `${c.lat}, ${c.lng}` : '-'
     },
 
@@ -109,28 +177,62 @@ export default {
       return this.lokasiTanah?.rt || ''
     },
     addressDetail() {
-      return this.lokasiTanah?.address_detail || ''
+      return this.lokasiTanah?.addressDetail || ''
+    },
+    // v-model computed setters for selects
+    setValueCity: {
+      get() {
+        return this.$store.state.imahAingForm.lokasiTanah.cityName
+      },
+      set(value) {
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'city_name', value })
+        this.handleCitySelected()
+      },
+    },
+    setValueSubDistrict: {
+      get() {
+        return this.$store.state.imahAingForm.lokasiTanah.districtName
+      },
+      set(value) {
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'district_name', value })
+        this.handleSubdistrictSelected()
+      },
+    },
+    setValueVillage: {
+      get() {
+        return this.$store.state.imahAingForm.lokasiTanah.villageName
+      },
+      set(value) {
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'village_name', value })
+        this.handleVillageSelected()
+      },
     },
   },
   methods: {
+    ...mapActions('location', ['setCitiesOption']),
+    ...mapActions('imahAingForm', ['handleCitySelected', 'handleSubdistrictSelected', 'handleVillageSelected']),
+
     openLocationModal() {
       this.showLocationModal = true
     },
 
-    onLocationSelected(payload) {
-      // Expect payload: { location: { lat, lng }, place: { name, address }, village_id, village_name, district_id, district_name, city_id, city_name }
-      this.showLocationModal = false
-      if (!payload) return
+    // Modal + BaseMap integration
+    getPlaceDetail(place) {
+      this.cloneLocation.place.name = place.name ?? ''
+      this.cloneLocation.place.address = place.formatted_address ?? ''
+    },
 
-      // Commit fields to store
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'location', value: payload.location })
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'place', value: payload.place })
-      if (payload.village_id) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'village_id', value: payload.village_id })
-      if (payload.village_name) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'village_name', value: payload.village_name })
-      if (payload.district_id) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: payload.district_id })
-      if (payload.district_name) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'district_name', value: payload.district_name })
-      if (payload.city_id) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'city_id', value: payload.city_id })
-      if (payload.city_name) this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'city_name', value: payload.city_name })
+    setCoords({ event }) {
+      if (event && event.latLng) {
+        this.cloneLocation.location.lat = event.latLng.lat()
+        this.cloneLocation.location.lng = event.latLng.lng()
+      }
+    },
+
+    handleLocation() {
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'location', value: { ...this.cloneLocation.location } })
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'place', value: { ...this.cloneLocation.place } })
+      this.showLocationModal = false
     },
 
     setDusun(val) {
@@ -148,6 +250,27 @@ export default {
     setAddressDetail(val) {
       this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'address_detail', value: val })
     },
+  },
+  created() {
+    this.setCitiesOption('cities')
+  },
+  mounted() {
+    // initialize cloneLocation coordinates with geolocation fallback
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.cloneLocation.location.lat = position.coords.latitude
+          this.cloneLocation.location.lng = position.coords.longitude
+        },
+        () => {
+          this.cloneLocation.location.lat = -6.9025
+          this.cloneLocation.location.lng = 107.6187
+        }
+      )
+    } else {
+      this.cloneLocation.location.lat = -6.9025
+      this.cloneLocation.location.lng = 107.6187
+    }
   },
 }
 </script>
