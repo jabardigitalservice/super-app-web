@@ -132,8 +132,11 @@ export default {
   actions: {
     initForm({ commit }, token) {
       commit('SET_AUTH_TOKEN', token)
-      // best-effort parse token (if token is JSON string with user data)
-      if (!token) return
+      if (!token) {
+        // Tanpa token → user adalah warga biasa, mulai dari step 1
+        commit('SET_ACCOUNT_TYPE', 'warga')
+        return
+      }
       try {
         const parsed = typeof token === 'string' ? JSON.parse(token) : token
         if (parsed) {
@@ -141,10 +144,12 @@ export default {
           if (parsed.phone) commit('SET_DATA_PENGUSUL_FIELD', { field: 'phone', value: parsed.phone })
           if (parsed.email) commit('SET_DATA_PENGUSUL_FIELD', { field: 'email', value: parsed.email })
           if (parsed.avatar_url) commit('SET_DATA_PENGUSUL_FIELD', { field: 'avatar_url', value: parsed.avatar_url })
-          if (parsed.accountType) commit('SET_ACCOUNT_TYPE', parsed.accountType)
+          // Jika accountType tidak ada dalam token, default ke 'warga'
+          commit('SET_ACCOUNT_TYPE', parsed.accountType || 'warga')
         }
       } catch (e) {
-        // token is not JSON - ignore silent
+        // Token bukan JSON valid → anggap warga biasa
+        commit('SET_ACCOUNT_TYPE', 'warga')
       }
     },
     nextStep({ commit, state }) {
@@ -273,7 +278,7 @@ export default {
         throw error
       }
     },
-    async submitForm({ commit, state }, axiosInstance) {
+    async submitForm({ commit, state }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
         const { ktp, kk, suratMiskin, suratTanah, fotoTanah } = state.dokumen
@@ -307,9 +312,7 @@ export default {
           RW: String(rw || ''),
         }
 
-        if (!axiosInstance) throw new Error('axiosInstance required')
-
-        const response = await axiosInstance.post('/v1/aduan/complaints', payload)
+        const response = await this.$axios.post('/v1/aduan/complaints', payload)
         const submissionId = response.data?.data?.id || response.data?.id || ''
 
         commit('SET_STATUS_SUBMIT', 'SUCCESS')

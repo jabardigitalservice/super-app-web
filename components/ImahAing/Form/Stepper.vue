@@ -46,7 +46,7 @@ export default {
     displayedFormTitle() {
       return this.formTitle.filter((item) => {
         if (item.id !== 1) return true
-        return this.accountType === 'warga'
+        return this.accountType !== 'rt_rw_kades'
       })
     },
   },
