@@ -54,19 +54,19 @@
 
     <div class="flex flex-col gap-2 mb-4">
       <label class="text-sm font-medium text-black dark:text-dark-emphasis-high">Dusun</label>
-      <JdsInputText :value="dusun" @input="setDusun($event)" placeholder="Masukkan nama dusun (opsional)" />
+      <JdsInputText :value="dusun" placeholder="Masukkan nama dusun (opsional)" @input="setDusun($event)" />
     </div>
 
     <!-- RW & RT -->
     <div class="grid grid-cols-2 gap-4 mb-4">
-      <ValidationProvider rules="required|numeric" name="RW" v-slot="{ errors }">
+      <ValidationProvider v-slot="{ errors }" rules="required|numeric" name="RW">
         <label class="text-sm font-medium text-black dark:text-dark-emphasis-high">RW <span class="text-red-500">*</span></label>
-        <JdsInputText :value="rw" @input="setRw($event)" :error-message="errors[0]" placeholder="Contoh: 001" />
+        <JdsInputText :value="rw" :error-message="errors[0]" placeholder="Contoh: 001" @input="setRw($event)" />
       </ValidationProvider>
 
-      <ValidationProvider rules="required|numeric" name="RT" v-slot="{ errors }">
+      <ValidationProvider v-slot="{ errors }" rules="required|numeric" name="RT">
         <label class="text-sm font-medium text-black dark:text-dark-emphasis-high">RT <span class="text-red-500">*</span></label>
-        <JdsInputText :value="rt" @input="setRt($event)" :error-message="errors[0]" placeholder="Contoh: 002" />
+        <JdsInputText :value="rt" :error-message="errors[0]" placeholder="Contoh: 002" @input="setRt($event)" />
       </ValidationProvider>
     </div>
 
@@ -76,9 +76,9 @@
       <textarea
         class="border rounded p-2 min-h-[80px] text-sm dark:bg-dark-emphasis-low dark:border-dark-emphasis-medium"
         :value="addressDetail"
-        @input="setAddressDetail($event.target.value)"
         maxlength="1000"
         placeholder="Tambahkan keterangan alamat jika diperlukan"
+        @input="setAddressDetail($event.target.value)"
       />
     </div>
 
@@ -97,7 +97,7 @@
       </div>
 
       <div class="mt-3">
-        <button type="button" class="jds-button jds-button--secondary" @click="openLocationModal" :disabled="!isMapEnabled">
+        <button type="button" class="jds-button jds-button--secondary" :disabled="!isMapEnabled" @click="openLocationModal">
           Pilih Titik Lokasi Tanah
         </button>
       </div>
@@ -208,11 +208,35 @@ export default {
       },
     },
   },
+  created() {
+    this.setCitiesOption('cities')
+  },
+
+  mounted() {
+    // initialize cloneLocation coordinates with geolocation fallback
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.cloneLocation.location.lat = position.coords.latitude
+          this.cloneLocation.location.lng = position.coords.longitude
+        },
+        () => {
+          this.cloneLocation.location.lat = -6.9025
+          this.cloneLocation.location.lng = 107.6187
+        }
+      )
+    } else {
+      this.cloneLocation.location.lat = -6.9025
+      this.cloneLocation.location.lng = 107.6187
+    }
+  },
+
   methods: {
     ...mapActions('location', ['setCitiesOption']),
     ...mapActions('imahAingForm', ['handleCitySelected', 'handleSubdistrictSelected', 'handleVillageSelected']),
 
     openLocationModal() {
+      this.cloneLocation = cloneDeep(this.lokasiTanah)
       this.showLocationModal = true
     },
 
@@ -251,27 +275,7 @@ export default {
       this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'address_detail', value: val })
     },
   },
-  created() {
-    this.setCitiesOption('cities')
-  },
-  mounted() {
-    // initialize cloneLocation coordinates with geolocation fallback
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          this.cloneLocation.location.lat = position.coords.latitude
-          this.cloneLocation.location.lng = position.coords.longitude
-        },
-        () => {
-          this.cloneLocation.location.lat = -6.9025
-          this.cloneLocation.location.lng = 107.6187
-        }
-      )
-    } else {
-      this.cloneLocation.location.lat = -6.9025
-      this.cloneLocation.location.lng = 107.6187
-    }
-  },
+  
 }
 </script>
 

@@ -16,14 +16,17 @@
       <hr class="dark:border-dark-emphasis-medium" />
 
       <div class="px-7 py-5">
-        <div>
+        <div v-if="currentFormStep > 0">
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
-          <ImahAingFormStepTwo ref="stepTwo" v-if="currentFormStep === 2" />
+          <ImahAingFormStepTwo v-if="currentFormStep === 2" ref="stepTwo" />
           <ImahAingFormStepThree v-if="currentFormStep === 3" />
           <ImahAingFormStepFour v-if="currentFormStep === 4" />
         </div>
+        <div v-else class="flex justify-center items-center py-10">
+          <p class="text-gray-500 italic">Initializing form...</p>
+        </div>
 
-        <div class="mt-6 flex justify-between">
+        <div v-if="currentFormStep > 0" class="mt-6 flex justify-between">
           <button
             v-if="!isFirstStep"
             class="jds-button jds-button--secondary"
@@ -86,10 +89,11 @@ export default {
   computed: {
     ...mapGetters('imahAingForm', ['currentFormStep', 'isFirstStep', 'isLastStep', 'startStep', 'isConsentValid']),
   },
-  mounted() {
+  async mounted() {
     const token = this.$route.query.token || ''
-    // initialize store with token and set starting step
-    this.initForm(token)
+    // initialize store with token
+    await this.initForm(token)
+    // ensure we are on the correct starting step after token is processed
     this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
   },
   methods: {

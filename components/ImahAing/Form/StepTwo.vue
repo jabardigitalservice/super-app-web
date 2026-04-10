@@ -1,5 +1,5 @@
 <template>
-  <ValidationObserver ref="observer" v-slot="{ invalid }">
+  <ValidationObserver ref="observer">
     <section class="grid grid-cols-1 gap-x-8 gap-y-4 mb-4">
     <!-- Foto Profil (tidak bisa diedit) -->
     <div class="flex flex-col items-center mb-4">
@@ -19,21 +19,21 @@
     </div>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->
-    <ValidationProvider v-slot="{ errors }" rules="email" name="Email Pribadi">
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi" vid="email">
       <label>Email Pribadi</label>
-      <JdsInputText v-model="setEmail" :error-message="errors[0]" />
+      <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
     </ValidationProvider>
 
     <!-- NIK — WAJIB -->
-    <ValidationProvider v-slot="{ errors }" rules="required|numeric|length:16" name="NIK">
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="NIK" vid="nik">
       <label>NIK <span class="text-red-500">*</span></label>
-      <JdsInputText v-model="setNik" :error-message="errors[0]" />
+      <JdsInputText :value="setNik" :error-message="errors[0]" @input="setNik = $event" />
     </ValidationProvider>
 
     <!-- Nomor KK — WAJIB -->
-    <ValidationProvider v-slot="{ errors }" rules="required|numeric|length:16" name="Nomor KK">
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="Nomor KK" vid="nomorKk">
       <label>Nomor KK <span class="text-red-500">*</span></label>
-      <JdsInputText v-model="setNomorKk" :error-message="errors[0]" />
+      <JdsInputText :value="setNomorKk" :error-message="errors[0]" @input="setNomorKk = $event" />
     </ValidationProvider>
     </section>
   </ValidationObserver>
@@ -41,11 +41,6 @@
 
 <script>
 export default {
-  methods: {
-    async validate() {
-      return await this.$refs.observer.validate()
-    },
-  },
   computed: {
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
@@ -79,6 +74,11 @@ export default {
       set(val) {
         this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: val })
       },
+    },
+  },
+  methods: {
+    async validate() {
+      return await this.$refs.observer.validate()
     },
   },
 }

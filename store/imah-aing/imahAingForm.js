@@ -1,7 +1,7 @@
 const getDefaultState = () => ({
   authToken: null,
   accountType: '',
-  currentFormStep: 1,
+  currentFormStep: 0,
 
   consent: {
     hasReadPrivacyPolicy: false,
@@ -55,7 +55,7 @@ export default {
   state: getDefaultState(),
   getters: {
     currentFormStep: (state) => state.currentFormStep,
-    isFirstStep: (state) => state.currentFormStep === 1,
+    isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
     startStep: (state) => (state.accountType === 'rt_rw_kades' ? 2 : 1),
     isConsentValid: (state) =>
