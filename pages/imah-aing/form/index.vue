@@ -18,7 +18,7 @@
       <div class="px-7 py-5">
         <div>
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
-          <ImahAingFormStepTwo v-if="currentFormStep === 2" />
+          <ImahAingFormStepTwo ref="stepTwo" v-if="currentFormStep === 2" />
           <ImahAingFormStepThree v-if="currentFormStep === 3" />
           <ImahAingFormStepFour v-if="currentFormStep === 4" />
         </div>
@@ -38,7 +38,7 @@
             class="jds-button jds-button--primary ml-auto"
             :disabled="currentFormStep === 1 ? !isConsentValid : false"
             type="button"
-            @click="nextStep"
+            @click="handleNext"
           >
             Simpan dan Lanjutkan
           </button>
@@ -94,6 +94,13 @@ export default {
   },
   methods: {
     ...mapActions('imahAingForm', ['initForm', 'nextStep', 'previousStep', 'resetForm']),
+    async handleNext() {
+      if (this.currentFormStep === 2) {
+        const isValid = await this.$refs.stepTwo?.validate()
+        if (!isValid) return
+      }
+      this.nextStep()
+    },
   },
 }
 </script>

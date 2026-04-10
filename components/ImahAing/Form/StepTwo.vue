@@ -1,5 +1,6 @@
 <template>
-  <section class="grid grid-cols-1 gap-x-8 gap-y-4 mb-4">
+  <ValidationObserver ref="observer" v-slot="{ invalid }">
+    <section class="grid grid-cols-1 gap-x-8 gap-y-4 mb-4">
     <!-- Foto Profil (tidak bisa diedit) -->
     <div class="flex flex-col items-center mb-4">
       <img :src="avatarUrl || '/images/ilustrasi-ktp.webp'" alt="avatar" class="w-24 h-24 rounded-full object-cover" />
@@ -34,11 +35,17 @@
       <label>Nomor KK <span class="text-red-500">*</span></label>
       <JdsInputText v-model="setNomorKk" :error-message="errors[0]" />
     </ValidationProvider>
-  </section>
+    </section>
+  </ValidationObserver>
 </template>
 
 <script>
 export default {
+  methods: {
+    async validate() {
+      return await this.$refs.observer.validate()
+    },
+  },
   computed: {
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
