@@ -173,7 +173,7 @@ export default {
     async refreshTokenHandle() {
       this.token = ''
       this.grantType = 'refresh_token'
-      await this.getToken()
+      this.token = await this.$getToken(this.grantType)
     },
     async onSearch(value) {
       this.search = value

@@ -207,7 +207,7 @@ export default {
   async mounted() {
     this.showLoadingSkeleton()
     if (!this.hasAuthToken) {
-      const token = await this.$getToken()
+      const token = await this.$getToken('client_credentials')
       this.setAuthToken(token)
     }
   },
