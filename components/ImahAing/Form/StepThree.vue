@@ -1,16 +1,10 @@
 <template>
   <section class="grid grid-cols-1 gap-x-8 gap-y-6 mb-4">
     <div>
-      <h3
-        class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
-      >
-        Upload File <span class="text-red-500">*</span>
-      </h3>
       <p
         class="font-lato text-[12px] leading-[18px] text-gray-600 text-left dark:text-dark-emphasis-high mt-1"
       >
-        Upload satu file yang berisi seluruh dokumen berikut. Ukuran maksimal file
-        2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
+        Ukuran maksimal file 2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
       </p>
     </div>
 
@@ -36,7 +30,6 @@
             :is-error="(errors && errors.length > 0)"
             @change="(f) => handleUpload(item.key, f)"
           />
-              v-if="showDropzone(item.key)"
           <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
         </ValidationProvider>
 
