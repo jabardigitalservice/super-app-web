@@ -26,7 +26,7 @@ export default {
   plugins: [
     '~/plugins/vue-gtag.js',
     '~/plugins/aduan-api.js',
-    { src: '~/plugins/aduan-get-token.js', mode: 'client' },
+    '~/plugins/aduan-get-token.js',
     { src: '~/plugins/dark-mode.js', mode: 'client' },
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
@@ -114,6 +114,7 @@ export default {
     unleash: {
       unleashURL: process.env.UNLEASH_URL,
       unleashToken: process.env.UNLEASH_TOKEN,
+      unleashBypass: process.env.UNLEASH_BYPASS,
     },
   },
 

@@ -207,13 +207,8 @@ export default {
   async mounted() {
     this.showLoadingSkeleton()
     if (!this.hasAuthToken) {
-      try {
-        const token = await this.$getToken('client_credentials')
-        this.setAuthToken(token)
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to get token:', error)
-      }
+      const token = await this.$getToken('client_credentials')
+      this.setAuthToken(token)
     }
   },
   methods: {
