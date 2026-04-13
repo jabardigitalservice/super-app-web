@@ -6,17 +6,17 @@
       <img :src="avatarUrl || '/images/ilustrasi-ktp.webp'" alt="avatar" class="w-24 h-24 rounded-full object-cover" />
     </div>
 
-    <!-- Nama Pengusul — READ ONLY -->
-    <div class="flex flex-col gap-2 mb-5">
+    <!-- Nama Pengusul -->
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Pengusul" vid="name">
       <label>Nama Pengusul <span class="text-red-500">*</span></label>
-      <JdsInputText :value="name" />
-    </div>
+      <JdsInputText :value="setName" :error-message="errors[0]" @input="setName = $event" />
+    </ValidationProvider>
 
-    <!-- No HP Pengusul — READ ONLY -->
-    <div class="flex flex-col gap-2 mb-5">
+    <!-- No HP Pengusul -->
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="No HP Pengusul" vid="phone">
       <label>No HP Pengusul <span class="text-red-500">*</span></label>
-      <JdsInputText :value="phone" />
-    </div>
+      <JdsInputText :value="setPhone" inputmode="numeric" type="number" :error-message="errors[0]" @input="setPhone = $event" />
+    </ValidationProvider>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->
     <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi" vid="email">
@@ -73,6 +73,22 @@ export default {
       },
       set(val) {
         this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: val })
+      },
+    },
+    setName: {
+      get() {
+        return this.$store.state.imahAingForm.dataPengusul.name
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'name', value: val })
+      },
+    },
+    setPhone: {
+      get() {
+        return this.$store.state.imahAingForm.dataPengusul.phone
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'phone', value: val })
       },
     },
   },
