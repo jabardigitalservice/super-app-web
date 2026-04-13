@@ -14,8 +14,17 @@
 
     <!-- No HP Pengusul -->
     <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="No HP Pengusul" vid="phone">
-      <label>No HP Pengusul <span class="text-red-500">*</span></label>
-      <JdsInputText :value="setPhone" inputmode="numeric" type="number" :error-message="errors[0]" @input="setPhone = $event" />
+      <BaseInputText
+        v-model="setPhone"
+        class="step-two-input-jds"
+        type="number"
+        label="No HP Pengusul"
+        required
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+        :error="!!errors[0]"
+        :error-message="errors[0]"
+      />
     </ValidationProvider>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->
@@ -26,14 +35,32 @@
 
     <!-- NIK — WAJIB -->
     <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="NIK" vid="nik">
-      <label>NIK <span class="text-red-500">*</span></label>
-      <JdsInputText :value="setNik" :error-message="errors[0]" @input="setNik = $event" />
+      <BaseInputText
+        v-model="setNik"
+        class="step-two-input-jds"
+        type="number"
+        label="NIK"
+        required
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+        :error="!!errors[0]"
+        :error-message="errors[0]"
+      />
     </ValidationProvider>
 
     <!-- Nomor KK — WAJIB -->
     <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="Nomor KK" vid="nomorKk">
-      <label>Nomor KK <span class="text-red-500">*</span></label>
-      <JdsInputText :value="setNomorKk" :error-message="errors[0]" @input="setNomorKk = $event" />
+      <BaseInputText
+        v-model="setNomorKk"
+        class="step-two-input-jds"
+        type="number"
+        label="Nomor KK"
+        required
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+        :error="!!errors[0]"
+        :error-message="errors[0]"
+      />
     </ValidationProvider>
     </section>
   </ValidationObserver>
@@ -41,6 +68,12 @@
 
 <script>
 export default {
+  data() {
+    return {
+      /** Zero-width space: enables :placeholder-shown for JDS-like empty background (see .spec/template/InputText.scss) */
+      zwsPlaceholder: '\u200B',
+    }
+  },
   computed: {
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
@@ -99,3 +132,66 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/*
+ * Align BaseInputText with JdsInputText / InputText.scss (.spec/template) and
+ * .citizen__form .jds-input-text rules on pages/imah-aing/form/index.vue
+ */
+.step-two-input-jds {
+  width: 100%;
+}
+
+::v-deep .step-two-input-jds.flex.flex-col {
+  gap: 0.5rem;
+}
+
+/* Input shell — mirrors .jds-input-text__input-wrapper */
+::v-deep .step-two-input-jds > div:nth-child(2) {
+  transition: border-color 0.3s ease-out;
+  background-color: #fff;
+}
+
+::v-deep .step-two-input-jds > div:nth-child(2):has(input:placeholder-shown) {
+  background-color: #fafafa;
+}
+
+/* Default border: gray-500 (JDS) instead of gray-400; keep focus/error utilities */
+::v-deep .step-two-input-jds > div:nth-child(2).border-gray-400:not(.border-green-700):not(.border-red-700) {
+  border-color: #737373;
+}
+
+::v-deep .step-two-input-jds > div:nth-child(2):hover:not(:focus-within):not(.border-red-700) {
+  border-color: #15803d;
+}
+
+/* Focus ring: green border (from Base) + inset yellow (JDS --focused) */
+::v-deep .step-two-input-jds > div:nth-child(2):focus-within:not(.border-red-700) {
+  box-shadow: inset 0 0 0 1px #eab308;
+}
+
+::v-deep .step-two-input-jds > div:nth-child(2).border-red-700 {
+  box-shadow: none;
+}
+
+/* Match .citizen__form .jds-input-text input */
+::v-deep .step-two-input-jds input {
+  background-color: transparent !important;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+  color: #616161;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+::v-deep .step-two-input-jds input::-webkit-outer-spin-button,
+::v-deep .step-two-input-jds input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+::v-deep .step-two-input-jds input[type='number'] {
+  -moz-appearance: textfield;
+}
+</style>
