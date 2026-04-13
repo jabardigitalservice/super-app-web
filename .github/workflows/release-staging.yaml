@@ -1,0 +1,14 @@
+name: Deploy Superapp Web Staging via Netlify Build Hook
+
+on:
+    push:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        runs-on: self-hosted
+        steps:
+            - name: Trigger Netlify
+              run: |
+                  curl -X POST -d {} "${{ secrets.NETLIFY_BUILD_HOOK_STAGING }}"
