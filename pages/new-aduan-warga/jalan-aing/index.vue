@@ -2,13 +2,13 @@
   <div
     class="min-h-screen p-3 bg-white md:p-4 lg:p-6 xl:py-8 xl:px-10 rounded-xl dark:bg-dark-emphasis-low"
   >
-    <TrackingComplaintFormStepper />
+    <JalanAingFormStepper />
     <div
       class="border border-gray-300 rounded-lg max-w-[650px] mx-auto dark:border-dark-emphasis-medium"
     >
       <template v-for="{ title, id } in formTitle">
         <h3
-          v-if="currentFormStep === id"
+          v-if="currentFormStep === id && currentFormStep !== 1"
           :key="id + title"
           class="py-5 font-bold text-black px-7 dark:text-dark-emphasis-high"
         >
@@ -16,29 +16,36 @@
         </h3>
       </template>
 
-      <hr class="dark:border-dark-emphasis-medium" />
+      <hr
+        v-if="currentFormStep !== 1"
+        class="dark:border-dark-emphasis-medium"
+      />
 
-      <TrackingComplaintSkeleton v-if="isLoading" />
+      <JalanAingSkeleton v-if="isLoading" />
 
       <div v-if="!isLoading" class="py-5 px-7">
         <ValidationObserver ref="form" v-slot="{ invalid }" slim>
+          <div v-if="currentFormStep === 4" class="hidden">
+            {{ logFormValidation(invalid) }}
+          </div>
           <form class="mb-10 citizen__form" @submit.prevent="">
-            <TrackingComplaintFormStepOne v-if="currentFormStep === 1" />
-            <TrackingComplaintFormStepTwo v-if="currentFormStep === 2" />
-            <TrackingComplaintFormStepThree v-if="currentFormStep === 3" />
-            <TrackingComplaintFormStepFour v-if="currentFormStep === 4" />
+            <JalanAingFormStepZero v-if="currentFormStep === 1" />
+            <JalanAingFormStepOne v-if="currentFormStep === 2" />
+            <JalanAingFormStepTwo v-if="currentFormStep === 3" />
+            <JalanAingFormStepThree v-if="currentFormStep === 4" />
+            <JalanAingFormStepFour v-if="currentFormStep === 5" />
 
             <!-- MOBILE -->
             <div class="grid grid-cols-1 gap-2 md:hidden">
               <Button
                 v-if="!isLastStep"
                 :style="[
-                  (currentFormStep === 3 ? invalidImages : invalid) && {
+                  (currentFormStep === 4 ? invalidImages : invalid) && {
                     backgroundColor: '#E0E0E0',
                     color: '#FFFFFF',
                   },
                 ]"
-                :disabled="currentFormStep === 3 ? invalidImages : invalid"
+                :disabled="currentFormStep === 4 ? invalidImages : invalid"
                 class="w-full !justify-center"
                 variant="primary"
                 type="button"
@@ -82,12 +89,12 @@
               <Button
                 v-if="!isLastStep"
                 :style="[
-                  (currentFormStep === 3 ? invalidImages : invalid) && {
+                  (currentFormStep === 4 ? invalidImages : invalid) && {
                     backgroundColor: '#E0E0E0',
                     color: '#FFFFFF',
                   },
                 ]"
-                :disabled="currentFormStep === 3 ? invalidImages : invalid"
+                :disabled="currentFormStep === 4 ? invalidImages : invalid"
                 class="col-start-2 col-end-3 w-fit justify-self-end"
                 variant="primary"
                 type="button"
@@ -114,7 +121,7 @@
     </div>
 
     <!-- CONFIRMATION MODAL -->
-    <TrackingComplaintModal
+    <JalanAingModal
       :open="statusSubmitForm.status === 'SUBMIT_CONFIRMATION'"
       label-primary-button="Iya, Kirim"
       label-secondary-button="Batalkan"
@@ -133,7 +140,7 @@
       :value="statusSubmitForm.progress"
     />
 
-    <TrackingComplaintModal
+    <JalanAingModal
       :open="statusSubmitForm.status === 'SUCCESS'"
       header="Berhasil!"
       label-primary-button="Check Email"
@@ -145,7 +152,7 @@
       @click="openEmail"
     />
 
-    <TrackingComplaintModal
+    <JalanAingModal
       :open="statusSubmitForm.status === 'ERROR'"
       header="Gagal Mengirim Aduan!"
       label-primary-button="Coba lagi"
@@ -175,16 +182,17 @@ export default {
     return {
       isLoading: true,
       formTitle: [
-        { id: 1, title: 'Data Wargi' },
-        { id: 2, title: 'Informasi Aduan' },
-        { id: 3, title: 'Foto Aduan' },
-        { id: 4, title: 'Lokasi Aduan' },
+        { id: 1, title: 'Perhatian' },
+        { id: 2, title: 'Data Pengusul' },
+        { id: 3, title: 'Informasi Pengajuan' },
+        { id: 4, title: 'Foto Aduan' },
+        { id: 5, title: 'Lokasi Aduan' },
       ],
     }
   },
   computed: {
-    ...mapState('citizenComplaintForm', ['statusSubmitForm', 'foto_aduan']),
-    ...mapGetters('citizenComplaintForm', [
+    ...mapState('jalan-aing', ['statusSubmitForm', 'foto_aduan']),
+    ...mapGetters('jalan-aing', [
       'currentFormStep',
       'isFirstStep',
       'isLastStep',
@@ -195,10 +203,40 @@ export default {
      * Function to check if the foto aduan form step is invalid or not
      *  */
     invalidImages() {
-      return (
-        !this.foto_aduan.raw_image.length ||
-        this.foto_aduan.raw_image.some((image) => image.errors?.length > 0)
+      const IMAGE_UPLOAD_STATUS = {
+        NONE: 'NONE',
+        UPLOADING: 'UPLOADING',
+        SUCCESS: 'SUCCESS',
+        ERROR: 'ERROR',
+      }
+
+      console.log('=== VALIDASI FOTO ADUAN ===')
+      console.log('Total gambar:', this.foto_aduan.raw_image.length)
+      console.log('Data gambar:', this.foto_aduan.raw_image)
+
+      this.foto_aduan.raw_image.forEach((image, index) => {
+        console.log(`Gambar ${index + 1}:`, {
+          id: image.id,
+          status: image.image_upload_status,
+          file: image.image_file?.name,
+          errors: image.errors,
+        })
+      })
+
+      const hasNoImages = !this.foto_aduan.raw_image.length
+      const hasInvalidImages = this.foto_aduan.raw_image.some(
+        (image) =>
+          image.image_upload_status === IMAGE_UPLOAD_STATUS.ERROR ||
+          image.image_upload_status === IMAGE_UPLOAD_STATUS.UPLOADING ||
+          image.image_upload_status === IMAGE_UPLOAD_STATUS.NONE
       )
+
+      console.log('Tidak ada gambar?', hasNoImages)
+      console.log('Ada gambar invalid?', hasInvalidImages)
+      console.log('Tombol disabled?', hasNoImages || hasInvalidImages)
+      console.log('=========================')
+
+      return hasNoImages || hasInvalidImages
     },
   },
   created() {
@@ -207,12 +245,17 @@ export default {
   async mounted() {
     this.showLoadingSkeleton()
     if (!this.hasAuthToken) {
-      const token = await this.$getToken('client_credentials')
-      this.setAuthToken(token)
+      try {
+        const token = await this.$getToken('client_credentials')
+        this.setAuthToken(token)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to get token:', error)
+      }
     }
   },
   methods: {
-    ...mapActions('citizenComplaintForm', [
+    ...mapActions('jalan-aing', [
       'nextStep',
       'previousStep',
       'submitConfirmation',
@@ -221,6 +264,18 @@ export default {
       'resetForm',
       'setAuthToken',
     ]),
+    logFormValidation(invalid) {
+      console.log('=== VALIDASI FORM ===')
+      console.log('Form invalid?', invalid)
+      console.log('Current step:', this.currentFormStep)
+      console.log('invalidImages:', this.invalidImages)
+      console.log(
+        'Kondisi tombol disabled:',
+        this.currentFormStep === 4 ? this.invalidImages : invalid
+      )
+      console.log('====================')
+      return ''
+    },
     submitComplaint() {
       this.submitConfirmation()
     },

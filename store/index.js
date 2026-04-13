@@ -5,6 +5,7 @@ import Vuex from 'vuex'
 
 import aduan from './aduan/storeAduan'
 import citizenComplaintForm from './citizen-complaint/citizenComplaintForm'
+import jalanAing from './jalan-aing'
 import location from './location'
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ Vue.use(Vuex)
 const modules = {
   aduan,
   citizenComplaintForm,
+  'jalan-aing': jalanAing,
   location,
 }
 

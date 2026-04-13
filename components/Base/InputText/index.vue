@@ -70,7 +70,7 @@
         <IconEyeOn
           v-if="!$slots['icon-right'] && iconEye === 'eye'"
           :class="{
-            'cursor-pointer stroke-gray-800': true,
+            'cursor-pointer stroke-gray-800 -mt-1': true,
             'stroke-green-800': isTyped || isFocused,
           }"
           @click="onClickEye"
@@ -78,7 +78,7 @@
         <IconEyeOff
           v-if="!$slots['icon-right'] && iconEye === 'eye-off'"
           :class="{
-            'cursor-pointer stroke-gray-800': true,
+            'cursor-pointer stroke-gray-800 -mt-1': true,
             'stroke-green-800': isTyped || isFocused,
           }"
           @click="onClickEye"
