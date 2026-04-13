@@ -26,6 +26,7 @@ export default {
   plugins: [
     '~/plugins/vue-gtag.js',
     '~/plugins/aduan-api.js',
+    { src: '~/plugins/aduan-get-token.js', mode: 'client' },
     { src: '~/plugins/dark-mode.js', mode: 'client' },
     { src: '~/plugins/vee-validate.js', mode: 'client' },
     '~/plugins/jds-design-system.js',
