@@ -247,6 +247,19 @@ export default {
       commit('SET_DOKUMEN_SLOT', { key, payload })
 
       try {
+        if (this.$config.useMockImahAing && this.$imahAingMock) {
+          commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 30 } })
+          const mockResponse = await this.$imahAingMock.uploadDocument()
+          const fileUrl = `${this.$config.urlFile}/${mockResponse.data.path}`
+
+          commit('SET_DOKUMEN_SLOT', {
+            key,
+            payload: { file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] },
+          })
+
+          return fileUrl
+        }
+
         // simulate progress
         commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 20 } })
 
@@ -318,7 +331,10 @@ export default {
           RW: String(rw || ''),
         }
 
-        const response = await this.$axios.post('/v1/aduan/complaints', payload)
+        const response =
+          this.$config.useMockImahAing && this.$imahAingMock
+            ? await this.$imahAingMock.submitForm(payload)
+            : await this.$axios.post('/v1/aduan/complaints', payload)
         const submissionId = response.data?.data?.id || response.data?.id || ''
 
         commit('SET_STATUS_SUBMIT', 'SUCCESS')
