@@ -1,17 +1,17 @@
 <template>
   <ValidationObserver ref="observer">
     <section>
-      <section class="grid grid-cols-1 gap-x-8 gap-y-6 mb-4">
+      <section class="grid grid-cols-1 mb-4 gap-x-8 gap-y-6">
         <ValidationProvider
           v-slot="{ errors }"
           rules="required"
-          class="flex flex-col gap-2 w-full"
+          class="flex flex-col w-full gap-2"
           tag="section"
           name="Kota/Kabupaten"
         >
           <label
             for="city"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
             Kota/Kabupaten <span class="text-red-500">*</span>
           </label>
@@ -29,13 +29,13 @@
         <ValidationProvider
           v-slot="{ errors }"
           rules="required"
-          class="flex flex-col gap-2 w-full"
+          class="flex flex-col w-full gap-2"
           tag="section"
           name="Kecamatan"
         >
           <label
             for="subdistrict"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
             Kecamatan <span class="text-red-500">*</span>
           </label>
@@ -60,7 +60,7 @@
         >
           <label
             for="village"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
             Kelurahan/Desa <span class="text-red-500">*</span>
           </label>
@@ -79,7 +79,7 @@
         <div class="flex flex-col gap-2">
           <label
             for="dusun"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
             Dusun
             <span class="text-gray-300 dark:text-dark-emphasis-high">
@@ -95,7 +95,7 @@
           />
         </div>
 
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <ValidationProvider
             v-slot="{ errors }"
             rules="required|numeric"
@@ -104,7 +104,7 @@
           >
             <label
               for="rw"
-              class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+              class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
             >
               RW <span class="text-red-500">*</span>
             </label>
@@ -126,7 +126,7 @@
           >
             <label
               for="rt"
-              class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+              class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
             >
               RT <span class="text-red-500">*</span>
             </label>
@@ -143,15 +143,17 @@
 
         <ValidationProvider
           v-slot="{ errors }"
-          rules="required"
           class="flex flex-col gap-2"
           name="Titik Lokasi Tanah"
         >
           <label
             for="location"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
-            Titik Lokasi Tanah <span class="text-red-500">*</span>
+            Titik Lokasi Tanah
+            <span class="text-gray-300 dark:text-dark-emphasis-high">
+              (opsional)
+            </span>
           </label>
           <JdsInputText
             id="location"
@@ -167,7 +169,7 @@
             <template #suffix-icon>
               <button
                 type="button"
-                class="text-green-700 text-sm font-lato font-semibold"
+                class="text-sm font-semibold text-green-700 font-lato"
                 @click="openLocationModal"
               >
                 Pilih
@@ -176,10 +178,13 @@
           </JdsInputText>
         </ValidationProvider>
 
-        <ValidationProvider class="flex flex-col gap-2" name="Detail Lokasi Tambahan">
+        <ValidationProvider
+          class="flex flex-col gap-2"
+          name="Detail Lokasi Tambahan"
+        >
           <label
             for="additionalLocation"
-            class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
             Detail lokasi tambahan
             <span class="text-gray-300 dark:text-dark-emphasis-high">
@@ -218,16 +223,20 @@
           />
         </div>
 
-        <div class="py-4 px-6 flex flex-col gap-2">
+        <div class="flex flex-col gap-2 px-6 py-4">
           <h5
-            class="text-base text-black font-lato font-semibold dark:text-dark-emphasis-high"
+            class="text-base font-semibold text-black font-lato dark:text-dark-emphasis-high"
           >
             {{ clonePlace.name || '-' }}
           </h5>
-          <p class="text-sm font-lato text-gray-500 dark:text-dark-emphasis-high">
+          <p
+            class="text-sm text-gray-500 font-lato dark:text-dark-emphasis-high"
+          >
             {{ clonePlace.address || '-' }}
           </p>
-          <p class="text-sm font-lato text-gray-400 dark:text-dark-emphasis-high">
+          <p
+            class="text-sm text-gray-400 font-lato dark:text-dark-emphasis-high"
+          >
             <span>{{ cloneLoc.lat || '-' }}</span>
             ,
             <span>{{ cloneLoc.lng || '-' }}</span>
@@ -236,7 +245,7 @@
 
         <template #footer>
           <BaseButton
-            class="text-sm font-bold text-white mr-2 dark:border-0 bg-green-700 hover:bg-green-600 ml-auto"
+            class="ml-auto mr-2 text-sm font-bold text-white bg-green-700 dark:border-0 hover:bg-green-600"
             @click="handleLocation"
           >
             Pilih Lokasi ini
@@ -310,7 +319,10 @@ export default {
         return this.lokasiTanah.cityName
       },
       set(value) {
-        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'city_name', value })
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+          field: 'city_name',
+          value,
+        })
         this.handleCitySelected()
       },
     },
@@ -319,7 +331,10 @@ export default {
         return this.lokasiTanah.districtName
       },
       set(value) {
-        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'district_name', value })
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+          field: 'district_name',
+          value,
+        })
         this.handleSubdistrictSelected()
       },
     },
@@ -328,7 +343,10 @@ export default {
         return this.lokasiTanah.villageName
       },
       set(value) {
-        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'village_name', value })
+        this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+          field: 'village_name',
+          value,
+        })
         this.handleVillageSelected()
       },
     },
@@ -348,7 +366,10 @@ export default {
     ]),
     openLocationModal() {
       this.cloneLocation = cloneDeep(this.lokasiTanah)
-      if (!this.cloneLocation.location.lat || !this.cloneLocation.location.lng) {
+      if (
+        !this.cloneLocation.location.lat ||
+        !this.cloneLocation.location.lng
+      ) {
         this.setCurrentLocation()
       }
       this.showLocationModal = true
@@ -378,33 +399,45 @@ export default {
       this.closeMaps()
     },
     setDusun(value) {
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'dusun', value })
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+        field: 'dusun',
+        value,
+      })
     },
     setRw(value) {
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'rw', value: String(value) })
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+        field: 'rw',
+        value: String(value),
+      })
     },
     setRt(value) {
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'rt', value: String(value) })
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+        field: 'rt',
+        value: String(value),
+      })
     },
     setAddressDetail(value) {
-      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', { field: 'address_detail', value })
+      this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
+        field: 'address_detail',
+        value,
+      })
     },
     setCurrentLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          this.cloneLocation.location.lat = position.coords.latitude
-          this.cloneLocation.location.lng = position.coords.longitude
-        },
-        () => {
-          this.cloneLocation.location.lat = -6.9025
-          this.cloneLocation.location.lng = 107.6187
-        }
-      )
-    } else {
-      this.cloneLocation.location.lat = -6.9025
-      this.cloneLocation.location.lng = 107.6187
-    }
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.cloneLocation.location.lat = position.coords.latitude
+            this.cloneLocation.location.lng = position.coords.longitude
+          },
+          () => {
+            this.cloneLocation.location.lat = -6.9025
+            this.cloneLocation.location.lng = 107.6187
+          }
+        )
+      } else {
+        this.cloneLocation.location.lat = -6.9025
+        this.cloneLocation.location.lng = 107.6187
+      }
     },
     async validate() {
       return await this.$refs.observer.validate()
