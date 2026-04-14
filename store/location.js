@@ -96,6 +96,12 @@ const actions = {
     const localStorageKey = typeof payload === 'string' ? payload : payload?.localStorageKey || null
     const skipMock = typeof payload === 'string' ? false : payload?.skipMock || false
 
+    // When skipMock is true, always fetch fresh data (don't use cache)
+    if (skipMock) {
+      dispatch('getCities', { params: state.params, localStorageKey, skipMock })
+      return
+    }
+
     const timeStamp = localStorage.getItem(`${localStorageKey}Date`)
       ? convertToLocaleDate(
           localStorage.getItem(`${localStorageKey}Date`),
