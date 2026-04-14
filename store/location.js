@@ -85,13 +85,17 @@ const actions = {
   /**
    * @function: To get Kota/Kabupaten data
    */
-  async getCities({ dispatch }, { params, localStorageKey }) {
-    await dispatch('fetchAreas', { params, localStorageKey })
+  async getCities({ dispatch }, { params, localStorageKey, skipMock = false }) {
+    await dispatch('fetchAreas', { params, localStorageKey, skipMock })
   },
   /**
    * @function: To set cities option
    */
-  setCitiesOption({ state, commit, dispatch }, localStorageKey = null) {
+  setCitiesOption({ state, commit, dispatch }, payload = null) {
+    // Backward compatibility: handle both string and object
+    const localStorageKey = typeof payload === 'string' ? payload : payload?.localStorageKey || null
+    const skipMock = typeof payload === 'string' ? false : payload?.skipMock || false
+
     const timeStamp = localStorage.getItem(`${localStorageKey}Date`)
       ? convertToLocaleDate(
           localStorage.getItem(`${localStorageKey}Date`),
@@ -104,7 +108,7 @@ const actions = {
     if (isEqual(timeStamp, nowDate)) {
       commit('SET_CITIES', JSON.parse(cities))
     } else {
-      dispatch('getCities', { params: state.params, localStorageKey })
+      dispatch('getCities', { params: state.params, localStorageKey, skipMock })
     }
   },
 }

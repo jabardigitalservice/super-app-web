@@ -329,7 +329,7 @@ export default {
     },
   },
   created() {
-    this.setCitiesOption('cities')
+    this.setCitiesOption({ localStorageKey: 'cities', skipMock: true })
   },
   mounted() {
     this.setCurrentLocation()
