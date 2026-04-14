@@ -632,11 +632,7 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$axios.post('/file/upload', formData, {
-          headers: {
-            Authorization: `Bearer ${state.authToken}`,
-          },
-        })
+        const response = await this.$axios.post('/file/upload', formData)
 
         if (response) {
           return {
