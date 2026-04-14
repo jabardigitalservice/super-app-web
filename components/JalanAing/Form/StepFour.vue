@@ -200,12 +200,40 @@
       <template #footer>
         <BaseButton
           class="text-sm font-bold text-white mr-2 dark:border-0 bg-green-700 hover:bg-green-600 ml-auto"
-          @click="handleLocation"
+          @click="confirmLocation"
         >
           Pilih Lokasi ini
         </BaseButton>
       </template>
     </JalanAingLocationModal>
+
+    <!-- CONFIRMATION MODAL -->
+    <JalanAingModal
+      :open="showConfirmLocation"
+      label-primary-button="Ya, Gunakan Lokasi Ini"
+      label-secondary-button="Batalkan"
+      header-close-button
+      src-icon="/icon/location-picker.svg"
+      size="48px"
+      title="Konfirmasi Lokasi"
+      description="Apakah Anda yakin ingin menggunakan lokasi ini untuk aduan Anda?"
+      @close="cancelConfirmLocation"
+      @click="handleLocation"
+    />
+
+    <!-- LOCATION PERMISSION DENIED MODAL -->
+    <JalanAingModal
+      :open="showLocationPermissionDenied"
+      label-primary-button="Tutup"
+      label-secondary-button="Buka Pengaturan"
+      header-close-button
+      name-icon="warning"
+      size="16px"
+      title="Akses Lokasi Diblokir"
+      description="Browser Anda memblokir akses lokasi. Silakan aktifkan izin lokasi di pengaturan browser untuk melanjutkan."
+      @close="closePermissionDeniedModal"
+      @click="closePermissionDeniedModal"
+    />
   </section>
 </template>
 
@@ -217,6 +245,8 @@ export default {
   data() {
     return {
       open: false,
+      showConfirmLocation: false,
+      showLocationPermissionDenied: false,
       cloneLocation: cloneDeep(
         this.$store.state['jalan-aing'].lokasi_aduan
       ),
@@ -321,16 +351,136 @@ export default {
     getPlaceDetail(place) {
       this.cloneLocation.place.name = place.name ?? ''
       this.cloneLocation.place.address = place.formatted_address ?? ''
+
+      // Extract kecamatan and kelurahan from address_components
+      if (place.address_components) {
+        this.autoPopulateLocation(place.address_components)
+      }
+    },
+    autoPopulateLocation(addressComponents) {
+      // Extract administrative areas from Google Maps
+      const kota = addressComponents.find((component) =>
+        component.types.includes('administrative_area_level_2')
+      )
+      const kecamatan = addressComponents.find((component) =>
+        component.types.includes('administrative_area_level_3')
+      )
+      const kelurahan = addressComponents.find((component) =>
+        component.types.includes('administrative_area_level_4')
+      )
+
+      // Auto-select kota if found
+      if (kota) {
+        const kotaName = kota.long_name.toUpperCase()
+        const matchedKota = this.$store.state.location.cities.find((city) =>
+          city.name.includes(kotaName)
+        )
+
+        if (matchedKota) {
+          this.$store.commit(
+            'jalan-aing/SET_LOKASI_ADUAN_CITY_NAME',
+            matchedKota.name
+          )
+          this.$store.commit(
+            'jalan-aing/SET_LOKASI_ADUAN_CITY_ID',
+            matchedKota.id
+          )
+
+          // Fetch kecamatan for this kota
+          this.$store.dispatch('location/fetchAreas', {
+            params: {
+              depth: 3,
+              cityId: matchedKota.id,
+            },
+          })
+        }
+      }
+
+      // Auto-select kecamatan if found (after a delay to let data load)
+      if (kecamatan) {
+        setTimeout(() => {
+          const kecamatanName = kecamatan.long_name.toUpperCase()
+          const matchedKecamatan = this.$store.state.location.subDistricts.find(
+            (district) => district.name === kecamatanName
+          )
+
+          if (matchedKecamatan) {
+            this.$store.commit(
+              'jalan-aing/SET_LOKASI_ADUAN_DISTRICT_NAME',
+              matchedKecamatan.name
+            )
+            this.$store.commit(
+              'jalan-aing/SET_LOKASI_ADUAN_DISTRICT_ID',
+              matchedKecamatan.id
+            )
+
+            // Fetch villages for this kecamatan
+            this.$store.dispatch('location/fetchAreas', {
+              params: {
+                depth: 4,
+                districtId: matchedKecamatan.id,
+              },
+            })
+          }
+        }, 500)
+      }
+
+      // Auto-select kelurahan if found (after a delay to let villages load)
+      if (kelurahan) {
+        setTimeout(() => {
+          const kelurahanName = kelurahan.long_name.toUpperCase()
+          const matchedKelurahan = this.$store.state.location.villages.find(
+            (village) => village.name === kelurahanName
+          )
+
+          if (matchedKelurahan) {
+            this.$store.commit(
+              'jalan-aing/SET_LOKASI_ADUAN_VILLAGE_NAME',
+              matchedKelurahan.name
+            )
+            this.$store.commit(
+              'jalan-aing/SET_LOKASI_ADUAN_VILLAGE_ID',
+              matchedKelurahan.id
+            )
+          }
+        }, 1000)
+      }
     },
     setCoords({ event }) {
       this.cloneLocation.location.lat = event.latLng.lat()
       this.cloneLocation.location.lng = event.latLng.lng()
     },
+    async confirmLocation() {
+      // Check location permission
+      if (navigator.permissions) {
+        try {
+          const permission = await navigator.permissions.query({
+            name: 'geolocation',
+          })
+
+          if (permission.state === 'denied') {
+            this.showLocationPermissionDenied = true
+            return
+          }
+        } catch (error) {
+          console.error('Error checking location permission:', error)
+        }
+      }
+
+      this.showConfirmLocation = true
+    },
+    cancelConfirmLocation() {
+      this.showConfirmLocation = false
+    },
+    closePermissionDeniedModal() {
+      this.showLocationPermissionDenied = false
+    },
     handleLocation() {
       this.handleLocationComplaint(this.cloneLocation)
+      this.showConfirmLocation = false
       setTimeout(() => {
         this.closeMaps()
-      }, 2000)
+      }, 500)
     },
     openLocationPicker() {
       if (!this.isLocationPickerDisabled) {
