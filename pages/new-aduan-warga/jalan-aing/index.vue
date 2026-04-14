@@ -147,7 +147,7 @@
       label-secondary-button="kembali ke form aduan"
       name-icon="check-mark-circle"
       size="16px"
-      description="Aduan berhasil dikirim. Silakan cek email Anda untuk informasi lebih lanjut."
+      :description="successDescription"
       @close="backToAduanPage"
       @click="openEmail"
     />
@@ -191,7 +191,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('jalan-aing', ['statusSubmitForm', 'foto_aduan']),
+    ...mapState('jalan-aing', ['statusSubmitForm', 'foto_aduan', 'complaintResponse']),
     ...mapGetters('jalan-aing', [
       'currentFormStep',
       'isFirstStep',
@@ -199,6 +199,12 @@ export default {
       'authToken',
       'hasAuthToken',
     ]),
+    successDescription() {
+      if (this.complaintResponse?.complaint_number) {
+        return `Aduan dengan ID ${this.complaintResponse.complaint_number} berhasil dikirim. Silakan cek email Anda untuk informasi lebih lanjut.`
+      }
+      return 'Aduan berhasil dikirim. Silakan cek email Anda untuk informasi lebih lanjut.'
+    },
     /**
      * Function to check if the foto aduan form step is invalid or not
      *  */

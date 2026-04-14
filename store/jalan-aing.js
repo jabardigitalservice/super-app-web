@@ -83,6 +83,7 @@ const getDefaultState = () => ({
     status: FORM_SUBMIT_STATUS.NONE,
     progress: 0,
   },
+  complaintResponse: null,
 })
 
 export default {
@@ -224,6 +225,9 @@ export default {
     SET_LOKASI_ADUAN_ADDRESS_DETAIL(state, payload) {
       state.lokasi_aduan.address_detail = payload
     },
+    SET_COMPLAINT_RESPONSE(state, payload) {
+      state.complaintResponse = payload
+    },
   },
   actions: {
     setAuthToken({ commit }, token) {
@@ -261,13 +265,27 @@ export default {
 
       return formComplaint
     },
-    async fetchUserProfile({ state, commit }) {
+    async fetchUserProfile({ state, commit, dispatch }) {
       try {
-        const response = await this.$axios.get('/user/profile', {
-          headers: {
-            Authorization: `Bearer ${state.authToken}`,
-          },
-        })
+        let response
+        try {
+          response = await this.$axios.get('/user/profile', {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          })
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.get('/user/profile', {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            })
+          } else {
+            throw error
+          }
+        }
         const { name, phone, email } = response.data.data
         commit('SET_DATA_WARGI_NAME', name)
         commit('SET_DATA_WARGI_PHONE', phone)
@@ -276,13 +294,27 @@ export default {
         console.error('Error fetching user profile:', error)
       }
     },
-    async fetchCategories({ commit, state }, localStorageKey) {
+    async fetchCategories({ commit, state, dispatch }, localStorageKey) {
       try {
-        const response = await this.$axios.get('/aduan/complaints/categories', {
-          headers: {
-            Authorization: `Bearer ${state.authToken}`,
-          },
-        })
+        let response
+        try {
+          response = await this.$axios.get('/aduan/complaints/categories', {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          })
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.get('/aduan/complaints/categories', {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            })
+          } else {
+            throw error
+          }
+        }
 
         commit('SET_INFORMASI_ADUAN_CATEGORY_OPTION', response.data.data)
         if (localStorageKey) {
@@ -296,19 +328,39 @@ export default {
         console.error(error)
       }
     },
-    async fetchSubCategories({ commit, state }, params) {
+    async fetchSubCategories({ commit, state, dispatch }, params) {
       try {
-        const response = await this.$axios.get(
-          '/aduan/complaints/subcategories',
-          {
-            headers: {
-              Authorization: `Bearer ${state.authToken}`,
-            },
-            params: {
-              ...params,
-            },
+        let response
+        try {
+          response = await this.$axios.get(
+            '/aduan/complaints/subcategories',
+            {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+              params: {
+                ...params,
+              },
+            }
+          )
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.get(
+              '/aduan/complaints/subcategories',
+              {
+                headers: {
+                  Authorization: `Bearer ${state.authToken}`,
+                },
+                params: {
+                  ...params,
+                },
+              }
+            )
+          } else {
+            throw error
           }
-        )
+        }
 
         commit('SET_INFORMASI_ADUAN_SUB_CATEGORY_OPTION', response.data.data)
       } catch (error) {
@@ -617,6 +669,16 @@ export default {
     closeConfirmation({ state }) {
       state.statusSubmitForm.status = FORM_SUBMIT_STATUS.NONE
     },
+    async refreshToken({ state }) {
+      try {
+        const newToken = await this.$getToken('refresh_token')
+        state.authToken = newToken
+        return newToken
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+        throw error
+      }
+    },
     async handleImage({ state, dispatch }, files) {
       const uploadPromises = files.map(async (file) => {
         const base64Data = await dispatch(
@@ -632,12 +694,33 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$axios.post('/file/upload', formData)
+        try {
+          const response = await this.$axios.post('/file/upload', formData, {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          })
 
-        if (response) {
-          return {
-            url: `${this.$config.urlFile}/` + response.data.data.path,
+          if (response) {
+            return {
+              url: `${this.$config.urlFile}/` + response.data.data.path,
+            }
           }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            const response = await this.$axios.post('/file/upload', formData, {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            })
+            if (response) {
+              return {
+                url: `${this.$config.urlFile}/` + response.data.data.path,
+              }
+            }
+          }
+          throw error
         }
       })
 
@@ -675,19 +758,39 @@ export default {
         }
 
         const jalanAingForm = await dispatch('generateFormData')
-        const response = await this.$axios.post(
-          '/aduan/complaints',
-          jalanAingForm,
-          {
-            headers: {
-              Authorization: `Bearer ${state.authToken}`,
-            },
+
+        let response
+        try {
+          response = await this.$axios.post(
+            '/aduan/complaints',
+            jalanAingForm,
+            {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            }
+          )
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.post(
+              '/aduan/complaints',
+              jalanAingForm,
+              {
+                headers: {
+                  Authorization: `Bearer ${state.authToken}`,
+                },
+              }
+            )
+          } else {
+            throw error
           }
-        )
+        }
 
         if (response) {
           await dispatch('updateSubmitProgress', { progress: 75, delay: 200 })
           await dispatch('updateSubmitProgress', { progress: 100, delay: 200 })
+          state.complaintResponse = response.data.data
           state.statusSubmitForm.status = FORM_SUBMIT_STATUS.SUCCESS
         } else {
           dispatch('updateSubmitProgress', { progress: 0, delay: 0 })
@@ -701,16 +804,33 @@ export default {
     resetForm({ state }) {
       Object.assign(state, getDefaultState())
     },
-    async handleCheckEmail({ state, getters }) {
+    async handleCheckEmail({ state, getters, dispatch }) {
       try {
-        const response = await this.$axios.get(
-          `/user/profile/email/${getters.email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${state.authToken}`,
-            },
+        let response
+        try {
+          response = await this.$axios.get(
+            `/user/profile/email/${getters.email}`,
+            {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            }
+          )
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.get(
+              `/user/profile/email/${getters.email}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${state.authToken}`,
+                },
+              }
+            )
+          } else {
+            throw error
           }
-        )
+        }
 
         state.data_wargi.is_email_valid = response.data.status
       } catch (error) {
