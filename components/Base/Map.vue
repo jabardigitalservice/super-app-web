@@ -160,7 +160,7 @@ export default {
     getPlaceDetail(placeId) {
       const request = {
         placeId,
-        fields: ['name', 'formatted_address', 'place_id'],
+        fields: ['name', 'formatted_address', 'place_id', 'address_components'],
       }
       this.placeService.getDetails(request, (place, status) => {
         if (status === 'OK') {
