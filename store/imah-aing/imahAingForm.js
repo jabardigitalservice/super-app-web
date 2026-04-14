@@ -1,5 +1,6 @@
 const getDefaultState = () => ({
-  authToken: null,
+  /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
+  sourceId: '',
   accountType: '',
   currentFormStep: 0,
 
@@ -50,6 +51,56 @@ const getDefaultState = () => ({
   },
 })
 
+/** Base64url-safe JSON dari query `meta` (UTF-8) */
+function decodeMetaQueryParam(encoded) {
+  if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
+    return null
+  }
+  try {
+    const normalized = encoded.trim().replace(/-/g, '+').replace(/_/g, '/')
+    const padLen = (4 - (normalized.length % 4)) % 4
+    const padded = normalized + '='.repeat(padLen)
+    const binary = atob(padded)
+    const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0))
+    const text = new TextDecoder('utf-8').decode(bytes)
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
+function applyQueryMetaToDataPengusul(commit, data) {
+  if (!data || typeof data !== 'object') {
+    return
+  }
+  const setField = (field, value) => {
+    if (value != null && String(value).trim() !== '') {
+      commit('SET_DATA_PENGUSUL_FIELD', { field, value: String(value).trim() })
+    }
+  }
+  setField('name', data.name)
+  setField('phone', data.phone)
+  setField('email', data.email)
+  setField('nik', data.nik)
+  const kkVal = data.kk != null ? data.kk : data.nomor_kk
+  setField('nomorKk', kkVal)
+}
+
+/** Normalisasi `meta` / `source_id` (termasuk dari `this.$route.query` Vue Router). */
+function normalizeInitQueryPayload(payload) {
+  if (payload == null) {
+    return { meta: '', sourceId: '' }
+  }
+  const metaRaw = payload.meta
+  const meta = Array.isArray(metaRaw) ? metaRaw[0] : metaRaw
+  const sidRaw = payload.source_id != null ? payload.source_id : payload.sourceId
+  const sourceId = Array.isArray(sidRaw) ? sidRaw[0] : sidRaw
+  return {
+    meta: meta != null && meta !== '' ? String(meta) : '',
+    sourceId: sourceId != null && sourceId !== '' ? String(sourceId) : '',
+  }
+}
+
 export default {
   namespaced: true,
   state: getDefaultState(),
@@ -70,8 +121,8 @@ export default {
     },
   },
   mutations: {
-    SET_AUTH_TOKEN(state, token) {
-      state.authToken = token
+    SET_SOURCE_ID(state, id) {
+      state.sourceId = id || ''
     },
     SET_ACCOUNT_TYPE(state, type) {
       state.accountType = type
@@ -132,26 +183,16 @@ export default {
     },
   },
   actions: {
-    initForm({ commit }, token) {
-      commit('SET_AUTH_TOKEN', token)
-      if (!token) {
-        // Tanpa token → user adalah warga biasa, mulai dari step 1
-        commit('SET_ACCOUNT_TYPE', 'warga')
-        return
-      }
-      try {
-        const parsed = typeof token === 'string' ? JSON.parse(token) : token
-        if (parsed) {
-          if (parsed.name) commit('SET_DATA_PENGUSUL_FIELD', { field: 'name', value: parsed.name })
-          if (parsed.phone) commit('SET_DATA_PENGUSUL_FIELD', { field: 'phone', value: parsed.phone })
-          if (parsed.email) commit('SET_DATA_PENGUSUL_FIELD', { field: 'email', value: parsed.email })
-          if (parsed.avatar_url) commit('SET_DATA_PENGUSUL_FIELD', { field: 'avatar_url', value: parsed.avatar_url })
-          // Jika accountType tidak ada dalam token, default ke 'warga'
-          commit('SET_ACCOUNT_TYPE', parsed.accountType || 'warga')
+    initForm({ commit }, payload) {
+      const { meta, sourceId } = normalizeInitQueryPayload(payload)
+      commit('SET_SOURCE_ID', sourceId)
+      commit('SET_ACCOUNT_TYPE', sourceId === 'sapawarga' ? 'rt_rw_kades' : 'warga')
+
+      if (meta) {
+        const decoded = decodeMetaQueryParam(meta)
+        if (decoded && typeof decoded === 'object') {
+          applyQueryMetaToDataPengusul(commit, decoded)
         }
-      } catch (e) {
-        // Token bukan JSON valid → anggap warga biasa
-        commit('SET_ACCOUNT_TYPE', 'warga')
       }
     },
     nextStep({ commit, state }) {
@@ -308,7 +349,7 @@ export default {
           user_phone: state.dataPengusul.phone,
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
-          source_id: 'sapawarga',
+          source_id: state.sourceId || 'sapawarga',
           type: 'private',
           photos,
           category_id: 'imah-aing',
