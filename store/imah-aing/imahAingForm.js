@@ -1,3 +1,11 @@
+/**
+ * Pusat peta default / fallback Geolocation
+ */
+export const IMAH_AING_DEFAULT_LOCATION = {
+  lat: -6.949097962580605,
+  lng: 107.66734566539526,
+}
+
 const getDefaultState = () => ({
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
@@ -84,6 +92,34 @@ function applyQueryMetaToDataPengusul(commit, data) {
   setField('nik', data.nik)
   const kkVal = data.kk != null ? data.kk : data.nomor_kk
   setField('nomorKk', kkVal)
+}
+
+/**
+ * Koordinat opsional dari decoded query `meta` (JSON).
+ * Mendukung `latitude`/`longitude` atau `lat`/`lng` (angka atau string yang bisa di-parse).
+ */
+function parseLocationFromMetaPayload(data) {
+  if (!data || typeof data !== 'object') {
+    return null
+  }
+  const latRaw = data.latitude != null ? data.latitude : data.lat
+  const lngRaw = data.longitude != null ? data.longitude : data.lng
+  if (latRaw == null || lngRaw == null) {
+    return null
+  }
+  const lat = typeof latRaw === 'number' ? latRaw : parseFloat(String(latRaw), 10)
+  const lng = typeof lngRaw === 'number' ? lngRaw : parseFloat(String(lngRaw), 10)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return null
+  }
+  return { lat, lng }
+}
+
+function applyQueryMetaToLokasiTanah(commit, data) {
+  const loc = parseLocationFromMetaPayload(data)
+  if (loc) {
+    commit('SET_LOKASI_TANAH_FIELD', { field: 'location', value: loc })
+  }
 }
 
 /** Normalisasi `meta` / `source_id` (termasuk dari `this.$route.query` Vue Router). */
@@ -192,8 +228,40 @@ export default {
         const decoded = decodeMetaQueryParam(meta)
         if (decoded && typeof decoded === 'object') {
           applyQueryMetaToDataPengusul(commit, decoded)
+          applyQueryMetaToLokasiTanah(commit, decoded)
         }
       }
+    },
+    hydrateLokasiTanahFromGeolocation({ commit, state }) {
+      if (!process.client) {
+        return
+      }
+      const { lat, lng } = state.lokasiTanah.location
+      if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
+        return
+      }
+      const fallback = () => {
+        commit('SET_LOKASI_TANAH_FIELD', {
+          field: 'location',
+          value: { ...IMAH_AING_DEFAULT_LOCATION },
+        })
+      }
+      if (typeof navigator === 'undefined' || !navigator.geolocation) {
+        fallback()
+        return
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          commit('SET_LOKASI_TANAH_FIELD', {
+            field: 'location',
+            value: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            },
+          })
+        },
+        fallback
+      )
     },
     nextStep({ commit, state }) {
       commit('SET_CURRENT_FORM_STEP', state.currentFormStep + 1)

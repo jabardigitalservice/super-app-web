@@ -216,11 +216,13 @@ export default {
   async mounted() {
     this.showLoadingSkeleton()
     await this.initForm(this.$route.query)
+    this.hydrateLokasiTanahFromGeolocation()
     this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
   },
   methods: {
     ...mapActions('imahAingForm', {
       initForm: 'initForm',
+      hydrateLokasiTanahFromGeolocation: 'hydrateLokasiTanahFromGeolocation',
       goToNextStep: 'nextStep',
       goToPreviousStep: 'previousStep',
       submitForm: 'submitForm',
@@ -268,6 +270,7 @@ export default {
       this.resetForm()
       this.showLoadingSkeleton()
       await this.initForm(this.$route.query)
+      this.hydrateLokasiTanahFromGeolocation()
       this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'NONE')
       this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
     },

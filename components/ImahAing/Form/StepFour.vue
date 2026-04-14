@@ -259,6 +259,7 @@
 <script>
 import { cloneDeep } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { IMAH_AING_DEFAULT_LOCATION } from '~/store/imah-aing/imahAingForm.js'
 import BaseMap from '~/components/Base/Map.vue'
 import TrackingComplaintLocationModal from '~/components/TrackingComplaint/LocationModal.vue'
 
@@ -354,9 +355,6 @@ export default {
   created() {
     this.setCitiesOption('cities')
   },
-  mounted() {
-    this.setCurrentLocation()
-  },
   methods: {
     ...mapActions('location', ['setCitiesOption']),
     ...mapActions('imahAingForm', [
@@ -366,11 +364,13 @@ export default {
     ]),
     openLocationModal() {
       this.cloneLocation = cloneDeep(this.lokasiTanah)
-      if (
-        !this.cloneLocation.location.lat ||
-        !this.cloneLocation.location.lng
-      ) {
-        this.setCurrentLocation()
+      const { lat, lng } = this.cloneLocation.location
+      const unset =
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng) ||
+        (lat === 0 && lng === 0)
+      if (unset) {
+        this.cloneLocation.location = { ...IMAH_AING_DEFAULT_LOCATION }
       }
       this.showLocationModal = true
     },
@@ -421,23 +421,6 @@ export default {
         field: 'address_detail',
         value,
       })
-    },
-    setCurrentLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            this.cloneLocation.location.lat = position.coords.latitude
-            this.cloneLocation.location.lng = position.coords.longitude
-          },
-          () => {
-            this.cloneLocation.location.lat = -6.9025
-            this.cloneLocation.location.lng = 107.6187
-          }
-        )
-      } else {
-        this.cloneLocation.location.lat = -6.9025
-        this.cloneLocation.location.lng = 107.6187
-      }
     },
     async validate() {
       return await this.$refs.observer.validate()
