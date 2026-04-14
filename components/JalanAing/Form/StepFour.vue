@@ -392,6 +392,7 @@ export default {
               depth: 3,
               cityId: matchedKota.id,
             },
+            skipMock: true,
           })
         }
       }
@@ -420,6 +421,7 @@ export default {
                 depth: 4,
                 districtId: matchedKecamatan.id,
               },
+              skipMock: true,
             })
           }
         }, 500)

@@ -461,7 +461,7 @@ export default {
         }
 
         commit('SET_LOKASI_ADUAN_CITY_ID', filteredCity[0].id)
-        dispatch('location/fetchAreas', { params }, { root: true })
+        dispatch('location/fetchAreas', { params, skipMock: true }, { root: true })
       }
 
       if (state.lokasi_aduan.city_name === undefined) {
@@ -496,7 +496,7 @@ export default {
         }
 
         commit('SET_LOKASI_ADUAN_DISTRICT_ID', filteredDistrict[0].id)
-        dispatch('location/fetchAreas', { params }, { root: true })
+        dispatch('location/fetchAreas', { params, skipMock: true }, { root: true })
       }
 
       if (state.lokasi_aduan.district_name === undefined) {

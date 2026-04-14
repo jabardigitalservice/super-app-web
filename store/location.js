@@ -48,7 +48,7 @@ const mutations = {
 }
 
 const actions = {
-  async fetchAreas({ commit }, { params, localStorageKey }) {
+  async fetchAreas({ commit }, { params, localStorageKey, skipMock = false }) {
     try {
       const endpoints = {
         2: { url: '/area/city', mutation: 'SET_CITIES' },
@@ -60,7 +60,7 @@ const actions = {
         const { url, mutation } = endpoints[params.depth]
         let areas = []
 
-        if (this.$config.useMockImahAing && this.$imahAingMock) {
+        if (this.$config.useMockImahAing && this.$imahAingMock && !skipMock) {
           areas = this.$imahAingMock.getAreas(params)
         } else {
           const response = await this.$axios.get(url, { params })
