@@ -8,7 +8,7 @@
         }"
         :for="label"
       >
-        {{ label }}
+        {{ label }}<span v-if="required" class="text-red-500 pl-1" aria-hidden="true">*</span>
       </label>
       <div
         v-if="isShowPasswordLevel && levelPassword"
@@ -59,6 +59,7 @@
         :autofocus="autofocus"
         autocomplete="on"
         :disabled="disabled"
+        :aria-required="required"
         @focus="isFocused = true"
         @blur="isFocused = false"
         @input="onInput"
@@ -148,6 +149,13 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    /**
+     * Show red asterisk after label (required field indicator)
+     */
+    required: {
+      type: Boolean,
+      default: false
     },
     /**
      * Error state

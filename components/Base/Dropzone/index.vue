@@ -8,7 +8,7 @@
     @drop.prevent="onDropFile"
   >
     <Icon class="mb-3" src="/icon/add-image.svg" size="36px" />
-    <label for="file" class="cursor-pointer text-center">
+    <label :for="uniqueInputId" class="cursor-pointer text-center">
       <span
         class="font-lato font-medium text-sm leading-6 text-blue-gray-300 mb-3"
       >
@@ -24,7 +24,7 @@
       </span>
     </label>
     <input
-      id="file"
+      :id="uniqueInputId"
       type="file"
       hidden
       :accept="accept"
@@ -83,6 +83,11 @@ export default {
     multiple: {
       type: Boolean,
       default: false,
+    },
+  },
+  computed: {
+    uniqueInputId() {
+      return `dropzone-input-${this._uid}`
     },
   },
   mounted() {

@@ -58,15 +58,22 @@ const actions = {
 
       if (endpoints[params.depth]) {
         const { url, mutation } = endpoints[params.depth]
-        const response = await this.$axios.get(url, { params })
+        let areas = []
 
-        commit(mutation, response.data.data)
+        if (this.$config.useMockImahAing && this.$imahAingMock) {
+          areas = this.$imahAingMock.getAreas(params)
+        } else {
+          const response = await this.$axios.get(url, { params })
+          areas = response.data.data
+        }
+
+        commit(mutation, areas)
 
         if (params.depth === 2 && localStorageKey) {
           localStorage.setItem(`${localStorageKey}Date`, new Date())
           localStorage.setItem(
             `${localStorageKey}Data`,
-            JSON.stringify(response.data.data)
+            JSON.stringify(areas)
           )
         }
       }
