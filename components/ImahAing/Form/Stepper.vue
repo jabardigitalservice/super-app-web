@@ -3,7 +3,7 @@
     class="form-stepper w-full min-w-0 min-h-[84px] overflow-auto flex lg:flex-row gap-1 lg:justify-center"
   >
     <li
-      v-for="item in displayedFormTitle"
+      v-for="item in formTitle"
       :key="item.id + item.title"
       class="flex items-center min-w-fit"
     >
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
@@ -42,13 +42,6 @@ export default {
   },
   computed: {
     ...mapGetters('imahAingForm', ['currentFormStep']),
-    ...mapState('imahAingForm', ['accountType']),
-    displayedFormTitle() {
-      return this.formTitle.filter((item) => {
-        if (item.id !== 1) return true
-        return this.accountType !== 'rt_rw_kades'
-      })
-    },
   },
 }
 </script>

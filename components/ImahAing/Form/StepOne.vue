@@ -1,6 +1,13 @@
 <template>
   <section class="mb-6 leading-relaxed text-gray-800 dark:text-gray-200">
-    <div class="mb-6 space-y-4">
+    <div v-if="isSapawargaSource" class="mb-6 space-y-4">
+      <p>
+        Formulir ini diperuntukkan bagi
+        <strong>Ketua RT/RW/Lurah/Kades yang akan mengusulkan warganya sebagai calon penerima bantuan</strong>
+      </p>
+    </div>
+
+    <div v-else class="mb-6 space-y-4">
       <p>
         Formulir ini diperuntukkan bagi <strong>Wargi yang mengusulkan dirinya sendiri sebagai calon penerima bantuan</strong>
       </p>

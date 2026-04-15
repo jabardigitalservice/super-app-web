@@ -9,7 +9,6 @@ export const IMAH_AING_DEFAULT_LOCATION = {
 const getDefaultState = () => ({
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
-  accountType: '',
   currentFormStep: 0,
 
   consent: {
@@ -144,7 +143,7 @@ export default {
     currentFormStep: (state) => state.currentFormStep,
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
-    startStep: (state) => (state.accountType === 'rt_rw_kades' ? 2 : 1),
+    startStep: () => 1,
     isConsentValid: (state) =>
       state.consent.hasReadPrivacyPolicy && state.consent.isBeneficiaryCandidate,
     isAllDocumentsUploaded: (state) => {
@@ -159,9 +158,6 @@ export default {
   mutations: {
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
-    },
-    SET_ACCOUNT_TYPE(state, type) {
-      state.accountType = type
     },
     SET_CURRENT_FORM_STEP(state, step) {
       state.currentFormStep = step
@@ -222,7 +218,6 @@ export default {
     initForm({ commit }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
-      commit('SET_ACCOUNT_TYPE', sourceId === 'sapawarga' ? 'rt_rw_kades' : 'warga')
 
       if (meta) {
         const decoded = decodeMetaQueryParam(meta)
@@ -266,9 +261,8 @@ export default {
     nextStep({ commit, state }) {
       commit('SET_CURRENT_FORM_STEP', state.currentFormStep + 1)
     },
-    previousStep({ commit, state, getters }) {
-      const minStep = getters.startStep
-      if (state.currentFormStep > minStep) {
+    previousStep({ commit, state }) {
+      if (state.currentFormStep > 1) {
         commit('SET_CURRENT_FORM_STEP', state.currentFormStep - 1)
       }
     },
