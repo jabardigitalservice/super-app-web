@@ -1,6 +1,14 @@
+/**
+ * Pusat peta default / fallback Geolocation
+ */
+export const IMAH_AING_DEFAULT_LOCATION = {
+  lat: -6.949097962580605,
+  lng: 107.66734566539526,
+}
+
 const getDefaultState = () => ({
-  authToken: null,
-  accountType: '',
+  /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
+  sourceId: '',
   currentFormStep: 0,
 
   consent: {
@@ -50,6 +58,84 @@ const getDefaultState = () => ({
   },
 })
 
+/** Base64url-safe JSON dari query `meta` (UTF-8) */
+function decodeMetaQueryParam(encoded) {
+  if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
+    return null
+  }
+  try {
+    const normalized = encoded.trim().replace(/-/g, '+').replace(/_/g, '/')
+    const padLen = (4 - (normalized.length % 4)) % 4
+    const padded = normalized + '='.repeat(padLen)
+    const binary = atob(padded)
+    const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0))
+    const text = new TextDecoder('utf-8').decode(bytes)
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
+function applyQueryMetaToDataPengusul(commit, data) {
+  if (!data || typeof data !== 'object') {
+    return
+  }
+  const setField = (field, value) => {
+    if (value != null && String(value).trim() !== '') {
+      commit('SET_DATA_PENGUSUL_FIELD', { field, value: String(value).trim() })
+    }
+  }
+  setField('name', data.name)
+  setField('phone', data.phone)
+  setField('email', data.email)
+  setField('nik', data.nik)
+  const kkVal = data.kk != null ? data.kk : data.nomor_kk
+  setField('nomorKk', kkVal)
+}
+
+/**
+ * Koordinat opsional dari decoded query `meta` (JSON).
+ * Mendukung `latitude`/`longitude` atau `lat`/`lng` (angka atau string yang bisa di-parse).
+ */
+function parseLocationFromMetaPayload(data) {
+  if (!data || typeof data !== 'object') {
+    return null
+  }
+  const latRaw = data.latitude != null ? data.latitude : data.lat
+  const lngRaw = data.longitude != null ? data.longitude : data.lng
+  if (latRaw == null || lngRaw == null) {
+    return null
+  }
+  const lat = typeof latRaw === 'number' ? latRaw : parseFloat(String(latRaw), 10)
+  const lng = typeof lngRaw === 'number' ? lngRaw : parseFloat(String(lngRaw), 10)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return null
+  }
+  return { lat, lng }
+}
+
+function applyQueryMetaToLokasiTanah(commit, data) {
+  const loc = parseLocationFromMetaPayload(data)
+  if (loc) {
+    commit('SET_LOKASI_TANAH_FIELD', { field: 'location', value: loc })
+  }
+}
+
+/** Normalisasi `meta` / `source_id` (termasuk dari `this.$route.query` Vue Router). */
+function normalizeInitQueryPayload(payload) {
+  if (payload == null) {
+    return { meta: '', sourceId: '' }
+  }
+  const metaRaw = payload.meta
+  const meta = Array.isArray(metaRaw) ? metaRaw[0] : metaRaw
+  const sidRaw = payload.source_id != null ? payload.source_id : payload.sourceId
+  const sourceId = Array.isArray(sidRaw) ? sidRaw[0] : sidRaw
+  return {
+    meta: meta != null && meta !== '' ? String(meta) : '',
+    sourceId: sourceId != null && sourceId !== '' ? String(sourceId) : '',
+  }
+}
+
 export default {
   namespaced: true,
   state: getDefaultState(),
@@ -57,7 +143,7 @@ export default {
     currentFormStep: (state) => state.currentFormStep,
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
-    startStep: (state) => (state.accountType === 'rt_rw_kades' ? 2 : 1),
+    startStep: () => 1,
     isConsentValid: (state) =>
       state.consent.hasReadPrivacyPolicy && state.consent.isBeneficiaryCandidate,
     isAllDocumentsUploaded: (state) => {
@@ -70,11 +156,8 @@ export default {
     },
   },
   mutations: {
-    SET_AUTH_TOKEN(state, token) {
-      state.authToken = token
-    },
-    SET_ACCOUNT_TYPE(state, type) {
-      state.accountType = type
+    SET_SOURCE_ID(state, id) {
+      state.sourceId = id || ''
     },
     SET_CURRENT_FORM_STEP(state, step) {
       state.currentFormStep = step
@@ -132,34 +215,54 @@ export default {
     },
   },
   actions: {
-    initForm({ commit }, token) {
-      commit('SET_AUTH_TOKEN', token)
-      if (!token) {
-        // Tanpa token → user adalah warga biasa, mulai dari step 1
-        commit('SET_ACCOUNT_TYPE', 'warga')
+    initForm({ commit }, payload) {
+      const { meta, sourceId } = normalizeInitQueryPayload(payload)
+      commit('SET_SOURCE_ID', sourceId)
+
+      if (meta) {
+        const decoded = decodeMetaQueryParam(meta)
+        if (decoded && typeof decoded === 'object') {
+          applyQueryMetaToDataPengusul(commit, decoded)
+          applyQueryMetaToLokasiTanah(commit, decoded)
+        }
+      }
+    },
+    hydrateLokasiTanahFromGeolocation({ commit, state }) {
+      if (!process.client) {
         return
       }
-      try {
-        const parsed = typeof token === 'string' ? JSON.parse(token) : token
-        if (parsed) {
-          if (parsed.name) commit('SET_DATA_PENGUSUL_FIELD', { field: 'name', value: parsed.name })
-          if (parsed.phone) commit('SET_DATA_PENGUSUL_FIELD', { field: 'phone', value: parsed.phone })
-          if (parsed.email) commit('SET_DATA_PENGUSUL_FIELD', { field: 'email', value: parsed.email })
-          if (parsed.avatar_url) commit('SET_DATA_PENGUSUL_FIELD', { field: 'avatar_url', value: parsed.avatar_url })
-          // Jika accountType tidak ada dalam token, default ke 'warga'
-          commit('SET_ACCOUNT_TYPE', parsed.accountType || 'warga')
-        }
-      } catch (e) {
-        // Token bukan JSON valid → anggap warga biasa
-        commit('SET_ACCOUNT_TYPE', 'warga')
+      const { lat, lng } = state.lokasiTanah.location
+      if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
+        return
       }
+      const fallback = () => {
+        commit('SET_LOKASI_TANAH_FIELD', {
+          field: 'location',
+          value: { ...IMAH_AING_DEFAULT_LOCATION },
+        })
+      }
+      if (typeof navigator === 'undefined' || !navigator.geolocation) {
+        fallback()
+        return
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          commit('SET_LOKASI_TANAH_FIELD', {
+            field: 'location',
+            value: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            },
+          })
+        },
+        fallback
+      )
     },
     nextStep({ commit, state }) {
       commit('SET_CURRENT_FORM_STEP', state.currentFormStep + 1)
     },
-    previousStep({ commit, state, getters }) {
-      const minStep = getters.startStep
-      if (state.currentFormStep > minStep) {
+    previousStep({ commit, state }) {
+      if (state.currentFormStep > 1) {
         commit('SET_CURRENT_FORM_STEP', state.currentFormStep - 1)
       }
     },
@@ -308,7 +411,7 @@ export default {
           user_phone: state.dataPengusul.phone,
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
-          source_id: 'sapawarga',
+          source_id: state.sourceId || 'sapawarga',
           type: 'private',
           photos,
           category_id: 'imah-aing',

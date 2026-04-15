@@ -329,7 +329,7 @@ export default {
     },
   },
   created() {
-    this.setCitiesOption({ localStorageKey: 'cities', skipMock: true })
+    this.setCitiesOption('cities')
   },
   mounted() {
     this.setCurrentLocation()
@@ -392,7 +392,6 @@ export default {
               depth: 3,
               cityId: matchedKota.id,
             },
-            skipMock: true,
           })
         }
       }
@@ -421,7 +420,6 @@ export default {
                 depth: 4,
                 districtId: matchedKecamatan.id,
               },
-              skipMock: true,
             })
           }
         }, 500)

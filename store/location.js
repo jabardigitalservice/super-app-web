@@ -48,7 +48,7 @@ const mutations = {
 }
 
 const actions = {
-  async fetchAreas({ commit }, { params, localStorageKey, skipMock = false }) {
+  async fetchAreas({ commit }, { params, localStorageKey }) {
     try {
       const endpoints = {
         2: { url: '/area/city', mutation: 'SET_CITIES' },
@@ -58,22 +58,15 @@ const actions = {
 
       if (endpoints[params.depth]) {
         const { url, mutation } = endpoints[params.depth]
-        let areas = []
+        const response = await this.$axios.get(url, { params })
 
-        if (this.$config.useMockImahAing && this.$imahAingMock && !skipMock) {
-          areas = this.$imahAingMock.getAreas(params)
-        } else {
-          const response = await this.$axios.get(url, { params })
-          areas = response.data.data
-        }
-
-        commit(mutation, areas)
+        commit(mutation, response.data.data)
 
         if (params.depth === 2 && localStorageKey) {
           localStorage.setItem(`${localStorageKey}Date`, new Date())
           localStorage.setItem(
             `${localStorageKey}Data`,
-            JSON.stringify(areas)
+            JSON.stringify(response.data.data)
           )
         }
       }
@@ -85,23 +78,13 @@ const actions = {
   /**
    * @function: To get Kota/Kabupaten data
    */
-  async getCities({ dispatch }, { params, localStorageKey, skipMock = false }) {
-    await dispatch('fetchAreas', { params, localStorageKey, skipMock })
+  async getCities({ dispatch }, { params, localStorageKey }) {
+    await dispatch('fetchAreas', { params, localStorageKey })
   },
   /**
    * @function: To set cities option
    */
-  setCitiesOption({ state, commit, dispatch }, payload = null) {
-    // Backward compatibility: handle both string and object
-    const localStorageKey = typeof payload === 'string' ? payload : payload?.localStorageKey || null
-    const skipMock = typeof payload === 'string' ? false : payload?.skipMock || false
-
-    // When skipMock is true, always fetch fresh data (don't use cache)
-    if (skipMock) {
-      dispatch('getCities', { params: state.params, localStorageKey, skipMock })
-      return
-    }
-
+  setCitiesOption({ state, commit, dispatch }, localStorageKey = null) {
     const timeStamp = localStorage.getItem(`${localStorageKey}Date`)
       ? convertToLocaleDate(
           localStorage.getItem(`${localStorageKey}Date`),
@@ -114,7 +97,7 @@ const actions = {
     if (isEqual(timeStamp, nowDate)) {
       commit('SET_CITIES', JSON.parse(cities))
     } else {
-      dispatch('getCities', { params: state.params, localStorageKey, skipMock })
+      dispatch('getCities', { params: state.params, localStorageKey })
     }
   },
 }
