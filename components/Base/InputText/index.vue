@@ -60,6 +60,7 @@
         autocomplete="on"
         :disabled="disabled"
         :aria-required="required"
+        :maxlength="maxlength"
         @focus="isFocused = true"
         @blur="isFocused = false"
         @input="onInput"
@@ -181,6 +182,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    maxlength: {
+      type: Number,
+      default: null
     }
   },
   data () {
