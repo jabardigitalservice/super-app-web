@@ -37,7 +37,7 @@
     <ValidationProvider
       v-slot="{ errors }"
       class="flex flex-col gap-2 mb-5"
-      rules="required|numeric|length:16"
+      :rules="`required|numeric|length:${maxNikKkLength}`"
       name="No KTP Calon Penerima Bantuan"
       vid="nik"
     >
@@ -47,6 +47,7 @@
         type="text"
         label="No KTP Calon Penerima Bantuan"
         required
+        :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
         :error="!!errors[0]"
@@ -58,7 +59,7 @@
     <ValidationProvider
       v-slot="{ errors }"
       class="flex flex-col gap-2 mb-5"
-      rules="required|numeric|length:16"
+      :rules="`required|numeric|length:${maxNikKkLength}`"
       name="No KK Calon Penerima Bantuan"
       vid="nomorKk"
     >
@@ -68,6 +69,7 @@
         type="text"
         label="No KK Calon Penerima Bantuan"
         required
+        :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
         :error="!!errors[0]"
@@ -84,6 +86,8 @@ export default {
     return {
       /** Zero-width space: enables :placeholder-shown for JDS-like empty background (see .spec/template/InputText.scss) */
       zwsPlaceholder: '\u200B',
+      /** NIK / No KK — panjang tetap 16 digit */
+      maxNikKkLength: 16,
     }
   },
   computed: {
@@ -111,7 +115,7 @@ export default {
       set(val) {
         const digits = String(val || '')
           .replace(/\D/g, '')
-          .slice(0, 16)
+          .slice(0, this.maxNikKkLength)
         this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nik', value: digits })
       },
     },
@@ -122,7 +126,7 @@ export default {
       set(val) {
         const digits = String(val || '')
           .replace(/\D/g, '')
-          .slice(0, 16)
+          .slice(0, this.maxNikKkLength)
         this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: digits })
       },
     },
