@@ -179,7 +179,7 @@ export default {
       isLoading: true,
       formTitle: [
         { id: 1, title: 'Perhatian' },
-        { id: 2, title: 'Data Pengusul' },
+        { id: 2, title: 'Calon Penerima Bantuan' },
         { id: 3, title: 'Dokumen Yang Diperlukan' },
         { id: 4, title: 'Lokasi Tanah untuk Pembangunan/Perbaikan Rumah' },
       ],

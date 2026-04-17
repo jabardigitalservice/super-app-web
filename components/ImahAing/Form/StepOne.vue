@@ -11,9 +11,6 @@
       <p>
         Formulir ini diperuntukkan bagi <strong>Wargi yang mengusulkan dirinya sendiri sebagai calon penerima bantuan</strong>
       </p>
-      <p>
-        Untuk <strong>proses rekomendasi</strong> hanya bisa dilakukan <strong>melalui Ketua RT/Ketua RW/Kades melalui akun Sapawarga RT / RW / Kades</strong>
-      </p>
     </div>
 
     <div class="mb-4">
@@ -23,48 +20,51 @@
       <ol class="list-decimal ml-5 space-y-1">
         <li>Kartu Tanda Penduduk (KTP);</li>
         <li>Kartu Keluarga (KK);</li>
-        <li>Surat Keterangan Miskin dari RT;</li>
+        <li>Surat Keterangan Miskin / Tidak Mampu dari RT;</li>
         <li>Surat Keterangan Kepemilikan Tanah Dari Kepala Desa/Lurah; dan</li>
-        <li>Foto Tanah.</li>
+        <li>Foto rumah.</li>
       </ol>
     </div>
 
     <div class="flex flex-col gap-4 mt-8">
-      <label v-if="isSapawargaSource" class="flex items-center gap-3 cursor-pointer">
+      <label class="flex items-center gap-3 cursor-pointer">
         <input
-          v-model="setSapawargaCombinedConsent"
+          v-model="privacyAccepted"
           type="checkbox"
           class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <span class="text-sm">
           Saya menyatakan telah membaca, mempelajari, dan menyetujui
           <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
-          serta memberikan rekomendasi calon penerima bantuan
         </span>
       </label>
 
-      <template v-else>
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input
-            v-model="setHasReadPrivacyPolicy"
-            type="checkbox"
-            class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span class="text-sm">
-            Saya menyatakan telah membaca, mempelajari, dan menyetujui
-            <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
-          </span>
-        </label>
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input
+          v-model="stmtSingleHouse"
+          type="checkbox"
+          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+        />
+        <span class="text-sm">{{ copySingleHouse }}</span>
+      </label>
 
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input
-            v-model="setIsBeneficiaryCandidate"
-            type="checkbox"
-            class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span class="text-sm">Saya adalah calon penerima bantuan</span>
-        </label>
-      </template>
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input
+          v-model="stmtNoSimilarProgram"
+          type="checkbox"
+          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+        />
+        <span class="text-sm">{{ copyNoSimilarProgram }}</span>
+      </label>
+
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input
+          v-model="stmtRevocationIfUntrue"
+          type="checkbox"
+          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+        />
+        <span class="text-sm">{{ copyRevocationIfUntrue }}</span>
+      </label>
     </div>
   </section>
 </template>
@@ -75,18 +75,22 @@ export default {
     isSapawargaSource() {
       return this.$store.state.imahAingForm.sourceId === 'sapawarga'
     },
-    /** One checkbox sets both consent flags so existing isConsentValid still applies */
-    setSapawargaCombinedConsent: {
-      get() {
-        const c = this.$store.state.imahAingForm.consent
-        return c.hasReadPrivacyPolicy && c.isBeneficiaryCandidate
-      },
-      set(val) {
-        this.$store.commit('imahAingForm/SET_CONSENT_PRIVACY', val)
-        this.$store.commit('imahAingForm/SET_CONSENT_BENEFICIARY', val)
-      },
+    copySingleHouse() {
+      return this.isSapawargaSource
+        ? 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah tunggal calon penerima bantuan'
+        : 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah tunggal saya'
     },
-    setHasReadPrivacyPolicy: {
+    copyNoSimilarProgram() {
+      return this.isSapawargaSource
+        ? 'Saya menyatakan bahwa calon penerima bantuan belum pernah menerima bantuan dari program serupa'
+        : 'Saya menyatakan bahwa saya belum pernah menerima bantuan dari program serupa'
+    },
+    copyRevocationIfUntrue() {
+      return this.isSapawargaSource
+        ? 'Saya menyatakan bahwa calon penerima bantuan bersedia dibatalkan jika data dan pernyataan yang saya berikan tidak benar'
+        : 'Saya bersedia dibatalkan pengajuannya jika data dan pernyataan yang saya berikan tidak benar'
+    },
+    privacyAccepted: {
       get() {
         return this.$store.state.imahAingForm.consent.hasReadPrivacyPolicy
       },
@@ -94,12 +98,28 @@ export default {
         this.$store.commit('imahAingForm/SET_CONSENT_PRIVACY', val)
       },
     },
-    setIsBeneficiaryCandidate: {
+    stmtSingleHouse: {
       get() {
-        return this.$store.state.imahAingForm.consent.isBeneficiaryCandidate
+        return this.$store.state.imahAingForm.consent.stmtSingleHouse
       },
       set(val) {
-        this.$store.commit('imahAingForm/SET_CONSENT_BENEFICIARY', val)
+        this.$store.commit('imahAingForm/SET_CONSENT_STATEMENT', { field: 'stmtSingleHouse', value: val })
+      },
+    },
+    stmtNoSimilarProgram: {
+      get() {
+        return this.$store.state.imahAingForm.consent.stmtNoSimilarProgram
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_CONSENT_STATEMENT', { field: 'stmtNoSimilarProgram', value: val })
+      },
+    },
+    stmtRevocationIfUntrue: {
+      get() {
+        return this.$store.state.imahAingForm.consent.stmtRevocationIfUntrue
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_CONSENT_STATEMENT', { field: 'stmtRevocationIfUntrue', value: val })
       },
     },
   },

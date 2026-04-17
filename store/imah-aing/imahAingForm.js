@@ -13,7 +13,18 @@ const getDefaultState = () => ({
 
   consent: {
     hasReadPrivacyPolicy: false,
-    isBeneficiaryCandidate: false,
+    /** Tiga pernyataan — teks UI beda sapawarga vs warga di StepOne */
+    stmtSingleHouse: false,
+    stmtNoSimilarProgram: false,
+    stmtRevocationIfUntrue: false,
+  },
+
+  /** PAGE 3 — penyebab/deskripsi/ceklis; payload API menyusul (lihat submitForm) */
+  kondisiRumah: {
+    penyebabKerusakan: '',
+    penyebabKerusakanLainnya: '',
+    deskripsiKondisi: '',
+    pernyataanKepemilikanTunggalBermaterai: false,
   },
 
   dataPengusul: {
@@ -30,7 +41,11 @@ const getDefaultState = () => ({
     kk: null,
     suratMiskin: null,
     suratTanah: null,
-    fotoTanah: null,
+    fotoRumahDepan: null,
+    fotoRumahKiri: null,
+    fotoRumahKanan: null,
+    fotoRumahDalam: null,
+    fotoRumahBelakang: null,
   },
 
   lokasiTanah: {
@@ -144,14 +159,31 @@ export default {
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
     startStep: () => 1,
-    isConsentValid: (state) =>
-      state.consent.hasReadPrivacyPolicy && state.consent.isBeneficiaryCandidate,
+    isConsentValid: (state) => {
+      const c = state.consent
+      return (
+        c.hasReadPrivacyPolicy &&
+        c.stmtSingleHouse &&
+        c.stmtNoSimilarProgram &&
+        c.stmtRevocationIfUntrue
+      )
+    },
     isAllDocumentsUploaded: (state) => {
-      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
-      return keys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
+      const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoRumahDepan']
+      return requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
     },
     documentSlotsOrdered: (state) => {
-      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+      const keys = [
+        'ktp',
+        'kk',
+        'suratMiskin',
+        'suratTanah',
+        'fotoRumahDepan',
+        'fotoRumahKiri',
+        'fotoRumahKanan',
+        'fotoRumahDalam',
+        'fotoRumahBelakang',
+      ]
       return keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
     },
   },
@@ -165,8 +197,15 @@ export default {
     SET_CONSENT_PRIVACY(state, val) {
       state.consent.hasReadPrivacyPolicy = val
     },
-    SET_CONSENT_BENEFICIARY(state, val) {
-      state.consent.isBeneficiaryCandidate = val
+    SET_CONSENT_STATEMENT(state, { field, value }) {
+      if (Object.prototype.hasOwnProperty.call(state.consent, field)) {
+        state.consent[field] = value
+      }
+    },
+    SET_KONDISI_RUMAH_FIELD(state, { field, value }) {
+      if (Object.prototype.hasOwnProperty.call(state.kondisiRumah, field)) {
+        state.kondisiRumah[field] = value
+      }
     },
     SET_DATA_PENGUSUL_FIELD(state, { field, value }) {
       // map common incoming snake_case fields to camelCase store keys
@@ -397,13 +436,24 @@ export default {
     async submitForm({ commit, state }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
-        // Build photos from the five document slots in fixed order
-        const docKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+        // photos[] — urutan tetap: KTP, KK, surat miskin/tidak mampu, surat tanah, lalu 5 sisi foto rumah (depan→kiri→kanan→dalam→belakang); slot opsional yang kosong di-skip
+        const docKeys = [
+          'ktp',
+          'kk',
+          'suratMiskin',
+          'suratTanah',
+          'fotoRumahDepan',
+          'fotoRumahKiri',
+          'fotoRumahKanan',
+          'fotoRumahDalam',
+          'fotoRumahBelakang',
+        ]
         const photos = docKeys
           .map((k) => state.dokumen[k]?.url || '')
           .filter((u) => !!u)
           .map((url) => ({ url }))
 
+        // Field `kondisiRumah` (penyebab/deskripsi/ceklis) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
           user_name: state.dataPengusul.name,

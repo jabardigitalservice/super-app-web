@@ -11,7 +11,8 @@
     <ul class="space-y-4">
       <li v-for="item in docsConfig" :key="item.key" class="flex flex-col gap-2">
         <div class="flex items-start gap-2 text-sm">
-          <span class="text-red-500 mt-0.5 flex-shrink-0">*</span>
+          <span v-if="item.required" class="text-red-500 mt-0.5 flex-shrink-0">*</span>
+          <span v-else class="w-1.5 flex-shrink-0" />
           <span class="font-roboto text-black dark:text-dark-emphasis-high">{{ item.label }}</span>
         </div>
 
@@ -19,7 +20,7 @@
           v-slot="{ errors }"
           :ref="`documentUploader_${item.key}`"
           class="flex flex-col gap-y-2"
-          rules="required"
+          :rules="item.required ? 'required' : ''"
           :name="item.label"
         >
           <BaseDropzone
@@ -50,6 +51,72 @@
         </transition>
       </li>
     </ul>
+
+    <div class="border-t border-gray-200 dark:border-dark-emphasis-medium pt-6 space-y-5">
+      <h4 class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">
+        Kondisi rumah
+      </h4>
+
+      <div class="flex flex-col gap-2">
+        <label
+          for="penyebabKerusakan"
+          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        >
+          Penyebab kerusakan
+        </label>
+        <JdsSelect
+          id="penyebabKerusakan"
+          v-model="setPenyebabKerusakan"
+          filterable
+          filter-type="contain"
+          placeholder="Pilih penyebab kerusakan"
+          :options="penyebabOptions"
+        />
+      </div>
+
+      <div v-if="kondisiRumah.penyebabKerusakan === 'lainnya'" class="flex flex-col gap-2">
+        <label
+          for="penyebabLainnya"
+          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        >
+          Penyebab lainnya
+        </label>
+        <JdsInputText
+          id="penyebabLainnya"
+          :value="setPenyebabKerusakanLainnya"
+          class="w-full"
+          placeholder="Jelaskan penyebab lainnya"
+          @input="setPenyebabKerusakanLainnya = $event"
+        />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label
+          for="deskripsiKondisi"
+          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        >
+          Deskripsi kondisi rumah
+        </label>
+        <textarea
+          id="deskripsiKondisi"
+          v-model="setDeskripsiKondisi"
+          rows="4"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 dark:bg-dark-emphasis-low dark:border-dark-emphasis-medium dark:text-dark-emphasis-high"
+          placeholder="Jelaskan kondisi rumah"
+        />
+      </div>
+
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input
+          v-model="setPernyataanKepemilikanTunggal"
+          type="checkbox"
+          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+        />
+        <span class="text-sm text-black dark:text-dark-emphasis-high">
+          Saya menyatakan kepemilikan tunggal atas rumah ini (pernyataan bermaterai mengikuti ketentuan operasional).
+        </span>
+      </label>
+    </div>
   </section>
 </template>
 
@@ -60,29 +127,87 @@ export default {
   data() {
     return {
       docsConfig: [
-        { key: 'ktp', label: 'Kartu Tanda Penduduk (KTP) Calon Penerima Bantuan' },
-        { key: 'kk', label: 'Kartu Keluarga (KK) Calon Penerima Bantuan' },
-        { key: 'suratMiskin', label: 'Surat Keterangan Miskin dari Ketua RT' },
-        { key: 'suratTanah', label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah' },
-        { key: 'fotoTanah', label: 'Foto Tanah' },
+        { key: 'ktp', label: 'Kartu Tanda Penduduk (KTP) Calon Penerima Bantuan', required: true },
+        { key: 'kk', label: 'Kartu Keluarga (KK) Calon Penerima Bantuan', required: true },
+        {
+          key: 'suratMiskin',
+          label: 'Surat Keterangan Miskin / Tidak Mampu dari Ketua RT',
+          required: true,
+        },
+        {
+          key: 'suratTanah',
+          label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah',
+          required: true,
+        },
+        { key: 'fotoRumahDepan', label: 'Foto rumah — tampak depan (wajib)', required: true },
+        { key: 'fotoRumahKiri', label: 'Foto rumah — tampak kiri', required: false },
+        { key: 'fotoRumahKanan', label: 'Foto rumah — tampak kanan', required: false },
+        { key: 'fotoRumahDalam', label: 'Foto rumah — tampak dalam', required: false },
+        { key: 'fotoRumahBelakang', label: 'Foto rumah — tampak belakang', required: false },
+      ],
+      penyebabOptions: [
+        { value: 'bencana', label: 'Bencana' },
+        { value: 'umur_sudah_tua', label: 'Umur sudah tua' },
+        { value: 'tidak_terawat', label: 'Tidak terawat' },
+        { value: 'struktur_bangunan_tidak_baik', label: 'Struktur bangunan tidak baik' },
+        { value: 'lainnya', label: 'Lainnya' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
     }
   },
   computed: {
-    ...mapState('imahAingForm', ['dokumen']),
+    ...mapState('imahAingForm', ['dokumen', 'kondisiRumah']),
     slotFor() {
-      return (key) => this.dokumen ? this.dokumen[key] : null
-    },
-    showDropzone() {
-      return (key) => {
-        const slot = this.dokumen ? this.dokumen[key] : null
-        return !slot || slot.status === 'NONE'
-      }
+      return (key) => (this.dokumen ? this.dokumen[key] : null)
     },
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
+    },
+    setPenyebabKerusakan: {
+      get() {
+        return this.kondisiRumah.penyebabKerusakan || ''
+      },
+      set(val) {
+        const v = val != null ? String(val) : ''
+        this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'penyebabKerusakan', value: v })
+        if (v !== 'lainnya') {
+          this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
+            field: 'penyebabKerusakanLainnya',
+            value: '',
+          })
+        }
+      },
+    },
+    setPenyebabKerusakanLainnya: {
+      get() {
+        return this.kondisiRumah.penyebabKerusakanLainnya
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
+          field: 'penyebabKerusakanLainnya',
+          value: val,
+        })
+      },
+    },
+    setDeskripsiKondisi: {
+      get() {
+        return this.kondisiRumah.deskripsiKondisi
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'deskripsiKondisi', value: val })
+      },
+    },
+    setPernyataanKepemilikanTunggal: {
+      get() {
+        return this.kondisiRumah.pernyataanKepemilikanTunggalBermaterai
+      },
+      set(val) {
+        this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
+          field: 'pernyataanKepemilikanTunggalBermaterai',
+          value: val,
+        })
+      },
     },
   },
   methods: {
@@ -93,8 +218,9 @@ export default {
 
       const refName = `documentUploader_${key}`
       const provider = this.$refs[refName]
-      if (provider && typeof provider.validate === 'function') {
-        const { valid } = await provider.validate(selectedFile)
+      const p = Array.isArray(provider) ? provider[0] : provider
+      if (p && typeof p.validate === 'function') {
+        const { valid } = await p.validate(selectedFile)
         if (!valid) return
       }
 
@@ -120,7 +246,8 @@ export default {
       const input = document.querySelector(`#imahAingDocumentDropzone_${key} input`)
       if (input) input.value = ''
       const provider = this.$refs[`documentUploader_${key}`]
-      if (provider && typeof provider.syncValue === 'function') provider.syncValue()
+      const p = Array.isArray(provider) ? provider[0] : provider
+      if (p && typeof p.syncValue === 'function') p.syncValue()
     },
     async handleRetry(key) {
       const slot = this.slotFor(key)
@@ -146,7 +273,7 @@ export default {
 }
 
 .slide-fade-leave-active {
-  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter,
