@@ -22,23 +22,11 @@
         <li>Kartu Keluarga (KK);</li>
         <li>Surat Keterangan Miskin / Tidak Mampu dari RT;</li>
         <li>Surat Keterangan Kepemilikan Tanah Dari Kepala Desa/Lurah; dan</li>
-        <li>Foto rumah.</li>
+        <li>Foto Rumah.</li>
       </ol>
     </div>
 
     <div class="flex flex-col gap-4 mt-8">
-      <label class="flex items-center gap-3 cursor-pointer">
-        <input
-          v-model="privacyAccepted"
-          type="checkbox"
-          class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-        <span class="text-sm">
-          Saya menyatakan telah membaca, mempelajari, dan menyetujui
-          <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
-        </span>
-      </label>
-
       <label class="flex items-start gap-3 cursor-pointer">
         <input
           v-model="stmtSingleHouse"
@@ -89,14 +77,6 @@ export default {
       return this.isSapawargaSource
         ? 'Saya menyatakan bahwa calon penerima bantuan bersedia dibatalkan jika data dan pernyataan yang saya berikan tidak benar'
         : 'Saya bersedia dibatalkan pengajuannya jika data dan pernyataan yang saya berikan tidak benar'
-    },
-    privacyAccepted: {
-      get() {
-        return this.$store.state.imahAingForm.consent.hasReadPrivacyPolicy
-      },
-      set(val) {
-        this.$store.commit('imahAingForm/SET_CONSENT_PRIVACY', val)
-      },
     },
     stmtSingleHouse: {
       get() {
