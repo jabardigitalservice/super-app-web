@@ -33,13 +33,19 @@
       <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
     </ValidationProvider>
 
-    <!-- NIK — WAJIB -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="NIK" vid="nik">
+    <!-- No KTP — WAJIB -->
+    <ValidationProvider
+      v-slot="{ errors }"
+      class="flex flex-col gap-2 mb-5"
+      rules="required|numeric|length:16"
+      name="No KTP Calon Penerima Bantuan"
+      vid="nik"
+    >
       <BaseInputText
         v-model="setNik"
         class="step-two-input-jds"
-        type="number"
-        label="NIK"
+        type="text"
+        label="No KTP Calon Penerima Bantuan"
         required
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -48,13 +54,19 @@
       />
     </ValidationProvider>
 
-    <!-- Nomor KK — WAJIB -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required|numeric|length:16" name="Nomor KK" vid="nomorKk">
+    <!-- No KK — WAJIB -->
+    <ValidationProvider
+      v-slot="{ errors }"
+      class="flex flex-col gap-2 mb-5"
+      rules="required|numeric|length:16"
+      name="No KK Calon Penerima Bantuan"
+      vid="nomorKk"
+    >
       <BaseInputText
         v-model="setNomorKk"
         class="step-two-input-jds"
-        type="number"
-        label="Nomor KK"
+        type="text"
+        label="No KK Calon Penerima Bantuan"
         required
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -97,7 +109,10 @@ export default {
         return this.$store.state.imahAingForm.dataPengusul.nik
       },
       set(val) {
-        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nik', value: val })
+        const digits = String(val || '')
+          .replace(/\D/g, '')
+          .slice(0, 16)
+        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nik', value: digits })
       },
     },
     setNomorKk: {
@@ -105,7 +120,10 @@ export default {
         return this.$store.state.imahAingForm.dataPengusul.nomorKk
       },
       set(val) {
-        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: val })
+        const digits = String(val || '')
+          .replace(/\D/g, '')
+          .slice(0, 16)
+        this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: digits })
       },
     },
     setName: {
