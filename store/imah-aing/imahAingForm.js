@@ -14,6 +14,7 @@ const getDefaultState = () => ({
   currentFormStep: 0,
 
   consent: {
+    hasReadPrivacyPolicy: false,
     /** Tiga pernyataan — teks UI beda sapawarga vs warga di StepOne */
     stmtSingleHouse: false,
     stmtNoSimilarProgram: false,
@@ -164,7 +165,12 @@ export default {
     startStep: () => 1,
     isConsentValid: (state) => {
       const c = state.consent
-      return c.stmtSingleHouse && c.stmtNoSimilarProgram && c.stmtRevocationIfUntrue
+      return (
+        c.hasReadPrivacyPolicy &&
+        c.stmtSingleHouse &&
+        c.stmtNoSimilarProgram &&
+        c.stmtRevocationIfUntrue
+      )
     },
     isAllDocumentsUploaded: (state) => {
       const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoRumahDepan']
@@ -194,6 +200,9 @@ export default {
     },
     SET_CURRENT_FORM_STEP(state, step) {
       state.currentFormStep = step
+    },
+    SET_CONSENT_PRIVACY(state, val) {
+      state.consent.hasReadPrivacyPolicy = val
     },
     SET_CONSENT_STATEMENT(state, { field, value }) {
       if (Object.prototype.hasOwnProperty.call(state.consent, field)) {
