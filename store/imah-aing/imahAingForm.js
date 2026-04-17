@@ -7,6 +7,8 @@ export const IMAH_AING_DEFAULT_LOCATION = {
 }
 
 const getDefaultState = () => ({
+  /** Partner API token (Keycloak); sama pola dengan jalan-aing / citizenComplaintForm */
+  authToken: null,
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
   currentFormStep: 0,
@@ -155,6 +157,8 @@ export default {
   namespaced: true,
   state: getDefaultState(),
   getters: {
+    authToken: (state) => state.authToken,
+    hasAuthToken: (state) => !!state.authToken,
     currentFormStep: (state) => state.currentFormStep,
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
@@ -188,6 +192,9 @@ export default {
     },
   },
   mutations: {
+    SET_AUTH_TOKEN(state, token) {
+      state.authToken = token
+    },
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
     },
@@ -254,6 +261,20 @@ export default {
     },
   },
   actions: {
+    setAuthToken({ commit }, token) {
+      commit('SET_AUTH_TOKEN', token)
+    },
+    async refreshToken({ state }) {
+      try {
+        const newToken = await this.$getToken('refresh_token')
+        state.authToken = newToken
+        return newToken
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Token refresh failed:', error)
+        throw error
+      }
+    },
     initForm({ commit }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
@@ -417,7 +438,21 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$axios.post('/file/upload', formData)
+        let response
+        try {
+          response = await this.$axios.post('/file/upload', formData)
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.post('/file/upload', formData, {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            })
+          } else {
+            throw error
+          }
+        }
 
         const fileUrl = `${this.$config.urlFile}/${response.data.data.path}`
 
@@ -433,7 +468,7 @@ export default {
         throw error
       }
     },
-    async submitForm({ commit, state }) {
+    async submitForm({ commit, state, dispatch }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
         // photos[] — urutan tetap: KTP, KK, surat miskin/tidak mampu, surat tanah, lalu 5 sisi foto rumah (depan→kiri→kanan→dalam→belakang); slot opsional yang kosong di-skip
@@ -482,10 +517,28 @@ export default {
           RW: String(rw || ''),
         }
 
-        const response =
-          this.$config.useMockImahAing && this.$imahAingMock
-            ? await this.$imahAingMock.submitForm(payload)
-            : await this.$axios.post('/v1/aduan/complaints', payload)
+        const postComplaint = () =>
+          this.$axios.post('/aduan/complaints', payload, {
+            headers: state.authToken
+              ? { Authorization: `Bearer ${state.authToken}` }
+              : {},
+          })
+
+        let response
+        if (this.$config.useMockImahAing && this.$imahAingMock) {
+          response = await this.$imahAingMock.submitForm(payload)
+        } else {
+          try {
+            response = await postComplaint()
+          } catch (error) {
+            if (error.response?.status === 401) {
+              await dispatch('refreshToken')
+              response = await postComplaint()
+            } else {
+              throw error
+            }
+          }
+        }
         const submissionId = response.data?.data?.id || response.data?.id || ''
 
         commit('SET_STATUS_SUBMIT', 'SUCCESS')

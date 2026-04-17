@@ -194,6 +194,7 @@ export default {
       'startStep',
       'isConsentValid',
       'isAllDocumentsUploaded',
+      'hasAuthToken',
     ]),
     nextButtonDisabled() {
       const step = Number(this.currentFormStep)
@@ -215,6 +216,15 @@ export default {
   },
   async mounted() {
     this.showLoadingSkeleton()
+    if (!this.hasAuthToken) {
+      try {
+        const token = await this.$getToken('client_credentials')
+        this.setAuthToken(token)
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to get token:', error)
+      }
+    }
     await this.initForm(this.$route.query)
     this.hydrateLokasiTanahFromGeolocation()
     this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
@@ -227,6 +237,7 @@ export default {
       goToPreviousStep: 'previousStep',
       submitForm: 'submitForm',
       resetForm: 'resetForm',
+      setAuthToken: 'setAuthToken',
     }),
     async nextStep() {
       const step = Number(this.currentFormStep)
@@ -269,6 +280,15 @@ export default {
     async backToFormPage() {
       this.resetForm()
       this.showLoadingSkeleton()
+      if (!this.hasAuthToken) {
+        try {
+          const token = await this.$getToken('client_credentials')
+          this.setAuthToken(token)
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to get token:', error)
+        }
+      }
       await this.initForm(this.$route.query)
       this.hydrateLokasiTanahFromGeolocation()
       this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'NONE')
