@@ -18,8 +18,8 @@
         Pastikan dokumen digital berikut sudah terlebih dahulu disiapkan untuk memudahkan proses pengajuan wargi (dalam format .pdf atau .jpeg/.jpg/.png) :
       </p>
       <ol class="list-decimal ml-5 space-y-1">
-        <li>Kartu Tanda Penduduk (KTP);</li>
-        <li>Kartu Keluarga (KK);</li>
+        <li><strong>KTP</strong> / "Surat Keterangan dari Kades atau Lurah";</li>
+        <li><strong>Kartu Keluarga</strong> / "Surat Keterangan dari Kades atau Lurah";</li>
         <li>Surat Keterangan Miskin / Tidak Mampu dari RT;</li>
         <li>Surat Keterangan Kepemilikan Tanah Dari Kepala Desa/Lurah; dan</li>
         <li>Foto rumah.</li>

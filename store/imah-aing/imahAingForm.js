@@ -7,7 +7,6 @@ export const IMAH_AING_DEFAULT_LOCATION = {
 }
 
 const getDefaultState = () => ({
-  /** Partner API token (Keycloak); sama pola dengan jalan-aing / citizenComplaintForm */
   authToken: null,
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
@@ -21,12 +20,10 @@ const getDefaultState = () => ({
     stmtRevocationIfUntrue: false,
   },
 
-  /** PAGE 3 — penyebab/deskripsi/ceklis; payload API menyusul (lihat submitForm) */
   kondisiRumah: {
     penyebabKerusakan: '',
     penyebabKerusakanLainnya: '',
     deskripsiKondisi: '',
-    pernyataanKepemilikanTunggalBermaterai: false,
   },
 
   dataPengusul: {
@@ -43,11 +40,8 @@ const getDefaultState = () => ({
     kk: null,
     suratMiskin: null,
     suratTanah: null,
-    fotoRumahDepan: null,
-    fotoRumahKiri: null,
-    fotoRumahKanan: null,
-    fotoRumahDalam: null,
-    fotoRumahBelakang: null,
+    /** Multifile — tiap item: { file, url, progress, status, errors } */
+    fotoRumah: [],
   },
 
   lokasiTanah: {
@@ -173,22 +167,22 @@ export default {
       )
     },
     isAllDocumentsUploaded: (state) => {
-      const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoRumahDepan']
-      return requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
+      const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
+      const baseOk = requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
+      const fr = state.dokumen.fotoRumah || []
+      const fotoOk =
+        fr.length >= 1 && fr.every((s) => s && s.status === 'SUCCESS')
+      return baseOk && fotoOk
     },
     documentSlotsOrdered: (state) => {
-      const keys = [
-        'ktp',
-        'kk',
-        'suratMiskin',
-        'suratTanah',
-        'fotoRumahDepan',
-        'fotoRumahKiri',
-        'fotoRumahKanan',
-        'fotoRumahDalam',
-        'fotoRumahBelakang',
-      ]
-      return keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
+      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
+      const base = keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
+      const foto = (state.dokumen.fotoRumah || []).map((slot, index) => ({
+        key: 'fotoRumah',
+        index,
+        slot,
+      }))
+      return [...base, ...foto]
     },
   },
   mutations: {
@@ -227,6 +221,21 @@ export default {
     },
     SET_DOKUMEN_SLOT(state, { key, payload }) {
       state.dokumen[key] = payload
+    },
+    ADD_FOTO_RUMAH_SLOT(state, payload) {
+      state.dokumen.fotoRumah.push(payload)
+    },
+    UPDATE_FOTO_RUMAH_SLOT(state, { index, payload }) {
+      if (index < 0 || index >= state.dokumen.fotoRumah.length) {
+        return
+      }
+      state.dokumen.fotoRumah.splice(index, 1, payload)
+    },
+    REMOVE_FOTO_RUMAH_SLOT(state, index) {
+      if (index < 0 || index >= state.dokumen.fotoRumah.length) {
+        return
+      }
+      state.dokumen.fotoRumah.splice(index, 1)
     },
     SET_LOKASI_TANAH_FIELD(state, { field, value }) {
       // allow mapping of incoming snake_case to camelCase
@@ -398,7 +407,22 @@ export default {
       })
     },
 
-    async uploadDocument({ commit, state, dispatch }, { key, file }) {
+    async uploadDocument({ commit, state, dispatch }, { key, file, index }) {
+      const isFotoRumah = key === 'fotoRumah'
+      if (isFotoRumah) {
+        if (index == null || index < 0 || index >= state.dokumen.fotoRumah.length) {
+          throw new Error('invalid_foto_rumah_index')
+        }
+      }
+
+      const setSlot = (slotPayload) => {
+        if (isFotoRumah) {
+          commit('UPDATE_FOTO_RUMAH_SLOT', { index, payload: slotPayload })
+        } else {
+          commit('SET_DOKUMEN_SLOT', { key, payload: slotPayload })
+        }
+      }
+
       const payload = {
         file,
         url: '',
@@ -407,28 +431,24 @@ export default {
         errors: [],
       }
 
-      commit('SET_DOKUMEN_SLOT', { key, payload })
+      setSlot(payload)
 
       try {
         if (this.$config.useMockImahAing && this.$imahAingMock) {
-          commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 30 } })
+          setSlot({ ...payload, progress: 30 })
           const mockResponse = await this.$imahAingMock.uploadDocument()
           const fileUrl = `${this.$config.urlFile}/${mockResponse.data.path}`
 
-          commit('SET_DOKUMEN_SLOT', {
-            key,
-            payload: { file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] },
-          })
+          setSlot({ file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] })
 
           return fileUrl
         }
 
-        // simulate progress
-        commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 20 } })
+        setSlot({ ...payload, progress: 20 })
 
         const base64Data = await dispatch('convertFileToBase64', file)
 
-        commit('SET_DOKUMEN_SLOT', { key, payload: { ...payload, progress: 50 } })
+        setSlot({ ...payload, progress: 50 })
 
         const formData = {
           name: file.name,
@@ -456,39 +476,25 @@ export default {
 
         const fileUrl = `${this.$config.urlFile}/${response.data.data.path}`
 
-        commit('SET_DOKUMEN_SLOT', {
-          key,
-          payload: { file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] },
-        })
+        setSlot({ file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] })
 
         return fileUrl
       } catch (error) {
         const errMsg = error?.response?.data?.message || error.message || 'upload_failed'
-        commit('SET_DOKUMEN_SLOT', { key, payload: { file, url: '', progress: 0, status: 'ERROR', errors: [errMsg] } })
+        setSlot({ file, url: '', progress: 0, status: 'ERROR', errors: [errMsg] })
         throw error
       }
     },
     async submitForm({ commit, state, dispatch }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
-        // photos[] — urutan tetap: KTP, KK, surat miskin/tidak mampu, surat tanah, lalu 5 sisi foto rumah (depan→kiri→kanan→dalam→belakang); slot opsional yang kosong di-skip
-        const docKeys = [
-          'ktp',
-          'kk',
-          'suratMiskin',
-          'suratTanah',
-          'fotoRumahDepan',
-          'fotoRumahKiri',
-          'fotoRumahKanan',
-          'fotoRumahDalam',
-          'fotoRumahBelakang',
-        ]
-        const photos = docKeys
-          .map((k) => state.dokumen[k]?.url || '')
-          .filter((u) => !!u)
-          .map((url) => ({ url }))
+        // photos[] — urutan: KTP, KK, surat miskin, surat tanah, lalu semua foto rumah (multifile)
+        const docKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
+        const baseUrls = docKeys.map((k) => state.dokumen[k]?.url || '').filter((u) => !!u)
+        const fotoUrls = (state.dokumen.fotoRumah || []).map((s) => s?.url || '').filter((u) => !!u)
+        const photos = [...baseUrls, ...fotoUrls].map((url) => ({ url }))
 
-        // Field `kondisiRumah` (penyebab/deskripsi/ceklis) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
+        // Field `kondisiRumah` (penyebab/deskripsi) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
           user_name: state.dataPengusul.name,

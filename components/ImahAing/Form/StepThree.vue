@@ -52,6 +52,54 @@
       </li>
     </ul>
 
+    <div class="space-y-4">
+      <div class="flex items-start gap-2 text-sm">
+        <span class="text-red-500 mt-0.5 flex-shrink-0">*</span>
+        <span class="font-roboto text-black dark:text-dark-emphasis-high">
+          Foto Rumah Tidak Layak (tampak depan, kiri, kanan, belakang, dalam)
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-y-2">
+        <BaseDropzone
+          id="imahAingDocumentDropzone_fotoRumah"
+          :accept="accept"
+          :max-size="maxSize"
+          :multiple="true"
+          :disabled="fotoRumah.length >= maxFotoRumah"
+          :is-error="fotoRumah.some((s) => s && s.status === 'ERROR')"
+          @change="handleFotoRumahChange"
+        />
+      </div>
+
+      <p
+        v-if="fotoRumah.length >= maxFotoRumah"
+        class="font-lato text-[12px] text-gray-600 dark:text-dark-emphasis-high"
+      >
+        Maksimal {{ maxFotoRumah }} file.
+      </p>
+
+      <ul class="space-y-3">
+        <li v-for="(slot, idx) in fotoRumah" :key="`fotoRumah_${idx}`" class="flex flex-col gap-2">
+          <transition name="slide-fade">
+            <div class="flex flex-col gap-2">
+              <BaseDropzoneUploadProgress
+                :file="slot.file"
+                :progress="slot.progress"
+                :status="slot.status"
+                :image-url="slot.url"
+                @delete="() => handleDeleteFotoRumah(idx)"
+                @retry="() => handleRetryFotoRumah(idx)"
+              />
+              <span v-if="slot.errors && slot.errors.length" class="font-lato text-[13px] text-red-700">
+                {{ slot.errors[0] }}
+              </span>
+            </div>
+          </transition>
+        </li>
+      </ul>
+    </div>
+
     <div class="border-t border-gray-200 dark:border-dark-emphasis-medium pt-6 space-y-5">
       <h4 class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">
         Kondisi rumah
@@ -62,14 +110,14 @@
           for="penyebabKerusakan"
           class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
         >
-          Penyebab kerusakan
+          Penyebab Rumah Tidak Layak
         </label>
         <JdsSelect
           id="penyebabKerusakan"
           v-model="setPenyebabKerusakan"
           filterable
           filter-type="contain"
-          placeholder="Pilih penyebab kerusakan"
+          placeholder="Pilih Penyebab Rumah Tidak Layak"
           :options="penyebabOptions"
         />
       </div>
@@ -105,17 +153,6 @@
           placeholder="Jelaskan kondisi rumah"
         />
       </div>
-
-      <label class="flex items-start gap-3 cursor-pointer">
-        <input
-          v-model="setPernyataanKepemilikanTunggal"
-          type="checkbox"
-          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
-        />
-        <span class="text-sm text-black dark:text-dark-emphasis-high">
-          Saya menyatakan kepemilikan tunggal atas rumah ini (pernyataan bermaterai mengikuti ketentuan operasional).
-        </span>
-      </label>
     </div>
   </section>
 </template>
@@ -126,9 +163,18 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
+      maxFotoRumah: 5,
       docsConfig: [
-        { key: 'ktp', label: 'Kartu Tanda Penduduk (KTP) Calon Penerima Bantuan', required: true },
-        { key: 'kk', label: 'Kartu Keluarga (KK) Calon Penerima Bantuan', required: true },
+        {
+          key: 'ktp',
+          label: 'KTP / Surat Keterangan dari Desa / Lurah Calon Penerima Bantuan',
+          required: true,
+        },
+        {
+          key: 'kk',
+          label: 'KK / Surat Keterangan dari Desa / Lurah Calon Penerima Bantuan',
+          required: true,
+        },
         {
           key: 'suratMiskin',
           label: 'Surat Keterangan Miskin / Tidak Mampu dari Ketua RT',
@@ -139,17 +185,11 @@ export default {
           label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah',
           required: true,
         },
-        { key: 'fotoRumahDepan', label: 'Foto rumah — tampak depan (wajib)', required: true },
-        { key: 'fotoRumahKiri', label: 'Foto rumah — tampak kiri', required: false },
-        { key: 'fotoRumahKanan', label: 'Foto rumah — tampak kanan', required: false },
-        { key: 'fotoRumahDalam', label: 'Foto rumah — tampak dalam', required: false },
-        { key: 'fotoRumahBelakang', label: 'Foto rumah — tampak belakang', required: false },
       ],
       penyebabOptions: [
         { value: 'bencana', label: 'Bencana' },
-        { value: 'umur_sudah_tua', label: 'Umur sudah tua' },
-        { value: 'tidak_terawat', label: 'Tidak terawat' },
-        { value: 'struktur_bangunan_tidak_baik', label: 'Struktur bangunan tidak baik' },
+        { value: 'kebakaran', label: 'Kebakaran' },
+        { value: 'usia_bangunan', label: 'Usia Bangunan' },
         { value: 'lainnya', label: 'Lainnya' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',
@@ -158,6 +198,9 @@ export default {
   },
   computed: {
     ...mapState('imahAingForm', ['dokumen', 'kondisiRumah']),
+    fotoRumah() {
+      return this.dokumen.fotoRumah || []
+    },
     slotFor() {
       return (key) => (this.dokumen ? this.dokumen[key] : null)
     },
@@ -198,17 +241,6 @@ export default {
         this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'deskripsiKondisi', value: val })
       },
     },
-    setPernyataanKepemilikanTunggal: {
-      get() {
-        return this.kondisiRumah.pernyataanKepemilikanTunggalBermaterai
-      },
-      set(val) {
-        this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
-          field: 'pernyataanKepemilikanTunggalBermaterai',
-          value: val,
-        })
-      },
-    },
   },
   methods: {
     ...mapActions('imahAingForm', ['uploadDocument']),
@@ -241,6 +273,39 @@ export default {
         this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: errPayload })
       }
     },
+    async handleFotoRumahChange(files) {
+      const list = files instanceof FileList ? Array.from(files) : files ? [files] : []
+      const room = Math.max(0, this.maxFotoRumah - this.fotoRumah.length)
+      const toAdd = list.filter(Boolean).slice(0, room)
+
+      for (const file of toAdd) {
+        const index = this.fotoRumah.length
+        this.$store.commit('imahAingForm/ADD_FOTO_RUMAH_SLOT', {
+          file,
+          url: '',
+          progress: 0,
+          status: 'UPLOADING',
+          errors: [],
+        })
+        try {
+          await this.uploadDocument({ key: 'fotoRumah', file, index })
+        } catch (err) {
+          this.$store.commit('imahAingForm/UPDATE_FOTO_RUMAH_SLOT', {
+            index,
+            payload: {
+              file,
+              url: '',
+              progress: 0,
+              status: 'ERROR',
+              errors: [err.message || 'upload_failed'],
+            },
+          })
+        }
+      }
+
+      const input = document.querySelector('#imahAingDocumentDropzone_fotoRumah input')
+      if (input) input.value = ''
+    },
     handleDelete(key) {
       this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: null })
       const input = document.querySelector(`#imahAingDocumentDropzone_${key} input`)
@@ -248,6 +313,11 @@ export default {
       const provider = this.$refs[`documentUploader_${key}`]
       const p = Array.isArray(provider) ? provider[0] : provider
       if (p && typeof p.syncValue === 'function') p.syncValue()
+    },
+    handleDeleteFotoRumah(index) {
+      this.$store.commit('imahAingForm/REMOVE_FOTO_RUMAH_SLOT', index)
+      const input = document.querySelector('#imahAingDocumentDropzone_fotoRumah input')
+      if (input) input.value = ''
     },
     async handleRetry(key) {
       const slot = this.slotFor(key)
@@ -261,6 +331,22 @@ export default {
       } catch (err) {
         const errPayload = { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] }
         this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: errPayload })
+      }
+    },
+    async handleRetryFotoRumah(index) {
+      const slot = this.fotoRumah[index]
+      if (!slot || !slot.file) return
+
+      const payload = { ...slot, status: 'UPLOADING', progress: 0, errors: [] }
+      this.$store.commit('imahAingForm/UPDATE_FOTO_RUMAH_SLOT', { index, payload })
+
+      try {
+        await this.uploadDocument({ key: 'fotoRumah', file: slot.file, index })
+      } catch (err) {
+        this.$store.commit('imahAingForm/UPDATE_FOTO_RUMAH_SLOT', {
+          index,
+          payload: { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] },
+        })
       }
     },
   },
