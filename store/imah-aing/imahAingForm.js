@@ -7,13 +7,26 @@ export const IMAH_AING_DEFAULT_LOCATION = {
 }
 
 const getDefaultState = () => ({
+  /** Partner API token (Keycloak); sama pola dengan jalan-aing / citizenComplaintForm */
+  authToken: null,
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
   currentFormStep: 0,
 
   consent: {
     hasReadPrivacyPolicy: false,
-    isBeneficiaryCandidate: false,
+    /** Tiga pernyataan — teks UI beda sapawarga vs warga di StepOne */
+    stmtSingleHouse: false,
+    stmtNoSimilarProgram: false,
+    stmtRevocationIfUntrue: false,
+  },
+
+  /** PAGE 3 — penyebab/deskripsi/ceklis; payload API menyusul (lihat submitForm) */
+  kondisiRumah: {
+    penyebabKerusakan: '',
+    penyebabKerusakanLainnya: '',
+    deskripsiKondisi: '',
+    pernyataanKepemilikanTunggalBermaterai: false,
   },
 
   dataPengusul: {
@@ -30,7 +43,11 @@ const getDefaultState = () => ({
     kk: null,
     suratMiskin: null,
     suratTanah: null,
-    fotoTanah: null,
+    fotoRumahDepan: null,
+    fotoRumahKiri: null,
+    fotoRumahKanan: null,
+    fotoRumahDalam: null,
+    fotoRumahBelakang: null,
   },
 
   lokasiTanah: {
@@ -140,22 +157,44 @@ export default {
   namespaced: true,
   state: getDefaultState(),
   getters: {
+    authToken: (state) => state.authToken,
+    hasAuthToken: (state) => !!state.authToken,
     currentFormStep: (state) => state.currentFormStep,
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
     startStep: () => 1,
-    isConsentValid: (state) =>
-      state.consent.hasReadPrivacyPolicy && state.consent.isBeneficiaryCandidate,
+    isConsentValid: (state) => {
+      const c = state.consent
+      return (
+        c.hasReadPrivacyPolicy &&
+        c.stmtSingleHouse &&
+        c.stmtNoSimilarProgram &&
+        c.stmtRevocationIfUntrue
+      )
+    },
     isAllDocumentsUploaded: (state) => {
-      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
-      return keys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
+      const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoRumahDepan']
+      return requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
     },
     documentSlotsOrdered: (state) => {
-      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+      const keys = [
+        'ktp',
+        'kk',
+        'suratMiskin',
+        'suratTanah',
+        'fotoRumahDepan',
+        'fotoRumahKiri',
+        'fotoRumahKanan',
+        'fotoRumahDalam',
+        'fotoRumahBelakang',
+      ]
       return keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
     },
   },
   mutations: {
+    SET_AUTH_TOKEN(state, token) {
+      state.authToken = token
+    },
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
     },
@@ -165,8 +204,15 @@ export default {
     SET_CONSENT_PRIVACY(state, val) {
       state.consent.hasReadPrivacyPolicy = val
     },
-    SET_CONSENT_BENEFICIARY(state, val) {
-      state.consent.isBeneficiaryCandidate = val
+    SET_CONSENT_STATEMENT(state, { field, value }) {
+      if (Object.prototype.hasOwnProperty.call(state.consent, field)) {
+        state.consent[field] = value
+      }
+    },
+    SET_KONDISI_RUMAH_FIELD(state, { field, value }) {
+      if (Object.prototype.hasOwnProperty.call(state.kondisiRumah, field)) {
+        state.kondisiRumah[field] = value
+      }
     },
     SET_DATA_PENGUSUL_FIELD(state, { field, value }) {
       // map common incoming snake_case fields to camelCase store keys
@@ -215,6 +261,20 @@ export default {
     },
   },
   actions: {
+    setAuthToken({ commit }, token) {
+      commit('SET_AUTH_TOKEN', token)
+    },
+    async refreshToken({ state }) {
+      try {
+        const newToken = await this.$getToken('refresh_token')
+        state.authToken = newToken
+        return newToken
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Token refresh failed:', error)
+        throw error
+      }
+    },
     initForm({ commit }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
@@ -378,7 +438,21 @@ export default {
           data: base64Data,
         }
 
-        const response = await this.$axios.post('/file/upload', formData)
+        let response
+        try {
+          response = await this.$axios.post('/file/upload', formData)
+        } catch (error) {
+          if (error.response?.status === 401) {
+            await dispatch('refreshToken')
+            response = await this.$axios.post('/file/upload', formData, {
+              headers: {
+                Authorization: `Bearer ${state.authToken}`,
+              },
+            })
+          } else {
+            throw error
+          }
+        }
 
         const fileUrl = `${this.$config.urlFile}/${response.data.data.path}`
 
@@ -394,16 +468,27 @@ export default {
         throw error
       }
     },
-    async submitForm({ commit, state }) {
+    async submitForm({ commit, state, dispatch }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
-        // Build photos from the five document slots in fixed order
-        const docKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah', 'fotoTanah']
+        // photos[] — urutan tetap: KTP, KK, surat miskin/tidak mampu, surat tanah, lalu 5 sisi foto rumah (depan→kiri→kanan→dalam→belakang); slot opsional yang kosong di-skip
+        const docKeys = [
+          'ktp',
+          'kk',
+          'suratMiskin',
+          'suratTanah',
+          'fotoRumahDepan',
+          'fotoRumahKiri',
+          'fotoRumahKanan',
+          'fotoRumahDalam',
+          'fotoRumahBelakang',
+        ]
         const photos = docKeys
           .map((k) => state.dokumen[k]?.url || '')
           .filter((u) => !!u)
           .map((url) => ({ url }))
 
+        // Field `kondisiRumah` (penyebab/deskripsi/ceklis) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
           user_name: state.dataPengusul.name,
@@ -432,10 +517,28 @@ export default {
           RW: String(rw || ''),
         }
 
-        const response =
-          this.$config.useMockImahAing && this.$imahAingMock
-            ? await this.$imahAingMock.submitForm(payload)
-            : await this.$axios.post('/v1/aduan/complaints', payload)
+        const postComplaint = () =>
+          this.$axios.post('/aduan/complaints', payload, {
+            headers: state.authToken
+              ? { Authorization: `Bearer ${state.authToken}` }
+              : {},
+          })
+
+        let response
+        if (this.$config.useMockImahAing && this.$imahAingMock) {
+          response = await this.$imahAingMock.submitForm(payload)
+        } else {
+          try {
+            response = await postComplaint()
+          } catch (error) {
+            if (error.response?.status === 401) {
+              await dispatch('refreshToken')
+              response = await postComplaint()
+            } else {
+              throw error
+            }
+          }
+        }
         const submissionId = response.data?.data?.id || response.data?.id || ''
 
         commit('SET_STATUS_SUBMIT', 'SUCCESS')

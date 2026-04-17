@@ -6,19 +6,19 @@
       <img :src="avatarUrl || '/images/ilustrasi-ktp.webp'" alt="avatar" class="w-24 h-24 rounded-full object-cover" />
     </div>
 
-    <!-- Nama Pengusul -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Pengusul" vid="name">
-      <label>Nama Pengusul <span class="text-red-500">*</span></label>
+    <!-- Nama Calon Penerima Bantuan -->
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Calon Penerima Bantuan" vid="name">
+      <label>Nama Calon Penerima Bantuan <span class="text-red-500">*</span></label>
       <JdsInputText :value="setName" :error-message="errors[0]" @input="setName = $event" />
     </ValidationProvider>
 
-    <!-- No HP Pengusul -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="No HP Pengusul" vid="phone">
+    <!-- No HP Calon Penerima Bantuan -->
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="No HP Calon Penerima Bantuan" vid="phone">
       <BaseInputText
         v-model="setPhone"
         class="step-two-input-jds"
         type="number"
-        label="No HP Pengusul"
+        label="No HP Calon Penerima Bantuan"
         required
         :placeholder="zwsPlaceholder"
         autocomplete="off"
