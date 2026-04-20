@@ -56,7 +56,7 @@
       <div class="flex items-start gap-2 text-sm">
         <span class="text-red-500 mt-0.5 flex-shrink-0">*</span>
         <span class="font-roboto text-black dark:text-dark-emphasis-high">
-          Foto Rumah Tidak Layak (tampak depan, kiri, kanan, belakang, dalam)
+          Foto Rumah Tidak Layak (Tampak depan, kiri, kanan, belakang, dalam)
         </span>
       </div>
 
@@ -165,7 +165,7 @@
             for="deskripsiKondisi"
             class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
-            Deskripsi kondisi rumah <span class="text-red-500">*</span>
+            Deskripsi Kondisi Rumah Tidak Layak <span class="text-red-500">*</span>
           </label>
           <textarea
             id="deskripsiKondisi"
@@ -199,12 +199,12 @@ export default {
       docsConfig: [
         {
           key: 'ktp',
-          label: 'KTP / Surat Keterangan dari Desa / Lurah Calon Penerima Bantuan',
+          label: 'KTP Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Desa atau Lurah',
           required: true,
         },
         {
           key: 'kk',
-          label: 'KK / Surat Keterangan dari Desa / Lurah Calon Penerima Bantuan',
+          label: 'KK Calon Penerima Bantuan / Surat Keterangan dari Kepala Desa atau Lurah',
           required: true,
         },
         {
@@ -219,10 +219,10 @@ export default {
         },
       ],
       penyebabOptions: [
-        { value: 'imah-aing-bencana', label: 'Bencana Alam' },
-        { value: 'imah-aing-kebakaran', label: 'Kebakaran' },
         { value: 'imah-aing-usia-bangunan', label: 'Usia Bangunan' },
-        { value: 'imah-aing-gagal-konstruksi', label: 'Kegagalan Konstruksi' },
+        { value: 'imah-aing-gagal-konstruksi', label: 'Tidak Sesuai Kaidah Teknis' },
+        { value: 'imah-aing-kebakaran', label: 'Kebakaran' },
+        { value: 'imah-aing-bencana', label: 'Bencana Alam' },
         { value: PENYEBAB_LAINNYA_VALUE, label: 'Lainnya' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',

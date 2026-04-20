@@ -38,7 +38,7 @@
       v-slot="{ errors }"
       class="flex flex-col gap-2 mb-5"
       :rules="`required|numeric|length:${maxNikKkLength}`"
-      name="NIK Kepala Keluarga"
+      name="NIK Calon Penerima Bantuan"
       vid="nik"
     >
       <BaseInputText

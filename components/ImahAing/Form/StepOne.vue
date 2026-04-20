@@ -18,11 +18,11 @@
         Pastikan dokumen digital berikut sudah terlebih dahulu disiapkan untuk memudahkan proses pengajuan wargi (dalam format .pdf atau .jpeg/.jpg/.png) :
       </p>
       <ol class="list-decimal ml-5 space-y-1">
-        <li><strong>KTP</strong> / Surat Keterangan dari Kades atau Lurah;</li>
-        <li><strong>Kartu Keluarga</strong> / Surat Keterangan dari Kades atau Lurah;</li>
-        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa / Lurah;</li>
-        <li>Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah; dan</li>
-        <li>Foto rumah.</li>
+        <li>Kartu Tanda Penduduk Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Desa atau Lurah;</li>
+        <li>Kartu Keluarga Calon Penerima Bantuan / Surat Keterangan dari Kepala Desa atau Lurah;</li>
+        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa atau Lurah;</li>
+        <li>Surat Keterangan Kepemilikan Tanah dari Kepala Desa atau Lurah;</li>
+        <li>Foto Rumah Tidak Layak (Tampak depan, kiri, kanan, belakang, dalam)</li>
       </ol>
     </div>
 
@@ -34,8 +34,8 @@
           class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <span class="text-sm">
-          Saya menyatakan telah membaca, mempelajari, dan menyetujui
-          <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
+          Saya menyatakan telah membaca dan mempelajari Aplikasi Imah Aing serta menyetujui
+          <a href="https://hotline.jabarprov.go.id/hc/help-center/articles/1776682585-m" class="underline hover:text-blue-600">Kebijakan Privasi</a>
         </span>
       </label>
 
