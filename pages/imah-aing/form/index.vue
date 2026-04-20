@@ -238,12 +238,26 @@ export default {
       submitForm: 'submitForm',
       resetForm: 'resetForm',
       setAuthToken: 'setAuthToken',
+      checkKkDuplicate: 'checkKkDuplicate',
     }),
     async nextStep() {
       const step = Number(this.currentFormStep)
       if (step === 2 && this.$refs.stepTwo) {
         const isValid = await this.$refs.stepTwo.validate()
         if (!isValid) {
+          return
+        }
+        this.$refs.stepTwo.clearKkDuplicateMessage()
+        try {
+          const exists = await this.checkKkDuplicate()
+          if (exists) {
+            this.$refs.stepTwo.setKkDuplicateMessage(
+              'No KK ini sudah pernah mengajukan pengajuan Imah Aing.'
+            )
+            return
+          }
+        } catch {
+          this.$refs.stepTwo.setKkDuplicateMessage('Gagal memverifikasi No KK. Silakan coba lagi.')
           return
         }
       }

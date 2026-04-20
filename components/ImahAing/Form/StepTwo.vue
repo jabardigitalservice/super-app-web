@@ -72,8 +72,8 @@
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
-        :error="!!errors[0]"
-        :error-message="errors[0]"
+        :error="!!(errors[0] || kkDuplicateMessage)"
+        :error-message="errors[0] || kkDuplicateMessage"
       />
     </ValidationProvider>
     </section>
@@ -88,6 +88,8 @@ export default {
       zwsPlaceholder: '\u200B',
       /** NIK / No KK — panjang tetap 16 digit */
       maxNikKkLength: 16,
+      /** Pesan server (cek duplikasi KK), ditampilkan di field No KK */
+      kkDuplicateMessage: '',
     }
   },
   computed: {
@@ -147,7 +149,18 @@ export default {
       },
     },
   },
+  watch: {
+    setNomorKk() {
+      this.kkDuplicateMessage = ''
+    },
+  },
   methods: {
+    clearKkDuplicateMessage() {
+      this.kkDuplicateMessage = ''
+    },
+    setKkDuplicateMessage(message) {
+      this.kkDuplicateMessage = message || ''
+    },
     async validate() {
       return await this.$refs.observer.validate()
     },

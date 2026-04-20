@@ -47,6 +47,10 @@ export default (_context, inject) => {
         },
       }
     },
+    async checkKkDuplicate() {
+      await wait(150)
+      return false
+    },
   }
 
   inject('imahAingMock', imahAingMock)

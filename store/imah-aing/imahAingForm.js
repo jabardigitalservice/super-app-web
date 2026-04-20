@@ -80,6 +80,25 @@ function buildImahAingDescription(kondisiRumah) {
   return deskripsi
 }
 
+/** Normalisasi response GET `/aduan/complaints/exists` ke boolean `exists`. */
+function parseComplaintExistsResponse(response) {
+  const body = response?.data
+  if (body == null) {
+    return false
+  }
+  const inner = Object.prototype.hasOwnProperty.call(body, 'data') ? body.data : body
+  if (typeof inner === 'boolean') {
+    return inner
+  }
+  if (inner && typeof inner === 'object' && typeof inner.exists === 'boolean') {
+    return inner.exists
+  }
+  if (typeof body.exists === 'boolean') {
+    return body.exists
+  }
+  return false
+}
+
 /** Base64url-safe JSON dari query `meta` (UTF-8) */
 function decodeMetaQueryParam(encoded) {
   if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
@@ -344,6 +363,43 @@ export default {
     previousStep({ commit, state }) {
       if (state.currentFormStep > 1) {
         commit('SET_CURRENT_FORM_STEP', state.currentFormStep - 1)
+      }
+    },
+    /**
+     * Cek apakah KK sudah punya pengajuan Imah Aing (double submission).
+     * @returns {Promise<boolean>} `true` jika sudah ada pengajuan.
+     */
+    async checkKkDuplicate({ state, dispatch }) {
+      const kk = String(state.dataPengusul.nomorKk || '').replace(/\D/g, '')
+      if (!kk) {
+        return false
+      }
+
+      if (this.$config.useMockImahAing && this.$imahAingMock) {
+        return this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
+      }
+
+      const params = {
+        complaint_category_id: 'imah-aing',
+        user_kk: kk,
+      }
+
+      const call = () =>
+        this.$axios.get('/aduan/complaints/exists', {
+          params,
+          headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
+        })
+
+      try {
+        const res = await call()
+        return parseComplaintExistsResponse(res)
+      } catch (error) {
+        if (error.response?.status === 401) {
+          await dispatch('refreshToken')
+          const res = await call()
+          return parseComplaintExistsResponse(res)
+        }
+        throw error
       }
     },
     // Cascading location handlers (mirror citizenComplaintForm patterns)
