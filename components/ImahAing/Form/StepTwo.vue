@@ -45,7 +45,7 @@
         v-model="setNik"
         class="step-two-input-jds"
         type="text"
-        label="NIK Kepala Keluarga"
+        label="NIK Calon Penerima Bantuan"
         required
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"

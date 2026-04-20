@@ -252,7 +252,7 @@ export default {
           const exists = await this.checkKkDuplicate()
           if (exists) {
             this.$refs.stepTwo.setKkDuplicateMessage(
-              'No KK ini sudah pernah mengajukan pengajuan Imah Aing.'
+              'No KK Sudah Pernah Diajukan. Silahkan Hubungi Hotline Jabar di Nomor WhatsApp 082126030038.'
             )
             return
           }
