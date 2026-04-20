@@ -33,19 +33,19 @@
       <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
     </ValidationProvider>
 
-    <!-- No KTP — WAJIB -->
+    <!-- NIK Kepala Keluarga — WAJIB -->
     <ValidationProvider
       v-slot="{ errors }"
       class="flex flex-col gap-2 mb-5"
       :rules="`required|numeric|length:${maxNikKkLength}`"
-      name="No KTP Calon Penerima Bantuan"
+      name="NIK Kepala Keluarga"
       vid="nik"
     >
       <BaseInputText
         v-model="setNik"
         class="step-two-input-jds"
         type="text"
-        label="No KTP Calon Penerima Bantuan"
+        label="NIK Kepala Keluarga"
         required
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
@@ -72,8 +72,8 @@
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
-        :error="!!errors[0]"
-        :error-message="errors[0]"
+        :error="!!(errors[0] || kkDuplicateMessage)"
+        :error-message="errors[0] || kkDuplicateMessage"
       />
     </ValidationProvider>
     </section>
@@ -84,10 +84,9 @@
 export default {
   data() {
     return {
-      /** Zero-width space: enables :placeholder-shown for JDS-like empty background (see .spec/template/InputText.scss) */
       zwsPlaceholder: '\u200B',
-      /** NIK / No KK — panjang tetap 16 digit */
       maxNikKkLength: 16,
+      kkDuplicateMessage: '',
     }
   },
   computed: {
@@ -147,7 +146,18 @@ export default {
       },
     },
   },
+  watch: {
+    setNomorKk() {
+      this.kkDuplicateMessage = ''
+    },
+  },
   methods: {
+    clearKkDuplicateMessage() {
+      this.kkDuplicateMessage = ''
+    },
+    setKkDuplicateMessage(message) {
+      this.kkDuplicateMessage = message || ''
+    },
     async validate() {
       return await this.$refs.observer.validate()
     },
@@ -156,10 +166,6 @@ export default {
 </script>
 
 <style scoped>
-/*
- * Align BaseInputText with JdsInputText / InputText.scss (.spec/template) and
- * .citizen__form .jds-input-text rules on pages/imah-aing/form/index.vue
- */
 .step-two-input-jds {
   width: 100%;
 }

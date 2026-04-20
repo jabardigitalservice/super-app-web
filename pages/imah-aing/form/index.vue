@@ -24,7 +24,7 @@
         <form class="citizen__form mb-10" @submit.prevent="">
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
           <ImahAingFormStepTwo v-if="currentFormStep === 2" ref="stepTwo" />
-          <ImahAingFormStepThree v-if="currentFormStep === 3" />
+          <ImahAingFormStepThree v-if="currentFormStep === 3" ref="stepThree" />
           <ImahAingFormStepFour v-if="currentFormStep === 4" ref="stepFour" />
 
           <div class="grid grid-cols-1 gap-2 md:hidden">
@@ -238,6 +238,7 @@ export default {
       submitForm: 'submitForm',
       resetForm: 'resetForm',
       setAuthToken: 'setAuthToken',
+      checkKkDuplicate: 'checkKkDuplicate',
     }),
     async nextStep() {
       const step = Number(this.currentFormStep)
@@ -246,9 +247,30 @@ export default {
         if (!isValid) {
           return
         }
+        this.$refs.stepTwo.clearKkDuplicateMessage()
+        try {
+          const exists = await this.checkKkDuplicate()
+          if (exists) {
+            this.$refs.stepTwo.setKkDuplicateMessage(
+              'No KK ini sudah pernah mengajukan pengajuan Imah Aing.'
+            )
+            return
+          }
+        } catch {
+          this.$refs.stepTwo.setKkDuplicateMessage('Gagal memverifikasi No KK. Silakan coba lagi.')
+          return
+        }
       }
-      if (step === 3 && !this.isAllDocumentsUploaded) {
-        return
+      if (step === 3) {
+        if (!this.isAllDocumentsUploaded) {
+          return
+        }
+        if (this.$refs.stepThree) {
+          const kondisiOk = await this.$refs.stepThree.validate()
+          if (!kondisiOk) {
+            return
+          }
+        }
       }
       await this.goToNextStep()
     },

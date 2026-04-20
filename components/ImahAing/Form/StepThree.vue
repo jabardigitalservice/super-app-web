@@ -100,65 +100,97 @@
       </ul>
     </div>
 
-    <div class="border-t border-gray-200 dark:border-dark-emphasis-medium pt-6 space-y-5">
-      <h4 class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">
-        Kondisi rumah
-      </h4>
+    <ValidationObserver ref="kondisiObserver">
+      <div class="border-t border-gray-200 dark:border-dark-emphasis-medium pt-6 space-y-5">
+        <h4 class="font-roboto font-medium text-black text-sm dark:text-dark-emphasis-high">
+          Kondisi rumah
+        </h4>
 
-      <div class="flex flex-col gap-2">
-        <label
-          for="penyebabKerusakan"
-          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required"
+          name="Penyebab Rumah Tidak Layak"
+          class="flex flex-col gap-2"
+          tag="div"
         >
-          Penyebab Rumah Tidak Layak
-        </label>
-        <JdsSelect
-          id="penyebabKerusakan"
-          v-model="setPenyebabKerusakan"
-          filterable
-          filter-type="contain"
-          placeholder="Pilih Penyebab Rumah Tidak Layak"
-          :options="penyebabOptions"
-        />
-      </div>
+          <label
+            for="penyebabKerusakan"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+          >
+            Penyebab Rumah Tidak Layak <span class="text-red-500">*</span>
+          </label>
+          <JdsSelect
+            id="penyebabKerusakan"
+            v-model="setPenyebabKerusakan"
+            filterable
+            filter-type="contain"
+            placeholder="Pilih Penyebab Rumah Tidak Layak"
+            :options="penyebabOptions"
+            :error-message="errors[0]"
+          />
+        </ValidationProvider>
 
-      <div v-if="kondisiRumah.penyebabKerusakan === 'lainnya'" class="flex flex-col gap-2">
-        <label
-          for="penyebabLainnya"
-          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        <ValidationProvider
+          v-if="isPenyebabLainnya"
+          v-slot="{ errors }"
+          rules="required"
+          name="Penyebab lainnya"
+          class="flex flex-col gap-2"
+          tag="div"
         >
-          Penyebab lainnya
-        </label>
-        <JdsInputText
-          id="penyebabLainnya"
-          :value="setPenyebabKerusakanLainnya"
-          class="w-full"
-          placeholder="Jelaskan penyebab lainnya"
-          @input="setPenyebabKerusakanLainnya = $event"
-        />
-      </div>
+          <label
+            for="penyebabLainnya"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+          >
+            Penyebab lainnya <span class="text-red-500">*</span>
+          </label>
+          <JdsInputText
+            id="penyebabLainnya"
+            :value="setPenyebabKerusakanLainnya"
+            class="w-full"
+            placeholder="Jelaskan penyebab lainnya"
+            :error-message="errors[0]"
+            @input="setPenyebabKerusakanLainnya = $event"
+          />
+        </ValidationProvider>
 
-      <div class="flex flex-col gap-2">
-        <label
-          for="deskripsiKondisi"
-          class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required"
+          name="Deskripsi kondisi rumah"
+          class="flex flex-col gap-2"
+          tag="div"
         >
-          Deskripsi kondisi rumah
-        </label>
-        <textarea
-          id="deskripsiKondisi"
-          v-model="setDeskripsiKondisi"
-          rows="4"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 dark:bg-dark-emphasis-low dark:border-dark-emphasis-medium dark:text-dark-emphasis-high"
-          placeholder="Jelaskan kondisi rumah"
-        />
+          <label
+            for="deskripsiKondisi"
+            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+          >
+            Deskripsi kondisi rumah <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="deskripsiKondisi"
+            v-model="setDeskripsiKondisi"
+            rows="4"
+            class="w-full rounded-lg border px-3 py-2 text-sm text-gray-800 dark:bg-dark-emphasis-low dark:text-dark-emphasis-high"
+            :class="
+              errors[0]
+                ? 'border-red-700 dark:border-red-600'
+                : 'border-gray-300 dark:border-dark-emphasis-medium'
+            "
+            placeholder="Jelaskan kondisi rumah"
+          />
+          <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
+        </ValidationProvider>
       </div>
-    </div>
+    </ValidationObserver>
   </section>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+
+/** Value `complaint_subcategory_id` untuk opsi "Lainnya" — harus sama dengan `buildImahAingDescription` di store. */
+const PENYEBAB_LAINNYA_VALUE = 'imah-aing-lainnya'
 
 export default {
   data() {
@@ -177,7 +209,7 @@ export default {
         },
         {
           key: 'suratMiskin',
-          label: 'Surat Keterangan Miskin / Tidak Mampu dari Ketua RT',
+          label: 'Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa / Lurah',
           required: true,
         },
         {
@@ -187,10 +219,11 @@ export default {
         },
       ],
       penyebabOptions: [
-        { value: 'bencana', label: 'Bencana' },
-        { value: 'kebakaran', label: 'Kebakaran' },
-        { value: 'usia_bangunan', label: 'Usia Bangunan' },
-        { value: 'lainnya', label: 'Lainnya' },
+        { value: 'imah-aing-bencana', label: 'Bencana Alam' },
+        { value: 'imah-aing-kebakaran', label: 'Kebakaran' },
+        { value: 'imah-aing-usia-bangunan', label: 'Usia Bangunan' },
+        { value: 'imah-aing-gagal-konstruksi', label: 'Kegagalan Konstruksi' },
+        { value: PENYEBAB_LAINNYA_VALUE, label: 'Lainnya' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
@@ -207,6 +240,9 @@ export default {
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
     },
+    isPenyebabLainnya() {
+      return this.kondisiRumah.penyebabKerusakan === PENYEBAB_LAINNYA_VALUE
+    },
     setPenyebabKerusakan: {
       get() {
         return this.kondisiRumah.penyebabKerusakan || ''
@@ -214,7 +250,7 @@ export default {
       set(val) {
         const v = val != null ? String(val) : ''
         this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'penyebabKerusakan', value: v })
-        if (v !== 'lainnya') {
+        if (v !== PENYEBAB_LAINNYA_VALUE) {
           this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
             field: 'penyebabKerusakanLainnya',
             value: '',
@@ -348,6 +384,13 @@ export default {
           payload: { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] },
         })
       }
+    },
+    async validate() {
+      const obs = this.$refs.kondisiObserver
+      if (!obs || typeof obs.validate !== 'function') {
+        return true
+      }
+      return await obs.validate()
     },
   },
 }

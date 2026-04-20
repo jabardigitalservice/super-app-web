@@ -69,6 +69,36 @@ const getDefaultState = () => ({
   },
 })
 
+const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-lainnya'
+
+function buildImahAingDescription(kondisiRumah) {
+  const deskripsi = String(kondisiRumah?.deskripsiKondisi || '').trim()
+  const penyebabLainnya = String(kondisiRumah?.penyebabKerusakanLainnya || '').trim()
+  if (kondisiRumah?.penyebabKerusakan === IMAH_AING_PENYEBAB_LAINNYA && penyebabLainnya) {
+    return `[Penyebab lainnya: ${penyebabLainnya}] ${deskripsi}`.trim()
+  }
+  return deskripsi
+}
+
+/** Normalisasi response GET `/aduan/complaints/exists` ke boolean `exists`. */
+function parseComplaintExistsResponse(response) {
+  const body = response?.data
+  if (body == null) {
+    return false
+  }
+  const inner = Object.prototype.hasOwnProperty.call(body, 'data') ? body.data : body
+  if (typeof inner === 'boolean') {
+    return inner
+  }
+  if (inner && typeof inner === 'object' && typeof inner.exists === 'boolean') {
+    return inner.exists
+  }
+  if (typeof body.exists === 'boolean') {
+    return body.exists
+  }
+  return false
+}
+
 /** Base64url-safe JSON dari query `meta` (UTF-8) */
 function decodeMetaQueryParam(encoded) {
   if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
@@ -335,6 +365,43 @@ export default {
         commit('SET_CURRENT_FORM_STEP', state.currentFormStep - 1)
       }
     },
+    /**
+     * Cek apakah KK sudah punya pengajuan Imah Aing (double submission).
+     * @returns {Promise<boolean>} `true` jika sudah ada pengajuan.
+     */
+    async checkKkDuplicate({ state, dispatch }) {
+      const kk = String(state.dataPengusul.nomorKk || '').replace(/\D/g, '')
+      if (!kk) {
+        return false
+      }
+
+      if (this.$config.useMockImahAing && this.$imahAingMock) {
+        return this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
+      }
+
+      const params = {
+        complaint_category_id: 'imah-aing',
+        user_kk: kk,
+      }
+
+      const call = () =>
+        this.$axios.get('/aduan/complaints/exists', {
+          params,
+          headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
+        })
+
+      try {
+        const res = await call()
+        return parseComplaintExistsResponse(res)
+      } catch (error) {
+        if (error.response?.status === 401) {
+          await dispatch('refreshToken')
+          const res = await call()
+          return parseComplaintExistsResponse(res)
+        }
+        throw error
+      }
+    },
     // Cascading location handlers (mirror citizenComplaintForm patterns)
     handleCitySelected({ state, commit, dispatch, rootState }) {
       const cityName = state.lokasiTanah.cityName
@@ -494,7 +561,6 @@ export default {
         const fotoUrls = (state.dokumen.fotoRumah || []).map((s) => s?.url || '').filter((u) => !!u)
         const photos = [...baseUrls, ...fotoUrls].map((url) => ({ url }))
 
-        // Field `kondisiRumah` (penyebab/deskripsi) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
           user_name: state.dataPengusul.name,
@@ -506,7 +572,8 @@ export default {
           type: 'private',
           photos,
           category_id: 'imah-aing',
-          complaint_subcategory_id: 'imah-aing-perbaikan-atau-pembangunan-rumah-tidak-layak-huni',
+          complaint_subcategory_id: state.kondisiRumah.penyebabKerusakan,
+          description: buildImahAingDescription(state.kondisiRumah),
           title: 'Imah Aing',
           latitude: String(location.lat),
           longitude: String(location.lng),

@@ -20,8 +20,8 @@
       <ol class="list-decimal ml-5 space-y-1">
         <li><strong>KTP</strong> / Surat Keterangan dari Kades atau Lurah;</li>
         <li><strong>Kartu Keluarga</strong> / Surat Keterangan dari Kades atau Lurah;</li>
-        <li>Surat Keterangan Miskin / Tidak Mampu dari RT;</li>
-        <li>Surat Keterangan Kepemilikan Tanah Dari Kepala Desa/Lurah; dan</li>
+        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa / Lurah;</li>
+        <li>Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah; dan</li>
         <li>Foto rumah.</li>
       </ol>
     </div>
