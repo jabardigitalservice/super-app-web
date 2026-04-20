@@ -84,11 +84,8 @@
 export default {
   data() {
     return {
-      /** Zero-width space: enables :placeholder-shown for JDS-like empty background (see .spec/template/InputText.scss) */
       zwsPlaceholder: '\u200B',
-      /** NIK / No KK — panjang tetap 16 digit */
       maxNikKkLength: 16,
-      /** Pesan server (cek duplikasi KK), ditampilkan di field No KK */
       kkDuplicateMessage: '',
     }
   },
@@ -169,10 +166,6 @@ export default {
 </script>
 
 <style scoped>
-/*
- * Align BaseInputText with JdsInputText / InputText.scss (.spec/template) and
- * .citizen__form .jds-input-text rules on pages/imah-aing/form/index.vue
- */
 .step-two-input-jds {
   width: 100%;
 }
