@@ -80,22 +80,33 @@ function buildImahAingDescription(kondisiRumah) {
   return deskripsi
 }
 
-/** Normalisasi response GET `/aduan/complaints/exists` ke boolean `exists`. */
 function parseComplaintExistsResponse(response) {
   const body = response?.data
   if (body == null) {
     return false
   }
+
   const inner = Object.prototype.hasOwnProperty.call(body, 'data') ? body.data : body
   if (typeof inner === 'boolean') {
     return inner
   }
-  if (inner && typeof inner === 'object' && typeof inner.exists === 'boolean') {
-    return inner.exists
+
+  if (inner && typeof inner === 'object') {
+    if (typeof inner.is_exists === 'boolean') {
+      return inner.is_exists
+    }
+    if (typeof inner.exists === 'boolean') {
+      return inner.exists
+    }
+  }
+
+  if (typeof body.is_exists === 'boolean') {
+    return body.is_exists
   }
   if (typeof body.exists === 'boolean') {
     return body.exists
   }
+
   return false
 }
 
@@ -376,7 +387,8 @@ export default {
       }
 
       if (this.$config.useMockImahAing && this.$imahAingMock) {
-        return this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
+        const mockRes = await this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
+        return parseComplaintExistsResponse(mockRes)
       }
 
       const params = {
