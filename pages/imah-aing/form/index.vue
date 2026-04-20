@@ -24,7 +24,7 @@
         <form class="citizen__form mb-10" @submit.prevent="">
           <ImahAingFormStepOne v-if="currentFormStep === 1" />
           <ImahAingFormStepTwo v-if="currentFormStep === 2" ref="stepTwo" />
-          <ImahAingFormStepThree v-if="currentFormStep === 3" />
+          <ImahAingFormStepThree v-if="currentFormStep === 3" ref="stepThree" />
           <ImahAingFormStepFour v-if="currentFormStep === 4" ref="stepFour" />
 
           <div class="grid grid-cols-1 gap-2 md:hidden">
@@ -247,8 +247,16 @@ export default {
           return
         }
       }
-      if (step === 3 && !this.isAllDocumentsUploaded) {
-        return
+      if (step === 3) {
+        if (!this.isAllDocumentsUploaded) {
+          return
+        }
+        if (this.$refs.stepThree) {
+          const kondisiOk = await this.$refs.stepThree.validate()
+          if (!kondisiOk) {
+            return
+          }
+        }
       }
       await this.goToNextStep()
     },
