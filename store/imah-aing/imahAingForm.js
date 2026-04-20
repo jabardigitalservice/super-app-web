@@ -69,6 +69,17 @@ const getDefaultState = () => ({
   },
 })
 
+const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-lainnya'
+
+function buildImahAingDescription(kondisiRumah) {
+  const deskripsi = String(kondisiRumah?.deskripsiKondisi || '').trim()
+  const penyebabLainnya = String(kondisiRumah?.penyebabKerusakanLainnya || '').trim()
+  if (kondisiRumah?.penyebabKerusakan === IMAH_AING_PENYEBAB_LAINNYA && penyebabLainnya) {
+    return `[Penyebab lainnya: ${penyebabLainnya}] ${deskripsi}`.trim()
+  }
+  return deskripsi
+}
+
 /** Base64url-safe JSON dari query `meta` (UTF-8) */
 function decodeMetaQueryParam(encoded) {
   if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
@@ -494,7 +505,6 @@ export default {
         const fotoUrls = (state.dokumen.fotoRumah || []).map((s) => s?.url || '').filter((u) => !!u)
         const photos = [...baseUrls, ...fotoUrls].map((url) => ({ url }))
 
-        // Field `kondisiRumah` (penyebab/deskripsi) belum dikirim — tunggu kontrak API (§6 dokumen rencana).
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const payload = {
           user_name: state.dataPengusul.name,
@@ -506,7 +516,8 @@ export default {
           type: 'private',
           photos,
           category_id: 'imah-aing',
-          complaint_subcategory_id: 'imah-aing-perbaikan-atau-pembangunan-rumah-tidak-layak-huni',
+          complaint_subcategory_id: state.kondisiRumah.penyebabKerusakan,
+          description: buildImahAingDescription(state.kondisiRumah),
           title: 'Imah Aing',
           latitude: String(location.lat),
           longitude: String(location.lng),

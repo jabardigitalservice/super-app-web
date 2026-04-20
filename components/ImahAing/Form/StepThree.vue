@@ -131,7 +131,7 @@
         </ValidationProvider>
 
         <ValidationProvider
-          v-if="kondisiRumah.penyebabKerusakan === 'lainnya'"
+          v-if="isPenyebabLainnya"
           v-slot="{ errors }"
           rules="required"
           name="Penyebab lainnya"
@@ -189,6 +189,9 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
+/** Value `complaint_subcategory_id` untuk opsi "Lainnya" — harus sama dengan `buildImahAingDescription` di store. */
+const PENYEBAB_LAINNYA_VALUE = 'imah-aing-lainnya'
+
 export default {
   data() {
     return {
@@ -216,10 +219,11 @@ export default {
         },
       ],
       penyebabOptions: [
-        { value: 'bencana', label: 'Bencana' },
-        { value: 'kebakaran', label: 'Kebakaran' },
-        { value: 'usia_bangunan', label: 'Usia Bangunan' },
-        { value: 'lainnya', label: 'Lainnya' },
+        { value: 'imah-aing-bencana', label: 'Bencana Alam' },
+        { value: 'imah-aing-kebakaran', label: 'Kebakaran' },
+        { value: 'imah-aing-usia-bangunan', label: 'Usia Bangunan' },
+        { value: 'imah-aing-gagal-konstruksi', label: 'Kegagalan Konstruksi' },
+        { value: PENYEBAB_LAINNYA_VALUE, label: 'Lainnya' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
@@ -236,6 +240,9 @@ export default {
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
     },
+    isPenyebabLainnya() {
+      return this.kondisiRumah.penyebabKerusakan === PENYEBAB_LAINNYA_VALUE
+    },
     setPenyebabKerusakan: {
       get() {
         return this.kondisiRumah.penyebabKerusakan || ''
@@ -243,7 +250,7 @@ export default {
       set(val) {
         const v = val != null ? String(val) : ''
         this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'penyebabKerusakan', value: v })
-        if (v !== 'lainnya') {
+        if (v !== PENYEBAB_LAINNYA_VALUE) {
           this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
             field: 'penyebabKerusakanLainnya',
             value: '',
