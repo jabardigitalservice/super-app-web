@@ -3,13 +3,13 @@ name: 🚀 Jabar Super Apps Web Release Production 🚀
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build-push-deploy-production:
     runs-on: ubuntu-latest
     steps:
-      - name: 📝 Checkout 
+      - name: 📝 Checkout
         uses: actions/checkout@v4
 
       - name: 🔄 Set up QEMU
@@ -17,7 +17,6 @@ jobs:
 
       - name: 🛠️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
 
       # Configure Docker with Credentials
       - name: 🐳 Configure Docker
@@ -40,29 +39,29 @@ jobs:
           method: token
           exportEnv: true
           secrets: |
-            kv-superapp-service-production/data/web API_KEY | API_KEY ;
-            kv-superapp-service-production/data/web SENTRY_DSN | SENTRY_DSN ;
-            kv-superapp-service-production/data/web SENTRY_ENABLED | SENTRY_ENABLED ;
-            kv-superapp-service-production/data/web SENTRY_SAMPLE_RATE | SENTRY_SAMPLE_RATE ;
-            kv-superapp-service-production/data/web GOOGLE_ANALYTICS_ID | GOOGLE_ANALYTICS_ID ;
-            kv-superapp-service-production/data/web NEW_RELIC_APP_NAME | NEW_RELIC_APP_NAME ;
-            kv-superapp-service-production/data/web NEW_RELIC_LICENSE_KEY | NEW_RELIC_LICENSE_KEY ;
-            kv-superapp-service-production/data/web NEW_RELIC_ACCOUNT_ID | NEW_RELIC_ACCOUNT_ID ;
-            kv-superapp-service-production/data/web NEW_RELIC_BROWSER_LICENSE_KEY | NEW_RELIC_BROWSER_LICENSE_KEY ;
-            kv-superapp-service-production/data/web NEW_RELIC_APPLICATION_ID | NEW_RELIC_APPLICATION_ID ;
-            kv-superapp-service-production/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
-            kv-superapp-service-production/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
-            kv-superapp-service-production/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN ;
-            kv-superapp-service-production/data/web KEYCLOAK_URL | KEYCLOAK_URL ;
-            kv-superapp-service-production/data/web KEYCLOAK_CLIENT_ID_PARTNER | KEYCLOAK_CLIENT_ID_PARTNER ;
-            kv-superapp-service-production/data/web KEYCLOAK_CLIENT_SECRET_PARTNER | KEYCLOAK_CLIENT_SECRET_PARTNER ;
-            kv-superapp-service-production/data/web X_PARTNER_ID | X_PARTNER_ID ;
-            kv-superapp-service-production/data/web GOOGLE_MAPS_API | GOOGLE_MAPS_API ;
-            kv-superapp-service-production/data/web URL_FILE | URL_FILE ;
-            kv-superapp-service-production/data/web NODE_ENV | NODE_ENV ;
-            kv-superapp-service-production/data/web UNLEASH_URL | UNLEASH_URL ;
-            kv-superapp-service-production/data/web UNLEASH_TOKEN | UNLEASH_TOKEN ;
-            kv-superapp-service-production/data/web LINK_PORTAL_JABAR | LINK_PORTAL_JABAR
+            kv-superapp-service-production-drc/data/web API_KEY | API_KEY ;
+            kv-superapp-service-production-drc/data/web SENTRY_DSN | SENTRY_DSN ;
+            kv-superapp-service-production-drc/data/web SENTRY_ENABLED | SENTRY_ENABLED ;
+            kv-superapp-service-production-drc/data/web SENTRY_SAMPLE_RATE | SENTRY_SAMPLE_RATE ;
+            kv-superapp-service-production-drc/data/web GOOGLE_ANALYTICS_ID | GOOGLE_ANALYTICS_ID ;
+            kv-superapp-service-production-drc/data/web NEW_RELIC_APP_NAME | NEW_RELIC_APP_NAME ;
+            kv-superapp-service-production-drc/data/web NEW_RELIC_LICENSE_KEY | NEW_RELIC_LICENSE_KEY ;
+            kv-superapp-service-production-drc/data/web NEW_RELIC_ACCOUNT_ID | NEW_RELIC_ACCOUNT_ID ;
+            kv-superapp-service-production-drc/data/web NEW_RELIC_BROWSER_LICENSE_KEY | NEW_RELIC_BROWSER_LICENSE_KEY ;
+            kv-superapp-service-production-drc/data/web NEW_RELIC_APPLICATION_ID | NEW_RELIC_APPLICATION_ID ;
+            kv-superapp-service-production-drc/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
+            kv-superapp-service-production-drc/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
+            kv-superapp-service-production-drc/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN ;
+            kv-superapp-service-production-drc/data/web KEYCLOAK_URL | KEYCLOAK_URL ;
+            kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_ID_PARTNER | KEYCLOAK_CLIENT_ID_PARTNER ;
+            kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_SECRET_PARTNER | KEYCLOAK_CLIENT_SECRET_PARTNER ;
+            kv-superapp-service-production-drc/data/web X_PARTNER_ID | X_PARTNER_ID ;
+            kv-superapp-service-production-drc/data/web GOOGLE_MAPS_API | GOOGLE_MAPS_API ;
+            kv-superapp-service-production-drc/data/web URL_FILE | URL_FILE ;
+            kv-superapp-service-production-drc/data/web NODE_ENV | NODE_ENV ;
+            kv-superapp-service-production-drc/data/web UNLEASH_URL | UNLEASH_URL ;
+            kv-superapp-service-production-drc/data/web UNLEASH_TOKEN | UNLEASH_TOKEN ;
+            kv-superapp-service-production-drc/data/web LINK_PORTAL_JABAR | LINK_PORTAL_JABAR
 
       - name: 🔨 Build and Push 📦
         uses: docker/build-push-action@v4
@@ -96,7 +95,6 @@ jobs:
             UNLEASH_TOKEN=${{env.UNLEASH_TOKEN}}
             LINK_PORTAL_JABAR=${{env.LINK_PORTAL_JABAR}}
 
-
       ## GitOps
       - name: ⚙️ GitOps ArgoCD Setup
         run: |
@@ -108,7 +106,9 @@ jobs:
       - name: 🔄 GitOps ArgoCD Update Image Tag
         uses: mikefarah/yq@master
         with:
-          cmd: yq -i '.spec.template.spec.containers[0].image = "${{ secrets.SERVICE_IMAGENAME }}:${{ env.version }}"' 'jds-terraform-gke/k8s/superapp/production/web/deployment.yaml'
+          cmd: yq -i '.spec.template.spec.containers[0].image = "${{
+            secrets.SERVICE_IMAGENAME }}:${{ env.version }}"'
+            'jds-terraform-gke/k8s/superapp/production/web/deployment.yaml'
 
       - name: 🚀 GitOps ArgoCD Create MR & Release to Production 🚀
         id: create_mr
@@ -123,7 +123,7 @@ jobs:
           git add .
           git commit -m "[Release] Superapp Web v${{ env.version }} to production"
           git push origin $BRANCH_NAME
-          
+
           # Create MR Gitlab
           MR_RESPONSE=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_API_TOKEN }}" \
             --data-urlencode "source_branch=$BRANCH_NAME" \
@@ -152,12 +152,12 @@ jobs:
           format: html
           message: |
             🚀 <b>Superapp Web New Release to Production</b>
-            
+
             Version: <code>v${{ env.version }}</code>
             Released by: <b>${{ github.actor }}</b>
-            
+
             <b>GitHub Release:</b> https://github.com/${{ github.repository }}/releases/tag/v${{ env.version }}
-            
+
             <b>Merge Request:</b> ${{ steps.create_mr.outputs.mr_url }}
-            
+
             ⚠️ Please review and merge the deployment MR @feriahmd
