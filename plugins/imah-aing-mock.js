@@ -47,9 +47,19 @@ export default (_context, inject) => {
         },
       }
     },
+    /** Bentuk sama dengan respons BE (agar lewat `parseComplaintExistsResponse` di store). */
     async checkKkDuplicate() {
       await wait(150)
-      return false
+      return {
+        data: {
+          status: true,
+          message: 'success',
+          code: '2001400',
+          data: {
+            is_exists: false,
+          },
+        },
+      }
     },
   }
 
