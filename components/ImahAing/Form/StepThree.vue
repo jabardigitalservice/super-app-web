@@ -209,7 +209,7 @@ export default {
         },
         {
           key: 'suratMiskin',
-          label: 'Surat Keterangan Miskin / Tidak Mampu dari Ketua RT',
+          label: 'Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa / Lurah',
           required: true,
         },
         {

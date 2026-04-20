@@ -33,19 +33,19 @@
       <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
     </ValidationProvider>
 
-    <!-- No KTP — WAJIB -->
+    <!-- NIK Kepala Keluarga — WAJIB -->
     <ValidationProvider
       v-slot="{ errors }"
       class="flex flex-col gap-2 mb-5"
       :rules="`required|numeric|length:${maxNikKkLength}`"
-      name="No KTP Calon Penerima Bantuan"
+      name="NIK Kepala Keluarga"
       vid="nik"
     >
       <BaseInputText
         v-model="setNik"
         class="step-two-input-jds"
         type="text"
-        label="No KTP Calon Penerima Bantuan"
+        label="NIK Kepala Keluarga"
         required
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
