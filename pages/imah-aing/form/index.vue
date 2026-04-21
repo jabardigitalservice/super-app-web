@@ -207,8 +207,7 @@ export default {
       return false
     },
     successDescription() {
-      const submissionId = this.statusSubmitForm.complaint_number || '-'
-      return `Pengajuan sudah berhasil dilakukan dengan ID: ${submissionId}. Pastikan warga mencatat ID pengajuan tersebut. Warga dapat melakukan pengecekan status pengajuan melalui Hotline Jabar di Nomor WhatsApp 082126030038.`
+      return 'Pengajuan sudah berhasil dilakukan. Warga dapat melakukan pengecekan pengajuan melalui Hotline Jabar di Nomor WhatsApp 082126030038.'
     },
   },
   created() {
