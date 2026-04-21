@@ -31,7 +31,7 @@
         <input
           v-model="privacyAccepted"
           type="checkbox"
-          class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
         />
         <span class="text-sm">
           Saya menyatakan telah membaca dan mempelajari
