@@ -34,8 +34,10 @@
           class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
         <span class="text-sm">
-          Saya menyatakan telah membaca dan mempelajari Aplikasi Imah Aing serta menyetujui
-          <a href="https://hotline.jabarprov.go.id/hc/help-center/articles/1776682585-m" class="underline hover:text-blue-600">Kebijakan Privasi</a>
+          Saya menyatakan telah membaca dan mempelajari
+          <a href="https://hotline.jabarprov.go.id/hc/help-center/articles/1776682585-m" class="underline hover:text-blue-600">Aplikasi Imah Aing</a>
+          serta menyetujui
+          <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
         </span>
       </label>
 
