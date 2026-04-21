@@ -190,7 +190,7 @@
 import { mapActions, mapState } from 'vuex'
 
 /** Value `complaint_subcategory_id` untuk opsi "Lainnya" — harus sama dengan `buildImahAingDescription` di store. */
-const PENYEBAB_LAINNYA_VALUE = 'imah-aing-lainnya'
+const PENYEBAB_LAINNYA_VALUE = 'imah-aing-other'
 
 export default {
   data() {

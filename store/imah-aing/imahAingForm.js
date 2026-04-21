@@ -69,7 +69,7 @@ const getDefaultState = () => ({
   },
 })
 
-const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-lainnya'
+const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-other'
 
 function buildImahAingDescription(kondisiRumah) {
   const deskripsi = String(kondisiRumah?.deskripsiKondisi || '').trim()
