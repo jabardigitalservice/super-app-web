@@ -76,6 +76,30 @@
         :error-message="errors[0] || kkDuplicateMessage"
       />
     </ValidationProvider>
+
+    <!-- Pendapatan per Bulan — WAJIB; digit-only via keydown + sanitasi @input; tampilan ribuan id-ID -->
+    <ValidationProvider
+      v-slot="{ errors }"
+      class="flex flex-col gap-2 mb-5"
+      rules="required"
+      name="Pendapatan per Bulan"
+      vid="incomePerMonth"
+      :value="incomeDigitsRaw"
+    >
+      <BaseInputText
+        :value="formatIncomeIdDisplay(incomeDigitsRaw)"
+        class="step-two-input-jds"
+        type="text"
+        label="Pendapatan per Bulan"
+        required
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+        :error="!!errors[0]"
+        :error-message="errors[0]"
+        @input="onIncomePerMonthInput"
+        @keydown.native="onIncomePerMonthKeydown"
+      />
+    </ValidationProvider>
     </section>
   </ValidationObserver>
 </template>
@@ -129,6 +153,10 @@ export default {
         this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', { field: 'nomorKk', value: digits })
       },
     },
+    /** Digit murni di Vuex — dipakai `ValidationProvider` `:value` + formatter tampilan. */
+    incomeDigitsRaw() {
+      return this.$store.state.imahAingForm.dataPengusul.incomePerMonth
+    },
     setName: {
       get() {
         return this.$store.state.imahAingForm.dataPengusul.name
@@ -152,6 +180,57 @@ export default {
     },
   },
   methods: {
+    /**
+     * Tampilan berpemisah ribuan (id-ID). Hanya digit 0–9 dari argumen yang dipakai;
+     * huruf dan karakter lain dibuang (sama seperti alur input).
+     */
+    formatIncomeIdDisplay(digitStr) {
+      const core = String(digitStr ?? '').replace(/\D/g, '')
+      if (core === '') {
+        return ''
+      }
+      const trimmed = core.replace(/^0+(?=\d)/, '') || '0'
+      const n = Number(trimmed)
+      if (!Number.isFinite(n)) {
+        return ''
+      }
+      return new Intl.NumberFormat('id-ID').format(n)
+    },
+    onIncomePerMonthInput(val) {
+      const digitsOnly = String(val ?? '').replace(/\D/g, '')
+      const normalized =
+        digitsOnly === '' ? '' : (digitsOnly.replace(/^0+(?=\d)/, '') || '0')
+      this.$store.commit('imahAingForm/SET_DATA_PENGUSUL_FIELD', {
+        field: 'incomePerMonth',
+        value: normalized,
+      })
+    },
+    /** Cegah huruf/simbol di keydown agar tidak sempat tampil di input terkontrol. */
+    onIncomePerMonthKeydown(e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return
+      }
+      const allowed = new Set([
+        'Backspace',
+        'Delete',
+        'Tab',
+        'Escape',
+        'Enter',
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+        'Home',
+        'End',
+      ])
+      if (allowed.has(e.key)) {
+        return
+      }
+      if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
+        return
+      }
+      e.preventDefault()
+    },
     clearKkDuplicateMessage() {
       this.kkDuplicateMessage = ''
     },

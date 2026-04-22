@@ -32,6 +32,7 @@ const getDefaultState = () => ({
     email: '',
     nik: '',
     nomorKk: '',
+    incomePerMonth: '',
     avatarUrl: '',
   },
 
@@ -70,6 +71,17 @@ const getDefaultState = () => ({
 })
 
 const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-other'
+
+const USER_INCOME_PER_MONTH_KEY = 'user_income_per_month'
+
+function incomeDigitsToNumber(digits) {
+  const s = String(digits || '').replace(/\D/g, '')
+  if (s === '') {
+    return NaN
+  }
+  const n = Number(s)
+  return Number.isFinite(n) && n >= 0 ? n : NaN
+}
 
 function buildImahAingDescription(kondisiRumah) {
   const deskripsi = String(kondisiRumah?.deskripsiKondisi || '').trim()
@@ -574,12 +586,19 @@ export default {
         const photos = [...baseUrls, ...fotoUrls].map((url) => ({ url }))
 
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
+        const userIncomePerMonth = incomeDigitsToNumber(state.dataPengusul.incomePerMonth)
+        if (!Number.isFinite(userIncomePerMonth)) {
+          commit('SET_STATUS_SUBMIT', 'ERROR')
+          throw new Error('invalid_user_income_per_month')
+        }
+
         const payload = {
           user_name: state.dataPengusul.name,
           user_email: state.dataPengusul.email || '',
           user_phone: state.dataPengusul.phone,
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
+          [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
           source_id: state.sourceId || 'sapawarga',
           type: 'private',
           photos,
