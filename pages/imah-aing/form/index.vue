@@ -147,6 +147,18 @@
       @close="cancelSubmit"
       @click="retrySubmitComplaintForm"
     />
+
+    <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'SESSION_EXPIRED'"
+      header="Sesi Anda Telah Habis"
+      label-primary-button="Masuk Kembali"
+      label-secondary-button="Tutup"
+      name-icon="warning"
+      size="16px"
+      description="Maaf, sesi Anda telah habis. Untuk melanjutkan, silakan masuk kembali dan kirim ulang pengajuan Anda."
+      @close="handleSessionExpired"
+      @click="handleSessionExpired"
+    />
   </div>
 </template>
 
@@ -256,6 +268,9 @@ export default {
             return
           }
         } catch {
+          if (this.statusSubmitForm.status === 'SESSION_EXPIRED') {
+            return
+          }
           this.$refs.stepTwo.setKkDuplicateMessage('Gagal memverifikasi No KK. Silakan coba lagi.')
           return
         }
@@ -320,6 +335,11 @@ export default {
       setTimeout(() => {
         this.isLoading = false
       }, 1500)
+    },
+    handleSessionExpired() {
+      if (process.client) {
+        window.location.reload()
+      }
     },
   },
 }
