@@ -115,6 +115,10 @@ function parseComplaintExistsResponse(response) {
   return false
 }
 
+function isUnauthorizedError(error) {
+  return error?.response?.status === 401
+}
+
 /** Base64url-safe JSON dari query `meta` (UTF-8) */
 function decodeMetaQueryParam(encoded) {
   if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
@@ -319,17 +323,6 @@ export default {
     setAuthToken({ commit }, token) {
       commit('SET_AUTH_TOKEN', token)
     },
-    async refreshToken({ state }) {
-      try {
-        const newToken = await this.$getToken('refresh_token')
-        state.authToken = newToken
-        return newToken
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Token refresh failed:', error)
-        throw error
-      }
-    },
     initForm({ commit }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
@@ -385,7 +378,7 @@ export default {
      * Cek apakah KK sudah punya pengajuan Imah Aing (double submission).
      * @returns {Promise<boolean>} `true` jika sudah ada pengajuan.
      */
-    async checkKkDuplicate({ state, dispatch }) {
+    async checkKkDuplicate({ state, commit }) {
       const kk = String(state.dataPengusul.nomorKk || '').replace(/\D/g, '')
       if (!kk) {
         return false
@@ -411,10 +404,8 @@ export default {
         const res = await call()
         return parseComplaintExistsResponse(res)
       } catch (error) {
-        if (error.response?.status === 401) {
-          await dispatch('refreshToken')
-          const res = await call()
-          return parseComplaintExistsResponse(res)
+        if (isUnauthorizedError(error)) {
+          commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
         }
         throw error
       }
@@ -546,16 +537,10 @@ export default {
         try {
           response = await this.$axios.post('/file/upload', formData)
         } catch (error) {
-          if (error.response?.status === 401) {
-            await dispatch('refreshToken')
-            response = await this.$axios.post('/file/upload', formData, {
-              headers: {
-                Authorization: `Bearer ${state.authToken}`,
-              },
-            })
-          } else {
-            throw error
+          if (isUnauthorizedError(error)) {
+            commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
           }
+          throw error
         }
 
         const fileUrl = `${this.$config.urlFile}/${response.data.data.path}`
@@ -569,7 +554,7 @@ export default {
         throw error
       }
     },
-    async submitForm({ commit, state, dispatch }) {
+    async submitForm({ commit, state }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
         // photos[] — urutan: KTP, KK, surat miskin, surat tanah, lalu semua foto rumah (multifile)
@@ -628,12 +613,10 @@ export default {
           try {
             response = await postComplaint()
           } catch (error) {
-            if (error.response?.status === 401) {
-              await dispatch('refreshToken')
-              response = await postComplaint()
-            } else {
-              throw error
+            if (isUnauthorizedError(error)) {
+              commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
             }
+            throw error
           }
         }
         const submissionId = response.data?.data?.id || response.data?.id || ''
@@ -642,7 +625,9 @@ export default {
         commit('SET_SUBMISSION_ID', submissionId)
         return response
       } catch (error) {
-        commit('SET_STATUS_SUBMIT', 'ERROR')
+        if (state.statusSubmitForm.status !== 'SESSION_EXPIRED') {
+          commit('SET_STATUS_SUBMIT', 'ERROR')
+        }
         throw error
       }
     },
