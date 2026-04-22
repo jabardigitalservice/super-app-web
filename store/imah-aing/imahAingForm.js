@@ -70,8 +70,6 @@ const getDefaultState = () => ({
   },
 })
 
-const IMAH_AING_PENYEBAB_LAINNYA = 'imah-aing-other'
-
 const USER_INCOME_PER_MONTH_KEY = 'user_income_per_month'
 
 function incomeDigitsToNumber(digits) {
@@ -84,12 +82,7 @@ function incomeDigitsToNumber(digits) {
 }
 
 function buildImahAingDescription(kondisiRumah) {
-  const deskripsi = String(kondisiRumah?.deskripsiKondisi || '').trim()
-  const penyebabLainnya = String(kondisiRumah?.penyebabKerusakanLainnya || '').trim()
-  if (kondisiRumah?.penyebabKerusakan === IMAH_AING_PENYEBAB_LAINNYA && penyebabLainnya) {
-    return `[Penyebab lainnya: ${penyebabLainnya}] ${deskripsi}`.trim()
-  }
-  return deskripsi
+  return String(kondisiRumah?.deskripsiKondisi || '').trim()
 }
 
 function parseComplaintExistsResponse(response) {

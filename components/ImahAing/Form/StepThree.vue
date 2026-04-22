@@ -131,30 +131,6 @@
         </ValidationProvider>
 
         <ValidationProvider
-          v-if="isPenyebabLainnya"
-          v-slot="{ errors }"
-          rules="required"
-          name="Penyebab lainnya"
-          class="flex flex-col gap-2"
-          tag="div"
-        >
-          <label
-            for="penyebabLainnya"
-            class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
-          >
-            Penyebab lainnya <span class="text-red-500">*</span>
-          </label>
-          <JdsInputText
-            id="penyebabLainnya"
-            :value="setPenyebabKerusakanLainnya"
-            class="w-full"
-            placeholder="Jelaskan penyebab lainnya"
-            :error-message="errors[0]"
-            @input="setPenyebabKerusakanLainnya = $event"
-          />
-        </ValidationProvider>
-
-        <ValidationProvider
           v-slot="{ errors }"
           rules="required"
           name="Deskripsi kondisi rumah"
@@ -189,9 +165,6 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 
-/** Value `complaint_subcategory_id` untuk opsi "Lainnya" — harus sama dengan `buildImahAingDescription` di store. */
-const PENYEBAB_LAINNYA_VALUE = 'imah-aing-other'
-
 export default {
   data() {
     return {
@@ -219,11 +192,8 @@ export default {
         },
       ],
       penyebabOptions: [
-        { value: 'imah-aing-usia-bangunan', label: 'Usia Bangunan' },
-        { value: 'imah-aing-gagal-konstruksi', label: 'Tidak Sesuai Kaidah Teknis' },
-        { value: 'imah-aing-kebakaran', label: 'Kebakaran' },
-        { value: 'imah-aing-bencana', label: 'Bencana Alam' },
-        { value: PENYEBAB_LAINNYA_VALUE, label: 'Lainnya' },
+        { value: 'imah-aing-bencana', label: 'Bencana' },
+        { value: 'imah-aing-non-bencana', label: 'Bukan Bencana' },
       ],
       accept: '.jpg, .jpeg, .png, .pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
@@ -240,9 +210,6 @@ export default {
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
     },
-    isPenyebabLainnya() {
-      return this.kondisiRumah.penyebabKerusakan === PENYEBAB_LAINNYA_VALUE
-    },
     setPenyebabKerusakan: {
       get() {
         return this.kondisiRumah.penyebabKerusakan || ''
@@ -250,22 +217,9 @@ export default {
       set(val) {
         const v = val != null ? String(val) : ''
         this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', { field: 'penyebabKerusakan', value: v })
-        if (v !== PENYEBAB_LAINNYA_VALUE) {
-          this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
-            field: 'penyebabKerusakanLainnya',
-            value: '',
-          })
-        }
-      },
-    },
-    setPenyebabKerusakanLainnya: {
-      get() {
-        return this.kondisiRumah.penyebabKerusakanLainnya
-      },
-      set(val) {
         this.$store.commit('imahAingForm/SET_KONDISI_RUMAH_FIELD', {
           field: 'penyebabKerusakanLainnya',
-          value: val,
+          value: '',
         })
       },
     },
