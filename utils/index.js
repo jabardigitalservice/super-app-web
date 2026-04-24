@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { isValid } from 'date-fns'
 import { format as formatDateFns, formatInTimeZone } from 'date-fns-tz'
 import id from 'date-fns/locale/id'
@@ -13,34 +14,17 @@ export function convertToLocaleDate(date, format) {
   return formatDateFns(new Date(date), format, { locale: id })
 }
 
-export async function fetchAduanData($aduanAPI, idAduan, config) {
+export async function fetchAduanData(idAduan) {
   try {
-    const response = await $aduanAPI.post('/aduan/login', {
-      username: config.baseURLAduan.username,
-      password: config.baseURLAduan.password,
+    const { data } = await axios.post('/api/aduan-data', {
+      id_aduan: idAduan,
     })
 
-    const token = response.data.access_token
-
-    if (token) {
-      const dataResponse = await $aduanAPI.post(
-        '/aduan/id_aduan',
-        {
-          id_aduan: idAduan,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      if (dataResponse.data.length > 0) {
-        return dataResponse.data
-      }
+    if (data && data.length > 0) {
+      return data
     }
-  } catch (error) {
-    console.error('fetch data ', error)
+  } catch {
+    /* request failed — caller receives null */
   }
 
   return null
