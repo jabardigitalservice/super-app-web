@@ -105,8 +105,8 @@ export default {
           this.errorMessage = this.errorMessage ? '' : 'OK'
           this.errorCheck = !this.errorCheck
         }
-      } catch (error) {
-        console.error('fetch data ', error)
+      } catch {
+        /* fetchAduanData returns null on failure; UI already reflects not found */
       }
 
       this.isLoading = false

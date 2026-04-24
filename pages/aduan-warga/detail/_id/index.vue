@@ -56,8 +56,7 @@ export default {
       dataAduan = data
 
       loading = false
-    } catch (error) {
-      console.error('fetch data ', error)
+    } catch {
       loading = false
     }
 

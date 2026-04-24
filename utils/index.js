@@ -23,8 +23,8 @@ export async function fetchAduanData(idAduan) {
     if (data && data.length > 0) {
       return data
     }
-  } catch (error) {
-    console.error('fetch data ', error)
+  } catch {
+    /* request failed — caller receives null */
   }
 
   return null

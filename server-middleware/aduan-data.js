@@ -60,6 +60,7 @@ module.exports = (req, res) => {
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify(dataResponse.data))
     } catch (err) {
+      // eslint-disable-next-line no-console -- server-side error visibility
       console.error('[aduan-data] Error:', err.message)
       res.statusCode = err.response?.status || 500
       res.setHeader('Content-Type', 'application/json')

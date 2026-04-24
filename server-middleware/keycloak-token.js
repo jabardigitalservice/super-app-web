@@ -46,6 +46,7 @@ module.exports = (req, res) => {
         })
       )
     } catch (err) {
+      // eslint-disable-next-line no-console -- server-side error visibility
       console.error('[keycloak-token] Error:', err.message)
       res.statusCode = 500
       res.setHeader('Content-Type', 'application/json')

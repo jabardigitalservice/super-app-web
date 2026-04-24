@@ -17,7 +17,6 @@ export default ({ store }, inject) => {
 
       return response.data.access_token
     } catch (error) {
-      console.error('Error fetching Keycloak token:', error)
       return Promise.reject(error)
     }
   }
