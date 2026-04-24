@@ -46,16 +46,12 @@ import { fetchAduanData } from '~/utils';
 export default {
   name: 'DetailAduanWarga',
   components: { Milestone },
-  async asyncData ({ $aduanAPI,  params, $config }) {
+  async asyncData ({ params }) {
     let loading = true
     let dataAduan = []
 
     try {
-      const data = await fetchAduanData(
-        $aduanAPI,
-        params.id,
-        $config
-      )
+      const data = await fetchAduanData(params.id)
 
       dataAduan = data
 

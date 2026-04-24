@@ -92,11 +92,7 @@ export default {
     async fetchData() {
       this.isLoading = true
       try {
-        this.data = await fetchAduanData(
-          this.$aduanAPI,
-          this.idAduan,
-          this.$config
-        )
+        this.data = await fetchAduanData(this.idAduan)
 
         if (this.data) {
           this.$router.push({
