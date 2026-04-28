@@ -92,7 +92,11 @@ export default {
     async fetchData() {
       this.isLoading = true
       try {
-        this.data = await fetchAduanData(this.idAduan)
+        this.data = await fetchAduanData(
+          this.$aduanAPI,
+          this.idAduan,
+          this.$config
+        )
 
         if (this.data) {
           this.$router.push({
@@ -105,8 +109,8 @@ export default {
           this.errorMessage = this.errorMessage ? '' : 'OK'
           this.errorCheck = !this.errorCheck
         }
-      } catch {
-        /* fetchAduanData returns null on failure; UI already reflects not found */
+      } catch (error) {
+        console.error('fetch data ', error)
       }
 
       this.isLoading = false

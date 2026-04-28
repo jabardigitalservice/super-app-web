@@ -80,24 +80,10 @@ export default {
     },
     overwriting: true,
   },
-  serverMiddleware: [
-    { path: '/api/token', handler: '~/server-middleware/keycloak-token.js' },
-    { path: '/api/aduan-data', handler: '~/server-middleware/aduan-data.js' },
-  ],
-
   // Private runtime config
   privateRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL + '/' + process.env.VERSION_ENDPOINT,
-    },
-    aduanCredential: {
-      username: process.env.USERNAME_URL_ADUAN,
-      password: process.env.PASSWORD_URL_ADUAN,
-    },
-    keycloak: {
-      url: process.env.KEYCLOAK_URL,
-      clientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
-      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
     },
   },
 
@@ -115,9 +101,16 @@ export default {
     googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
     baseURLAduan: {
       url: process.env.BASE_URL_ADUAN,
+      username: process.env.USERNAME_URL_ADUAN,
+      password: process.env.PASSWORD_URL_ADUAN,
     },
     urlPortalJabar: process.env.LINK_PORTAL_JABAR,
     gmapsKey: process.env.GOOGLE_MAPS_API,
+    apiAduanIdeal: {
+      keycloakUrl: process.env.KEYCLOAK_URL,
+      keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
+      keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
+    },
     urlFile: process.env.URL_FILE,
     useMockImahAing: process.env.USE_MOCK_IMAH_AING === 'true',
     unleash: {

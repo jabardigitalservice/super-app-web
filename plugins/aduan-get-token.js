@@ -1,22 +1,34 @@
 import axios from 'axios'
 
-export default ({ store }, inject) => {
+export default ({ store, $config }, inject) => {
   const getToken = async (grantType) => {
     try {
-      const body = { grant_type: grantType }
+      const params = new URLSearchParams({
+        client_id: $config.apiAduanIdeal.keycloakClientId,
+        client_secret: $config.apiAduanIdeal.keycloakClientSecret,
+        grant_type: grantType,
+        scope: 'openid',
+      })
 
       if (grantType === 'refresh_token') {
-        body.refresh_token = store.state.aduan.refreshTokenKeycloak
+        params.append('refresh_token', store.state.aduan.refreshTokenKeycloak)
       }
 
-      const response = await axios.post('/api/token', body, {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const response = await axios.post(
+        $config.apiAduanIdeal.keycloakUrl,
+        params,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      )
 
       store.commit('aduan/setRefreshTokenKeycloak', response.data.refresh_token)
 
       return response.data.access_token
     } catch (error) {
+      console.error('Error fetching Keycloak token:', error)
       return Promise.reject(error)
     }
   }
