@@ -26,6 +26,7 @@ export default {
   plugins: [
     '~/plugins/vue-gtag.js',
     '~/plugins/aduan-api.js',
+    '~/plugins/gateway-partner-api.js',
     '~/plugins/imah-aing-mock.js',
     '~/plugins/aduan-get-token.js',
     { src: '~/plugins/dark-mode.js', mode: 'client' },
@@ -99,6 +100,9 @@ export default {
       },
     },
     googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
+    apiKey: process.env.API_KEY,
+    xPartnerId: process.env.X_PARTNER_ID,
+    baseURLGatewayPartner: process.env.BASE_URL_GATEWAY_PARTNER,
     baseURLAduan: {
       url: process.env.BASE_URL_ADUAN,
       username: process.env.USERNAME_URL_ADUAN,

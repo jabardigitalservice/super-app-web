@@ -269,7 +269,7 @@ export default {
       try {
         let response
         try {
-          response = await this.$axios.get('/user/profile', {
+          response = await this.$gatewayPartnerAPI.get('/user/profile', {
             headers: {
               Authorization: `Bearer ${state.authToken}`,
             },
@@ -277,7 +277,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            response = await this.$axios.get('/user/profile', {
+            response = await this.$gatewayPartnerAPI.get('/user/profile', {
               headers: {
                 Authorization: `Bearer ${state.authToken}`,
               },
@@ -298,7 +298,7 @@ export default {
       try {
         let response
         try {
-          response = await this.$axios.get('/aduan/complaints/categories', {
+          response = await this.$gatewayPartnerAPI.get('/aduan/complaints/categories', {
             headers: {
               Authorization: `Bearer ${state.authToken}`,
             },
@@ -306,7 +306,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            response = await this.$axios.get('/aduan/complaints/categories', {
+            response = await this.$gatewayPartnerAPI.get('/aduan/complaints/categories', {
               headers: {
                 Authorization: `Bearer ${state.authToken}`,
               },
@@ -332,7 +332,7 @@ export default {
       try {
         let response
         try {
-          response = await this.$axios.get('/aduan/complaints/subcategories', {
+          response = await this.$gatewayPartnerAPI.get('/aduan/complaints/subcategories', {
             headers: {
               Authorization: `Bearer ${state.authToken}`,
             },
@@ -343,7 +343,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            response = await this.$axios.get(
+            response = await this.$gatewayPartnerAPI.get(
               '/aduan/complaints/subcategories',
               {
                 headers: {
@@ -692,7 +692,7 @@ export default {
         }
 
         try {
-          const response = await this.$axios.post('/file/upload', formData, {})
+          const response = await this.$gatewayPartnerAPI.post('/file/upload', formData, {})
 
           if (response) {
             return {
@@ -702,7 +702,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            const response = await this.$axios.post('/file/upload', formData, {
+            const response = await this.$gatewayPartnerAPI.post('/file/upload', formData, {
               headers: {
                 Authorization: `Bearer ${state.authToken}`,
               },
@@ -754,7 +754,7 @@ export default {
 
         let response
         try {
-          response = await this.$axios.post(
+          response = await this.$gatewayPartnerAPI.post(
             '/aduan/complaints',
             jalanAingForm,
             {
@@ -766,7 +766,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            response = await this.$axios.post(
+            response = await this.$gatewayPartnerAPI.post(
               '/aduan/complaints',
               jalanAingForm,
               {
@@ -801,7 +801,7 @@ export default {
       try {
         let response
         try {
-          response = await this.$axios.get(
+          response = await this.$gatewayPartnerAPI.get(
             `/user/profile/email/${getters.email}`,
             {
               headers: {
@@ -812,7 +812,7 @@ export default {
         } catch (error) {
           if (error.response?.status === 401) {
             await dispatch('refreshToken')
-            response = await this.$axios.get(
+            response = await this.$gatewayPartnerAPI.get(
               `/user/profile/email/${getters.email}`,
               {
                 headers: {
