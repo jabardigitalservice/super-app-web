@@ -395,7 +395,7 @@ export default {
       }
 
       const call = () =>
-        this.$axios.get('/aduan/complaints/exists', {
+        this.$gatewayPartnerAPI.get('/aduan/complaints/exists', {
           params,
           headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
         })
@@ -535,7 +535,7 @@ export default {
 
         let response
         try {
-          response = await this.$axios.post('/file/upload', formData)
+          response = await this.$gatewayPartnerAPI.post('/file/upload', formData)
         } catch (error) {
           if (isUnauthorizedError(error)) {
             commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
@@ -600,7 +600,7 @@ export default {
         }
 
         const postComplaint = () =>
-          this.$axios.post('/aduan/complaints', payload, {
+          this.$gatewayPartnerAPI.post('/aduan/complaints', payload, {
             headers: state.authToken
               ? { Authorization: `Bearer ${state.authToken}` }
               : {},
