@@ -50,6 +50,7 @@ jobs:
             kv-superapp-service-production-drc/data/web NEW_RELIC_BROWSER_LICENSE_KEY | NEW_RELIC_BROWSER_LICENSE_KEY ;
             kv-superapp-service-production-drc/data/web NEW_RELIC_APPLICATION_ID | NEW_RELIC_APPLICATION_ID ;
             kv-superapp-service-production-drc/data/web BASE_URL_ADUAN | BASE_URL_ADUAN ;
+            kv-superapp-service-production-drc/data/web BASE_URL_GATEWAY_PARTNER | BASE_URL_GATEWAY_PARTNER ;
             kv-superapp-service-production-drc/data/web USERNAME_URL_ADUAN | USERNAME_URL_ADUAN ;
             kv-superapp-service-production-drc/data/web PASSWORD_URL_ADUAN | PASSWORD_URL_ADUAN ;
             kv-superapp-service-production-drc/data/web KEYCLOAK_URL | KEYCLOAK_URL ;
@@ -82,6 +83,7 @@ jobs:
             NEW_RELIC_BROWSER_LICENSE_KEY=${{env.NEW_RELIC_BROWSER_LICENSE_KEY}}
             NEW_RELIC_APPLICATION_ID=${{env.NEW_RELIC_APPLICATION_ID}}
             BASE_URL_ADUAN=${{env.BASE_URL_ADUAN}}
+            BASE_URL_GATEWAY_PARTNER=${{env.BASE_URL_GATEWAY_PARTNER}}
             USERNAME_URL_ADUAN=${{env.USERNAME_URL_ADUAN}}
             PASSWORD_URL_ADUAN=${{env.PASSWORD_URL_ADUAN}}
             KEYCLOAK_URL=${{env.KEYCLOAK_URL}}
