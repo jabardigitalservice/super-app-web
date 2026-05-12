@@ -26,6 +26,10 @@
       </ol>
     </div>
 
+    <p class="text-sm font-medium">
+      Guna memastikan akurasi lokasi, mohon isi formulir langsung di lokasi rumah calon penerima bantuan.
+    </p>
+
     <div class="flex flex-col gap-4 mt-8">
       <label class="flex items-center gap-3 cursor-pointer">
         <input
@@ -80,7 +84,7 @@ export default {
     copySingleHouse() {
       return this.isSapawargaSource
         ? 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah tunggal calon penerima bantuan'
-        : 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah tunggal saya'
+        : 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah satu-satunya saya'
     },
     copyNoSimilarProgram() {
       return this.isSapawargaSource
