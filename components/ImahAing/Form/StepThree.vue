@@ -130,6 +130,14 @@
           />
         </ValidationProvider>
 
+        <div
+          v-if="selectedPenyebabDetail"
+          class="info-box"
+        >
+          <div class="info-box-title">{{ selectedPenyebabDetail.title }}</div>
+          <div class="info-box-desc">{{ selectedPenyebabDetail.desc }}</div>
+        </div>
+
         <ValidationProvider
           v-slot="{ errors }"
           rules="required"
@@ -192,9 +200,29 @@ export default {
         },
       ],
       penyebabOptions: [
-        { value: 'imah-aing-bencana', label: 'Bencana' },
-        { value: 'imah-aing-non-bencana', label: 'Bukan Bencana' },
+        { value: 'imah-aing-bangunan-tua', label: 'Usia bangunan tua' },
+        { value: 'imah-aing-kesalahan-konstruksi', label: 'Kesalahan konstruksi' },
+        { value: 'imah-aing-perawatan-buruk', label: 'Perawatan yang buruk' },
+        { value: 'imah-aing-hama-jamur', label: 'Hama dan jamur' },
       ],
+      penyebabDetailMap: {
+        'imah-aing-bangunan-tua': {
+          title: 'Usia bangunan tua',
+          desc: 'Material lapuk, retak, atau struktur melemah karena kurang perawatan seiring bertambahnya usia bangunan.',
+        },
+        'imah-aing-kesalahan-konstruksi': {
+          title: 'Kesalahan konstruksi',
+          desc: 'Penggunaan material berkualitas rendah, fondasi tidak sesuai standar, atau desain yang tidak kokoh saat pembangunan.',
+        },
+        'imah-aing-perawatan-buruk': {
+          title: 'Perawatan yang buruk',
+          desc: 'Kebocoran atap tidak diperbaiki, dinding retak dibiarkan, atau saluran air tersumbat dalam jangka panjang.',
+        },
+        'imah-aing-hama-jamur': {
+          title: 'Hama dan jamur',
+          desc: 'Rayap merusak kayu struktur bangunan, jamur melapukkan dinding atau plafon sehingga melemahkan integritas bangunan.',
+        },
+      },
       accept: '.jpg, .jpeg, .png, .pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
     }
@@ -209,6 +237,10 @@ export default {
     },
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
+    },
+    selectedPenyebabDetail() {
+      const key = this.kondisiRumah.penyebabKerusakan
+      return key ? this.penyebabDetailMap[key] : null
     },
     setPenyebabKerusakan: {
       get() {
@@ -363,5 +395,32 @@ export default {
 .slide-fade-leave-to {
   transform: translateY(10px);
   opacity: 0;
+}
+
+/* Info box penyebab */
+.info-box {
+  margin-top: 12px;
+  padding: 14px;
+  background: #F0F9F4;
+  border: 1px solid #D1EADE;
+  border-left: 4px solid #069550;
+  border-radius: 4px 8px 8px 4px;
+  animation: fadeIn 0.2s ease;
+}
+.info-box-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+.info-box-desc {
+  font-size: 13px;
+  color: #4B5563;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
