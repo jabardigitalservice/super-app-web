@@ -83,7 +83,7 @@ export default {
     },
     copySingleHouse() {
       return this.isSapawargaSource
-        ? 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah tunggal calon penerima bantuan'
+        ? 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah satu-satunya calon penerima bantuan'
         : 'Saya menyatakan bahwa rumah yang diajukan merupakan rumah satu-satunya saya'
     },
     copyNoSimilarProgram() {
