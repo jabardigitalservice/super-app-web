@@ -384,11 +384,6 @@ export default {
         return false
       }
 
-      if (this.$config.useMockImahAing && this.$imahAingMock) {
-        const mockRes = await this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
-        return parseComplaintExistsResponse(mockRes)
-      }
-
       const params = {
         complaint_category_id: 'imah-aing',
         user_kk: kk,
@@ -509,16 +504,6 @@ export default {
       setSlot(payload)
 
       try {
-        if (this.$config.useMockImahAing && this.$imahAingMock) {
-          setSlot({ ...payload, progress: 30 })
-          const mockResponse = await this.$imahAingMock.uploadDocument()
-          const fileUrl = `${this.$config.urlFile}/${mockResponse.data.path}`
-
-          setSlot({ file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] })
-
-          return fileUrl
-        }
-
         setSlot({ ...payload, progress: 20 })
 
         const base64Data = await dispatch('convertFileToBase64', file)
@@ -607,17 +592,13 @@ export default {
           })
 
         let response
-        if (this.$config.useMockImahAing && this.$imahAingMock) {
-          response = await this.$imahAingMock.submitForm(payload)
-        } else {
-          try {
-            response = await postComplaint()
-          } catch (error) {
-            if (isUnauthorizedError(error)) {
-              commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
-            }
-            throw error
+        try {
+          response = await postComplaint()
+        } catch (error) {
+          if (isUnauthorizedError(error)) {
+            commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
           }
+          throw error
         }
         const submissionId = response.data?.data?.id || response.data?.id || ''
 
