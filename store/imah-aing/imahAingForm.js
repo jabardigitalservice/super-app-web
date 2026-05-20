@@ -34,6 +34,8 @@ const getDefaultState = () => ({
     nomorKk: '',
     incomePerMonth: '',
     avatarUrl: '',
+    id: '',
+    role: '',
   },
 
   dokumen: {
@@ -150,8 +152,23 @@ function applyQueryMetaToDataPengusul(commit, data) {
   setField('phone', data.phone)
   setField('email', data.email)
   setField('nik', data.nik)
+  setField('id', data.id)
+  setField('role', data.role)
   const kkVal = data.kk != null ? data.kk : data.nomor_kk
   setField('nomorKk', kkVal)
+}
+
+/**
+ * Resolve field proposer dengan aturan:
+ * - Jika meta.role selain 'warga' -> pakai nilai dari meta (state.dataPengusul)
+ * - Jika meta.role === 'warga' atau kosong -> pakai nilai dari state.dataPengusul (diisi user)
+ */
+function resolveProposerField(state, fieldName) {
+  const role = (state.dataPengusul.role || '').trim().toLowerCase()
+  if (role && role !== 'warga') {
+    return state.dataPengusul[fieldName] || ''
+  }
+  return state.dataPengusul[fieldName] || ''
 }
 
 /**
@@ -384,11 +401,6 @@ export default {
         return false
       }
 
-      if (this.$config.useMockImahAing && this.$imahAingMock) {
-        const mockRes = await this.$imahAingMock.checkKkDuplicate({ user_kk: kk })
-        return parseComplaintExistsResponse(mockRes)
-      }
-
       const params = {
         complaint_category_id: 'imah-aing',
         user_kk: kk,
@@ -509,16 +521,6 @@ export default {
       setSlot(payload)
 
       try {
-        if (this.$config.useMockImahAing && this.$imahAingMock) {
-          setSlot({ ...payload, progress: 30 })
-          const mockResponse = await this.$imahAingMock.uploadDocument()
-          const fileUrl = `${this.$config.urlFile}/${mockResponse.data.path}`
-
-          setSlot({ file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] })
-
-          return fileUrl
-        }
-
         setSlot({ ...payload, progress: 20 })
 
         const base64Data = await dispatch('convertFileToBase64', file)
@@ -571,11 +573,16 @@ export default {
         }
 
         const payload = {
+          user_id: state.dataPengusul.id || '',
           user_name: state.dataPengusul.name,
           user_email: state.dataPengusul.email || '',
           user_phone: state.dataPengusul.phone,
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
+          proposer_name: resolveProposerField(state, 'name'),
+          proposer_phone: resolveProposerField(state, 'phone'),
+          proposer_email: resolveProposerField(state, 'email'),
+          proposer_role: state.dataPengusul.role || '',
           [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
           source_id: state.sourceId || 'sapawarga',
           type: 'private',
@@ -607,17 +614,13 @@ export default {
           })
 
         let response
-        if (this.$config.useMockImahAing && this.$imahAingMock) {
-          response = await this.$imahAingMock.submitForm(payload)
-        } else {
-          try {
-            response = await postComplaint()
-          } catch (error) {
-            if (isUnauthorizedError(error)) {
-              commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
-            }
-            throw error
+        try {
+          response = await postComplaint()
+        } catch (error) {
+          if (isUnauthorizedError(error)) {
+            commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
           }
+          throw error
         }
         const submissionId = response.data?.data?.id || response.data?.id || ''
 

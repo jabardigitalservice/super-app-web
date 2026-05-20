@@ -27,7 +27,6 @@ export default {
     '~/plugins/vue-gtag.js',
     '~/plugins/aduan-api.js',
     '~/plugins/gateway-partner-api.js',
-    '~/plugins/imah-aing-mock.js',
     '~/plugins/aduan-get-token.js',
     { src: '~/plugins/dark-mode.js', mode: 'client' },
     { src: '~/plugins/vee-validate.js', mode: 'client' },
@@ -116,7 +115,6 @@ export default {
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
     },
     urlFile: process.env.URL_FILE,
-    useMockImahAing: process.env.USE_MOCK_IMAH_AING === 'true',
     unleash: {
       unleashURL: process.env.UNLEASH_URL,
       unleashToken: process.env.UNLEASH_TOKEN,
