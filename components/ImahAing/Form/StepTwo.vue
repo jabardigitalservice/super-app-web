@@ -7,8 +7,8 @@
     </div>
 
     <!-- Nama Calon Penerima Bantuan -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Calon Penerima Bantuan" vid="name">
-      <label>Nama Calon Penerima Bantuan <span class="text-red-500">*</span></label>
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Calon Penerima Bantuan (sesuai KTP)" vid="name">
+      <label>Nama Calon Penerima Bantuan (sesuai KTP) <span class="text-red-500">*</span></label>
       <JdsInputText :value="setName" :error-message="errors[0]" @input="setName = $event" />
     </ValidationProvider>
 
@@ -28,8 +28,8 @@
     </ValidationProvider>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi" vid="email">
-      <label>Email Pribadi</label>
+    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi Calon Penerima Bantuan" vid="email">
+      <label>Email Pribadi Calon Penerima Bantuan</label>
       <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
     </ValidationProvider>
 
