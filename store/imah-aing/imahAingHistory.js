@@ -1,5 +1,3 @@
-import { imahAingMockData } from '~/constant/imah-aing-mock-data'
-
 const getDefaultState = () => ({
   /** Data dari decoded meta query param */
   metaPayload: {
@@ -27,12 +25,13 @@ const getDefaultState = () => ({
     hasMore: false,
   },
 
+  /** Auth token dari Keycloak (client_credentials) — BUKAN dari metaPayload.token */
+  authToken: null,
+
   /** Status */
   status: 'IDLE', // IDLE | LOADING | SUCCESS | ERROR | CANCELLING | CANCELLED
   errorMessage: '',
 
-  /** Whether mock data is being used (no API data available) */
-  isMockData: false,
 })
 
 export const state = () => getDefaultState()
@@ -40,6 +39,9 @@ export const state = () => getDefaultState()
 export const mutations = {
   SET_META_PAYLOAD(state, payload) {
     state.metaPayload = { ...state.metaPayload, ...payload }
+  },
+  SET_AUTH_TOKEN(state, token) {
+    state.authToken = token
   },
   SET_ITEMS(state, items) {
     state.items = items
@@ -70,9 +72,6 @@ export const mutations = {
   SET_ERROR(state, message) {
     state.errorMessage = message
   },
-  SET_MOCK_DATA(state, value) {
-    state.isMockData = value
-  },
   RESET_STATE(state) {
     const def = getDefaultState()
     Object.keys(def).forEach((k) => {
@@ -82,9 +81,13 @@ export const mutations = {
 }
 
 export const actions = {
+  setAuthToken({ commit }, token) {
+    commit('SET_AUTH_TOKEN', token)
+  },
+
   async fetchHistory({ commit, state }) {
     const { metaPayload, pagination } = state
-    const { id, role, kk, token } = metaPayload
+    const { id, role, kk } = metaPayload
 
     const roleLower = (role || '').trim().toLowerCase()
     const params = {
@@ -104,28 +107,20 @@ export const actions = {
     commit('SET_STATUS', 'LOADING')
 
     try {
+      // Gunakan authToken dari Keycloak, BUKAN metaPayload.token
       const res = await this.$gatewayPartnerAPI.get('/aduan/complaints', {
         params,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: state.authToken
+          ? { Authorization: `Bearer ${state.authToken}` }
+          : {},
       })
 
-      const responseData = res.data?.data || res.data || {}
-      const items = Array.isArray(responseData)
-        ? responseData
-        : responseData.items || responseData.complaints || []
-
-      // Jika API mengembalikan data kosong, gunakan mock data sebagai fallback
-      if (items.length === 0 && pagination.page === 1) {
-        commit('SET_ITEMS', imahAingMockData)
-        commit('SET_PAGINATION', {
-          ...pagination,
-          total: imahAingMockData.length,
-          hasMore: false,
-        })
-        commit('SET_STATUS', 'SUCCESS')
-        commit('SET_MOCK_DATA', true)
-        return
-      }
+      // Response structure (verified 2026-05-26):
+      // { status, message, code, data: { data: [...], page_size, page, total_pages, total_data }, meta: {...} }
+      const responseData = res.data?.data || {}
+      const items = Array.isArray(responseData.data)
+        ? responseData.data
+        : []
 
       if (pagination.page === 1) {
         commit('SET_ITEMS', items)
@@ -133,41 +128,24 @@ export const actions = {
         commit('APPEND_ITEMS', items)
       }
 
-      const total = responseData.total || responseData.meta?.total || items.length
+      const total = responseData.total_data || 0
       commit('SET_PAGINATION', {
         ...pagination,
         total,
         hasMore: pagination.page * pagination.limit < total,
       })
       commit('SET_STATUS', 'SUCCESS')
-      commit('SET_MOCK_DATA', false)
     } catch (error) {
-      // Jika API gagal, fallback ke mock data (hanya di page 1)
-      if (pagination.page === 1) {
-        commit('SET_ITEMS', imahAingMockData)
-        commit('SET_PAGINATION', {
-          ...pagination,
-          total: imahAingMockData.length,
-          hasMore: false,
-        })
-        commit('SET_STATUS', 'SUCCESS')
-        commit('SET_MOCK_DATA', true)
-        commit(
-          'SET_ERROR',
-          error?.response?.data?.message || error.message || 'Gagal memuat riwayat'
-        )
-      } else {
-        commit('SET_STATUS', 'ERROR')
-        commit(
-          'SET_ERROR',
-          error?.response?.data?.message || error.message || 'Gagal memuat riwayat'
-        )
-      }
+      commit('SET_STATUS', 'ERROR')
+      commit(
+        'SET_ERROR',
+        error?.response?.data?.message || error.message || 'Gagal memuat riwayat'
+      )
     }
   },
 
   async cancelSubmissions({ commit, state }) {
-    const { selectedIds, metaPayload } = state
+    const { selectedIds } = state
     if (!selectedIds.length) {
       return
     }
@@ -177,8 +155,8 @@ export const actions = {
       await Promise.all(
         selectedIds.map((id) =>
           this.$gatewayPartnerAPI.delete(`/aduan/complaints/${id}`, {
-            headers: metaPayload.token
-              ? { Authorization: `Bearer ${metaPayload.token}` }
+            headers: state.authToken
+              ? { Authorization: `Bearer ${state.authToken}` }
               : {},
           })
         )

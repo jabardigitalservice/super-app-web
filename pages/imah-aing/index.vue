@@ -95,7 +95,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('imahAingHistory', ['items', 'selectedIds', 'pagination', 'status', 'errorMessage']),
+    ...mapState('imahAingHistory', ['items', 'selectedIds', 'pagination', 'status', 'errorMessage', 'authToken']),
     isLoading() {
       return this.status === 'LOADING' && this.pagination.page === 1
     },
@@ -118,7 +118,17 @@ export default {
 
     this.decodedMeta = decoded
   },
-  mounted() {
+  async mounted() {
+    // Dapatkan token dari Keycloak (sama seperti form page)
+    if (!this.authToken) {
+      try {
+        const token = await this.$getToken('client_credentials')
+        this.$store.dispatch('imahAingHistory/setAuthToken', token)
+      } catch (error) {
+        console.error('Failed to get token:', error)
+      }
+    }
+
     if (this.decodedMeta) {
       this.fetchHistory()
     }

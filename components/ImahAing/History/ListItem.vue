@@ -50,6 +50,10 @@ export default {
   },
   computed: {
     statusLabel() {
+      const name = this.item.complaint_status?.name
+      if (name) return name
+
+      // Fallback for mock data or other sources
       const phase = this.item.phase || this.item.status || ''
       const mapping = {
         unverified: 'Menunggu Verifikasi',
