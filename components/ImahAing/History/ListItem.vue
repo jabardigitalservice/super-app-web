@@ -19,7 +19,7 @@
       />
     </label>
 
-    <!-- Konten -->
+    <!-- Kolom Konten: NIK, nama, status (tanpa tanggal) -->
     <div class="flex-1 min-w-0 pt-1">
       <div class="text-xs text-gray-500 font-roboto">
         IA-{{ item.user_nik || item.nik || '-' }}
@@ -27,24 +27,30 @@
       <div class="text-sm font-semibold text-gray-900 mt-0.5 dark:text-dark-emphasis-high">
         {{ item.user_name || item.name || '-' }}
       </div>
-      <div class="flex justify-between items-center mt-1">
+      <div class="mt-1">
         <span class="text-xs text-gray-600 dark:text-dark-emphasis-medium">
           {{ statusLabel }}
-        </span>
-        <span class="text-xs text-gray-400 flex-shrink-0 ml-2">
-          {{ formattedDate }}
         </span>
       </div>
     </div>
 
-    <!-- Tombol Edit Usulan — hanya untuk status unverified -->
-    <button
-      v-if="isUnverified"
-      class="flex-shrink-0 mt-1 px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
-      @click.stop="$emit('edit')"
+    <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit (bawah, hanya unverified) -->
+    <!-- justify-center saat tidak ada tombol Edit agar tanggal center vertikal -->
+    <div
+      class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
+      :class="{ 'justify-center': !isUnverified }"
     >
-      Edit Usulan
-    </button>
+      <span class="text-xs text-gray-400 whitespace-nowrap">
+        {{ formattedDate }}
+      </span>
+      <button
+        v-if="isUnverified"
+        class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
+        @click.stop="$emit('edit')"
+      >
+        Edit Usulan
+      </button>
+    </div>
   </div>
 </template>
 
