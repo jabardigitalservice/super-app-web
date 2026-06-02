@@ -1,3 +1,5 @@
+import { decodeMetaQueryParam } from '~/utils/decode-meta'
+
 /**
  * Pusat peta default / fallback Geolocation
  */
@@ -73,6 +75,9 @@ const getDefaultState = () => ({
     progress: 0,
     submission_id: '',
   },
+
+  /** ID usulan yang sedang diedit (mode edit via query param `edit`) */
+  editComplaintId: '',
 })
 
 const USER_INCOME_PER_MONTH_KEY = 'user_income_per_month'
@@ -122,24 +127,6 @@ function parseComplaintExistsResponse(response) {
 
 function isUnauthorizedError(error) {
   return error?.response?.status === 401
-}
-
-/** Base64url-safe JSON dari query `meta` (UTF-8) */
-function decodeMetaQueryParam(encoded) {
-  if (!encoded || typeof encoded !== 'string' || typeof atob === 'undefined') {
-    return null
-  }
-  try {
-    const normalized = encoded.trim().replace(/-/g, '+').replace(/_/g, '/')
-    const padLen = (4 - (normalized.length % 4)) % 4
-    const padded = normalized + '='.repeat(padLen)
-    const binary = atob(padded)
-    const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0))
-    const text = new TextDecoder('utf-8').decode(bytes)
-    return JSON.parse(text)
-  } catch {
-    return null
-  }
 }
 
 function applyQueryMetaToDataPengusul(commit, data) {
@@ -327,6 +314,9 @@ export default {
     SET_SUBMISSION_ID(state, id) {
       state.statusSubmitForm.submission_id = id
     },
+    SET_EDIT_COMPLAINT_ID(state, id) {
+      state.editComplaintId = id || ''
+    },
     RESET_STATE(state) {
       const def = getDefaultState()
       Object.keys(def).forEach((k) => {
@@ -349,6 +339,45 @@ export default {
           applyQueryMetaToLokasiTanah(commit, decoded)
         }
       }
+    },
+    /**
+     * Hydrate form store dari data list item (mode edit).
+     * Hanya field yang tersedia di response list yang diisi — sisanya harus diisi ulang user.
+     * Data dari list item menimpa hasil `initForm` agar identitas yang tampil milik usulan.
+     */
+    hydrateFromExisting({ commit, rootState }, complaintId) {
+      const items = rootState.imahAingHistory?.items || []
+      const item = items.find((i) => i.id === complaintId)
+      if (!item) {
+        return
+      }
+
+      commit('SET_EDIT_COMPLAINT_ID', complaintId)
+
+      // Prefill data pengusul dari list item (menimpa hasil initForm)
+      const setPengusul = (field, value) => {
+        if (value != null && String(value).trim() !== '') {
+          commit('SET_DATA_PENGUSUL_FIELD', { field, value: String(value).trim() })
+        }
+      }
+      setPengusul('name', item.user_name)
+      setPengusul('nik', item.user_nik)
+      setPengusul('nomorKk', item.user_kk)
+      setPengusul('id', item.user_id)
+
+      // Prefill lokasi RT/RW dari list item
+      if (item.rt != null) {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'rt', value: String(item.rt) })
+      }
+      if (item.rw != null) {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'rw', value: String(item.rw) })
+      }
+
+      // Consent dianggap sudah disetujui di mode edit
+      commit('SET_CONSENT_PRIVACY', true)
+      commit('SET_CONSENT_STATEMENT', { field: 'stmtSingleHouse', value: true })
+      commit('SET_CONSENT_STATEMENT', { field: 'stmtNoSimilarProgram', value: true })
+      commit('SET_CONSENT_STATEMENT', { field: 'stmtRevocationIfUntrue', value: true })
     },
     hydrateLokasiTanahFromGeolocation({ commit, state }) {
       if (!process.client) {
@@ -606,6 +635,14 @@ export default {
           RW: String(rw || ''),
         }
 
+        // TODO(BE): saat endpoint update siap, ganti menjadi:
+        // const isEdit = !!state.editComplaintId
+        // if (isEdit) {
+        //   return this.$gatewayPartnerAPI.put(`/aduan/complaints/${state.editComplaintId}`, payload, {
+        //     headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
+        //   })
+        // }
+        // Untuk sekarang tetap POST (create) walau mode edit.
         const postComplaint = () =>
           this.$gatewayPartnerAPI.post('/aduan/complaints', payload, {
             headers: state.authToken
