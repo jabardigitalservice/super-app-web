@@ -43,8 +43,11 @@ const getDefaultState = () => ({
     kk: null,
     suratMiskin: null,
     suratTanah: null,
-    /** Multifile — tiap item: { file, url, progress, status, errors } */
-    fotoRumah: [],
+    fotoDepan: null,
+    fotoBelakang: null,
+    fotoKiri: null,
+    fotoKanan: null,
+    fotoDalam: null,
   },
 
   lokasiTanah: {
@@ -234,22 +237,32 @@ export default {
       )
     },
     isAllDocumentsUploaded: (state) => {
-      const requiredKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
-      const baseOk = requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
-      const fr = state.dokumen.fotoRumah || []
-      const fotoOk =
-        fr.length >= 1 && fr.every((s) => s && s.status === 'SUCCESS')
-      return baseOk && fotoOk
+      const requiredKeys = [
+        'ktp',
+        'kk',
+        'suratMiskin',
+        'suratTanah',
+        'fotoDepan',
+        'fotoBelakang',
+        'fotoKiri',
+        'fotoKanan',
+        'fotoDalam',
+      ]
+      return requiredKeys.every((k) => state.dokumen[k] && state.dokumen[k].status === 'SUCCESS')
     },
     documentSlotsOrdered: (state) => {
-      const keys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
-      const base = keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
-      const foto = (state.dokumen.fotoRumah || []).map((slot, index) => ({
-        key: 'fotoRumah',
-        index,
-        slot,
-      }))
-      return [...base, ...foto]
+      const keys = [
+        'ktp',
+        'kk',
+        'suratMiskin',
+        'suratTanah',
+        'fotoDepan',
+        'fotoBelakang',
+        'fotoKiri',
+        'fotoKanan',
+        'fotoDalam',
+      ]
+      return keys.map((k) => ({ key: k, slot: state.dokumen[k] }))
     },
   },
   mutations: {
@@ -288,21 +301,6 @@ export default {
     },
     SET_DOKUMEN_SLOT(state, { key, payload }) {
       state.dokumen[key] = payload
-    },
-    ADD_FOTO_RUMAH_SLOT(state, payload) {
-      state.dokumen.fotoRumah.push(payload)
-    },
-    UPDATE_FOTO_RUMAH_SLOT(state, { index, payload }) {
-      if (index < 0 || index >= state.dokumen.fotoRumah.length) {
-        return
-      }
-      state.dokumen.fotoRumah.splice(index, 1, payload)
-    },
-    REMOVE_FOTO_RUMAH_SLOT(state, index) {
-      if (index < 0 || index >= state.dokumen.fotoRumah.length) {
-        return
-      }
-      state.dokumen.fotoRumah.splice(index, 1)
     },
     SET_LOKASI_TANAH_FIELD(state, { field, value }) {
       // allow mapping of incoming snake_case to camelCase
@@ -494,20 +492,9 @@ export default {
       })
     },
 
-    async uploadDocument({ commit, state, dispatch }, { key, file, index }) {
-      const isFotoRumah = key === 'fotoRumah'
-      if (isFotoRumah) {
-        if (index == null || index < 0 || index >= state.dokumen.fotoRumah.length) {
-          throw new Error('invalid_foto_rumah_index')
-        }
-      }
-
+    async uploadDocument({ commit, state, dispatch }, { key, file }) {
       const setSlot = (slotPayload) => {
-        if (isFotoRumah) {
-          commit('UPDATE_FOTO_RUMAH_SLOT', { index, payload: slotPayload })
-        } else {
-          commit('SET_DOKUMEN_SLOT', { key, payload: slotPayload })
-        }
+        commit('SET_DOKUMEN_SLOT', { key, payload: slotPayload })
       }
 
       const payload = {
@@ -559,11 +546,24 @@ export default {
     async submitForm({ commit, state }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
-        // photos[] — urutan: KTP, KK, surat miskin, surat tanah, lalu semua foto rumah (multifile)
-        const docKeys = ['ktp', 'kk', 'suratMiskin', 'suratTanah']
-        const baseUrls = docKeys.map((k) => state.dokumen[k]?.url || '').filter((u) => !!u)
-        const fotoUrls = (state.dokumen.fotoRumah || []).map((s) => s?.url || '').filter((u) => !!u)
-        const photos = [...baseUrls, ...fotoUrls].map((url) => ({ url }))
+        const docMapping = [
+          { key: 'ktp', field: 'ktp' },
+          { key: 'kk', field: 'kk' },
+          { key: 'suratMiskin', field: 'surat_miskin' },
+          { key: 'suratTanah', field: 'surat_tanah' },
+          { key: 'fotoDepan', field: 'foto_depan' },
+          { key: 'fotoBelakang', field: 'foto_belakang' },
+          { key: 'fotoKiri', field: 'foto_kiri' },
+          { key: 'fotoKanan', field: 'foto_kanan' },
+          { key: 'fotoDalam', field: 'foto_dalam' },
+        ]
+
+        const photos = docMapping
+          .map((m) => ({
+            url: state.dokumen[m.key]?.url || '',
+            field: m.field,
+          }))
+          .filter((p) => !!p.url)
 
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
         const userIncomePerMonth = incomeDigitsToNumber(state.dataPengusul.incomePerMonth)

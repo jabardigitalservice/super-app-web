@@ -88,8 +88,8 @@ export default {
     },
     copyNoSimilarProgram() {
       return this.isSapawargaSource
-        ? 'Saya menyatakan bahwa calon penerima bantuan belum pernah menerima bantuan dari program serupa'
-        : 'Saya menyatakan bahwa saya belum pernah menerima bantuan dari program serupa'
+        ? 'Saya menyatakan bahwa calon penerima bantuan belum pernah menerima bantuan program serupa dari pemerintah'
+        : 'Saya menyatakan bahwa saya belum pernah menerima bantuan program serupa dari pemerintah'
     },
     copyRevocationIfUntrue() {
       return this.isSapawargaSource
