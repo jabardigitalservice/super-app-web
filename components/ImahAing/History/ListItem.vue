@@ -4,11 +4,17 @@
     @click="$emit('click')"
   >
     <!-- Checkbox — large tap target (44px) for mobile, stop propagation agar tidak trigger klik item -->
-    <label class="relative flex items-center justify-center w-11 h-11 -ml-2 -mt-2 flex-shrink-0 cursor-pointer" @click.stop>
+    <label
+      class="relative flex items-center justify-center w-11 h-11 -ml-2 -mt-2 flex-shrink-0"
+      :class="isVerified ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
+      @click.stop
+    >
       <input
         type="checkbox"
         :checked="selected"
-        class="w-5 h-5 rounded border-gray-300 text-[#069550] focus:ring-[#069550] focus:ring-2 cursor-pointer"
+        :disabled="isVerified"
+        class="w-5 h-5 rounded border-gray-300 text-[#069550] focus:ring-[#069550] focus:ring-2"
+        :class="isVerified ? 'cursor-not-allowed' : 'cursor-pointer'"
         @change="$emit('toggle')"
       />
     </label>
@@ -49,6 +55,9 @@ export default {
     }
   },
   computed: {
+    isVerified() {
+      return (this.item.complaint_status_id || this.item.phase || this.item.status) === 'verified'
+    },
     statusLabel() {
       const name = this.item.complaint_status?.name
       if (name) return name

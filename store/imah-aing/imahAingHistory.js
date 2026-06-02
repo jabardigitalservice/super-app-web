@@ -151,23 +151,23 @@ export const actions = {
     }
 
     commit('SET_STATUS', 'CANCELLING')
-    try {
-      await Promise.all(
-        selectedIds.map((id) =>
-          this.$gatewayPartnerAPI.delete(`/aduan/complaints/${id}`, {
-            headers: state.authToken
-              ? { Authorization: `Bearer ${state.authToken}` }
-              : {},
-          })
-        )
-      )
-      commit('REMOVE_ITEMS', selectedIds)
-      commit('SET_SELECTED_IDS', [])
-      commit('SET_STATUS', 'CANCELLED')
-    } catch (error) {
-      commit('SET_STATUS', 'ERROR')
-      throw error
-    }
+
+    // TODO(BE): Integrasi endpoint DELETE saat backend sudah ready.
+    // Untuk sekarang hanya menghapus dari state store (tanpa API call).
+    // Contoh integrasi nanti:
+    // await Promise.all(
+    //   selectedIds.map((id) =>
+    //     this.$gatewayPartnerAPI.delete(`/aduan/complaints/${id}`, {
+    //       headers: state.authToken
+    //         ? { Authorization: `Bearer ${state.authToken}` }
+    //         : {},
+    //     })
+    //   )
+    // )
+
+    commit('REMOVE_ITEMS', selectedIds)
+    commit('SET_SELECTED_IDS', [])
+    commit('SET_STATUS', 'CANCELLED')
   },
 }
 
