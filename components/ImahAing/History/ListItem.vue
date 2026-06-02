@@ -28,8 +28,11 @@
         {{ item.user_name || item.name || '-' }}
       </div>
       <div class="mt-1">
-        <span class="text-xs text-gray-600 dark:text-dark-emphasis-medium">
-          {{ statusLabel }}
+        <span
+          class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
+          :style="{ color: statusStyle.hex, backgroundColor: statusStyle.hex + '1A' }"
+        >
+          {{ statusStyle.name }}
         </span>
       </div>
     </div>
@@ -56,6 +59,7 @@
 
 <script>
 import { formatDate } from '~/utils'
+import { getImahAingStatus } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -70,25 +74,27 @@ export default {
     }
   },
   computed: {
+    /** Kunci status — satu sumber untuk isVerified, isUnverified, dan statusStyle */
+    statusKey() {
+      return this.item.complaint_status?.id
+        || this.item.complaint_status_id
+        || this.item.phase
+        || this.item.status
+        || ''
+    },
     isVerified() {
-      return (this.item.complaint_status_id || this.item.phase || this.item.status) === 'verified'
+      return this.statusKey === 'verified'
     },
     isUnverified() {
-      return (this.item.complaint_status_id || this.item.phase || this.item.status) === 'unverified'
+      return this.statusKey === 'unverified'
     },
+    /** Objek style guide (name + hex) dari mapping 13 status */
+    statusStyle() {
+      return getImahAingStatus(this.statusKey)
+    },
+    /** Label status dari mapping style guide */
     statusLabel() {
-      const name = this.item.complaint_status?.name
-      if (name) return name
-
-      // Fallback for mock data or other sources
-      const phase = this.item.phase || this.item.status || ''
-      const mapping = {
-        unverified: 'Menunggu Verifikasi',
-        verified: 'Terverifikasi',
-        failed: 'Gagal Diverifikasi',
-        directed_to_hotline_jabar: 'Dialihkan ke Hotline Jabar'
-      }
-      return mapping[phase] || phase || '-'
+      return this.statusStyle.name
     },
     formattedDate() {
       const date = this.item.created_at || this.item.submitted_at
