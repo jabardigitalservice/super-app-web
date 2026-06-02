@@ -112,10 +112,13 @@ export default {
     const metaStr = Array.isArray(meta) ? meta[0] : meta
     const decoded = metaStr ? decodeMetaQueryParam(metaStr) : null
 
-    if (decoded) {
-      this.$store.commit('imahAingHistory/SET_META_PAYLOAD', decoded)
+    // Guard #1 — tidak ada token dari meta → redirect ke form
+    if (!decoded || !decoded.token) {
+      this.redirectToForm()
+      return
     }
 
+    this.$store.commit('imahAingHistory/SET_META_PAYLOAD', decoded)
     this.decodedMeta = decoded
   },
   async mounted() {
@@ -130,7 +133,11 @@ export default {
     }
 
     if (this.decodedMeta) {
-      this.fetchHistory()
+      await this.fetchHistory()
+      // Guard #2 — sukses tapi tidak ada riwayat → redirect ke form
+      if (this.status === 'SUCCESS' && this.items.length === 0) {
+        this.redirectToForm()
+      }
     }
   },
   beforeDestroy() {
@@ -156,6 +163,13 @@ export default {
 
     confirmCancel() {
       this.showCancelDialog = true
+    },
+
+    redirectToForm() {
+      this.$router.replace({
+        path: '/imah-aing/form',
+        query: this.$route.query,
+      })
     },
 
     async handleCancel() {
