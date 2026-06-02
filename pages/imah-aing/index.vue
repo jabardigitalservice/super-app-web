@@ -105,6 +105,9 @@ export default {
     },
     hasMore() {
       return this.pagination.hasMore
+    },
+    useMock() {
+      return this.$route.query.use_mock === 'true'
     }
   },
   created() {
@@ -113,22 +116,35 @@ export default {
     const metaStr = Array.isArray(meta) ? meta[0] : meta
     const decoded = metaStr ? decodeMetaQueryParam(metaStr) : null
 
-    // Guard #1 — tidak ada token dari meta → redirect ke form
-    if (!decoded || !decoded.token) {
-      this.redirectToForm()
+    if (decoded) {
+      this.$store.commit('imahAingHistory/SET_META_PAYLOAD', decoded)
+      this.decodedMeta = decoded
+    }
+
+    // Mode mock (?use_mock=true) → lewati guard token
+    if (this.useMock) {
       return
     }
 
-    this.$store.commit('imahAingHistory/SET_META_PAYLOAD', decoded)
-    this.decodedMeta = decoded
+    // Guard #1 — tidak ada token dari meta → redirect ke form
+    if (!decoded || !decoded.token) {
+      this.redirectToForm()
+    }
   },
   async mounted() {
+    // Mode mock → tampilkan data mock tanpa API & tanpa redirect
+    if (this.useMock) {
+      this.loadMockData()
+      return
+    }
+
     // Dapatkan token dari Keycloak (sama seperti form page)
     if (!this.authToken) {
       try {
         const token = await this.$getToken('client_credentials')
         this.$store.dispatch('imahAingHistory/setAuthToken', token)
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Failed to get token:', error)
       }
     }
@@ -145,7 +161,7 @@ export default {
     this.RESET_STATE()
   },
   methods: {
-    ...mapActions('imahAingHistory', ['fetchHistory', 'cancelSubmissions']),
+    ...mapActions('imahAingHistory', ['fetchHistory', 'cancelSubmissions', 'loadMockData']),
     ...mapMutations('imahAingHistory', ['TOGGLE_SELECT_ID', 'SET_PAGINATION', 'RESET_STATE']),
 
     async loadMore() {

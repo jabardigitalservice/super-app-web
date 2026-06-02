@@ -635,9 +635,8 @@ export default {
           RW: String(rw || ''),
         }
 
-        const isEdit = !!state.editComplaintId
-
         // TODO(BE): saat endpoint update siap, ganti menjadi:
+        // const isEdit = !!state.editComplaintId
         // if (isEdit) {
         //   return this.$gatewayPartnerAPI.put(`/aduan/complaints/${state.editComplaintId}`, payload, {
         //     headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
