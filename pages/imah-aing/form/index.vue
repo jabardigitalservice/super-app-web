@@ -238,12 +238,21 @@ export default {
     }
     await this.initForm(this.$route.query)
     this.hydrateLokasiTanahFromGeolocation()
-    this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
+
+    // Mode edit: hydrate dari data list + set langsung ke Step 2
+    const editId = this.$route.query.edit
+    if (editId) {
+      await this.hydrateFromExisting(editId)
+      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', 2)
+    } else {
+      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
+    }
   },
   methods: {
     ...mapActions('imahAingForm', {
       initForm: 'initForm',
       hydrateLokasiTanahFromGeolocation: 'hydrateLokasiTanahFromGeolocation',
+      hydrateFromExisting: 'hydrateFromExisting',
       goToNextStep: 'nextStep',
       goToPreviousStep: 'previousStep',
       submitForm: 'submitForm',
@@ -327,8 +336,16 @@ export default {
       }
       await this.initForm(this.$route.query)
       this.hydrateLokasiTanahFromGeolocation()
+
+      const editId = this.$route.query.edit
+      if (editId) {
+        await this.hydrateFromExisting(editId)
+        this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', 2)
+      } else {
+        this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
+      }
+
       this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'NONE')
-      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
     },
     showLoadingSkeleton() {
       this.isLoading = true

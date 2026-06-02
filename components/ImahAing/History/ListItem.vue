@@ -36,6 +36,15 @@
         </span>
       </div>
     </div>
+
+    <!-- Tombol Edit Usulan — hanya untuk status unverified -->
+    <button
+      v-if="isUnverified"
+      class="flex-shrink-0 mt-1 px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
+      @click.stop="$emit('edit')"
+    >
+      Edit Usulan
+    </button>
   </div>
 </template>
 
@@ -57,6 +66,9 @@ export default {
   computed: {
     isVerified() {
       return (this.item.complaint_status_id || this.item.phase || this.item.status) === 'verified'
+    },
+    isUnverified() {
+      return (this.item.complaint_status_id || this.item.phase || this.item.status) === 'unverified'
     },
     statusLabel() {
       const name = this.item.complaint_status?.name

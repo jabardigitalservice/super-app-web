@@ -28,6 +28,7 @@
               :selected="selectedIds.includes(item.id)"
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
+              @edit="editUsulan(item)"
             />
 
             <!-- Load more -->
@@ -169,6 +170,16 @@ export default {
       this.$router.replace({
         path: '/imah-aing/form',
         query: this.$route.query,
+      })
+    },
+
+    editUsulan(item) {
+      this.$router.push({
+        path: '/imah-aing/form',
+        query: {
+          ...this.$route.query,
+          edit: item.id,
+        },
       })
     },
 
