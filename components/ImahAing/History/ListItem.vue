@@ -43,16 +43,16 @@
       class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
       :class="{ 'justify-center': !isUnverified }"
     >
-      <span class="text-xs text-gray-400 whitespace-nowrap">
-        {{ formattedDate }}
-      </span>
       <button
         v-if="isUnverified"
         class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
         @click.stop="$emit('edit')"
       >
-        Edit Usulan
+        Edit Ajuan
       </button>
+      <span class="text-xs text-gray-400 whitespace-nowrap">
+        {{ formattedDate }}
+      </span>
     </div>
   </div>
 </template>
