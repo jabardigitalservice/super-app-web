@@ -759,24 +759,25 @@ export default {
           RW: String(rw || ''),
         }
 
-        // TODO(BE): saat endpoint update siap, ganti menjadi:
-        // const isEdit = !!state.editComplaintId
-        // if (isEdit) {
-        //   return this.$gatewayPartnerAPI.put(`/aduan/complaints/${state.editComplaintId}`, payload, {
-        //     headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
-        //   })
-        // }
-        // Untuk sekarang tetap POST (create) walau mode edit.
-        const postComplaint = () =>
-          this.$gatewayPartnerAPI.post('/aduan/complaints', payload, {
-            headers: state.authToken
-              ? { Authorization: `Bearer ${state.authToken}` }
-              : {},
-          })
+        // Mode edit (US-013): PUT update ke endpoint /mobile
+        // Mode buat baru: POST create
+        const isEdit = !!state.editComplaintId
+        const headers = state.authToken
+          ? { Authorization: `Bearer ${state.authToken}` }
+          : {}
+
+        const sendComplaint = () =>
+          isEdit
+            ? this.$gatewayPartnerAPI.put(
+                `/aduan/complaints/${state.editComplaintId}/mobile`,
+                payload,
+                { headers }
+              )
+            : this.$gatewayPartnerAPI.post('/aduan/complaints', payload, { headers })
 
         let response
         try {
-          response = await postComplaint()
+          response = await sendComplaint()
         } catch (error) {
           if (isUnauthorizedError(error)) {
             commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
