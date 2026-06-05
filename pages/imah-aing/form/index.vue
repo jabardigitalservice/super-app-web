@@ -238,21 +238,41 @@ export default {
     }
     await this.initForm(this.$route.query)
     this.hydrateLokasiTanahFromGeolocation()
-
-    // Mode edit: hydrate dari data list + set langsung ke Step 2
-    const editId = this.$route.query.edit
-    if (editId) {
-      await this.hydrateFromExisting(editId)
-      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', 2)
-    } else {
-      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
-    }
+    await this.setupEditOrFirstStep()
   },
   methods: {
+    /**
+     * Mode edit: prefill form lalu langsung ke Step 2. Selain itu mulai dari Step 1.
+     * Baseline diisi dari data list (`hydrateFromExisting` — set consent & editComplaintId),
+     * lalu di-overlay prefill lengkap dari GET detail. Bila GET gagal, baseline tetap dipakai.
+     */
+    async setupEditOrFirstStep() {
+      const editId = this.$route.query.edit
+      if (!editId) {
+        this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
+        return
+      }
+      // Pastikan editComplaintId selalu ter-set saat mode edit —
+      // Ditempatkan sebelum hydrateFromExisting karena hydrateFromExisting hanya
+      // set editComplaintId jika item ditemukan di list (gagal jika akses langsung URL).
+      this.$store.commit('imahAingForm/SET_EDIT_COMPLAINT_ID', editId)
+      await this.hydrateFromExisting(editId)
+      try {
+        const detail = await this.fetchComplaintDetail(editId)
+        if (detail) {
+          this.hydrateFromDetail(detail)
+        }
+      } catch (error) {
+        // GET detail gagal → tetap pakai baseline data list, form bisa dilanjutkan
+      }
+      this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', 2)
+    },
     ...mapActions('imahAingForm', {
       initForm: 'initForm',
       hydrateLokasiTanahFromGeolocation: 'hydrateLokasiTanahFromGeolocation',
       hydrateFromExisting: 'hydrateFromExisting',
+      fetchComplaintDetail: 'fetchComplaintDetail',
+      hydrateFromDetail: 'hydrateFromDetail',
       goToNextStep: 'nextStep',
       goToPreviousStep: 'previousStep',
       submitForm: 'submitForm',
@@ -336,14 +356,7 @@ export default {
       }
       await this.initForm(this.$route.query)
       this.hydrateLokasiTanahFromGeolocation()
-
-      const editId = this.$route.query.edit
-      if (editId) {
-        await this.hydrateFromExisting(editId)
-        this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', 2)
-      } else {
-        this.$store.commit('imahAingForm/SET_CURRENT_FORM_STEP', this.startStep)
-      }
+      await this.setupEditOrFirstStep()
 
       this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'NONE')
     },

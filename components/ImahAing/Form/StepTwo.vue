@@ -47,6 +47,7 @@
         type="text"
         label="NIK Calon Penerima Bantuan"
         required
+        :disabled="isEditMode"
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -69,6 +70,7 @@
         type="text"
         label="No KK Calon Penerima Bantuan"
         required
+        :disabled="isEditMode"
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -105,6 +107,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   data() {
     return {
@@ -114,6 +118,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('imahAingForm', ['isEditMode']),
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
     },

@@ -13,6 +13,13 @@
         <hr class="mt-4 md:mt-5 dark:border-dark-emphasis-medium" />
 
         <div class="px-4 py-4 md:px-7 md:py-5">
+          <!-- Add new submission -->
+          <div class="flex justify-end mb-4">
+            <Button variant="primary" @click="goToForm">
+              + Tambah
+            </Button>
+          </div>
+
           <!-- Loading skeleton -->
           <ImahAingHistorySkeleton v-if="isLoading" />
 
@@ -189,12 +196,19 @@ export default {
       })
     },
 
+    goToForm() {
+      this.$router.push({
+        path: '/imah-aing/form',
+        query: this.$route.query,
+      })
+    },
+
     editUsulan(item) {
       this.$router.push({
         path: '/imah-aing/form',
         query: {
           ...this.$route.query,
-          edit: item.id,
+          edit: item.complaint_id || item.id,
         },
       })
     },

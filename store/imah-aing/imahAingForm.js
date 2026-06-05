@@ -211,6 +211,8 @@ export default {
     authToken: (state) => state.authToken,
     hasAuthToken: (state) => !!state.authToken,
     currentFormStep: (state) => state.currentFormStep,
+    /** Mode edit aktif jika ada usulan yang sedang diedit (`editComplaintId` terisi). */
+    isEditMode: (state) => !!state.editComplaintId,
     isFirstStep: (state, getters) => state.currentFormStep === getters.startStep,
     isLastStep: (state) => state.currentFormStep === 4,
     startStep: () => 1,
@@ -379,6 +381,122 @@ export default {
       commit('SET_CONSENT_STATEMENT', { field: 'stmtNoSimilarProgram', value: true })
       commit('SET_CONSENT_STATEMENT', { field: 'stmtRevocationIfUntrue', value: true })
     },
+    /**
+     * Ambil detail usulan untuk prefill lengkap di mode edit.
+     * @returns {Promise<object|null>} data detail, atau `null` bila kosong.
+     */
+    async fetchComplaintDetail({ state, commit }, complaintId) {
+      if (!complaintId) {
+        return null
+      }
+      try {
+        const res = await this.$gatewayPartnerAPI.get(`/aduan/complaints/${complaintId}`, {
+          params: { phase: 'verification' },
+          headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
+        })
+        return res.data?.data || null
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
+        }
+        throw error
+      }
+    },
+    /**
+     * Overlay prefill form dari response GET detail (menimpa baseline list item).
+     * Hanya field yang tersedia di detail yang diisi.
+     */
+    hydrateFromDetail({ commit }, detail) {
+      if (!detail || typeof detail !== 'object') {
+        return
+      }
+
+      // Data pengusul / calon penerima
+      const setPengusul = (field, value) => {
+        if (value != null && String(value).trim() !== '') {
+          commit('SET_DATA_PENGUSUL_FIELD', { field, value: String(value).trim() })
+        }
+      }
+      setPengusul('name', detail.user_name)
+      setPengusul('nik', detail.user_nik)
+      setPengusul('nomorKk', detail.user_kk)
+      setPengusul('phone', detail.user_phone)
+      setPengusul('email', detail.user_email)
+      setPengusul('id', detail.user_id)
+      setPengusul('role', detail.user_role)
+      if (detail.user_income_per_month != null && detail.user_income_per_month !== '') {
+        commit('SET_DATA_PENGUSUL_FIELD', {
+          field: 'incomePerMonth',
+          value: String(detail.user_income_per_month).replace(/\D/g, ''),
+        })
+      }
+
+      // Kondisi rumah
+      if (detail.description != null) {
+        commit('SET_KONDISI_RUMAH_FIELD', { field: 'deskripsiKondisi', value: String(detail.description) })
+      }
+      if (detail.complaint_subcategory_id) {
+        commit('SET_KONDISI_RUMAH_FIELD', { field: 'penyebabKerusakan', value: detail.complaint_subcategory_id })
+      }
+
+      // Lokasi tanah
+      const setLokasi = (field, value) => {
+        if (value != null && String(value).trim() !== '') {
+          commit('SET_LOKASI_TANAH_FIELD', { field, value: String(value).trim() })
+        }
+      }
+      setLokasi('city_id', detail.city_id)
+      setLokasi('city_name', detail.city_name)
+      setLokasi('district_id', detail.district_id)
+      setLokasi('district_name', detail.district_name)
+      setLokasi('village_id', detail.village_id)
+      setLokasi('village_name', detail.village_name)
+      setLokasi('rt', detail.RT)
+      setLokasi('rw', detail.RW)
+      setLokasi('dusun', detail.dusun_name)
+      setLokasi('address_detail', detail.address_detail)
+      if (detail.address != null) {
+        commit('SET_LOKASI_TANAH_FIELD', {
+          field: 'place',
+          value: { name: '', address: String(detail.address) },
+        })
+      }
+      const loc = parseLocationFromMetaPayload(detail)
+      if (loc) {
+        commit('SET_LOKASI_TANAH_FIELD', { field: 'location', value: loc })
+      }
+
+      // Dokumen — map photos[].field → slot store, tandai SUCCESS agar lolos validasi
+      if (Array.isArray(detail.photos)) {
+        const fieldToSlot = {
+          ktp: 'ktp',
+          kk: 'kk',
+          surat_miskin: 'suratMiskin',
+          surat_tanah: 'suratTanah',
+          foto_depan: 'fotoDepan',
+          foto_belakang: 'fotoBelakang',
+          foto_kiri: 'fotoKiri',
+          foto_kanan: 'fotoKanan',
+          foto_dalam: 'fotoDalam',
+        }
+        detail.photos.forEach((photo) => {
+          const slotKey = fieldToSlot[photo?.field]
+          if (slotKey && photo?.url) {
+            // Buat placeholder File agar file.size tidak null di UploadProgress.
+            // Size diambil dari photo.size (jika API menyediakan), fallback ke 0.
+            const fileName = photo.url.split('/').pop().split('?')[0] || 'document'
+            const byteSize = photo.size != null && Number.isFinite(Number(photo.size)) ? Number(photo.size) : 0
+            const placeholderFile = process.client
+              ? new File([new ArrayBuffer(byteSize)], fileName)
+              : null
+            commit('SET_DOKUMEN_SLOT', {
+              key: slotKey,
+              payload: { file: placeholderFile, url: photo.url, progress: 100, status: 'SUCCESS', errors: [] },
+            })
+          }
+        })
+      }
+    },
     hydrateLokasiTanahFromGeolocation({ commit, state }) {
       if (!process.client) {
         return
@@ -423,6 +541,12 @@ export default {
      * @returns {Promise<boolean>} `true` jika sudah ada pengajuan.
      */
     async checkKkDuplicate({ state, commit }) {
+      // Mode edit: KK milik usulan yang sedang diedit — lewati cek duplikat
+      // agar tidak salah memblokir dengan "No KK Sudah Pernah Diajukan".
+      if (state.editComplaintId) {
+        return false
+      }
+
       const kk = String(state.dataPengusul.nomorKk || '').replace(/\D/g, '')
       if (!kk) {
         return false
@@ -635,24 +759,25 @@ export default {
           RW: String(rw || ''),
         }
 
-        // TODO(BE): saat endpoint update siap, ganti menjadi:
-        // const isEdit = !!state.editComplaintId
-        // if (isEdit) {
-        //   return this.$gatewayPartnerAPI.put(`/aduan/complaints/${state.editComplaintId}`, payload, {
-        //     headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
-        //   })
-        // }
-        // Untuk sekarang tetap POST (create) walau mode edit.
-        const postComplaint = () =>
-          this.$gatewayPartnerAPI.post('/aduan/complaints', payload, {
-            headers: state.authToken
-              ? { Authorization: `Bearer ${state.authToken}` }
-              : {},
-          })
+        // Mode edit (US-013): PUT update ke endpoint /mobile
+        // Mode buat baru: POST create
+        const isEdit = !!state.editComplaintId
+        const headers = state.authToken
+          ? { Authorization: `Bearer ${state.authToken}` }
+          : {}
+
+        const sendComplaint = () =>
+          isEdit
+            ? this.$gatewayPartnerAPI.put(
+                `/aduan/complaints/${state.editComplaintId}/mobile`,
+                payload,
+                { headers }
+              )
+            : this.$gatewayPartnerAPI.post('/aduan/complaints', payload, { headers })
 
         let response
         try {
-          response = await postComplaint()
+          response = await sendComplaint()
         } catch (error) {
           if (isUnauthorizedError(error)) {
             commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
