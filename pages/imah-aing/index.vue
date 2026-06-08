@@ -208,7 +208,7 @@ export default {
         path: '/imah-aing/form',
         query: {
           ...this.$route.query,
-          edit: item.complaint_id || item.id,
+          edit: item.id,
         },
       })
     },
