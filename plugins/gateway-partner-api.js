@@ -14,7 +14,7 @@ export default (context, inject) => {
   })
 
   const gatewayPartnerMainAPI = axios.create({
-    baseURL: `${context.$config.baseURLGatewayPartner}/main/v1`,
+    baseURL: `${context.$config.baseURL}/main/v1`,
     headers: baseHeaders,
   })
 
