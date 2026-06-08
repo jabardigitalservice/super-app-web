@@ -102,6 +102,7 @@ export default {
     apiKey: process.env.API_KEY,
     xPartnerId: process.env.X_PARTNER_ID,
     baseURLGatewayPartner: process.env.BASE_URL_GATEWAY_PARTNER,
+    baseURLMain: process.env.BASE_URL_MAIN,
     baseURLAduan: {
       url: process.env.BASE_URL_ADUAN,
       username: process.env.USERNAME_URL_ADUAN,
