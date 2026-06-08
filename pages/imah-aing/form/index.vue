@@ -237,7 +237,9 @@ export default {
       }
     }
     await this.initForm(this.$route.query)
-    this.hydrateLokasiTanahFromGeolocation()
+    if (!this.$route.query.edit) {
+      this.hydrateLokasiTanahFromGeolocation()
+    }
     await this.setupEditOrFirstStep()
   },
   methods: {
