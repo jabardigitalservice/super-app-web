@@ -812,7 +812,7 @@ export default {
 
         const sendComplaint = () =>
           isEdit
-            ? this.$gatewayPartnerAPI.put(
+            ? this.$gatewayPartnerMainAPI.put(
                 `/aduan/complaints/${state.editComplaintId}/mobile`,
                 payload,
                 { headers }

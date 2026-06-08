@@ -8,8 +8,17 @@
 
     <!-- Nama Calon Penerima Bantuan -->
     <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="required" name="Nama Calon Penerima Bantuan (sesuai KTP)" vid="name">
-      <label>Nama Calon Penerima Bantuan (sesuai KTP) <span class="text-red-500">*</span></label>
-      <JdsInputText :value="setName" :error-message="errors[0]" @input="setName = $event" />
+      <BaseInputText
+        v-model="setName"
+        class="step-two-input-jds"
+        type="text"
+        label="Nama Calon Penerima Bantuan (sesuai KTP)"
+        required
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+        :error="!!errors[0]"
+        :error-message="errors[0]"
+      />
     </ValidationProvider>
 
     <!-- No HP Calon Penerima Bantuan -->
@@ -28,9 +37,15 @@
     </ValidationProvider>
 
     <!-- Email Pribadi — OPSIONAL, EDITABLE -->
-    <ValidationProvider v-slot="{ errors }" class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi Calon Penerima Bantuan" vid="email">
-      <label>Email Pribadi Calon Penerima Bantuan</label>
-      <JdsInputText :value="setEmail" :error-message="errors[0]" @input="setEmail = $event" />
+    <ValidationProvider class="flex flex-col gap-2 mb-5" rules="email" name="Email Pribadi Calon Penerima Bantuan" vid="email">
+      <BaseInputText
+        v-model="setEmail"
+        class="step-two-input-jds"
+        type="email"
+        label="Email Pribadi Calon Penerima Bantuan"
+        :placeholder="zwsPlaceholder"
+        autocomplete="off"
+      />
     </ValidationProvider>
 
     <!-- NIK Kepala Keluarga — WAJIB -->
