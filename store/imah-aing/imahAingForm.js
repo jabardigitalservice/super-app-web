@@ -451,8 +451,8 @@ export default {
       setLokasi('district_name', detail.district_name)
       setLokasi('village_id', detail.village_id)
       setLokasi('village_name', detail.village_name)
-      setLokasi('rt', detail.RT)
-      setLokasi('rw', detail.RW)
+      setLokasi('rt', detail.rt)
+      setLokasi('rw', detail.rw)
       setLokasi('dusun', detail.dusun_name)
       setLokasi('address_detail', detail.address_detail)
       if (detail.address != null) {
@@ -572,6 +572,50 @@ export default {
         }
         throw error
       }
+    },
+    /**
+     * Prefetch opsi cascade lokasi (kecamatan & kelurahan) di mode edit.
+     * Memakai `cityId`/`districtId` hasil hydrate detail agar opsi JdsSelect terisi
+     * tanpa interaksi user. Bila id kosong, resolve dari nama via daftar yang ada.
+     */
+    async prefillLocationOptions({ state, commit, dispatch, rootState }) {
+      const { cityId, cityName, districtId, districtName } = state.lokasiTanah
+
+      let resolvedCityId = cityId
+      if (!resolvedCityId && cityName) {
+        const city = rootState.location.cities.find((c) => c.name === cityName)
+        if (city) {
+          resolvedCityId = city.id
+          commit('SET_LOKASI_TANAH_FIELD', { field: 'city_id', value: city.id })
+        }
+      }
+      if (!resolvedCityId) {
+        return
+      }
+      await dispatch(
+        'location/fetchAreas',
+        { params: { depth: 3, cityId: resolvedCityId } },
+        { root: true }
+      )
+
+      let resolvedDistrictId = districtId
+      if (!resolvedDistrictId && districtName) {
+        const district = rootState.location.subDistricts.find(
+          (d) => d.name === districtName
+        )
+        if (district) {
+          resolvedDistrictId = district.id
+          commit('SET_LOKASI_TANAH_FIELD', { field: 'district_id', value: district.id })
+        }
+      }
+      if (!resolvedDistrictId) {
+        return
+      }
+      await dispatch(
+        'location/fetchAreas',
+        { params: { depth: 4, districtId: resolvedDistrictId } },
+        { root: true }
+      )
     },
     // Cascading location handlers (mirror citizenComplaintForm patterns)
     handleCitySelected({ state, commit, dispatch, rootState }) {

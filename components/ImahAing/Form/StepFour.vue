@@ -284,6 +284,7 @@ export default {
       'subDitrictsOption',
       'villagesOption',
     ]),
+    ...mapGetters('imahAingForm', ['isEditMode']),
     getCitiesOption() {
       return this.citiesOption || []
     },
@@ -354,6 +355,9 @@ export default {
   },
   created() {
     this.setCitiesOption('cities')
+    if (this.isEditMode) {
+      this.prefillLocationOptions()
+    }
   },
   methods: {
     ...mapActions('location', ['setCitiesOption']),
@@ -361,6 +365,7 @@ export default {
       'handleCitySelected',
       'handleSubdistrictSelected',
       'handleVillageSelected',
+      'prefillLocationOptions',
     ]),
     openLocationModal() {
       this.cloneLocation = cloneDeep(this.lokasiTanah)
