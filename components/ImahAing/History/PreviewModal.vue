@@ -11,7 +11,11 @@
       </h4>
     </template>
     <template #content>
-      <div class="space-y-4">
+      <div v-if="detailLoading" class="space-y-3 animate-pulse">
+        <div class="h-24 bg-gray-200 rounded-lg dark:bg-dark-emphasis-medium" />
+        <div v-for="n in 5" :key="n" class="h-4 bg-gray-200 rounded dark:bg-dark-emphasis-medium" />
+      </div>
+      <div v-else class="space-y-4">
         <!-- Foto Rumah (jika ada) -->
         <div v-if="photos.length" class="flex gap-2 overflow-x-auto pb-2">
           <img
@@ -29,19 +33,19 @@
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">NIK</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ item?.user_nik || item?.nik || '-' }}
+                {{ resolvedItem?.user_nik || resolvedItem?.nik || '-' }}
               </p>
             </div>
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">KK</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ item?.user_kk || item?.kk || '-' }}
+                {{ resolvedItem?.user_kk || resolvedItem?.kk || '-' }}
               </p>
             </div>
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">Nama</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ item?.user_name || item?.name || '-' }}
+                {{ resolvedItem?.user_name || resolvedItem?.name || '-' }}
               </p>
             </div>
             <div class="space-y-1">
@@ -127,13 +131,31 @@ export default {
       default: () => ({}),
     },
   },
+  data() {
+    return {
+      detail: null,
+      detailLoading: false,
+    }
+  },
   computed: {
+    resolvedItem() {
+      return this.detail || this.item
+    },
     photos() {
-      const photos = this.item?.photos || this.item?.images || []
+      const photos = this.resolvedItem?.photos || this.resolvedItem?.images || []
       return Array.isArray(photos) ? photos : []
     },
     statusLabel() {
-      const phase = this.item?.phase || this.item?.status || ''
+      // detail response: complaint_status.name (ready-to-display) or complaint_status_id (key)
+      // list response: phase or status (key)
+      if (this.resolvedItem?.complaint_status?.name) {
+        return this.resolvedItem.complaint_status.name
+      }
+      const phase =
+        this.resolvedItem?.complaint_status_id ||
+        this.resolvedItem?.phase ||
+        this.resolvedItem?.status ||
+        ''
       const mapping = {
         unverified: 'Menunggu Verifikasi',
         verified: 'Terverifikasi',
@@ -143,29 +165,51 @@ export default {
       return newDataStatusMilestone[phase]?.name || mapping[phase] || phase || '-'
     },
     formattedDate() {
-      const date = this.item?.created_at || this.item?.submitted_at || ''
+      const date = this.resolvedItem?.created_at || this.resolvedItem?.submitted_at || ''
       return date ? formatDate(date, 'dd MMMM yyyy') : '-'
     },
     cityName() {
-      return this.item?.city_name || this.item?.cityName || '-'
+      return this.resolvedItem?.city_name || this.resolvedItem?.cityName || '-'
     },
     districtName() {
-      return this.item?.district_name || this.item?.districtName || '-'
+      return this.resolvedItem?.district_name || this.resolvedItem?.districtName || '-'
     },
     villageName() {
-      return this.item?.village_name || this.item?.villageName || '-'
+      // detail response uses subdistrict_name; list response uses village_name
+      return this.resolvedItem?.subdistrict_name || this.resolvedItem?.village_name || this.resolvedItem?.villageName || '-'
     },
     dusun() {
-      return this.item?.dusun_name || '-'
+      return this.resolvedItem?.dusun_name || '-'
     },
     rw() {
-      return this.item?.rw || '-'
+      return this.resolvedItem?.rw || '-'
     },
     rt() {
-      return this.item?.rt || '-'
+      return this.resolvedItem?.rt || '-'
     },
     locationAddress() {
-      return this.item?.address || this.item?.place?.address || '-'
+      return this.resolvedItem?.address || this.resolvedItem?.place?.address || '-'
+    },
+  },
+  watch: {
+    open(val) {
+      if (val && this.item?.id) {
+        this.loadDetail()
+      } else {
+        this.detail = null
+      }
+    },
+  },
+  methods: {
+    async loadDetail() {
+      this.detailLoading = true
+      try {
+        this.detail = await this.$store.dispatch('imahAingHistory/fetchDetail', this.item.id)
+      } catch (_) {
+        // fall back to item prop silently
+      } finally {
+        this.detailLoading = false
+      }
     },
   },
 }
