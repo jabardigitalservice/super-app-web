@@ -156,6 +156,15 @@ export const actions = {
     }
   },
 
+  async fetchDetail({ state }, complaintId) {
+    if (!complaintId) return null
+    const res = await this.$gatewayPartnerAPI.get(`/aduan/complaints/${complaintId}`, {
+      params: { phase: 'verification' },
+      headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {},
+    })
+    return res.data?.data || null
+  },
+
   cancelSubmissions({ commit, state }) {
     const { selectedIds } = state
     if (!selectedIds.length) {
