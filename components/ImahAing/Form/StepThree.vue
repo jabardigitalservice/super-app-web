@@ -175,22 +175,22 @@ export default {
       docsConfig: [
         {
           key: 'ktp',
-          label: 'KTP Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Desa atau Lurah',
+          label: 'KTP Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah',
           required: true,
         },
         {
           key: 'kk',
-          label: 'KK Calon Penerima Bantuan / Surat Keterangan dari Kepala Desa atau Lurah',
+          label: 'KK Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah',
           required: true,
         },
         {
           key: 'suratMiskin',
-          label: 'Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa / Lurah',
+          label: 'Surat Keterangan Miskin / Tidak Mampu dari Kepala Dusun / Kepala Desa / Lurah',
           required: true,
         },
         {
           key: 'suratTanah',
-          label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Desa/Lurah',
+          label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Dusun/Kepala Desa/Lurah',
           required: true,
         },
       ],

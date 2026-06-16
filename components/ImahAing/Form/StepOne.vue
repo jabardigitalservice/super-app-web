@@ -3,7 +3,7 @@
     <div v-if="isSapawargaSource" class="mb-6 space-y-4">
       <p>
         Formulir ini diperuntukkan bagi
-        <strong>Ketua RT/RW/Lurah/Kades yang akan mengusulkan warganya sebagai calon penerima bantuan</strong>
+        <strong>Ketua RT/RW/Kadus/Kades/Lurah yang akan mengusulkan warganya sebagai calon penerima bantuan</strong>
       </p>
     </div>
 
@@ -18,10 +18,10 @@
         Pastikan dokumen digital berikut sudah terlebih dahulu disiapkan untuk memudahkan proses pengajuan wargi (dalam format .pdf atau .jpeg/.jpg/.png) :
       </p>
       <ol class="list-decimal ml-5 space-y-1">
-        <li>Kartu Tanda Penduduk Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Desa atau Lurah;</li>
-        <li>Kartu Keluarga Calon Penerima Bantuan / Surat Keterangan dari Kepala Desa atau Lurah;</li>
-        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Desa atau Lurah;</li>
-        <li>Surat Keterangan Kepemilikan Tanah dari Kepala Desa atau Lurah;</li>
+        <li>Kartu Tanda Penduduk Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
+        <li>Kartu Keluarga Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
+        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
+        <li>Surat Keterangan Kepemilikan Tanah dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
         <li>Foto Rumah Tidak Layak (Tampak depan, kiri, kanan, belakang, dalam)</li>
       </ol>
     </div>
