@@ -206,23 +206,33 @@ export default {
         { value: 'imah-aing-kesalahan-konstruksi', label: 'Kesalahan konstruksi' },
         { value: 'imah-aing-perawatan-buruk', label: 'Perawatan yang buruk' },
         { value: 'imah-aing-hama-jamur', label: 'Hama dan jamur' },
+        { value: 'imah-aing-prasarana-dasar', label: 'Ketidaktersediaan prasarana dasar' },
+        { value: 'imah-aing-bencana', label: 'Bencana' },
       ],
       penyebabDetailMap: {
         'imah-aing-bangunan-tua': {
-          title: 'Usia bangunan tua',
-          desc: 'Material lapuk, retak, atau struktur melemah karena kurang perawatan seiring bertambahnya usia bangunan.',
+          title: 'Usia Bangunan Sudah Tua',
+          desc: 'Material bangunan mengalami pelapukan, keretakan, korosi, atau penurunan kekuatan struktur akibat faktor usia dan kurangnya perawatan berkala.',
         },
         'imah-aing-kesalahan-konstruksi': {
-          title: 'Kesalahan konstruksi',
-          desc: 'Penggunaan material berkualitas rendah, fondasi tidak sesuai standar, atau desain yang tidak kokoh saat pembangunan.',
+          title: 'Kesalahan Konstruksi',
+          desc: 'Pembangunan tidak sesuai standar teknis seperti material berkualitas rendah, struktur fondasi, kolom, balok, dinding struktural, atau rangka atap yang tidak kokoh dan memadai atau metode pelaksanaan yang kurang tepat sehingga bangunan mudah mengalami kerusakan.',
         },
         'imah-aing-perawatan-buruk': {
-          title: 'Perawatan yang buruk',
-          desc: 'Kebocoran atap tidak diperbaiki, dinding retak dibiarkan, atau saluran air tersumbat dalam jangka panjang.',
+          title: 'Perawatan dan Pemeliharaan yang Buruk',
+          desc: 'Kerusakan ringan yang tidak segera diperbaiki, seperti atap bocor, dinding retak, plafon rusak, atau saluran drainase tersumbat, dapat berkembang menjadi kerusakan yang lebih serius dalam jangka panjang.',
         },
         'imah-aing-hama-jamur': {
-          title: 'Hama dan jamur',
-          desc: 'Rayap merusak kayu struktur bangunan, jamur melapukkan dinding atau plafon sehingga melemahkan integritas bangunan.',
+          title: 'Serangan Hama dan Jamur',
+          desc: 'Rayap merusak komponen kayu seperti rangka atap, kusen, dan pintu, jamur akibat kelembapan tinggi, kurangnya ventilasi dan pencahayaan alami menyebabkan pelapukan pada dinding dan plafon, serta menimbulkan risiko kesehatan dan melemahkan integritas bangunan.',
+        },
+        'imah-aing-prasarana-dasar': {
+          title: 'Ketidaktersediaan Prasarana Dasar',
+          desc: 'Rumah tidak memiliki akses yang memadai terhadap air bersih, sanitasi, listrik, ventilasi, pencahayaan alami, atau kecukupan ruang tidak sebanding dengan jumlah penghuni.',
+        },
+        'imah-aing-bencana': {
+          title: 'Bencana',
+          desc: 'Jenis bencana alam meliputi banjir, banjir bandang,  gempa bumi, cuaca ekstrem, angin puting beliung, kebakaran hutan dan lahan.',
         },
       },
       accept: '.jpg, .jpeg, .png, .pdf',
