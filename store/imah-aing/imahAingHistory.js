@@ -101,6 +101,12 @@ export const actions = {
     const { metaPayload, pagination } = state
     const { id, role, kk } = metaPayload
 
+    if (!id && !kk) {
+      commit('SET_ITEMS', [])
+      commit('SET_STATUS', 'SUCCESS')
+      return
+    }
+
     const roleLower = (role || '').trim().toLowerCase()
     const params = {
       limit: pagination.limit,
