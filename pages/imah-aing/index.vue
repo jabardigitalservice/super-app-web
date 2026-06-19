@@ -15,7 +15,7 @@
         <div class="px-4 py-4 md:px-7 md:py-5">
           <!-- Add new submission -->
           <div class="flex justify-end mb-4">
-            <Button variant="primary" @click="goToForm">
+            <Button v-if="!isWarga" variant="primary" @click="goToForm">
               + Tambah
             </Button>
           </div>
@@ -103,7 +103,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('imahAingHistory', ['items', 'selectedIds', 'pagination', 'status', 'errorMessage', 'authToken']),
+    ...mapState('imahAingHistory', ['items', 'selectedIds', 'pagination', 'status', 'errorMessage', 'authToken', 'metaPayload']),
     isLoading() {
       return this.status === 'LOADING' && this.pagination.page === 1
     },
@@ -115,6 +115,9 @@ export default {
     },
     useMock() {
       return this.$route.query.use_mock === 'true'
+    },
+    isWarga() {
+      return (this.metaPayload?.role || '').trim().toLowerCase() === 'warga'
     }
   },
   created() {
