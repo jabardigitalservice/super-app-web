@@ -33,6 +33,7 @@
               :key="item.id"
               :item="item"
               :selected="selectedIds.includes(item.id)"
+              :can-edit="canEdit(item)"
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
               @edit="editUsulan(item)"
@@ -204,6 +205,15 @@ export default {
         path: '/imah-aing/form',
         query: this.$route.query,
       })
+    },
+
+    canEdit(item) {
+      const EDITABLE_STATUSES = ['unverified', 'rejected', 'rejected_appeal', 'rejected_criteria']
+      const statusId = item.complaint_status?.id || item.complaint_status_id || ''
+      const isSelfProposer =
+        item.user_id === this.metaPayload.id ||
+        (this.isWarga && item.user_kk === this.metaPayload.kk)
+      return isSelfProposer && EDITABLE_STATUSES.includes(statusId)
     },
 
     editUsulan(item) {

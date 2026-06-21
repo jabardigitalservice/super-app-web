@@ -37,14 +37,14 @@
       </div>
     </div>
 
-    <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit (bawah, hanya unverified) -->
+    <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit (bawah) -->
     <!-- justify-center saat tidak ada tombol Edit agar tanggal center vertikal -->
     <div
       class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
-      :class="{ 'justify-center': !isUnverified }"
+      :class="{ 'justify-center': !canEdit }"
     >
       <button
-        v-if="isUnverified"
+        v-if="canEdit"
         class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
         @click.stop="$emit('edit')"
       >
@@ -71,10 +71,14 @@ export default {
     selected: {
       type: Boolean,
       default: false
+    },
+    canEdit: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
-    /** Kunci status — satu sumber untuk isVerified, isUnverified, dan statusStyle */
+    /** Kunci status — satu sumber untuk isVerified dan statusStyle */
     statusKey() {
       return this.item.complaint_status?.id
         || this.item.complaint_status_id
@@ -84,9 +88,6 @@ export default {
     },
     isVerified() {
       return this.statusKey === 'verified'
-    },
-    isUnverified() {
-      return this.statusKey === 'unverified'
     },
     /** Objek style guide (name + hex) dari mapping 13 status */
     statusStyle() {
