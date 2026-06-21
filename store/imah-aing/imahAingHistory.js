@@ -11,6 +11,9 @@ const getDefaultState = () => ({
     id: '',
     role: '',
     token: '',
+    rt: '',         // diisi jika role === 'rt' (format string, mis. "003")
+    rw: '',         // diisi jika role === 'rw'
+    village_id: '', // diisi jika role === 'kades' atau 'lurah'
   },
 
   /** Daftar complaint / usulan */
@@ -99,7 +102,7 @@ export const actions = {
 
   async fetchHistory({ commit, state }) {
     const { metaPayload, pagination } = state
-    const { id, role, kk } = metaPayload
+    const { id, role, kk, rt, rw, village_id: villageId } = metaPayload
 
     if (!id && !kk) {
       commit('SET_ITEMS', [])
@@ -116,10 +119,24 @@ export const actions = {
       current_user_id: id,
     }
 
-    if (roleLower && roleLower !== 'warga') {
-      params.user_id = id
-    } else {
-      params.user_kk = kk
+    switch (roleLower) {
+      case 'warga':
+        params.user_kk = kk
+        break
+      case 'rt':
+        params.rt = rt // TODO(BE): konfirmasi nama param — rt atau user_rt
+        break
+      case 'rw':
+        params.rw = rw // TODO(BE): konfirmasi nama param — rw atau user_rw
+        break
+      case 'kades':
+      case 'lurah':
+        params.village_id = villageId
+        break
+      default:
+        commit('SET_ITEMS', [])
+        commit('SET_STATUS', 'SUCCESS')
+        return
     }
 
     commit('SET_STATUS', 'LOADING')
