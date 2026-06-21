@@ -11,6 +11,9 @@ const getDefaultState = () => ({
     id: '',
     role: '',
     token: '',
+    rt: '',         // diisi jika role === 'rt' (format string, mis. "003")
+    rw: '',         // diisi jika role === 'rw'
+    village_id: '', // diisi jika role === 'kades' atau 'lurah'
   },
 
   /** Daftar complaint / usulan */
