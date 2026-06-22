@@ -34,6 +34,7 @@
               :item="item"
               :selected="selectedIds.includes(item.id)"
               :can-edit="canEdit(item)"
+              :is-self-item="isSelfItem(item)"
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
               @edit="editUsulan(item)"
@@ -207,13 +208,18 @@ export default {
       })
     },
 
+    isSelfItem(item) {
+      if (!item) return false
+      const { id, kk } = this.metaPayload || {}
+      if (item.user_id && id && item.user_id === id) return true
+      if (this.isWarga && item.user_kk && kk && item.user_kk === kk) return true
+      return false
+    },
+
     canEdit(item) {
       const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
       const statusId = item.complaint_status?.id || item.complaint_status_id || ''
-      const isSelfProposer =
-        item.user_id === this.metaPayload.id ||
-        (this.isWarga && item.user_kk === this.metaPayload.kk)
-      return isSelfProposer && EDITABLE_STATUSES.includes(statusId)
+      return this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
     },
 
     editUsulan(item) {

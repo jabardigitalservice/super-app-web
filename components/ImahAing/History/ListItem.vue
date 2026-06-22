@@ -25,7 +25,7 @@
         IA-{{ item.user_nik || item.nik || '-' }}
       </div>
       <div class="text-sm font-semibold text-gray-900 mt-0.5 dark:text-dark-emphasis-high">
-        {{ item.user_name || item.name || '-' }}
+        {{ displayName }}
       </div>
       <div class="mt-1">
         <span
@@ -75,6 +75,10 @@ export default {
     canEdit: {
       type: Boolean,
       default: false
+    },
+    isSelfItem: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -100,6 +104,22 @@ export default {
     formattedDate() {
       const date = this.item.created_at || this.item.submitted_at
       return formatDate(date, 'dd MMM yyyy')
+    },
+    displayName() {
+      const raw = this.item.user_name || this.item.name || ''
+      if (!raw) return '-'
+      return this.isSelfItem ? raw : this.maskName(raw)
+    }
+  },
+  methods: {
+    maskName(fullName) {
+      return fullName
+        .split(' ')
+        .map((word) => {
+          if (word.length <= 2) return word.toUpperCase()
+          return word.substring(0, 2).toUpperCase() + '*'.repeat(Math.min(word.length - 2, 6))
+        })
+        .join(' ')
     }
   }
 }
