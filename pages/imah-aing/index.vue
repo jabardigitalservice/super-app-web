@@ -208,7 +208,7 @@ export default {
     },
 
     canEdit(item) {
-      const EDITABLE_STATUSES = ['unverified', 'rejected', 'rejected_appeal', 'rejected_criteria']
+      const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
       const statusId = item.complaint_status?.id || item.complaint_status_id || ''
       const isSelfProposer =
         item.user_id === this.metaPayload.id ||
