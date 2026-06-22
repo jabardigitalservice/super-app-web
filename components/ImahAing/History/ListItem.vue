@@ -25,7 +25,11 @@
         IA-{{ item.user_nik || item.nik || '-' }}
       </div>
       <div class="text-sm font-semibold text-gray-900 mt-0.5 dark:text-dark-emphasis-high">
-        {{ item.user_name || item.name || '-' }}
+        {{ displayName }}
+      </div>
+      <!-- TODO(BE): proposer_role field needed from list complaints endpoint for non-self items -->
+      <div v-if="proposerRoleLabel" class="text-xs text-gray-400 mt-0.5">
+        Pengusul: {{ proposerRoleLabel }}
       </div>
       <div class="mt-1">
         <span
@@ -37,19 +41,32 @@
       </div>
     </div>
 
-    <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit (bawah) -->
-    <!-- justify-center saat tidak ada tombol Edit agar tanggal center vertikal -->
+    <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit + Info Icon (bawah) -->
     <div
       class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
       :class="{ 'justify-center': !canEdit }"
     >
-      <button
-        v-if="canEdit"
-        class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
-        @click.stop="$emit('edit')"
-      >
-        Edit Ajuan
-      </button>
+      <div class="flex items-center gap-1">
+        <button
+          v-if="canEdit"
+          class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
+          @click.stop="$emit('edit')"
+        >
+          Edit Ajuan
+        </button>
+        <button
+          type="button"
+          class="w-5 h-5 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
+          :title="editTooltipText"
+          @click.stop
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </button>
+      </div>
       <span class="text-xs text-gray-400 whitespace-nowrap">
         {{ formattedDate }}
       </span>
@@ -75,6 +92,14 @@ export default {
     canEdit: {
       type: Boolean,
       default: false
+    },
+    isSelfItem: {
+      type: Boolean,
+      default: true
+    },
+    proposerRole: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -100,6 +125,37 @@ export default {
     formattedDate() {
       const date = this.item.created_at || this.item.submitted_at
       return formatDate(date, 'dd MMM yyyy')
+    },
+    displayName() {
+      const raw = this.item.user_name || this.item.name || ''
+      if (!raw) return '-'
+      return this.isSelfItem ? raw : this.maskName(raw)
+    },
+    proposerRoleLabel() {
+      const ROLE_LABELS = {
+        warga: 'Warga',
+        rt: 'Ketua RT',
+        rw: 'Ketua RW',
+        kadus: 'Kepala Dusun',
+        kades: 'Kepala Desa',
+        lurah: 'Lurah',
+      }
+      const key = (this.proposerRole || '').trim().toLowerCase()
+      return ROLE_LABELS[key] || ''
+    },
+    editTooltipText() {
+      return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi atau Tahap Verifikasi'
+    }
+  },
+  methods: {
+    maskName(fullName) {
+      return fullName
+        .split(' ')
+        .map((word) => {
+          if (word.length <= 2) return word.toUpperCase()
+          return word.substring(0, 2).toUpperCase() + '*'.repeat(Math.min(word.length - 2, 6))
+        })
+        .join(' ')
     }
   }
 }
