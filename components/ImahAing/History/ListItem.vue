@@ -27,6 +27,10 @@
       <div class="text-sm font-semibold text-gray-900 mt-0.5 dark:text-dark-emphasis-high">
         {{ displayName }}
       </div>
+      <!-- TODO(BE): proposer_role field needed from list complaints endpoint for non-self items -->
+      <div v-if="proposerRoleLabel" class="text-xs text-gray-400 mt-0.5">
+        Pengusul: {{ proposerRoleLabel }}
+      </div>
       <div class="mt-1">
         <span
           class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
@@ -79,6 +83,10 @@ export default {
     isSelfItem: {
       type: Boolean,
       default: true
+    },
+    proposerRole: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -109,6 +117,18 @@ export default {
       const raw = this.item.user_name || this.item.name || ''
       if (!raw) return '-'
       return this.isSelfItem ? raw : this.maskName(raw)
+    },
+    proposerRoleLabel() {
+      const ROLE_LABELS = {
+        warga: 'Warga',
+        rt: 'Ketua RT',
+        rw: 'Ketua RW',
+        kadus: 'Kepala Dusun',
+        kades: 'Kepala Desa',
+        lurah: 'Lurah',
+      }
+      const key = (this.proposerRole || '').trim().toLowerCase()
+      return ROLE_LABELS[key] || ''
     }
   },
   methods: {
