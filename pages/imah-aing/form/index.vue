@@ -132,7 +132,7 @@
       name-icon="check-mark-circle"
       size="16px"
       :description="successDescription"
-      @close="backToFormPage"
+      @close="handleCloseAfterSuccess"
       @click="backToFormPage"
     />
 
@@ -367,6 +367,17 @@ export default {
       setTimeout(() => {
         this.isLoading = false
       }, 1500)
+    },
+    handleCloseAfterSuccess() {
+      const { id, nomorKk } = this.$store.state.imahAingForm.dataPengusul || {}
+      if (id || nomorKk) {
+        this.$router.push({
+          path: '/imah-aing',
+          query: this.$route.query,
+        })
+      } else {
+        this.backToFormPage()
+      }
     },
     handleSessionExpired() {
       if (process.client) {

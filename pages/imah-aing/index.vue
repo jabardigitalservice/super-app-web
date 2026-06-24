@@ -39,6 +39,7 @@
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
               @edit="editUsulan(item)"
+              @show-info="showEditInfo"
             />
 
             <!-- Load more -->
@@ -78,6 +79,14 @@
       @close="previewOpen = false"
     />
 
+    <!-- Info snackbar for edit restriction -->
+    <div
+      v-if="showInfoSnackbar"
+      class="fixed bottom-20 left-4 right-4 z-20 md:max-w-[650px] md:mx-auto md:left-1/2 md:-translate-x-1/2 md:right-auto md:w-[calc(650px-2rem)] bg-gray-700 text-white text-sm rounded-lg px-4 py-3 shadow-lg"
+    >
+      Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi atau Tahap Verifikasi.
+    </div>
+
     <!-- Cancel Confirmation Dialog -->
     <BaseDialog
       :show-popup="showCancelDialog"
@@ -102,7 +111,8 @@ export default {
     return {
       previewOpen: false,
       previewItem: null,
-      showCancelDialog: false
+      showCancelDialog: false,
+      showInfoSnackbar: false
     }
   },
   computed: {
@@ -231,6 +241,11 @@ export default {
           edit: item.id,
         },
       })
+    },
+
+    showEditInfo() {
+      this.showInfoSnackbar = true
+      setTimeout(() => { this.showInfoSnackbar = false }, 4000)
     },
 
     async handleCancel() {
