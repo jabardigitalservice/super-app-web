@@ -62,7 +62,7 @@
         type="text"
         label="NIK Calon Penerima Bantuan"
         required
-        :disabled="isEditMode"
+        :disabled="isEditMode || isNikKkLocked"
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -85,7 +85,7 @@
         type="text"
         label="No KK Calon Penerima Bantuan"
         required
-        :disabled="isEditMode"
+        :disabled="isEditMode || isNikKkLocked"
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
@@ -134,6 +134,14 @@ export default {
   },
   computed: {
     ...mapGetters('imahAingForm', ['isEditMode']),
+    isSapawargaSource() {
+      return this.$store.state.imahAingForm.sourceId === 'sapawarga'
+    },
+    isNikKkLocked() {
+      if (this.isEditMode) return false
+      const role = (this.$store.state.imahAingForm.dataPengusul.role || '').trim().toLowerCase()
+      return this.isSapawargaSource && role === 'warga'
+    },
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
     },
