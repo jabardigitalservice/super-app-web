@@ -77,6 +77,7 @@
     <ImahAingHistoryPreviewModal
       :open="previewOpen"
       :item="previewItem"
+      :is-self-item="previewItem ? isSelfItem(previewItem) : true"
       @close="previewOpen = false"
     />
 
@@ -223,7 +224,11 @@ export default {
     isSelfItem(item) {
       if (!item) return false
       const { id, kk } = this.metaPayload || {}
+      // Check as proposer (non-warga submitting on behalf of warga)
+      if (item.proposer?.id && id && item.proposer.id === id) return true
+      // Check as beneficiary (warga self-submit)
       if (item.user_id && id && item.user_id === id) return true
+      // KK fallback for warga without user_id
       if (this.isWarga && item.user_kk && kk && item.user_kk === kk) return true
       return false
     },
