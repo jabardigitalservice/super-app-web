@@ -36,6 +36,7 @@
               :can-edit="canEdit(item)"
               :is-self-item="isSelfItem(item)"
               :proposer-role="isSelfItem(item) ? (metaPayload.role || '') : (item.proposer_role || '')"
+              :proposer-name="isSelfItem(item) ? (metaPayload.name || '') : (item.proposer_name || '')"
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
               @edit="editUsulan(item)"
