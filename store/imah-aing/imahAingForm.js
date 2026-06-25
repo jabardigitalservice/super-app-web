@@ -40,6 +40,15 @@ const getDefaultState = () => ({
     role: '',
   },
 
+  // Identitas pengusul dari meta Sapawarga — tidak boleh ditimpa oleh hydrateFromExisting atau input form
+  proposerMeta: {
+    id: '',
+    name: '',
+    phone: '',
+    email: '',
+    role: '',
+  },
+
   dokumen: {
     ktp: null,
     kk: null,
@@ -148,17 +157,19 @@ function applyQueryMetaToDataPengusul(commit, data) {
   setField('nomorKk', kkVal)
 }
 
-/**
- * Resolve field proposer dengan aturan:
- * - Jika meta.role selain 'warga' -> pakai nilai dari meta (state.dataPengusul)
- * - Jika meta.role === 'warga' atau kosong -> pakai nilai dari state.dataPengusul (diisi user)
- */
-function resolveProposerField(state, fieldName) {
-  const role = (state.dataPengusul.role || '').trim().toLowerCase()
-  if (role && role !== 'warga') {
-    return state.dataPengusul[fieldName] || ''
-  }
-  return state.dataPengusul[fieldName] || ''
+// Simpan identitas pengusul dari meta — tidak boleh ditimpa oleh form/hydrate.
+// Guard: hanya isi jika ada `role` (SW deeplink). Hotline/tanpa meta → skip, proposerMeta tetap kosong.
+function applyQueryMetaToProposerMeta(commit, data) {
+  const role = (data.role || '').trim().toLowerCase()
+  if (!role) return
+  const pick = (val) => (val != null && String(val).trim() !== '' ? String(val).trim() : '')
+  commit('SET_PROPOSER_META', {
+    id:    pick(data.id),
+    name:  pick(data.name),
+    phone: pick(data.phone),
+    email: pick(data.email),
+    role,
+  })
 }
 
 /**
@@ -277,6 +288,9 @@ export default {
         state.kondisiRumah[field] = value
       }
     },
+    SET_PROPOSER_META(state, payload) {
+      state.proposerMeta = { ...state.proposerMeta, ...payload }
+    },
     SET_DATA_PENGUSUL_FIELD(state, { field, value }) {
       // map common incoming snake_case fields to camelCase store keys
       const fieldMap = {
@@ -338,6 +352,7 @@ export default {
         const decoded = decodeMetaQueryParam(meta)
         if (decoded && typeof decoded === 'object') {
           applyQueryMetaToDataPengusul(commit, decoded)
+          applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
         }
       }
@@ -776,10 +791,10 @@ export default {
           user_phone: state.dataPengusul.phone,
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
-          proposer_name: resolveProposerField(state, 'name'),
-          proposer_phone: resolveProposerField(state, 'phone'),
-          proposer_email: resolveProposerField(state, 'email'),
-          proposer_role: state.dataPengusul.role || '',
+          proposer_name:  state.proposerMeta.name  || '',
+          proposer_phone: state.proposerMeta.phone || '',
+          proposer_email: state.proposerMeta.email || '',
+          proposer_role:  state.proposerMeta.role  || '',
           [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
           source_id: state.sourceId || 'sapawarga',
           type: 'private',
