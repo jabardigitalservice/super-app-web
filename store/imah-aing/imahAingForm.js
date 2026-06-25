@@ -807,6 +807,7 @@ export default {
           user_name: state.dataPengusul.name,
           user_email: state.dataPengusul.email || '',
           user_phone: state.dataPengusul.phone,
+          user_role: state.dataPengusul.role || '',
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
           proposer_name:  state.proposerMeta.name  || '',
