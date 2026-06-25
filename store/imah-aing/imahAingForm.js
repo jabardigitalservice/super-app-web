@@ -40,6 +40,15 @@ const getDefaultState = () => ({
     role: '',
   },
 
+  // Identitas pengusul dari meta Sapawarga — tidak boleh ditimpa oleh hydrateFromExisting atau input form
+  proposerMeta: {
+    id: '',
+    name: '',
+    phone: '',
+    email: '',
+    role: '',
+  },
+
   dokumen: {
     ktp: null,
     kk: null,
@@ -148,17 +157,19 @@ function applyQueryMetaToDataPengusul(commit, data) {
   setField('nomorKk', kkVal)
 }
 
-/**
- * Resolve field proposer dengan aturan:
- * - Jika meta.role selain 'warga' -> pakai nilai dari meta (state.dataPengusul)
- * - Jika meta.role === 'warga' atau kosong -> pakai nilai dari state.dataPengusul (diisi user)
- */
-function resolveProposerField(state, fieldName) {
-  const role = (state.dataPengusul.role || '').trim().toLowerCase()
-  if (role && role !== 'warga') {
-    return state.dataPengusul[fieldName] || ''
-  }
-  return state.dataPengusul[fieldName] || ''
+// Simpan identitas pengusul dari meta — tidak boleh ditimpa oleh form/hydrate.
+// Guard: hanya isi jika ada `role` (SW deeplink). Hotline/tanpa meta → skip, proposerMeta tetap kosong.
+function applyQueryMetaToProposerMeta(commit, data) {
+  const role = (data.role || '').trim().toLowerCase()
+  if (!role) return
+  const pick = (val) => (val != null && String(val).trim() !== '' ? String(val).trim() : '')
+  commit('SET_PROPOSER_META', {
+    id:    pick(data.id),
+    name:  pick(data.name),
+    phone: pick(data.phone),
+    email: pick(data.email),
+    role,
+  })
 }
 
 /**
@@ -186,6 +197,24 @@ function applyQueryMetaToLokasiTanah(commit, data) {
   const loc = parseLocationFromMetaPayload(data)
   if (loc) {
     commit('SET_LOKASI_TANAH_FIELD', { field: 'location', value: loc })
+  }
+
+  // Pre-fill area lokasi untuk role non-warga dari meta Sapawarga
+  const role = (data.role || '').trim().toLowerCase()
+  if (role && role !== 'warga') {
+    const setArea = (field, value) => {
+      if (value != null && String(value).trim() !== '') {
+        commit('SET_LOKASI_TANAH_FIELD', { field, value: String(value).trim() })
+      }
+    }
+    setArea('city_id', data.cityId)
+    setArea('city_name', data.cityName)
+    setArea('district_id', data.districtId)
+    setArea('district_name', data.districtName)
+    setArea('village_id', data.villageId)
+    setArea('village_name', data.villageName)
+    setArea('rt', data.rt)
+    setArea('rw', data.rw)
   }
 }
 
@@ -277,6 +306,9 @@ export default {
         state.kondisiRumah[field] = value
       }
     },
+    SET_PROPOSER_META(state, payload) {
+      state.proposerMeta = { ...state.proposerMeta, ...payload }
+    },
     SET_DATA_PENGUSUL_FIELD(state, { field, value }) {
       // map common incoming snake_case fields to camelCase store keys
       const fieldMap = {
@@ -338,6 +370,7 @@ export default {
         const decoded = decodeMetaQueryParam(meta)
         if (decoded && typeof decoded === 'object') {
           applyQueryMetaToDataPengusul(commit, decoded)
+          applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
         }
       }
@@ -774,12 +807,13 @@ export default {
           user_name: state.dataPengusul.name,
           user_email: state.dataPengusul.email || '',
           user_phone: state.dataPengusul.phone,
+          user_role: state.dataPengusul.role || '',
           user_nik: state.dataPengusul.nik,
           user_kk: state.dataPengusul.nomorKk,
-          proposer_name: resolveProposerField(state, 'name'),
-          proposer_phone: resolveProposerField(state, 'phone'),
-          proposer_email: resolveProposerField(state, 'email'),
-          proposer_role: state.dataPengusul.role || '',
+          proposer_name:  state.proposerMeta.name  || '',
+          proposer_phone: state.proposerMeta.phone || '',
+          proposer_email: state.proposerMeta.email || '',
+          proposer_role:  state.proposerMeta.role  || '',
           [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
           source_id: state.sourceId || 'sapawarga',
           type: 'private',

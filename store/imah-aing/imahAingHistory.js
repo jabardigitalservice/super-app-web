@@ -11,9 +11,16 @@ const getDefaultState = () => ({
     id: '',
     role: '',
     token: '',
-    rt: '',         // diisi jika role === 'rt' (format string, mis. "003")
-    rw: '',         // diisi jika role === 'rw'
-    village_id: '', // diisi jika role === 'kades' atau 'lurah'
+    rt: '',
+    rw: '',
+    village_id: '',
+    cityId: '',
+    cityName: '',
+    districtId: '',
+    districtName: '',
+    villageId: '',
+    villageName: '',
+    address: '',
   },
 
   /** Daftar complaint / usulan */
@@ -43,7 +50,12 @@ export const state = () => getDefaultState()
 
 export const mutations = {
   SET_META_PAYLOAD(state, payload) {
-    state.metaPayload = { ...state.metaPayload, ...payload }
+    // Sapawarga sends villageId (camelCase); normalize to village_id for fetchHistory.
+    const normalized = {
+      ...payload,
+      village_id: payload.village_id || payload.villageId || '',
+    }
+    state.metaPayload = { ...state.metaPayload, ...normalized }
   },
   SET_AUTH_TOKEN(state, token) {
     state.authToken = token
