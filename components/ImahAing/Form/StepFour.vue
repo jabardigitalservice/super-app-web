@@ -23,6 +23,7 @@
             placeholder="Pilih kota/kabupaten"
             :error-message="errors[0]"
             :options="getCitiesOption"
+            :disabled="isNonWarga"
           />
         </ValidationProvider>
 
@@ -47,7 +48,7 @@
             placeholder="Pilih kecamatan"
             :error-message="errors[0]"
             :options="getSubDitrictsOption"
-            :disabled="getSubDitrictsOption.length === 0"
+            :disabled="isNonWarga || getSubDitrictsOption.length === 0"
           />
         </ValidationProvider>
 
@@ -72,7 +73,7 @@
             placeholder="Pilih kelurahan/desa"
             :error-message="errors[0]"
             :options="getVillagesOption"
-            :disabled="getVillagesOption.length === 0"
+            :disabled="isNonWarga || getVillagesOption.length === 0"
           />
         </ValidationProvider>
 
@@ -114,6 +115,7 @@
               class="w-full"
               :error-message="errors[0]"
               placeholder="Contoh: 001"
+              :disabled="isNonWarga && !!rw"
               @input="setRw($event)"
             />
           </ValidationProvider>
@@ -136,6 +138,7 @@
               class="w-full"
               :error-message="errors[0]"
               placeholder="Contoh: 002"
+              :disabled="isNonWarga && !!rt"
               @input="setRt($event)"
             />
           </ValidationProvider>
@@ -278,6 +281,7 @@ export default {
   computed: {
     ...mapState('imahAingForm', {
       lokasiTanah: (state) => state.lokasiTanah,
+      dataPengusul: (state) => state.dataPengusul,
     }),
     ...mapGetters('location', [
       'citiesOption',
@@ -285,6 +289,10 @@ export default {
       'villagesOption',
     ]),
     ...mapGetters('imahAingForm', ['isEditMode']),
+    isNonWarga() {
+      const role = (this.dataPengusul?.role || '').trim().toLowerCase()
+      return !!role && role !== 'warga'
+    },
     getCitiesOption() {
       return this.citiesOption || []
     },
@@ -355,7 +363,7 @@ export default {
   },
   created() {
     this.setCitiesOption('cities')
-    if (this.isEditMode) {
+    if (this.isEditMode || this.isNonWarga) {
       this.prefillLocationOptions()
     }
   },

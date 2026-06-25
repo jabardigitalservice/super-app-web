@@ -198,6 +198,24 @@ function applyQueryMetaToLokasiTanah(commit, data) {
   if (loc) {
     commit('SET_LOKASI_TANAH_FIELD', { field: 'location', value: loc })
   }
+
+  // Pre-fill area lokasi untuk role non-warga dari meta Sapawarga
+  const role = (data.role || '').trim().toLowerCase()
+  if (role && role !== 'warga') {
+    const setArea = (field, value) => {
+      if (value != null && String(value).trim() !== '') {
+        commit('SET_LOKASI_TANAH_FIELD', { field, value: String(value).trim() })
+      }
+    }
+    setArea('city_id', data.cityId)
+    setArea('city_name', data.cityName)
+    setArea('district_id', data.districtId)
+    setArea('district_name', data.districtName)
+    setArea('village_id', data.villageId)
+    setArea('village_name', data.villageName)
+    setArea('rt', data.rt)
+    setArea('rw', data.rw)
+  }
 }
 
 /** Normalisasi `meta` / `source_id` (termasuk dari `this.$route.query` Vue Router). */
