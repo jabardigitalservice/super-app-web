@@ -131,24 +131,12 @@ export const actions = {
       current_user_id: id,
     }
 
-    switch (roleLower) {
-      case 'warga':
-        params.user_kk = kk
-        break
-      case 'rt':
-        params.rt = rt // TODO(BE): konfirmasi nama param — rt atau user_rt
-        break
-      case 'rw':
-        params.rw = rw // TODO(BE): konfirmasi nama param — rw atau user_rw
-        break
-      case 'kades':
-      case 'lurah':
-        params.village_id = villageId
-        break
-      default:
-        commit('SET_ITEMS', [])
-        commit('SET_STATUS', 'SUCCESS')
-        return
+    if (roleLower === 'warga') {
+      params.user_kk = kk
+    } else {
+      if (rt)        params.rt = rt
+      if (rw)        params.rw = rw
+      if (villageId) params.village_id = villageId
     }
 
     commit('SET_STATUS', 'LOADING')

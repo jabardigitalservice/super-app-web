@@ -33,19 +33,19 @@
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">NIK</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ resolvedItem?.user_nik || resolvedItem?.nik || '-' }}
+                {{ displayNik }}
               </p>
             </div>
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">KK</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ resolvedItem?.user_kk || resolvedItem?.kk || '-' }}
+                {{ displayKk }}
               </p>
             </div>
             <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">Nama</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
-                {{ resolvedItem?.user_name || resolvedItem?.name || '-' }}
+                {{ displayName }}
               </p>
             </div>
             <div class="space-y-1">
@@ -130,6 +130,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isSelfItem: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -141,7 +145,23 @@ export default {
     resolvedItem() {
       return this.detail || this.item
     },
+    displayName() {
+      const raw = this.item?.user_name || this.item?.name || ''
+      if (!raw) return '-'
+      return this.isSelfItem ? raw : this.maskName(raw)
+    },
+    displayNik() {
+      const raw = this.item?.user_nik || this.item?.nik || ''
+      if (!raw) return '-'
+      return this.isSelfItem ? raw : this.maskNumber(raw)
+    },
+    displayKk() {
+      const raw = this.item?.user_kk || this.item?.kk || ''
+      if (!raw) return '-'
+      return this.isSelfItem ? raw : this.maskNumber(raw)
+    },
     photos() {
+      if (!this.isSelfItem) return []
       const photos = this.resolvedItem?.photos || this.resolvedItem?.images || []
       return Array.isArray(photos) ? photos : []
     },
@@ -201,6 +221,19 @@ export default {
     },
   },
   methods: {
+    maskName(fullName) {
+      return fullName
+        .split(' ')
+        .map((word) => {
+          if (word.length <= 2) return word.toUpperCase()
+          return word.substring(0, 2).toUpperCase() + '*'.repeat(Math.min(word.length - 2, 6))
+        })
+        .join(' ')
+    },
+    maskNumber(value) {
+      if (value.length <= 8) return value
+      return value.substring(0, 4) + '********' + value.slice(-4)
+    },
     async loadDetail() {
       this.detailLoading = true
       try {
