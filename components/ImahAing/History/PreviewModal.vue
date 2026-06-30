@@ -16,6 +16,30 @@
         <div v-for="n in 5" :key="n" class="h-4 bg-gray-200 rounded dark:bg-dark-emphasis-medium" />
       </div>
       <div v-else class="space-y-4">
+        <!-- Catatan Penolakan -->
+        <div
+          v-if="rejectionNote"
+          class="flex gap-2 p-3 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800"
+        >
+          <svg
+            class="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <div>
+            <p class="text-xs font-bold text-red-600 dark:text-red-400 uppercase mb-0.5">
+              Alasan Penolakan
+            </p>
+            <p class="text-sm text-red-700 dark:text-red-300">{{ rejectionNote }}</p>
+          </div>
+        </div>
+
         <!-- Foto Rumah (jika ada) -->
         <div v-if="photos.length" class="flex gap-2 overflow-x-auto pb-2">
           <img
@@ -164,6 +188,18 @@ export default {
       if (!this.isSelfItem) return []
       const photos = this.resolvedItem?.photos || this.resolvedItem?.images || []
       return Array.isArray(photos) ? photos : []
+    },
+    isRejected() {
+      const key =
+        this.resolvedItem?.complaint_status_id ||
+        this.resolvedItem?.phase ||
+        this.resolvedItem?.status ||
+        ''
+      return ['rejected_appeal', 'rejected_criteria'].includes(key)
+    },
+    rejectionNote() {
+      if (!this.isRejected) return ''
+      return this.resolvedItem?.complaint_status_note || ''
     },
     statusLabel() {
       if (this.resolvedItem?.complaint_status?.name) {
