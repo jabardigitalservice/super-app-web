@@ -1,17 +1,33 @@
 export const IMAH_AING_STATUS = {
-  unverified:                { id: 'unverified',                name: 'Menunggu Verifikasi',       color: 'yellow',     hex: '#FF7500' },
-  verified:                  { id: 'verified',                  name: 'Terverifikasi',             color: 'green',      hex: '#166534' },
-  failed:                    { id: 'failed',                    name: 'Gagal Diverifikasi',        color: 'red',        hex: '#DD5E5E' },
-  directed_to_hotline_jabar: { id: 'directed_to_hotline_jabar', name: 'Dialihkan ke Hotline Jabar', color: 'purple',    hex: '#691B9A' },
-  not_yet_instructed:        { id: 'not_yet_instructed',        name: 'Belum Diinstruksikan',      color: 'yellow',     hex: '#FF7500' },
-  not_yet_coordinated:       { id: 'not_yet_coordinated',       name: 'Belum Dikoordinasikan',     color: 'light-blue', hex: '#1E88E5' },
-  coordinated:               { id: 'coordinated',               name: 'Dikoordinasikan',           color: 'green',      hex: '#166534' },
-  diverted_to_span:          { id: 'diverted_to_span',          name: 'Dialihkan ke SP4N Lapor',   color: 'green',      hex: '#166534' },
-  rejected:                  { id: 'rejected',                  name: 'Ditolak',                   color: 'red',        hex: '#DD5E5E' },
-  followup:                  { id: 'followup',                  name: 'Ditindaklanjuti',           color: 'light-blue', hex: '#1E88E5' },
-  postponed:                 { id: 'postponed',                 name: 'Pengerjaan Ditunda',        color: 'purple',     hex: '#691B9A' },
-  review:                    { id: 'review',                    name: 'Ditinjau Ulang',            color: 'dark-blue',  hex: '#64748B' },
-  finished:                  { id: 'finished',                  name: 'Selesai',                   color: 'green',      hex: '#166534' }
+  // verification
+  unverified:                { id: 'unverified',                phase: 'verification',  name: 'Menunggu Verifikasi',             color: 'yellow',  hex: '#FF7500' },
+  verified:                  { id: 'verified',                  phase: 'verification',  name: 'Terverifikasi',                   color: 'green',   hex: '#166534' },
+  canceled:                  { id: 'canceled',                  phase: 'verification',  name: 'Dibatalkan',                      color: 'red',     hex: '#DD5E5E' },
+  rejected_appeal:           { id: 'rejected_appeal',           phase: 'verification',  name: 'Ditolak (Sanggah)',               color: 'red',     hex: '#DD5E5E' },
+  rejected_criteria:         { id: 'rejected_criteria',         phase: 'verification',  name: 'Ditolak',                         color: 'red',     hex: '#DD5E5E' },
+  directed_to_hotline_jabar: { id: 'directed_to_hotline_jabar', phase: 'verification',  name: 'Dialihkan ke Hotline Jabar',      color: 'purple',  hex: '#691B9A' },
+
+  // authorization (nominatif)
+  central_nominative:        { id: 'central_nominative',        phase: 'authorization', name: 'Nominatif Pusat',                 color: 'yellow',  hex: '#FF7500' },
+  provincial_nominative:     { id: 'provincial_nominative',     phase: 'authorization', name: 'Nominatif Provinsi',              color: 'yellow',  hex: '#FF7500' },
+  regency_nominative:        { id: 'regency_nominative',        phase: 'authorization', name: 'Nominatif Kabupaten/Kota',        color: 'yellow',  hex: '#FF7500' },
+  other_nominative:          { id: 'other_nominative',          phase: 'authorization', name: 'Nominatif Lainnya (CSR)',         color: 'yellow',  hex: '#FF7500' },
+
+  // coordination (pengajuan bantuan)
+  regency_aid_submission:    { id: 'regency_aid_submission',    phase: 'coordination',  name: 'Pengajuan Bantuan Kabupaten/Kota', color: 'light-blue', hex: '#1E88E5' },
+  provincial_aid_submission: { id: 'provincial_aid_submission', phase: 'coordination',  name: 'Pengajuan Bantuan Provinsi',      color: 'light-blue', hex: '#1E88E5' },
+  central_aid_submission:    { id: 'central_aid_submission',    phase: 'coordination',  name: 'Pengajuan Bantuan Pusat',         color: 'light-blue', hex: '#1E88E5' },
+  other_aid_submission:      { id: 'other_aid_submission',      phase: 'coordination',  name: 'Pengajuan Bantuan Lainnya',       color: 'light-blue', hex: '#1E88E5' },
+
+  // coordination (penetapan bantuan)
+  regency_aid_determination:    { id: 'regency_aid_determination',    phase: 'coordination', name: 'Penetapan Bantuan Kabupaten/Kota', color: 'purple', hex: '#691B9A' },
+  provincial_aid_determination: { id: 'provincial_aid_determination', phase: 'coordination', name: 'Penetapan Bantuan Provinsi',        color: 'purple', hex: '#691B9A' },
+  central_aid_determination:    { id: 'central_aid_determination',    phase: 'coordination', name: 'Penetapan Bantuan Pusat',           color: 'purple', hex: '#691B9A' },
+  other_aid_determination:      { id: 'other_aid_determination',      phase: 'coordination', name: 'Penetapan Bantuan Lainnya',         color: 'purple', hex: '#691B9A' },
+
+  // coordination (akhir)
+  rutilahu_repair_process: { id: 'rutilahu_repair_process', phase: 'coordination', name: 'Proses Perbaikan Rutilahu', color: 'light-blue', hex: '#1E88E5' },
+  aid_received:            { id: 'aid_received',            phase: 'coordination', name: 'Telah Menerima Bantuan',    color: 'green',      hex: '#166534' },
 }
 
 /** Fallback aman untuk status yang tidak dikenal */

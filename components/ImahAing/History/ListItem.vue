@@ -6,15 +6,15 @@
     <!-- Checkbox — large tap target (44px) for mobile, stop propagation agar tidak trigger klik item -->
     <label
       class="relative flex items-center justify-center w-11 h-11 -ml-2 -mt-2 flex-shrink-0"
-      :class="isVerified ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
+      :class="isNonEditable ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
       @click.stop
     >
       <input
         type="checkbox"
         :checked="selected"
-        :disabled="isVerified"
+        :disabled="isNonEditable"
         class="w-5 h-5 rounded border-gray-300 text-[#069550] focus:ring-[#069550] focus:ring-2"
-        :class="isVerified ? 'cursor-not-allowed' : 'cursor-pointer'"
+        :class="isNonEditable ? 'cursor-not-allowed' : 'cursor-pointer'"
         @change="$emit('toggle')"
       />
     </label>
@@ -106,7 +106,7 @@ export default {
     }
   },
   computed: {
-    /** Kunci status — satu sumber untuk isVerified dan statusStyle */
+    /** Kunci status — satu sumber untuk isNonEditable dan statusStyle */
     statusKey() {
       return this.item.complaint_status?.id
         || this.item.complaint_status_id
@@ -114,8 +114,8 @@ export default {
         || this.item.status
         || ''
     },
-    isVerified() {
-      return this.statusKey === 'verified'
+    isNonEditable() {
+      return !['unverified', 'rejected_appeal'].includes(this.statusKey)
     },
     /** Objek style guide (name + hex) dari mapping 13 status */
     statusStyle() {
