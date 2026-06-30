@@ -117,7 +117,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { newDataStatusMilestone } from '~/constant/status-milestone'
+import { getImahAingStatus } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryPreviewModal',
@@ -166,23 +166,15 @@ export default {
       return Array.isArray(photos) ? photos : []
     },
     statusLabel() {
-      // detail response: complaint_status.name (ready-to-display) or complaint_status_id (key)
-      // list response: phase or status (key)
       if (this.resolvedItem?.complaint_status?.name) {
         return this.resolvedItem.complaint_status.name
       }
-      const phase =
+      const key =
         this.resolvedItem?.complaint_status_id ||
         this.resolvedItem?.phase ||
         this.resolvedItem?.status ||
         ''
-      const mapping = {
-        unverified: 'Menunggu Verifikasi',
-        verified: 'Terverifikasi',
-        failed: 'Gagal Diverifikasi',
-        directed_to_hotline_jabar: 'Dialihkan ke Hotline Jabar',
-      }
-      return newDataStatusMilestone[phase]?.name || mapping[phase] || phase || '-'
+      return getImahAingStatus(key).name
     },
     formattedDate() {
       const date = this.resolvedItem?.created_at || this.resolvedItem?.submitted_at || ''
