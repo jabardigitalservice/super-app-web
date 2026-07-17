@@ -87,6 +87,9 @@ const getDefaultState = () => ({
 
   /** ID usulan yang sedang diedit (mode edit via query param `edit`) */
   editComplaintId: '',
+
+  /** Token user Sapawarga dari query `meta` — dipakai khusus submit mode edit (PUT /mobile) */
+  metaToken: '',
 })
 
 const USER_INCOME_PER_MONTH_KEY = 'user_income_per_month'
@@ -351,6 +354,9 @@ export default {
     SET_EDIT_COMPLAINT_ID(state, id) {
       state.editComplaintId = id || ''
     },
+    SET_META_TOKEN(state, token) {
+      state.metaToken = token || ''
+    },
     RESET_STATE(state) {
       const def = getDefaultState()
       Object.keys(def).forEach((k) => {
@@ -372,6 +378,9 @@ export default {
           applyQueryMetaToDataPengusul(commit, decoded)
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
+          if (decoded.token) {
+            commit('SET_META_TOKEN', String(decoded.token).trim())
+          }
         }
       }
     },
@@ -773,7 +782,7 @@ export default {
         throw error
       }
     },
-    async submitForm({ commit, state }) {
+    async submitForm({ commit, state, rootState }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
         const docMapping = [
@@ -837,12 +846,14 @@ export default {
           RW: String(rw || ''),
         }
 
-        // Mode edit (US-013): PUT update ke endpoint /mobile
-        // Mode buat baru: POST create
+        // Mode edit (US-013): PUT update ke endpoint /mobile — pakai token user Sapawarga dari
+        // query `meta`, BUKAN token Keycloak client_credentials (kebutuhan integrasi backend).
+        // Mode buat baru: POST create tetap pakai authToken Keycloak.
         const isEdit = !!state.editComplaintId
-        const headers = state.authToken
-          ? { Authorization: `Bearer ${state.authToken}` }
-          : {}
+        const metaToken = state.metaToken || rootState.imahAingHistory?.metaPayload?.token || ''
+        const headers = isEdit
+          ? (metaToken ? { Authorization: `Bearer ${metaToken}` } : {})
+          : (state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
 
         const sendComplaint = () =>
           isEdit
