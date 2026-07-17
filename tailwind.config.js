@@ -22,6 +22,22 @@ module.exports = {
         white: '#FFF',
         black: '#000',
         background: '#EFF2F3',
+        'jalan-aing': {
+          primary: '#1565C0',
+          'primary-dark': '#0D47A1',
+          'primary-soft': '#EFF6FF',
+          'primary-border': '#BFDBFE',
+          ink: '#022B55',
+          'ink-soft': '#133C6B',
+          green: '#069550',
+          'green-dark': '#008444',
+          yellow: '#FFC800',
+          'yellow-soft': '#FFF9E1',
+          blue: '#415C84',
+          muted: '#627798',
+          mist: '#F7F8F6',
+          border: '#E3E7ED'
+        },
         red: {
           50: '#FFEBEE',
           100: '#FFCDD2',
