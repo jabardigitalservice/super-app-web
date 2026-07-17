@@ -20,7 +20,7 @@
       <ol class="list-decimal ml-5 space-y-1">
         <li>Kartu Tanda Penduduk Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
         <li>Kartu Keluarga Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
-        <li>Surat Keterangan Miskin / Tidak Mampu dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
+        <li>Surat Keterangan Miskin / Tidak Mampu dari Ketua RT/RW;</li>
         <li>Surat Keterangan Kepemilikan Tanah dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
         <li>Foto Rumah Tidak Layak (Tampak depan, kiri, kanan, belakang, dalam)</li>
       </ol>
