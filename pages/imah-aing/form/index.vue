@@ -132,7 +132,7 @@
       name-icon="check-mark-circle"
       size="16px"
       :description="successDescription"
-      @close="handleCloseAfterSuccess"
+      @close="handleReturnToList"
       @click="backToFormPage"
     />
 
@@ -157,7 +157,7 @@
       size="16px"
       description="Maaf, sesi Anda telah habis. Untuk melanjutkan, silakan masuk kembali dan kirim ulang pengajuan Anda."
       @close="handleSessionExpired"
-      @click="handleSessionExpired"
+      @click="handleReturnToList"
     />
   </div>
 </template>
@@ -368,7 +368,7 @@ export default {
         this.isLoading = false
       }, 1500)
     },
-    handleCloseAfterSuccess() {
+    handleReturnToList() {
       const { id, nomorKk } = this.$store.state.imahAingForm.dataPengusul || {}
       if (id || nomorKk) {
         this.$router.push({
