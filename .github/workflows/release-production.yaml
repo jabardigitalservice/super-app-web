@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+env: 
+  SERVICE_NAME: web # superapp-web
+
 jobs:
   build-push-deploy-production:
     runs-on: ubuntu-latest
@@ -111,8 +114,9 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq -i '.spec.template.spec.containers[0].image = "${{
-            secrets.SERVICE_IMAGENAME }}:${{ env.version }}"'
+            env.SERVICE_NAME }}:${{ env.version }}"'
             'jds-terraform-gke/k8s/superapp/production/web/deployment.yaml'
+                               
 
       - name: 🚀 GitOps ArgoCD Create MR & Release to Production 🚀
         id: create_mr
