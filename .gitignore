@@ -89,5 +89,13 @@ sw.*
 # macOS
 .DS_Store
 
+# Local agent skills
+.agents/
+
+# Local Hallmark design artifacts
+design.md
+.hallmark/
+skills-lock.json
+
 # Vim swap files
 *.swp

@@ -19,7 +19,7 @@
           placeholder="Masukan ID Aduan"
         >
           <template #prefix-icon>
-            <jds-icon name="magnifier" size="1em" fill="#bdbdbd" />
+            <jds-icon name="magnifier" size="1em" fill="#64748B" />
           </template>
         </JdsInputText>
       </ValidationProvider>

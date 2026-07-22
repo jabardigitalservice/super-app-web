@@ -10,7 +10,7 @@
         </svg>
         <Icon v-else name="info-circle-outline" size="18px" />
         {{ mobileOpen ? 'Layer & Filter OPD Sektoral' : 'Layer OPD Sektoral' }}
-        <button v-if="mobileOpen" type="button" class="ml-auto rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup layer" @pointerdown.stop @click="$emit('close')">
+        <button v-if="mobileOpen" type="button" class="ml-auto rounded-lg p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup layer" @pointerdown.stop @click="$emit('close')">
           <Icon name="times" size="18px" />
         </button>
       </h2>
@@ -32,10 +32,11 @@
           <div v-for="item in section.items" :key="item.id" class="space-y-2">
             <div class="flex items-center justify-between gap-3">
               <span class="font-medium text-slate-600" :class="mobileOpen ? 'text-base' : 'text-xs'">{{ item.label }}</span>
-              <button type="button" class="rounded-md p-1.5 transition" :class="layerVisibility[item.id] ? 'bg-jalan-aing-primary-soft text-jalan-aing-primary' : 'text-slate-400 hover:text-slate-600'" :aria-label="`${layerVisibility[item.id] ? 'Sembunyikan' : 'Tampilkan'} ${item.label}`" @click="toggleLayer(item.id)">
+              <button type="button" class="rounded-md p-1.5 transition" :disabled="!dataAvailability[item.id]" :class="!dataAvailability[item.id] ? 'cursor-not-allowed text-slate-300' : layerVisibility[item.id] ? 'bg-jalan-aing-primary-soft text-jalan-aing-primary' : 'text-slate-500 hover:text-slate-600'" :aria-label="dataAvailability[item.id] ? `${layerVisibility[item.id] ? 'Sembunyikan' : 'Tampilkan'} ${item.label}` : `${item.label} belum tersedia`" @click="toggleLayer(item.id)">
                 <Icon :name="layerVisibility[item.id] ? 'eye' : 'eye-off'" :size="mobileOpen ? '22px' : '16px'" />
               </button>
             </div>
+            <p v-if="!dataAvailability[item.id]" class="text-[11px] text-slate-400">Data belum tersedia dari OPD</p>
 
             <div v-if="item.id === 'apj' && layerVisibility[item.id]" class="grid grid-cols-3 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
               <button v-for="status in apjStatuses" :key="status" type="button" class="rounded py-1 font-medium capitalize transition" :class="[filterStatus.apjStatus === status ? 'bg-amber-500 font-bold text-white' : 'text-slate-500 hover:bg-white', mobileOpen ? 'py-2 text-sm' : 'text-xs']" @click="updateFilter('apjStatus', status)">{{ status }}</button>
@@ -45,16 +46,6 @@
               <button v-for="status in cctvStatuses" :key="status" type="button" class="rounded py-1 font-medium capitalize transition" :class="[filterStatus.cctvStatus === status ? 'bg-jalan-aing-primary font-bold text-white' : 'text-slate-500 hover:bg-white', mobileOpen ? 'py-2 text-sm' : 'text-xs']" @click="updateFilter('cctvStatus', status)">{{ status }}</button>
             </div>
 
-            <JdsSelect
-              v-if="item.id === 'ruasJalan' && layerVisibility[item.id]"
-              :value="filterStatus.roadCondition"
-              class="w-full"
-              value-key="value"
-              label-key="label"
-              :options="roadConditions"
-              placeholder="Pilih kondisi jalan"
-              @change="updateFilter('roadCondition', $event)"
-            />
           </div>
           </div>
         </transition>
@@ -80,6 +71,7 @@ export default {
     mobileOpen: { type: Boolean, default: false },
     layerVisibility: { type: Object, required: true },
     filterStatus: { type: Object, required: true },
+    dataAvailability: { type: Object, required: true },
   },
   data() {
     return {
@@ -90,22 +82,14 @@ export default {
       openSections: { dishub: true, dinkes: false, bpbd: false, satpol: false, dbmpr: true },
       apjStatuses: ['semua', 'aktif', 'mati'],
       cctvStatuses: ['semua', 'online', 'offline'],
-      roadConditions: [
-        { value: 'semua', label: 'Semua Kondisi' },
-        { value: 'baik', label: 'Kondisi Baik' },
-        { value: 'rusak_ringan', label: 'Rusak Ringan' },
-        { value: 'rusak_sedang', label: 'Rusak Sedang' },
-        { value: 'rusak_berat', label: 'Rusak Berat' },
-      ],
       sections: [
         { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'apj', label: 'Penerangan Jalan (APJ)' }, { id: 'cctv', label: 'CCTV Lalu Lintas' }, { id: 'metro', label: 'Metro Jabar Trans' }] },
         { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-emerald-500', items: [{ id: 'faskes', label: 'Fasilitas Kesehatan' }] },
         { id: 'bpbd', label: 'Penanggulangan Bencana (BPBD)', color: 'bg-red-500', items: [{ id: 'bencana', label: 'Titik Rawan Bencana' }] },
         { id: 'satpol', label: 'Satuan Polisi Pamong Praja', color: 'bg-indigo-500', items: [{ id: 'karesidenan', label: 'Pos Karesidenan' }] },
-        { id: 'dbmpr', label: 'Bina Marga (DBMPR)', color: 'bg-jalan-aing-primary', items: [{ id: 'ruasJalan', label: 'Kondisi Ruas Jalan' }, { id: 'aduanPublik', label: 'Aduan Publik Aktif' }] },
       ],
       legendItems: [
-        { label: 'Baik / Mantap', color: 'bg-green-500' },
+        { label: 'Baik / Mantap', color: 'bg-jalan-aing-primary' },
         { label: 'Rusak Ringan', color: 'bg-yellow-500' },
         { label: 'Rusak Sedang', color: 'bg-orange-500' },
         { label: 'Rusak Berat', color: 'bg-red-500' },

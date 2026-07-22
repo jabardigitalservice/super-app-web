@@ -14,7 +14,7 @@
 
         <div class="flex gap-4 p-5">
           <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-jalan-aing-primary-soft">
-            <Icon :name="nameIcon" :size="size || '24px'" :class="nameIcon === 'warning' ? 'text-red-500' : 'text-jalan-aing-primary'" />
+            <Icon :name="nameIcon" :size="size || '24px'" :class="nameIcon === 'warning' ? 'text-red-700' : 'text-jalan-aing-primary'" />
           </div>
           <div>
             <h3 id="jalan-aing-location-dialog-title" class="text-lg font-bold leading-6 text-jalan-aing-ink">{{ title }}</h3>

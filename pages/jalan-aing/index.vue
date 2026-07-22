@@ -1,14 +1,14 @@
 <template>
-  <div class="jalan-aing-page min-h-screen overflow-x-hidden bg-slate-50 font-lato text-slate-800">
+  <div class="jalan-aing-page min-h-screen overflow-x-clip bg-slate-50 font-lato text-slate-800">
     <div v-if="notification" class="fixed left-1/2 top-20 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-blue-400/30 bg-jalan-aing-primary px-4 py-2.5 text-xs font-bold text-white shadow-lg">
       <Icon name="check-mark" size="14px" />
       {{ notification }}
     </div>
 
-    <header class="fixed left-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur-md sm:px-6">
+    <header class="fixed left-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
       <div class="flex items-center gap-4 sm:gap-8">
-        <a href="#beranda" class="group flex items-center gap-3 transition-all active:scale-95">
-          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-jalan-aing-primary text-xs font-bold text-white shadow-lg shadow-blue-500/10"><span class="md:hidden"><Icon name="home-outline" size="22px" /></span><span class="hidden md:inline">JA</span></span>
+        <a href="#beranda" class="group flex items-center gap-3 transition-transform active:scale-95">
+          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-jalan-aing-primary text-xs font-bold text-white"><span class="md:hidden"><Icon name="home-outline" size="22px" /></span><span class="hidden md:inline">JA</span></span>
           <span class="text-left">
             <span class="block text-base font-bold leading-none tracking-tight transition-colors group-hover:text-jalan-aing-primary">Jalan Aing</span>
             <span class="mt-1 block text-xs font-bold uppercase leading-none tracking-wider text-slate-400">Web GIS Jabar</span>
@@ -16,24 +16,24 @@
         </a>
 
         <nav class="hidden items-center gap-1.5 md:flex">
-          <a v-for="item in navItems" :key="item.id" :href="`#${item.id}`" class="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all" :class="activeTab === item.id ? 'bg-jalan-aing-primary text-white shadow-md shadow-blue-500/10' : 'text-slate-500 hover:bg-slate-50 hover:text-jalan-aing-primary'">
+          <a v-for="item in navItems" :key="item.id" :href="`#${item.id}`" class="border-b-2 px-3 py-2 text-xs font-bold transition" :class="activeTab === item.id ? 'border-jalan-aing-primary text-jalan-aing-primary' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-jalan-aing-primary'">
             {{ item.label }}
           </a>
         </nav>
       </div>
 
       <div class="flex items-center gap-3 sm:gap-4">
-        <div class="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-500 lg:flex"><span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Layanan GIS Aktif</div>
-        <button type="button" class="rounded-full p-1.5 text-slate-400 transition-all hover:bg-slate-50 hover:text-jalan-aing-primary" title="Pusat Bantuan" @click="showNotification('Layanan Informasi Jalan Provinsi Jawa Barat')">
+        <div class="hidden items-center gap-2 text-xs font-bold text-slate-500 lg:flex"><span class="h-1.5 w-1.5 rounded-full bg-jalan-aing-primary" /> Layanan GIS</div>
+        <button type="button" class="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-50 hover:text-jalan-aing-primary" title="Pusat Bantuan" @click="showNotification('Layanan Informasi Jalan Provinsi Jawa Barat')">
           <span class="md:hidden"><Icon name="question-mark-circle-outline" size="22px" /></span><span class="hidden md:inline"><Icon name="info-circle-outline" size="18px" /></span>
         </button>
       </div>
     </header>
 
     <main class="min-h-[calc(100vh-64px)] flex-grow pb-20 pt-16 md:pb-0">
-      <JalanAingHomePage v-if="activeTab === 'beranda'" :statistics="statistics" @open-map="selectTab('peta')" @open-complaint="selectTab('aduan')" />
-      <JalanAingInteractiveMapPage v-else-if="activeTab === 'peta'" :layer-visibility="layerVisibility" :filter-status="filterStatus" :mobile-layer-open="mobileLayerOpen" @toggle-layer="handleLayerToggle" @update-filter="handleFilterUpdate" @notify="showNotification" @close-layer="mobileLayerOpen = false" @create-complaint="selectTab('aduan')" />
-      <JalanAingComplaintPage v-else-if="activeTab === 'aduan'" :complaint-steps="complaintSteps" @track="trackSubmittedTicket" />
+      <JalanAingHomePage v-if="activeTab === 'beranda'" @open-map="selectTab('peta')" @open-complaint="selectTab('aduan')" />
+      <JalanAingInteractiveMapPage v-else-if="activeTab === 'peta'" :layer-visibility="layerVisibility" :filter-status="filterStatus" :data-availability="dataAvailability" :mobile-layer-open="mobileLayerOpen" @toggle-layer="handleLayerToggle" @update-filter="handleFilterUpdate" @data-status="updateDataAvailability" @notify="showNotification" @close-layer="mobileLayerOpen = false" @create-complaint="openComplaintForm" />
+      <JalanAingComplaintPage v-else-if="activeTab === 'aduan'" :complaint-steps="complaintSteps" :location="complaintLocation" @track="trackSubmittedTicket" />
       <JalanAingTrackingPage v-else-if="activeTab === 'lacak'" v-model="trackingNumber" @submit="openTracking" />
     </main>
 
@@ -43,7 +43,7 @@
           <Icon :name="item.icon" size="24px" />
           <span class="mt-0.5 text-[9px] font-extrabold uppercase tracking-wider">{{ item.label }}</span>
         </button>
-        <a v-else :key="item.id" :href="`#${item.id}`" :aria-current="activeTab === item.id ? 'page' : undefined" class="flex h-full flex-1 flex-col items-center justify-center py-2 transition-all" :class="activeTab === item.id ? 'font-bold text-jalan-aing-primary' : 'text-slate-400'" @click="mobileLayerOpen = false">
+        <a v-else :key="item.id" :href="`#${item.id}`" :aria-current="activeTab === item.id ? 'page' : undefined" class="flex h-full flex-1 flex-col items-center justify-center py-2 transition-colors" :class="activeTab === item.id ? 'font-bold text-jalan-aing-primary' : 'text-slate-500'" @click="mobileLayerOpen = false">
           <Icon v-if="item.iconSrc" :src="item.iconSrc" size="18px" />
           <Icon v-else :name="item.icon" size="18px" />
           <span class="mt-1 text-xs font-bold tracking-wide">{{ item.label }}</span>
@@ -63,7 +63,9 @@ export default {
       notification: '',
       notificationTimer: null,
       trackingNumber: '',
-      layerVisibility: { apj: true, cctv: true, metro: true, faskes: true, bencana: true, karesidenan: true, ruasJalan: true, aduanPublik: true },
+      complaintLocation: null,
+      layerVisibility: { apj: true, cctv: true, metro: true, faskes: true, bencana: true, karesidenan: true },
+      dataAvailability: { apj: false, cctv: false, metro: false, faskes: false, bencana: false, karesidenan: false },
       filterStatus: { apjStatus: 'semua', cctvStatus: 'semua', roadCondition: 'semua' },
       navItems: [
         { id: 'beranda', label: 'Beranda' },
@@ -77,12 +79,6 @@ export default {
         { id: 'layer', label: 'Layer', icon: 'filter' },
         { id: 'aduan', label: 'Lapor', icon: 'pencil-outline' },
         { id: 'lacak', label: 'Lacak', icon: 'magnifier' },
-      ],
-      statistics: [
-        { value: '1,248', unit: 'KM', label: 'Ruas Jalan Provinsi', note: 'Terpantau secara periodik', icon: 'arrow-top-right', iconClass: 'bg-blue-50 text-jalan-aing-primary' },
-        { value: '450', unit: 'Titik', label: 'CCTV Arus Lalu Lintas', note: 'Pemantauan aktif 24/7', icon: 'eye', iconClass: 'bg-blue-50 text-jalan-aing-primary' },
-        { value: '12,300', unit: 'Unit', label: 'Aset Penerangan Jalan', note: 'Status lampu APJ aktif', icon: 'night-outline', iconClass: 'bg-amber-50 text-amber-600' },
-        { value: '98%', unit: '', label: 'Aduan Terselesaikan', note: 'Solusi cepat dinas lapangan', icon: 'check-mark-circle', iconClass: 'bg-emerald-50 text-emerald-600', highlight: true },
       ],
       complaintSteps: ['Pilih Kategori', 'Detail & Foto', 'Data Pelapor'],
     }
@@ -99,6 +95,10 @@ export default {
     selectTab(tab) {
       this.mobileLayerOpen = false
       window.location.hash = tab
+    },
+    openComplaintForm(location) {
+      this.complaintLocation = location || null
+      this.selectTab('aduan')
     },
     openMobileLayer() {
       this.selectTab('peta')
@@ -120,6 +120,9 @@ export default {
     },
     handleFilterUpdate({ key, value }) {
       if (key in this.filterStatus) this.filterStatus[key] = value
+    },
+    updateDataAvailability(payload) {
+      this.dataAvailability = { ...this.dataAvailability, ...payload }
     },
     openTracking() {
       if (!this.trackingNumber.trim()) {
