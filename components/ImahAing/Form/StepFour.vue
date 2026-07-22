@@ -145,7 +145,9 @@
         </section>
 
         <ValidationProvider
+          ref="locationProvider"
           v-slot="{ errors }"
+          rules="required"
           class="flex flex-col gap-2"
           name="Titik Lokasi Tanah"
         >
@@ -153,10 +155,7 @@
             for="location"
             class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
-            Titik Lokasi Tanah
-            <span class="text-gray-300 dark:text-dark-emphasis-high">
-              (opsional)
-            </span>
+            Titik Lokasi Tanah <span class="text-red-500">*</span>
           </label>
           <JdsInputText
             id="location"
@@ -182,6 +181,8 @@
         </ValidationProvider>
 
         <ValidationProvider
+          v-slot="{ errors }"
+          rules="required"
           class="flex flex-col gap-2"
           name="Detail Lokasi Tambahan"
         >
@@ -189,10 +190,7 @@
             for="additionalLocation"
             class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
           >
-            Detail lokasi tambahan
-            <span class="text-gray-300 dark:text-dark-emphasis-high">
-              (opsional)
-            </span>
+            Detail Alamat <span class="text-red-500">*</span>
           </label>
           <textarea
             id="additionalLocation"
@@ -205,6 +203,9 @@
           />
           <p class="text-xs text-left text-gray-600">
             Tersisa {{ 1000 - setValueAddressDetail.length }} karakter
+          </p>
+          <p v-if="errors[0]" class="text-xs text-left text-red-500">
+            {{ errors[0] }}
           </p>
         </ValidationProvider>
       </section>
@@ -410,6 +411,9 @@ export default {
         value: { ...this.cloneLocation.place },
       })
       this.closeMaps()
+      this.$nextTick(() => {
+        this.$refs.locationProvider?.validate()
+      })
     },
     setDusun(value) {
       this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
