@@ -17,10 +17,13 @@
 
 <script>
 import 'leaflet/dist/leaflet.css'
+import { csvRecords } from '~/utils/jalan-aing-csv'
+
+const ROAD_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1JSiHBGrGJztFuPgyYtkYJ3s8yTZPfEYnqKYrocUpN0w/gviz/tq?tqx=out:csv&gid=1884441526'
 
 const LEAFLET_MAP_CONFIG = Object.freeze({
   center: [-6.9175, 107.6191],
-  zoom: 10,
+  zoom: 9,
   minZoom: 7,
   maxZoom: 19,
   basemaps: {
@@ -28,21 +31,23 @@ const LEAFLET_MAP_CONFIG = Object.freeze({
       label: 'Light',
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; OpenStreetMap contributors',
-      previewClass: 'bg-[linear-gradient(135deg,#dbeafe_25%,#f8fafc_25%,#f8fafc_50%,#bfdbfe_50%,#bfdbfe_75%,#f8fafc_75%)] bg-[length:18px_18px]',
     },
     satellite: {
       label: 'Satellite',
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       attribution: 'Tiles &copy; Esri',
-      previewClass: 'bg-[linear-gradient(135deg,#365314,#65a30d,#14532d,#166534)]',
     },
     dark: {
       label: 'Dark',
       url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
       attribution: '&copy; OpenStreetMap &copy; CARTO',
-      previewClass: 'bg-[linear-gradient(135deg,#020617,#334155,#0f172a,#475569)]',
     },
   },
+})
+
+const MAP_COLORS = Object.freeze({
+  primary: '#008444',
+  primarySoft: '#C3E9D0',
 })
 
 export default {
@@ -52,6 +57,7 @@ export default {
       type: Object,
       required: true,
     },
+    filterStatus: { type: Object, required: true },
   },
   data() {
     return {
@@ -62,6 +68,7 @@ export default {
       layerGroups: {},
       markerLayers: [],
       pendingLocate: false,
+      roads: [],
     }
   },
   watch: {
@@ -71,12 +78,16 @@ export default {
         this.syncLayers(value)
       },
     },
+    filterStatus: {
+      deep: true,
+      handler() { this.renderRoads() },
+    },
   },
   async mounted() {
     this.mapConfig = this.readMapConfig()
     const module = await import('leaflet')
     this.leaflet = module.default || module
-    this.initMap()
+      this.initMap()
   },
   beforeDestroy() {
     if (this.map) {
@@ -114,6 +125,8 @@ export default {
       })
       this.setBasemap(config.basemap)
       this.createDataLayers()
+      this.map.on('click', (event) => this.$emit('create-complaint', event.latlng))
+      if (this.layerVisibility.ruasJalan) this.loadRoads()
       this.syncLayers(this.layerVisibility)
       if (this.pendingLocate) {
         this.pendingLocate = false
@@ -134,6 +147,54 @@ export default {
       const L = this.leaflet
       this.layerGroups = Object.fromEntries(Object.keys(this.layerVisibility).map((id) => [id, L.layerGroup()]))
       this.markerLayers = []
+    },
+    async loadRoads() {
+      try {
+        const response = await fetch(ROAD_SHEET_URL)
+        if (!response.ok) throw new Error('Master data ruas jalan tidak tersedia')
+        this.roads = csvRecords(await response.text()).map((road, index) => ({
+          id: `${road.No || index}-${road['Nomor Ruas Jalan'] || ''}`,
+          name: road['Nama Ruas Jalan'], number: road['Nomor Ruas Jalan'], city: road['Nama Kabupaten / Kota'],
+          condition: road['Kondisi Jalan'], surface: road['Jenis Permukaan'], length: road['Panjang Ruas Jalan'],
+          from: [Number(road['Latitude Awal']), Number(road['Longitude Awal'])], to: [Number(road['Latitude Akhir']), Number(road['Longitude Akhir'])],
+        })).filter((road) => road.name && road.from.every(Number.isFinite) && road.to.every(Number.isFinite))
+        this.renderRoads()
+        this.$emit('data-status', { ruasJalan: this.roads.length > 0 })
+      } catch (error) {
+        this.$emit('data-status', { ruasJalan: false })
+        this.$emit('notify', 'Data ruas jalan belum dapat dimuat')
+      }
+    },
+    roadColor(condition) {
+      return ({ baik: '#008444', ringan: '#CA8A04', sedang: '#EA580C', berat: '#D32F2F' })[(condition || '').toLowerCase()] || '#64748B'
+    },
+    renderRoads() {
+      const layer = this.layerGroups.ruasJalan
+      if (!layer || !this.leaflet) return
+      layer.clearLayers()
+      const condition = this.filterStatus.roadCondition
+      this.roads.filter((road) => condition === 'semua' || road.condition.toLowerCase().includes(condition.replace('rusak_', ''))).forEach((road) => {
+        const line = this.leaflet.polyline([road.from, road.to], { color: this.roadColor(road.condition), weight: 4, opacity: 0.85 })
+        line.bindPopup(this.roadPopup(road))
+        line.on('click', () => this.$emit('select-marker', { type: 'Ruas Jalan', label: road.name, ...road }))
+        layer.addLayer(line)
+      })
+      this.syncLayers(this.layerVisibility)
+    },
+    roadPopup(road) {
+      const safe = (value) => String(value || '—').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character])
+      return `<strong>${safe(road.name)}</strong><br>Ruas: ${safe(road.number)}<br>Kab/Kota: ${safe(road.city)}<br>Kondisi: ${safe(road.condition)}<br>Permukaan: ${safe(road.surface)}<br>Panjang: ${safe(road.length)} m`
+    },
+    search(query) {
+      const term = query.trim().toLowerCase()
+      const results = term ? this.roads.filter((road) => `${road.name} ${road.city}`.toLowerCase().includes(term)).slice(0, 6) : []
+      this.$emit('search-results', results)
+    },
+    focusRoad(id) {
+      const road = this.roads.find((item) => item.id === id)
+      if (!road || !this.map) return
+      const bounds = this.leaflet.latLngBounds([road.from, road.to])
+      this.map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
     },
     syncLayers(visibility) {
       if (!this.map) return
@@ -173,7 +234,7 @@ export default {
       }
       this.map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true })
         .once('locationfound', (event) => {
-          const locationCircle = this.leaflet.circle(event.latlng, { radius: event.accuracy, color: '#1565C0', fillColor: '#60A5FA', fillOpacity: 0.2 }).addTo(this.map)
+          const locationCircle = this.leaflet.circle(event.latlng, { radius: event.accuracy, color: MAP_COLORS.primary, fillColor: MAP_COLORS.primarySoft, fillOpacity: 0.2 }).addTo(this.map)
           this.animatePoint(locationCircle)
           this.$emit('location-found', event.latlng)
         })

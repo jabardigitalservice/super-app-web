@@ -59,7 +59,7 @@
                   v-show="isSelected(item.value)"
                   name="check-mark-circle"
                   size="16px"
-                  class="text-green-600"
+                  class="text-jalan-aing-primary"
                 />
               </div>
             </div>

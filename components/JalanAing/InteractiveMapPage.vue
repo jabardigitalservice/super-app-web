@@ -1,31 +1,40 @@
 <template>
   <section class="relative flex h-[calc(100vh-144px)] min-h-0 flex-row overflow-hidden font-lato md:h-[calc(100vh-64px)]">
     <button v-if="mobileLayerOpen" type="button" class="fixed inset-0 z-[700] bg-slate-900/45 backdrop-blur-sm md:hidden" aria-label="Tutup panel layer" @click="$emit('close-layer')" />
-    <JalanAingLayerPanel :mobile-open="mobileLayerOpen" :layer-visibility="layerVisibility" :filter-status="filterStatus" @toggle-layer="$emit('toggle-layer', $event)" @update-filter="$emit('update-filter', $event)" @close="$emit('close-layer')" />
+    <JalanAingLayerPanel :mobile-open="mobileLayerOpen" :layer-visibility="layerVisibility" :filter-status="filterStatus" :data-availability="dataAvailability" @toggle-layer="$emit('toggle-layer', $event)" @update-filter="$emit('update-filter', $event)" @close="$emit('close-layer')" />
 
     <div class="relative min-h-[560px] min-w-0 flex-1 overflow-hidden">
       <JalanAingLeafletMap
         ref="leafletMap"
         :layer-visibility="layerVisibility"
+        :filter-status="filterStatus"
         @select-marker="selectMarker"
+        @create-complaint="$emit('create-complaint', $event)"
         @toggle-layer="$emit('toggle-layer', $event)"
         @location-found="handleLocationFound"
         @location-error="handleLocationError"
         @notify="$emit('notify', $event)"
+        @data-status="$emit('data-status', $event)"
+        @search-results="searchResults = $event"
       />
 
       <form class="absolute left-4 right-4 top-4 z-[600] flex h-12 items-center gap-2 rounded-xl border-2 border-jalan-aing-primary bg-white px-3 shadow-lg md:hidden" @submit.prevent="submitSearch">
-        <Icon name="magnifier" size="18px" class="shrink-0 text-slate-400" aria-hidden="true" />
+        <Icon name="magnifier" size="18px" class="shrink-0 text-slate-500" aria-hidden="true" />
         <input v-model="searchQuery" type="search" aria-label="Cari lokasi" placeholder="Cari jalan, faskes, CCTV..." class="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400">
       </form>
+      <div v-if="searchResults.length" class="absolute left-4 right-4 top-20 z-[600] max-w-md overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+        <button v-for="road in searchResults" :key="road.id" type="button" class="block w-full border-b border-slate-100 px-4 py-3 text-left text-sm last:border-b-0 hover:bg-jalan-aing-primary-soft" @click="selectSearchResult(road)">
+          <span class="block font-bold text-slate-800">{{ road.name }}</span><span class="text-xs text-slate-500">{{ road.city }}</span>
+        </button>
+      </div>
 
       <div v-if="selectedMarker" class="absolute bottom-4 left-4 right-4 z-[600] max-w-sm rounded-3xl border border-slate-200 bg-white/95 p-5 text-slate-800 shadow-2xl backdrop-blur-lg">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ selectedMarker.type }}</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ selectedMarker.type }}</span>
           <h3 class="mt-1 text-sm font-bold">{{ selectedMarker.label }}</h3>
         </div>
-        <button type="button" class="text-slate-400 hover:text-slate-700" aria-label="Tutup detail marker" @click="selectedMarker = null"><Icon name="times" size="16px" /></button>
+        <button type="button" class="text-slate-500 hover:text-slate-700" aria-label="Tutup detail marker" @click="selectedMarker = null"><Icon name="times" size="16px" /></button>
       </div>
       <p class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
         Data layer ini mengikuti visual prototipe Jalan Aing. Detail API dapat disambungkan setelah kontrak GIS tersedia.
@@ -64,12 +73,14 @@ export default {
   props: {
     layerVisibility: { type: Object, required: true },
     filterStatus: { type: Object, required: true },
+    dataAvailability: { type: Object, required: true },
     mobileLayerOpen: { type: Boolean, default: false },
   },
   data() {
     return {
       selectedMarker: null,
       searchQuery: '',
+      searchResults: [],
       locationPromptOpen: false,
       locationPromptTimer: null,
     }
@@ -85,8 +96,12 @@ export default {
       this.selectedMarker = marker
     },
     submitSearch() {
-      if (!this.searchQuery.trim()) return
-      this.$emit('notify', `Pencarian: ${this.searchQuery.trim()}`)
+      this.$refs.leafletMap?.search(this.searchQuery)
+      if (this.searchQuery.trim() && !this.searchResults.length) this.$emit('notify', 'Ruas jalan tidak ditemukan')
+    },
+    selectSearchResult(road) {
+      this.$refs.leafletMap?.focusRoad(road.id)
+      this.searchResults = []
     },
     async prepareLocationAccess() {
       if (!navigator.geolocation) {

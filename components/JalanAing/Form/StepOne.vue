@@ -112,11 +112,11 @@
                 isEmailValid ? 'check-mark-circle' : 'exclamation-mark-circle'
               "
               size="16px"
-              :class="isEmailValid ? 'text-green-600' : 'text-[#FF7500]'"
+              :class="isEmailValid ? 'text-jalan-aing-primary' : 'text-[#FF7500]'"
             />
             <span
               class="font-lato text-[13px] self-center"
-              :class="isEmailValid ? 'text-green-600' : 'text-[#FF7500]'"
+              :class="isEmailValid ? 'text-jalan-aing-primary' : 'text-[#FF7500]'"
             >
               {{
                 isEmailValid

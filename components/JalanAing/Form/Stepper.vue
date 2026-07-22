@@ -29,7 +29,7 @@
       </h2>
       <span class="w-6 h-6 flex items-center justify-start">
         <!-- TODO: ADD ARROW JSA -->
-        <Icon name="chevron-right" class="text-gray-400" size="12px" />
+        <Icon name="chevron-right" class="text-gray-600" size="12px" />
       </span>
     </li>
   </ul>

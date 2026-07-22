@@ -32,26 +32,26 @@
         <ol class="flex w-full min-w-0 items-start px-0 sm:px-2">
           <template v-for="(step, index) in complaintSteps">
             <li :key="step" class="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all" :class="currentStep > index + 1 ? 'bg-emerald-500 text-white' : currentStep === index + 1 ? 'bg-jalan-aing-primary text-white ring-4 ring-blue-100' : 'bg-slate-100 text-slate-400'">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors" :class="currentStep > index + 1 ? 'bg-jalan-aing-primary text-white' : currentStep === index + 1 ? 'bg-jalan-aing-primary text-white ring-4 ring-jalan-aing-primary-border' : 'bg-slate-100 text-slate-400'">
                 {{ currentStep > index + 1 ? '✓' : index + 1 }}
               </span>
               <span class="text-[10px] font-bold" :class="currentStep >= index + 1 ? 'text-jalan-aing-primary' : 'text-slate-400'">{{ step }}</span>
             </li>
-            <li v-if="index < complaintSteps.length - 1" :key="`${step}-connector`" class="mx-1 mt-4 h-0.5 min-w-3 flex-1" :class="currentStep > index + 1 ? 'bg-emerald-500' : 'bg-slate-200'" aria-hidden="true" />
+            <li v-if="index < complaintSteps.length - 1" :key="`${step}-connector`" class="mx-1 mt-4 h-0.5 min-w-3 flex-1" :class="currentStep > index + 1 ? 'bg-jalan-aing-primary' : 'bg-slate-200'" aria-hidden="true" />
           </template>
         </ol>
       </div>
 
       <form class="space-y-6" @submit.prevent="submitComplaint">
-        <p v-if="validationError" role="alert" class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-semibold text-red-600">
+        <p v-if="validationError" role="alert" class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-semibold text-red-700">
           <Icon name="warning" size="16px" /> {{ validationError }}
         </p>
 
         <div v-if="currentStep === 1" class="space-y-4">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Pilih Kategori Permasalahan:</h3>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-            <button v-for="category in categories" :key="category.id" type="button" class="flex min-h-[150px] flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all hover:border-slate-300 hover:bg-slate-50" :class="formData.category === category.id ? 'border-jalan-aing-primary bg-blue-50/50 ring-2 ring-blue-100' : 'border-slate-200 bg-white'" :aria-pressed="formData.category === category.id" @click="selectCategory(category.id)">
-              <span class="text-2xl" aria-hidden="true">{{ category.icon }}</span>
+            <button v-for="(category, index) in categories" :key="category.id" type="button" class="flex min-h-[132px] flex-col items-start gap-3 rounded-xl border p-4 text-left transition hover:border-jalan-aing-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary active:translate-y-px" :class="formData.category === category.id ? 'border-jalan-aing-primary bg-jalan-aing-primary-soft ring-1 ring-jalan-aing-primary-border' : 'border-slate-200 bg-white hover:bg-slate-50'" :aria-pressed="formData.category === category.id" @click="selectCategory(category.id)">
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-jalan-aing-primary-soft text-xs font-bold text-jalan-aing-primary" aria-hidden="true">{{ index + 1 }}</span>
               <span>
                 <strong class="block text-sm font-bold text-slate-800">{{ category.label }}</strong>
                 <small class="mt-0.5 block text-xs font-medium leading-relaxed text-slate-500">{{ category.description }}</small>
@@ -76,9 +76,9 @@
           <div class="space-y-2">
             <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">Bukti Foto</span>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-6 text-center transition-all hover:border-jalan-aing-primary hover:bg-blue-50/20">
+              <label class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-6 text-center transition-colors hover:border-jalan-aing-primary hover:bg-jalan-aing-primary-soft">
                 <input type="file" accept="image/jpeg,image/png" class="hidden" @change="handlePhotoUpload">
-                <span class="text-3xl text-jalan-aing-primary/70" aria-hidden="true">📷</span>
+              <Icon name="pencil-outline" size="28px" class="text-jalan-aing-primary" aria-hidden="true" />
                 <span class="text-xs font-bold text-slate-700">Unggah Foto Pendukung</span>
                 <span class="text-[10px] font-medium text-slate-400">Format JPG/PNG, Maksimal 5MB</span>
               </label>
@@ -95,8 +95,8 @@
           <fieldset class="space-y-2 border-t border-slate-100 pt-4">
             <legend class="block text-xs font-bold uppercase tracking-wider text-slate-500">Tipe Kerahasiaan Laporan</legend>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button type="button" class="rounded-xl border p-3 text-xs font-bold transition-all" :class="formData.complaintType === 'publik' ? 'border-jalan-aing-primary bg-blue-50 text-jalan-aing-primary' : 'border-slate-200 text-slate-500 hover:border-slate-300'" @click="formData.complaintType = 'publik'">Publik (Terlihat di peta)</button>
-              <button type="button" class="rounded-xl border p-3 text-xs font-bold transition-all" :class="formData.complaintType === 'privat' ? 'border-jalan-aing-primary bg-blue-50 text-jalan-aing-primary' : 'border-slate-200 text-slate-500 hover:border-slate-300'" @click="formData.complaintType = 'privat'">Privat (Rahasia)</button>
+              <button type="button" class="rounded-xl border p-3 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary" :class="formData.complaintType === 'publik' ? 'border-jalan-aing-primary bg-jalan-aing-primary-soft text-jalan-aing-primary' : 'border-slate-200 text-slate-500 hover:border-slate-300'" @click="formData.complaintType = 'publik'">Publik (Terlihat di peta)</button>
+              <button type="button" class="rounded-xl border p-3 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary" :class="formData.complaintType === 'privat' ? 'border-jalan-aing-primary bg-jalan-aing-primary-soft text-jalan-aing-primary' : 'border-slate-200 text-slate-500 hover:border-slate-300'" @click="formData.complaintType = 'privat'">Privat (Rahasia)</button>
             </div>
           </fieldset>
         </div>
@@ -114,8 +114,8 @@
           <div class="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 class="border-b border-slate-100 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">Lokasi Koordinat Terdeteksi</h3>
             <div class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs">
-              <div class="flex items-center justify-between font-medium text-slate-600"><span class="font-bold">Titik Lintang (Lat):</span><span class="font-mono font-bold text-jalan-aing-primary">-6.9175</span></div>
-              <div class="flex items-center justify-between border-t border-slate-100 pt-2 font-medium text-slate-600"><span class="font-bold">Titik Bujur (Lng):</span><span class="font-mono font-bold text-jalan-aing-primary">107.6191</span></div>
+              <div class="flex items-center justify-between font-medium text-slate-600"><span class="font-bold">Titik Lintang (Lat):</span><span class="font-mono font-bold text-jalan-aing-primary">{{ formattedLatitude }}</span></div>
+              <div class="flex items-center justify-between border-t border-slate-100 pt-2 font-medium text-slate-600"><span class="font-bold">Titik Bujur (Lng):</span><span class="font-mono font-bold text-jalan-aing-primary">{{ formattedLongitude }}</span></div>
               <div class="mt-1 flex flex-col gap-1 border-t border-slate-200 pt-2"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Alamat Geo-reverse</span><span class="text-xs italic font-medium text-slate-700">Jl. Asia Afrika No. 65, Sumur Bandung, Kota Bandung, Jawa Barat 40111</span></div>
             </div>
           </div>
@@ -148,6 +148,7 @@ export default {
   name: 'JalanAingComplaintPage',
   props: {
     complaintSteps: { type: Array, required: true },
+    location: { type: Object, default: null },
   },
   data() {
     return {
@@ -157,17 +158,25 @@ export default {
       submittedTicket: '',
       copied: false,
       categories: [
-        { id: 'jalan_berlubang', label: 'Jalan Berlubang', icon: '🕳️', description: 'Lubang atau keretakan pada aspal' },
-        { id: 'jalan_rusak', label: 'Jalan Rusak', icon: '🚧', description: 'Kerusakan struktur jalan/bergelombang' },
-        { id: 'apj_mati', label: 'APJ Mati', icon: '💡', description: 'Lampu penerangan jalan padam' },
-        { id: 'cctv_rusak', label: 'CCTV Rusak', icon: '📷', description: 'Kamera pengawas tidak aktif/mati' },
-        { id: 'genangan', label: 'Genangan Air', icon: '🌧️', description: 'Sumbatan drainase, genangan banjir' },
-        { id: 'pohon_tumbang', label: 'Pohon Tumbang', icon: '🌳', description: 'Pohon roboh menghalangi jalan' },
-        { id: 'longsor', label: 'Tanah Longsor', icon: '⛰️', description: 'Guguran tebing menutup jalan' },
-        { id: 'marka_rusak', label: 'Marka Rusak', icon: '🛣️', description: 'Garis jalan pudar atau tidak jelas' },
-        { id: 'lainnya', label: 'Darurat Lainnya', icon: '⚠️', description: 'Hambatan, kecelakaan, masalah lainnya' },
+        { id: 'jalan_berlubang', label: 'Jalan Berlubang', description: 'Lubang atau keretakan pada aspal' },
+        { id: 'jalan_rusak', label: 'Jalan Rusak', description: 'Kerusakan struktur jalan/bergelombang' },
+        { id: 'apj_mati', label: 'APJ Mati', description: 'Lampu penerangan jalan padam' },
+        { id: 'cctv_rusak', label: 'CCTV Rusak', description: 'Kamera pengawas tidak aktif/mati' },
+        { id: 'genangan', label: 'Genangan Air', description: 'Sumbatan drainase, genangan banjir' },
+        { id: 'pohon_tumbang', label: 'Pohon Tumbang', description: 'Pohon roboh menghalangi jalan' },
+        { id: 'longsor', label: 'Tanah Longsor', description: 'Guguran tebing menutup jalan' },
+        { id: 'marka_rusak', label: 'Marka Rusak', description: 'Garis jalan pudar atau tidak jelas' },
+        { id: 'lainnya', label: 'Darurat Lainnya', description: 'Hambatan, kecelakaan, masalah lainnya' },
       ],
     }
+  },
+  computed: {
+    formattedLatitude() {
+      return this.location?.lat?.toFixed(6) || '-6.917500'
+    },
+    formattedLongitude() {
+      return this.location?.lng?.toFixed(6) || '107.619100'
+    },
   },
   methods: {
     selectCategory(category) {

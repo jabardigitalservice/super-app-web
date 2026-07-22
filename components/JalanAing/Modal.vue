@@ -27,7 +27,7 @@
             :class="{
               'mx-auto': srcIcon,
               'pt-2': nameIcon,
-              'text-red-500': nameIcon === 'warning',
+              'text-red-700': nameIcon === 'warning',
               'text-green-700': nameIcon === 'check-mark-circle',
             }"
             :src="srcIcon"
