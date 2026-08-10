@@ -30,11 +30,46 @@
       Guna memastikan akurasi lokasi, mohon isi formulir langsung di lokasi rumah calon penerima bantuan.
     </p>
 
+    <div class="mb-2 mt-6">
+      <p class="font-semibold text-sm mb-2 text-gray-900 dark:text-gray-100">Syarat dan Ketentuan Akses</p>
+      <div
+        ref="termsBox"
+        class="border border-gray-300 dark:border-dark-emphasis-medium rounded-lg p-4 h-48 overflow-y-auto text-sm bg-gray-50 dark:bg-dark-emphasis-medium space-y-3"
+        @scroll="handleTermsScroll"
+      >
+        <p class="font-bold uppercase text-center mb-1">{{ termsTitle }}</p>
+
+        <p v-for="(paragraph, index) in termsIntro" :key="'intro-' + index" class="font-normal">{{ paragraph }}</p>
+
+        <div v-for="(section, index) in termsSections" :key="'section-' + index">
+          <p class="font-bold">{{ section.title }}</p>
+          <p v-if="section.lead" class="mt-1 font-normal">{{ section.lead }}</p>
+          <p v-if="section.paragraph" class="mt-1 font-normal">{{ section.paragraph }}</p>
+          <ul v-if="section.items" class="list-disc ml-5 mt-1 space-y-1 font-normal">
+            <li v-for="(item, itemIndex) in section.items" :key="itemIndex">{{ item }}</li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="font-bold">{{ termsClosing.title }}</p>
+          <p class="mt-1 font-normal">{{ termsClosing.text }}</p>
+        </div>
+      </div>
+      <p v-if="!hasScrolledTermsToBottom" class="text-orange-500 text-xs mt-2 flex items-center gap-1">
+        <span aria-hidden="true">&darr;</span>
+        Gulir ke bawah untuk membaca seluruh ketentuan
+      </p>
+    </div>
+
     <div class="flex flex-col gap-4 mt-8">
-      <label class="flex items-center gap-3 cursor-pointer">
+      <label
+        class="flex items-center gap-3"
+        :class="hasScrolledTermsToBottom ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+      >
         <input
           v-model="privacyAccepted"
           type="checkbox"
+          :disabled="!hasScrolledTermsToBottom"
           class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
         />
         <span class="text-sm">
@@ -45,28 +80,40 @@
         </span>
       </label>
 
-      <label class="flex items-start gap-3 cursor-pointer">
+      <label
+        class="flex items-start gap-3"
+        :class="hasScrolledTermsToBottom ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+      >
         <input
           v-model="stmtSingleHouse"
           type="checkbox"
+          :disabled="!hasScrolledTermsToBottom"
           class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
         />
         <span class="text-sm">{{ copySingleHouse }}</span>
       </label>
 
-      <label class="flex items-start gap-3 cursor-pointer">
+      <label
+        class="flex items-start gap-3"
+        :class="hasScrolledTermsToBottom ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+      >
         <input
           v-model="stmtNoSimilarProgram"
           type="checkbox"
+          :disabled="!hasScrolledTermsToBottom"
           class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
         />
         <span class="text-sm">{{ copyNoSimilarProgram }}</span>
       </label>
 
-      <label class="flex items-start gap-3 cursor-pointer">
+      <label
+        class="flex items-start gap-3"
+        :class="hasScrolledTermsToBottom ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+      >
         <input
           v-model="stmtRevocationIfUntrue"
           type="checkbox"
+          :disabled="!hasScrolledTermsToBottom"
           class="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
         />
         <span class="text-sm">{{ copyRevocationIfUntrue }}</span>
@@ -76,7 +123,24 @@
 </template>
 
 <script>
+import {
+  IMAH_AING_TERMS_TITLE,
+  IMAH_AING_TERMS_INTRO,
+  IMAH_AING_TERMS_SECTIONS,
+  IMAH_AING_TERMS_CLOSING,
+} from '~/constant/imah-aing-terms-content'
+
 export default {
+  data() {
+    return {
+      termsTitle: IMAH_AING_TERMS_TITLE,
+      termsIntro: IMAH_AING_TERMS_INTRO,
+      termsSections: IMAH_AING_TERMS_SECTIONS,
+      termsClosing: IMAH_AING_TERMS_CLOSING,
+      // Mode edit dianggap sudah pernah menyetujui, jadi checkbox tidak perlu digembok ulang.
+      hasScrolledTermsToBottom: this.$store.getters['imahAingForm/isEditMode'],
+    }
+  },
   computed: {
     isSapawargaSource() {
       return this.$store.state.imahAingForm.sourceId === 'sapawarga'
@@ -127,6 +191,18 @@ export default {
       set(val) {
         this.$store.commit('imahAingForm/SET_CONSENT_STATEMENT', { field: 'stmtRevocationIfUntrue', value: val })
       },
+    },
+  },
+  methods: {
+    handleTermsScroll(event) {
+      if (this.hasScrolledTermsToBottom) {
+        return
+      }
+      const el = event.target
+      const reachedBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 4
+      if (reachedBottom) {
+        this.hasScrolledTermsToBottom = true
+      }
     },
   },
 }
