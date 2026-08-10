@@ -76,7 +76,7 @@
           Saya menyatakan telah membaca dan mempelajari
           <a href="https://hotline.jabarprov.go.id/hc/help-center/articles/1776682585-m" class="underline hover:text-blue-600">Aplikasi Imah Aing</a>
           serta menyetujui
-          <a href="https://sapawarga.digitalservice.id/kebijakan-privasi-ketentuan-pengguna" class="underline hover:text-blue-600">Kebijakan Privasi</a>
+          Kebijakan Privasi
         </span>
       </label>
 
