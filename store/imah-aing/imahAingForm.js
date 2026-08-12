@@ -261,8 +261,6 @@ export default {
       const requiredKeys = [
         'ktp',
         'kk',
-        'suratMiskin',
-        'suratTanah',
         'fotoDepan',
         'fotoBelakang',
         'fotoKiri',

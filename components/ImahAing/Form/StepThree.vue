@@ -183,16 +183,6 @@ export default {
           label: 'KK Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah',
           required: true,
         },
-        {
-          key: 'suratMiskin',
-          label: 'Surat Keterangan Miskin / Tidak Mampu dari Ketua RT/RW',
-          required: true,
-        },
-        {
-          key: 'suratTanah',
-          label: 'Surat Keterangan Kepemilikan Tanah dari Kepala Dusun/Kepala Desa/Lurah',
-          required: true,
-        },
       ],
       fotoRumahConfig: [
         { key: 'fotoDepan', label: 'Foto tampak depan', required: true },
