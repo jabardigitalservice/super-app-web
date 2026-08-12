@@ -51,9 +51,6 @@ const getDefaultState = () => ({
 
   dokumen: {
     ktp: null,
-    kk: null,
-    suratMiskin: null,
-    suratTanah: null,
     fotoDepan: null,
     fotoBelakang: null,
     fotoKiri: null,
@@ -260,7 +257,6 @@ export default {
     isAllDocumentsUploaded: (state) => {
       const requiredKeys = [
         'ktp',
-        'kk',
         'fotoDepan',
         'fotoBelakang',
         'fotoKiri',
@@ -272,9 +268,6 @@ export default {
     documentSlotsOrdered: (state) => {
       const keys = [
         'ktp',
-        'kk',
-        'suratMiskin',
-        'suratTanah',
         'fotoDepan',
         'fotoBelakang',
         'fotoKiri',
@@ -510,9 +503,6 @@ export default {
       if (Array.isArray(detail.photos)) {
         const fieldToSlot = {
           ktp: 'ktp',
-          kk: 'kk',
-          surat_miskin: 'suratMiskin',
-          surat_tanah: 'suratTanah',
           foto_depan: 'fotoDepan',
           foto_belakang: 'fotoBelakang',
           foto_kiri: 'fotoKiri',
@@ -785,9 +775,6 @@ export default {
       try {
         const docMapping = [
           { key: 'ktp', field: 'ktp' },
-          { key: 'kk', field: 'kk' },
-          { key: 'suratMiskin', field: 'surat_miskin' },
-          { key: 'suratTanah', field: 'surat_tanah' },
           { key: 'fotoDepan', field: 'foto_depan' },
           { key: 'fotoBelakang', field: 'foto_belakang' },
           { key: 'fotoKiri', field: 'foto_kiri' },
