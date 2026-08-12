@@ -20,7 +20,7 @@
       <ol class="list-decimal ml-5 space-y-1">
         <li>KTP Calon Penerima Bantuan</li>
         <li>Alamat Rumah dan Titik Koordinat</li>
-        <li>Nomor HP Pemilik Rumah atau Keluarga</li>
+        <li>Nomor HP Calon Penerima Bantuan atau Keluarga</li>
         <li>Foto Rumah Tidak Layak (tampak Depan, Kiri, Kanan, Belakang, Dalam)</li>
       </ol>
     </div>
