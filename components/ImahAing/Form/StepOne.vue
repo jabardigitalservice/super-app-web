@@ -18,9 +18,10 @@
         Pastikan dokumen digital berikut sudah terlebih dahulu disiapkan untuk memudahkan proses pengajuan wargi (dalam format .pdf atau .jpeg/.jpg/.png) :
       </p>
       <ol class="list-decimal ml-5 space-y-1">
-        <li>Kartu Tanda Penduduk Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
-        <li>Kartu Keluarga Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah;</li>
-        <li>Foto Rumah Tidak Layak (Tampak depan, kiri, kanan, belakang, dalam)</li>
+        <li>KTP Calon Penerima Bantuan</li>
+        <li>Alamat Rumah dan Titik Koordinat</li>
+        <li>Nomor HP Pemilik Rumah atau Keluarga</li>
+        <li>Foto Rumah Tidak Layak (tampak Depan, Kiri, Kanan, Belakang, Dalam)</li>
       </ol>
     </div>
 
