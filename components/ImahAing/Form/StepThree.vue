@@ -185,11 +185,11 @@ export default {
         },
       ],
       fotoRumahConfig: [
-        { key: 'fotoDepan', label: 'Foto tampak depan', required: true },
-        { key: 'fotoBelakang', label: 'Foto tampak belakang', required: true },
-        { key: 'fotoKiri', label: 'Foto tampak samping kiri', required: true },
-        { key: 'fotoKanan', label: 'Foto tampak samping kanan', required: true },
-        { key: 'fotoDalam', label: 'Foto tampak dalam', required: true },
+        { key: 'fotoDepan', label: 'Foto Rumah Tampak Depan', required: true },
+        { key: 'fotoBelakang', label: 'Foto Rumah Tampak Belakang', required: true },
+        { key: 'fotoKiri', label: 'Foto Rumah Tampak Samping Kiri', required: true },
+        { key: 'fotoKanan', label: 'Foto Rumah Tampak Samping Kanan', required: true },
+        { key: 'fotoDalam', label: 'Foto Rumah Tampak Dalam', required: true },
       ],
       penyebabOptions: [
         { value: 'imah-aing-bangunan-tua', label: 'Usia bangunan tua' },
