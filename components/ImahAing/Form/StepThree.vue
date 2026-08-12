@@ -175,12 +175,7 @@ export default {
       docsConfig: [
         {
           key: 'ktp',
-          label: 'KTP Calon Penerima Bantuan (Kepala Keluarga) / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah',
-          required: true,
-        },
-        {
-          key: 'kk',
-          label: 'KK Calon Penerima Bantuan / Surat Keterangan dari Kepala Dusun, Kepala Desa, atau Lurah',
+          label: 'KTP Calon Penerima Bantuan',
           required: true,
         },
       ],

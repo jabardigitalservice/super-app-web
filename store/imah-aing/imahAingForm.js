@@ -803,11 +803,7 @@ export default {
           .filter((p) => !!p.url)
 
         const { location, place, cityId, cityName, districtId, districtName, villageId, villageName, dusun, rw, rt, addressDetail } = state.lokasiTanah
-        const userIncomePerMonth = incomeDigitsToNumber(state.dataPengusul.incomePerMonth)
-        if (!Number.isFinite(userIncomePerMonth)) {
-          commit('SET_STATUS_SUBMIT', 'ERROR')
-          throw new Error('invalid_user_income_per_month')
-        }
+        const userIncomePerMonth = incomeDigitsToNumber(state.dataPengusul.incomePerMonth) || 0
 
         const payload = {
           user_id: state.dataPengusul.id || '',
