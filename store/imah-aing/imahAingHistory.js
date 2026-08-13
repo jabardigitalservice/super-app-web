@@ -132,7 +132,7 @@ export const actions = {
     }
 
     if (roleLower === 'warga') {
-      params.user_kk = kk
+      params.user_id = id
     } else {
       if (rt)        params.rt = rt
       if (rw)        params.rw = rw
