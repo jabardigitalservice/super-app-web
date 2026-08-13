@@ -7,6 +7,7 @@ on:
 
 env: 
   SERVICE_NAME: web # superapp-web
+  SERVICE_IMAGENAME: harbor.digitalservice.id/superapp/web
 
 jobs:
   build-push-deploy-production:
@@ -114,7 +115,7 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq -i '.spec.template.spec.containers[0].image = "${{
-            env.SERVICE_NAME }}:${{ env.version }}"'
+            env.SERVICE_IMAGENAME }}:${{ env.version }}"'
             'jds-terraform-gke/k8s/superapp/production/web/deployment.yaml'
                                
 
