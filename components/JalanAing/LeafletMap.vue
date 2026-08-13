@@ -23,6 +23,7 @@ const BUS_REFRESH_INTERVAL = 10000
 const BUS_MAX_SMOOTH_DISTANCE = 750
 const BUS_QUERY_MOVE_THRESHOLD = 1000
 const BUS_STOP_MIN_ZOOM = 12
+const BUSTER_API_URL = 'https://busterdekat.netlify.app/api'
 
 const GIS_LAYERS = Object.freeze({
   ruasJalan: {
@@ -227,7 +228,7 @@ export default {
         const center = this.busQueryCenter || this.map.getCenter()
         const queryCenter = this.leaflet.latLng(center.lat, center.lng)
         const query = new URLSearchParams({ lat: queryCenter.lat.toFixed(6), lng: queryCenter.lng.toFixed(6) })
-        const response = await fetch(`/api/jalan-aing/buses?${query}`)
+        const response = await fetch(`${BUSTER_API_URL}/buses?${query}&pref=63`)
         const payload = await response.json()
         if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data bus tidak tersedia')
         if (queryCenter.distanceTo(this.busQueryCenter) < BUS_QUERY_MOVE_THRESHOLD) {
@@ -252,7 +253,7 @@ export default {
     async loadBusStops() {
       if (this.busStopsLoaded) return
       try {
-        const response = await fetch('/api/jalan-aing/bus-stops')
+        const response = await fetch(`${BUSTER_API_URL}/bus-stops`)
         const payload = await response.json()
         if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data halte bus tidak tersedia')
 
