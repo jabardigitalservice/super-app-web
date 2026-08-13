@@ -9,7 +9,7 @@
           <path d="m3 16 9 5 9-5" />
         </svg>
         <Icon v-else name="info-circle-outline" size="18px" />
-        {{ mobileOpen ? 'Layer & Filter OPD Sektoral' : 'Layer OPD Sektoral' }}
+        {{ mobileOpen ? 'Layer Jalan Aing' : 'Layer Jalan Aing' }}
         <button v-if="mobileOpen" type="button" class="ml-auto rounded-lg p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup layer" @pointerdown.stop @click="$emit('close')">
           <Icon name="times" size="18px" />
         </button>
@@ -38,12 +38,8 @@
             </div>
             <p v-if="!dataAvailability[item.id]" class="text-[11px] text-slate-400">Data belum tersedia dari OPD</p>
 
-            <div v-if="item.id === 'apj' && layerVisibility[item.id]" class="grid grid-cols-3 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
-              <button v-for="status in apjStatuses" :key="status" type="button" class="rounded py-1 font-medium capitalize transition" :class="[filterStatus.apjStatus === status ? 'bg-amber-500 font-bold text-white' : 'text-slate-500 hover:bg-white', mobileOpen ? 'py-2 text-sm' : 'text-xs']" @click="updateFilter('apjStatus', status)">{{ status }}</button>
-            </div>
-
-            <div v-if="item.id === 'cctv' && layerVisibility[item.id]" class="grid grid-cols-3 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
-              <button v-for="status in cctvStatuses" :key="status" type="button" class="rounded py-1 font-medium capitalize transition" :class="[filterStatus.cctvStatus === status ? 'bg-jalan-aing-primary font-bold text-white' : 'text-slate-500 hover:bg-white', mobileOpen ? 'py-2 text-sm' : 'text-xs']" @click="updateFilter('cctvStatus', status)">{{ status }}</button>
+            <div v-if="item.id === 'ruasJalan' && layerVisibility[item.id]" class="grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
+              <button v-for="status in roadStatuses" :key="status.value" type="button" class="rounded py-1 font-medium transition" :class="[filterStatus.roadClass === status.value ? 'bg-jalan-aing-primary font-bold text-white' : 'text-slate-500 hover:bg-white', mobileOpen ? 'py-2 text-sm' : 'text-xs']" @click="updateFilter('roadClass', status.value)">{{ status.label }}</button>
             </div>
 
           </div>
@@ -79,29 +75,29 @@ export default {
       sheetPointerId: null,
       sheetDragStartY: 0,
       sheetDragging: false,
-      openSections: { dishub: true, dinkes: false, bpbd: false, satpol: false, dbmpr: true },
-      apjStatuses: ['semua', 'aktif', 'mati'],
-      cctvStatuses: ['semua', 'online', 'offline'],
+      openSections: { bus: true, dbmpr: false, dinkes: false, dishub: false },
+      roadStatuses: [
+        { value: 'semua', label: 'Semua' },
+        { value: 'arteri_primer', label: 'Arteri Primer' },
+        { value: 'kolektor_primer', label: 'Kolektor Primer' },
+        { value: 'jalan_tol', label: 'Jalan Tol' },
+      ],
       sections: [
-        { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'apj', label: 'Penerangan Jalan (APJ)' }, { id: 'cctv', label: 'CCTV Lalu Lintas' }, { id: 'metro', label: 'Metro Jabar Trans' }] },
-        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-emerald-500', items: [{ id: 'faskes', label: 'Fasilitas Kesehatan' }] },
-        { id: 'bpbd', label: 'Penanggulangan Bencana (BPBD)', color: 'bg-red-500', items: [{ id: 'bencana', label: 'Titik Rawan Bencana' }] },
-        { id: 'satpol', label: 'Satuan Polisi Pamong Praja', color: 'bg-indigo-500', items: [{ id: 'karesidenan', label: 'Pos Karesidenan' }] },
+        { id: 'bus', label: 'Bus', color: 'bg-sky-500', items: [{ id: 'bus', label: 'Posisi Bus Real-time' }, { id: 'busStops', label: 'Halte Bus' }] },
+        { id: 'dbmpr', label: 'Dinas Bina Marga (DBMPR)', color: 'bg-emerald-600', items: [{ id: 'ruasJalan', label: 'Jalan Provinsi' }] },
+        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-red-500', items: [{ id: 'rumahSakit', label: 'Rumah Sakit' }, { id: 'puskesmas', label: 'Puskesmas' }] },
+        { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'restArea', label: 'Rest Area' }] },
       ],
       legendItems: [
-        { label: 'Baik / Mantap', color: 'bg-jalan-aing-primary' },
-        { label: 'Rusak Ringan', color: 'bg-yellow-500' },
-        { label: 'Rusak Sedang', color: 'bg-orange-500' },
-        { label: 'Rusak Berat', color: 'bg-red-500' },
+        { label: 'Jalan Arteri Primer', color: 'bg-jalan-aing-primary' },
+        { label: 'Jalan Kolektor Primer', color: 'bg-blue-500' },
+        { label: 'Jalan Tol', color: 'bg-orange-500' },
       ],
     }
   },
   watch: {
     mobileOpen(value) {
-      if (value) {
-        this.openSections.dishub = true
-        this.openSections.dbmpr = true
-      }
+      if (value) this.openSections.bus = true
     },
   },
   methods: {

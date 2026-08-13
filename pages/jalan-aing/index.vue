@@ -64,9 +64,9 @@ export default {
       notificationTimer: null,
       trackingNumber: '',
       complaintLocation: null,
-      layerVisibility: { apj: true, cctv: true, metro: true, faskes: true, bencana: true, karesidenan: true },
-      dataAvailability: { apj: false, cctv: false, metro: false, faskes: false, bencana: false, karesidenan: false },
-      filterStatus: { apjStatus: 'semua', cctvStatus: 'semua', roadCondition: 'semua' },
+      layerVisibility: { bus: true, busStops: true, ruasJalan: true, rumahSakit: true, puskesmas: true, restArea: true },
+      dataAvailability: { bus: true, busStops: true, ruasJalan: true, rumahSakit: true, puskesmas: true, restArea: true },
+      filterStatus: { roadClass: 'semua' },
       navItems: [
         { id: 'beranda', label: 'Beranda' },
         { id: 'peta', label: 'Peta Interaktif' },
