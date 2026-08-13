@@ -50,6 +50,12 @@ export default {
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
+  serverMiddleware: [
+    { path: '/api/jalan-aing/buses', handler: '~/server-middleware/jalan-aing-buses.js' },
+    { path: '/api/jalan-aing/bus-stops', handler: '~/server-middleware/jalan-aing-bus-stops.js' },
+    { path: '/api/jalan-aing/geodata', handler: '~/server-middleware/jalan-aing-geoserver.js' },
+  ],
+
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/eslint
