@@ -135,18 +135,7 @@ export default {
       return this.isSelfItem ? raw : this.maskName(raw)
     },
     proposerLabel() {
-      const name = (this.proposerName || '').trim()
-      if (name) return name
-      const ROLE_LABELS = {
-        warga: 'Warga',
-        rt: 'Ketua RT',
-        rw: 'Ketua RW',
-        kadus: 'Kepala Dusun',
-        kades: 'Kepala Desa',
-        lurah: 'Lurah',
-      }
-      const key = (this.proposerRole || '').trim().toLowerCase()
-      return ROLE_LABELS[key] || ''
+      return (this.proposerName || '').trim()
     },
     editTooltipText() {
       return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi atau Tahap Verifikasi'
