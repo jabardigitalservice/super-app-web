@@ -91,6 +91,8 @@
 </template>
 
 <script>
+const BUSTER_API_URL = 'https://busterdekat.netlify.app/api'
+
 export default {
   name: 'JalanAingInteractiveMapPage',
   props: {
@@ -142,7 +144,7 @@ export default {
       this.shelterBusesInFlight = true
       this.shelterBusesLoading = !this.selectedMarker.buses
       try {
-        const response = await fetch(`/api/jalan-aing/buses?shelterId=${encodeURIComponent(shelterId)}`)
+        const response = await fetch(`${BUSTER_API_URL}/buses?shelterId=${encodeURIComponent(shelterId)}&pref=63`)
         const payload = await response.json()
         if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data bus halte tidak tersedia')
         if (this.selectedMarker?.shelterId === shelterId) {

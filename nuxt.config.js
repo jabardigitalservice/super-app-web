@@ -51,8 +51,6 @@ export default {
   components: true,
 
   serverMiddleware: [
-    { path: '/api/jalan-aing/buses', handler: '~/server-middleware/jalan-aing-buses.js' },
-    { path: '/api/jalan-aing/bus-stops', handler: '~/server-middleware/jalan-aing-bus-stops.js' },
     { path: '/api/jalan-aing/geodata', handler: '~/server-middleware/jalan-aing-geoserver.js' },
   ],
 
