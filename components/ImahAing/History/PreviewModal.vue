@@ -236,7 +236,7 @@ export default {
       return this.resolvedItem?.rt || '-'
     },
     locationAddress() {
-      return this.resolvedItem?.address || this.resolvedItem?.place?.address || '-'
+      return this.resolvedItem?.address_detail || this.resolvedItem?.place?.address || '-'
     },
   },
   watch: {
