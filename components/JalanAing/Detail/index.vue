@@ -98,7 +98,7 @@
       @close="showLocationModal = false"
     >
       <div class="space-y-3">
-        <BaseMap
+        <JalanAingMap
           v-if="coordsLocation"
           :coords="coordsLocation"
           :zoom="16"
