@@ -171,7 +171,7 @@
       @close="closeMaps"
     >
       <div class="space-y-3">
-        <BaseMap
+        <JalanAingMap
           v-show="cloneLoc"
           :coords="cloneLoc"
           :zoom="16"
@@ -446,9 +446,9 @@ export default {
         }, 1000)
       }
     },
-    setCoords({ event }) {
-      this.cloneLocation.location.lat = event.latLng.lat()
-      this.cloneLocation.location.lng = event.latLng.lng()
+    setCoords({ position }) {
+      this.cloneLocation.location.lat = position.lat
+      this.cloneLocation.location.lng = position.lng
     },
     async confirmLocation() {
       // Check location permission
