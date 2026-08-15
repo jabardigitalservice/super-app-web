@@ -217,7 +217,7 @@
         @close="closeMaps"
       >
         <div class="space-y-3">
-          <BaseMap
+          <JalanAingMap
             v-show="cloneLoc"
             :coords="cloneLoc"
             :zoom="16"
@@ -264,13 +264,11 @@
 import { cloneDeep } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { IMAH_AING_DEFAULT_LOCATION } from '~/store/imah-aing/imahAingForm.js'
-import BaseMap from '~/components/Base/Map.vue'
 import TrackingComplaintLocationModal from '~/components/TrackingComplaint/LocationModal.vue'
 
 export default {
   name: 'ImahAingFormStepFour',
   components: {
-    BaseMap,
     TrackingComplaintLocationModal,
   },
   data() {
@@ -395,11 +393,9 @@ export default {
       this.cloneLocation.place.name = place.name ?? ''
       this.cloneLocation.place.address = place.formatted_address ?? ''
     },
-    setCoords({ event }) {
-      if (event?.latLng) {
-        this.cloneLocation.location.lat = event.latLng.lat()
-        this.cloneLocation.location.lng = event.latLng.lng()
-      }
+    setCoords({ position }) {
+      this.cloneLocation.location.lat = position.lat
+      this.cloneLocation.location.lng = position.lng
     },
     handleLocation() {
       this.$store.commit('imahAingForm/SET_LOKASI_TANAH_FIELD', {
