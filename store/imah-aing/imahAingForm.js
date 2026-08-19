@@ -536,14 +536,10 @@ export default {
         return
       }
       if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        // eslint-disable-next-line no-console
-        console.warn('[ImahAing][geolocation] navigator.geolocation unavailable — location left empty, user picks manually via Step 4 map picker')
         return
       }
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // eslint-disable-next-line no-console
-          console.info('[ImahAing][geolocation] success')
           commit('SET_LOKASI_TANAH_FIELD', {
             field: 'location',
             value: {
@@ -552,13 +548,7 @@ export default {
             },
           })
         },
-        (error) => {
-          // eslint-disable-next-line no-console
-          console.warn('[ImahAing][geolocation] getCurrentPosition failed — location left empty, user picks manually via Step 4 map picker', {
-            code: error?.code,
-            message: error?.message,
-          })
-        }
+        () => {}
       )
     },
     nextStep({ commit, state }) {
