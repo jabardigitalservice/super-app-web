@@ -535,18 +535,15 @@ export default {
       if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
         return
       }
-      const fallback = () => {
-        commit('SET_LOKASI_TANAH_FIELD', {
-          field: 'location',
-          value: { ...IMAH_AING_DEFAULT_LOCATION },
-        })
-      }
       if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        fallback()
+        // eslint-disable-next-line no-console
+        console.warn('[ImahAing][geolocation] navigator.geolocation unavailable — location left empty, user picks manually via Step 4 map picker')
         return
       }
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          // eslint-disable-next-line no-console
+          console.info('[ImahAing][geolocation] success')
           commit('SET_LOKASI_TANAH_FIELD', {
             field: 'location',
             value: {
@@ -555,7 +552,13 @@ export default {
             },
           })
         },
-        fallback
+        (error) => {
+          // eslint-disable-next-line no-console
+          console.warn('[ImahAing][geolocation] getCurrentPosition failed — location left empty, user picks manually via Step 4 map picker', {
+            code: error?.code,
+            message: error?.message,
+          })
+        }
       )
     },
     nextStep({ commit, state }) {
