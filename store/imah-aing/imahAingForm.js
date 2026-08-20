@@ -535,14 +535,7 @@ export default {
       if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
         return
       }
-      const fallback = () => {
-        commit('SET_LOKASI_TANAH_FIELD', {
-          field: 'location',
-          value: { ...IMAH_AING_DEFAULT_LOCATION },
-        })
-      }
       if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        fallback()
         return
       }
       navigator.geolocation.getCurrentPosition(
@@ -555,7 +548,7 @@ export default {
             },
           })
         },
-        fallback
+        () => {}
       )
     },
     nextStep({ commit, state }) {
