@@ -1,8 +1,7 @@
 <template>
   <aside :class="mobileOpen ? 'fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-0 flex-col rounded-t-[32px] border-t shadow-2xl md:static md:bottom-auto md:h-full md:w-[340px] md:translate-y-0 md:rounded-none md:border-t-0 md:border-r md:shadow-none' : 'fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-full pointer-events-none flex-col rounded-t-[32px] border-t shadow-2xl md:static md:bottom-auto md:h-full md:w-[340px] md:translate-y-0 md:pointer-events-auto md:rounded-none md:border-t-0 md:border-r md:shadow-none'" :style="sheetDragging ? { transform: `translateY(${sheetDragY}px)`, transition: 'none' } : null" class="min-h-0 flex-shrink-0 flex-col overflow-hidden border border-slate-200 bg-white font-lato text-slate-800 transition-transform duration-300 ease-out">
-    <div v-if="mobileOpen" class="mx-auto mt-4 h-1.5 w-12 rounded-full bg-slate-300" />
-    <div class="border-b border-slate-200 p-4" :class="mobileOpen ? 'touch-none select-none px-5 py-3' : ''" @pointerdown="startSheetGesture" @pointermove="moveSheetGesture" @pointerup="endSheetGesture" @pointercancel="cancelSheetGesture">
-      <h2 class="flex items-center gap-2 text-base font-semibold text-jalan-aing-primary">
+    <div class="border-b border-slate-200 p-4" :class="mobileOpen ? 'touch-none select-none px-5 py-2' : ''" @pointerdown="startSheetGesture" @pointermove="moveSheetGesture" @pointerup="endSheetGesture" @pointercancel="cancelSheetGesture">
+      <h2 class="m-0 flex items-center gap-2 text-base font-semibold leading-5 text-jalan-aing-primary">
         <svg v-if="mobileOpen" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true">
           <path d="m3 8 9-5 9 5-9 5-9-5Z" />
           <path d="m3 12 9 5 9-5" />
