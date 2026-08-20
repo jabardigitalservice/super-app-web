@@ -1,6 +1,6 @@
 <template>
   <header class="ja-header">
-    <a class="ja-brand" href="/jalan-aing" aria-label="Jalan Aing, beranda">
+    <NuxtLink class="ja-brand" to="/jalan-aing" aria-label="Jalan Aing, beranda">
       <svg class="ja-brand-mark" viewBox="0 0 58 64" fill="none" aria-hidden="true">
         <path d="M29 3C14.7 3 6 13.7 6 26.8c0 14.2 14.5 27 23 34.2 8.5-7.2 23-20 23-34.2C52 13.7 43.3 3 29 3Z" fill="#239CD5" />
         <path d="M29 3c14.3 0 23 10.7 23 23.8 0 14.2-14.5 27-23 34.2V3Z" fill="#356AB6" />
@@ -10,19 +10,19 @@
         <circle cx="40.5" cy="16.5" r="1.3" fill="#356AB6" />
       </svg>
       <span>Jalan<br>Aing</span>
-    </a>
+    </NuxtLink>
     <nav class="ja-nav" aria-label="Navigasi Jalan Aing">
-      <a href="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined">Beranda</a>
-      <a href="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined">Peta Interaktif</a>
-      <a href="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined">Buat Aduan</a>
-      <a href="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined">Lacak Status</a>
+      <NuxtLink to="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined">Beranda</NuxtLink>
+      <NuxtLink to="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined">Peta Interaktif</NuxtLink>
+      <NuxtLink to="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined">Buat Aduan</NuxtLink>
+      <NuxtLink to="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined">Lacak Status</NuxtLink>
     </nav>
-    <a class="ja-help" href="/jalan-aing/aduan">Perlu bantuan?</a>
+    <NuxtLink class="ja-help" to="/jalan-aing/aduan">Perlu bantuan?</NuxtLink>
     <nav class="ja-bottom-nav" aria-label="Navigasi utama">
-      <a href="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined"><span aria-hidden="true"><Icon name="home-outline" size="18px" /></span><span>Beranda</span></a>
-      <a href="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined"><span aria-hidden="true"><Icon src="/icon/pin-map.svg" size="18px" /></span><span>Peta</span></a>
-      <a href="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined"><span aria-hidden="true"><Icon name="warning" size="18px" /></span><span>Aduan</span></a>
-      <a href="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined"><span aria-hidden="true"><Icon name="magnifier" size="18px" /></span><span>Lacak</span></a>
+      <NuxtLink to="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined"><span aria-hidden="true"><Icon name="home-outline" size="18px" /></span><span>Beranda</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined"><span aria-hidden="true"><Icon src="/icon/pin-map.svg" size="18px" /></span><span>Peta</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined"><span aria-hidden="true"><Icon name="warning" size="18px" /></span><span>Aduan</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined"><span aria-hidden="true"><Icon name="magnifier" size="18px" /></span><span>Lacak</span></NuxtLink>
     </nav>
   </header>
 </template>

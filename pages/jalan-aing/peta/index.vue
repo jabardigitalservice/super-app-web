@@ -4,6 +4,7 @@
 
     <section class="ja-map-shell" aria-label="Peta interaktif Jalan Aing">
       <JalanAingLayerPanel
+        v-show="mobileLayerOpen"
         class="ja-map-layer-card"
         :mobile-open="mobileLayerOpen"
         :layer-visibility="layerVisibility"
@@ -108,16 +109,16 @@ export default {
   name: 'JalanAingMapPage',
   data() {
     return {
-      mobileLayerOpen: false,
+      mobileLayerOpen: true,
       mapCenter: [-6.9025, 107.6187],
       mapZoom: 16,
       layerVisibility: {
-        bus: true,
-        busStops: true,
-        ruasJalan: true,
-        rumahSakit: true,
-        puskesmas: true,
-        restArea: true,
+        bus: false,
+        busStops: false,
+        ruasJalan: false,
+        rumahSakit: false,
+        puskesmas: false,
+        restArea: false,
       },
       dataAvailability: {
         bus: true,
@@ -137,6 +138,9 @@ export default {
       searching: false,
       searchTimer: null,
       searchRequestId: 0,
+      documentOverflow: '',
+      viewportMeta: null,
+      viewportContent: '',
     }
   },
   head() {
@@ -151,6 +155,17 @@ export default {
   },
   beforeDestroy() {
     window.clearTimeout(this.searchTimer)
+    document.documentElement.style.overflow = this.documentOverflow
+    this.viewportMeta?.setAttribute('content', this.viewportContent)
+  },
+  mounted() {
+    this.documentOverflow = document.documentElement.style.overflow
+    document.documentElement.style.overflow = 'hidden'
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      this.viewportMeta = document.querySelector('meta[name="viewport"]')
+      this.viewportContent = this.viewportMeta?.getAttribute('content') || ''
+      this.viewportMeta?.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+    }
   },
   methods: {
     toggleLayer({ id, value }) {
@@ -228,7 +243,11 @@ export default {
   --ja-map-rule: #dce7e0;
   --ja-map-green-dark: #0d6d43;
   --ja-map-yellow: #ffcf51;
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   overflow: hidden;
   background: var(--ja-map-paper);
   color: var(--ja-map-ink);
@@ -290,7 +309,8 @@ export default {
   position: relative;
   height: calc(100vh - 76px);
   height: calc(100svh - 76px);
-  min-height: 540px;
+  min-height: 0;
+  overflow: hidden;
 }
 .ja-map-canvas {
   position: relative;
@@ -298,8 +318,26 @@ export default {
   height: 100%;
 }
 .ja-map-mobile-layers {
-  display: none;
+  position: absolute;
+  bottom: 36px;
+  left: clamp(20px, 3vw, 40px);
+  z-index: 600;
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--ja-map-paper);
+  color: var(--ja-map-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(20, 35, 63, 0.16);
 }
+::v-deep(.ja-map-leaflet) { min-height: 0 !important; }
 .ja-map-search {
   --ja-map-search-muted: #6f7785;
   position: absolute;
@@ -755,25 +793,11 @@ export default {
     font-size: 13px;
   }
   .ja-map-mobile-layers {
-    position: absolute;
-    right: auto;
     bottom: 78px;
     left: 16px;
-    z-index: 600;
     display: grid;
     width: 46px;
-    min-height: 46px;
-    align-items: center;
-    justify-content: center;
     padding: 0;
-    border: 0;
-    border-radius: 14px;
-    background: var(--ja-map-paper);
-    color: var(--ja-map-ink);
-    font: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    box-shadow: 0 10px 24px rgba(20, 35, 63, 0.16);
   }
   .ja-map-mobile-layers > span { display: none; }
   ::v-deep(.ja-map-leaflet .right-4.top-5) { top: 76px; right: 16px; gap: 8px; }

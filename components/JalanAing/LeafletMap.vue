@@ -19,7 +19,6 @@
 import 'leaflet/dist/leaflet.css'
 import { getMjtRoutes } from '~/utils/jalan-aing-map-search'
 
-const ENABLE_GEOSERVER_DATA = false
 const BUS_REFRESH_INTERVAL = 10000
 const BUS_MAX_SMOOTH_DISTANCE = 750
 const BUS_STOP_MIN_ZOOM = 13
@@ -61,37 +60,31 @@ const GIS_LAYERS = Object.freeze({
     label: 'Jalan Provinsi',
     type: 'line',
     color: '#008444',
-    wmsUrl: 'https://geoserver.jabarprov.go.id/geoserver/basis_data_dbmpr/wms',
-    wmsOptions: { layers: 'basis_data_dbmpr:jaringan_jalan_ln' },
-    geoJsonUrl: '/api/jalan-aing/geodata?layer=ruasJalan',
-    nameFields: ['namaruasjalan', 'namaruas', 'namajalan', 'nama'],
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/jalan-provinsi',
+    nameFields: ['namaruasjalan', 'namaruas', 'namajalan', 'namobj', 'remark', 'nama'],
   },
   rumahSakit: {
     label: 'Rumah Sakit',
     type: 'point',
     color: '#DC2626',
-    wmsUrl: 'https://geoserver.jabarprov.go.id/geoserver/dinkes/wms',
-    wmsOptions: { layers: 'dinkes:RUMAHSAKIT_PT_50K_2023_JAWABARAT' },
-    geoJsonUrl: '/api/jalan-aing/geodata?layer=rumahSakit',
-    nameFields: ['namarumahsakit', 'namars', 'namafaskes', 'nama'],
+    iconUrl: '/icon/marker-hospital.svg',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rumah-sakit',
+    nameFields: ['namarumahsakit', 'namars', 'namafaskes', 'namobj', 'nama'],
   },
   puskesmas: {
     label: 'Puskesmas',
     type: 'point',
     color: '#2563EB',
-    wmsUrl: 'https://geoserver.jabarprov.go.id/geoserver/dinkes_arc/wms',
-    wmsOptions: { layers: 'dinkes_arc:puskesmas_pt' },
-    geoJsonUrl: '/api/jalan-aing/geodata?layer=puskesmas',
-    nameFields: ['namapuskesmas', 'namafaskes', 'nama'],
+    iconUrl: '/icon/marker-puskesmas.svg',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/puskesmas',
+    nameFields: ['namapuskesmas', 'namafaskes', 'namobj', 'nama'],
   },
   restArea: {
     label: 'Rest Area',
     type: 'point',
     color: '#D97706',
-    wmsUrl: 'https://geoserver.jabarprov.go.id/geoserver/dishub_arc/wms',
-    wmsOptions: { layers: 'dishub_arc:rest_area' },
-    geoJsonUrl: '/api/jalan-aing/geodata?layer=restArea',
-    nameFields: ['namarestarea', 'namalokasi', 'restarea', 'nama'],
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rest-area',
+    nameFields: ['namarestarea', 'namalokasi', 'restarea', 'rest_area', 'nama'],
   },
 })
 
@@ -145,7 +138,6 @@ export default {
       baseLayer: null,
       mapConfig: null,
       layerGroups: {},
-      wmsLayers: {},
       geoJsonLayers: {},
       geoJsonData: {},
       loadingGeoJson: {},
@@ -180,7 +172,6 @@ export default {
       deep: true,
       handler() {
         this.renderGeoJson('ruasJalan')
-        this.syncRoadWmsFilter()
       },
     },
     complaintLocation(value) {
@@ -536,25 +527,7 @@ export default {
     createDataLayers() {
       const L = this.leaflet
       this.layerGroups = Object.fromEntries(Object.keys(this.layerVisibility).map((id) => [id, L.layerGroup()]))
-      this.wmsLayers = {}
-      if (!ENABLE_GEOSERVER_DATA) {
-        this.$emit('data-status', Object.fromEntries(Object.keys(GIS_LAYERS).map((id) => [id, false])))
-        return
-      }
-      Object.entries(GIS_LAYERS).forEach(([id, config]) => {
-        if (!this.layerGroups[id]) return
-        const wms = L.tileLayer.wms(config.wmsUrl, {
-          ...config.wmsOptions,
-          format: 'image/png',
-          transparent: true,
-          version: '1.1.0',
-          opacity: 0.9,
-        })
-        this.wmsLayers[id] = wms
-        this.layerGroups[id].addLayer(wms)
-      })
       this.$emit('data-status', Object.fromEntries(Object.keys(GIS_LAYERS).map((id) => [id, true])))
-      this.syncRoadWmsFilter()
     },
     async loadGeoJson(id) {
       const config = GIS_LAYERS[id]
@@ -564,7 +537,7 @@ export default {
       try {
         const response = await fetch(config.geoJsonUrl)
         if (!response.ok) throw new Error('GeoJSON tidak tersedia')
-        const data = await response.json()
+        const { data } = await response.json()
         if (data?.type !== 'FeatureCollection') throw new Error('Format GeoJSON tidak valid')
         this.$set(this.geoJsonData, id, data)
         if (id === 'ruasJalan') this.buildRoadIndex(data)
@@ -574,6 +547,7 @@ export default {
           this.$set(this.geoJsonErrorNotified, id, true)
           this.$emit('notify', `Detail ${config.label} belum dapat dimuat`)
         }
+        this.$emit('data-status', { [id]: false })
       } finally {
         this.$set(this.loadingGeoJson, id, false)
       }
@@ -602,10 +576,10 @@ export default {
 
       const layer = this.leaflet.geoJSON(data, {
         filter: (feature) => id !== 'ruasJalan' || this.roadMatchesClass(feature),
-        style: { color: config.color, weight: 10, opacity: 0.01, fillOpacity: 0.01 },
-        pointToLayer: (feature, latlng) => this.leaflet.circleMarker(latlng, {
-          radius: 9, color: config.color, weight: 10, opacity: 0.01, fillColor: config.color, fillOpacity: 0.01,
-        }),
+        style: { color: config.color, weight: 4, opacity: 0.9, fillOpacity: 0.9 },
+        pointToLayer: (feature, latlng) => config.iconUrl
+          ? this.leaflet.marker(latlng, { icon: this.leaflet.icon({ iconUrl: config.iconUrl, iconSize: [36, 44], iconAnchor: [18, 44] }) })
+          : this.leaflet.circleMarker(latlng, { radius: 7, color: '#fff', weight: 2, fillColor: config.color, fillOpacity: 0.9 }),
         onEachFeature: (feature, featureLayer) => {
           const label = this.featureLabel(feature, config)
           featureLayer.on('click', (event) => {
@@ -627,16 +601,6 @@ export default {
       if (!wanted || wanted === 'semua') return true
       const roadClass = String(this.propertyValue(feature.properties || {}, ['fgsrjl']) || '').toLowerCase()
       return roadClass === wanted.replace(/_/g, ' ')
-    },
-    syncRoadWmsFilter() {
-      const layer = this.wmsLayers.ruasJalan
-      if (!layer) return
-      const filters = {
-        arteri_primer: "fgsrjl='Jalan Arteri Primer'",
-        kolektor_primer: "fgsrjl='Jalan Kolektor Primer'",
-        jalan_tol: "fgsrjl='Jalan Tol'",
-      }
-      layer.setParams({ cql_filter: filters[this.filterStatus.roadClass] || '' })
     },
     normalisePropertyKey(key) {
       return String(key).toLowerCase().replace(/[^a-z0-9]/g, '')
