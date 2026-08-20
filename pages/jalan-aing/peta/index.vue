@@ -4,7 +4,6 @@
 
     <section class="ja-map-shell" aria-label="Peta interaktif Jalan Aing">
       <JalanAingLayerPanel
-        v-show="mobileLayerOpen"
         class="ja-map-layer-card"
         :mobile-open="mobileLayerOpen"
         :layer-visibility="layerVisibility"
@@ -109,7 +108,7 @@ export default {
   name: 'JalanAingMapPage',
   data() {
     return {
-      mobileLayerOpen: true,
+      mobileLayerOpen: false,
       mapCenter: [-6.9025, 107.6187],
       mapZoom: 16,
       layerVisibility: {
@@ -139,8 +138,6 @@ export default {
       searchTimer: null,
       searchRequestId: 0,
       documentOverflow: '',
-      viewportMeta: null,
-      viewportContent: '',
     }
   },
   head() {
@@ -156,16 +153,10 @@ export default {
   beforeDestroy() {
     window.clearTimeout(this.searchTimer)
     document.documentElement.style.overflow = this.documentOverflow
-    this.viewportMeta?.setAttribute('content', this.viewportContent)
   },
   mounted() {
     this.documentOverflow = document.documentElement.style.overflow
     document.documentElement.style.overflow = 'hidden'
-    if (window.matchMedia('(max-width: 640px)').matches) {
-      this.viewportMeta = document.querySelector('meta[name="viewport"]')
-      this.viewportContent = this.viewportMeta?.getAttribute('content') || ''
-      this.viewportMeta?.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
-    }
   },
   methods: {
     toggleLayer({ id, value }) {
@@ -422,10 +413,13 @@ export default {
   position: absolute;
   top: 74px;
   left: 50%;
-  z-index: 600;
+  z-index: 750;
   width: min(400px, calc(100% - 440px));
   min-width: 260px;
-  overflow: hidden;
+  max-height: min(480px, calc(100dvh - 96px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid #d9dde4;
   border-radius: 10px;
   background: #fff;
@@ -481,7 +475,7 @@ export default {
 @keyframes ja-map-search-spin { to { transform: rotate(360deg); } }
 .ja-map-detail-card {
   position: absolute;
-  z-index: 650;
+  z-index: 700;
   right: clamp(20px, 3vw, 48px);
   bottom: 24px;
   width: min(360px, calc(100% - 40px));
@@ -752,11 +746,13 @@ export default {
     min-width: 0;
     transform: none;
   }
+  .ja-map-search input { font-size: 16px; }
   .ja-map-search-results {
     top: 70px;
     left: 16px;
     width: calc(100% - 32px);
     min-width: 0;
+    max-height: calc(100dvh - 220px);
     transform: none;
   }
   .ja-map-detail-card {

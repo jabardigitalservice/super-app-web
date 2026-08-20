@@ -157,6 +157,7 @@ export default {
       busStopErrorNotified: false,
       busStops: [],
       busStopMarkers: {},
+      activeMarkerElement: null,
       pendingLocate: false,
       roads: [],
     }
@@ -381,11 +382,11 @@ export default {
           icon: this.busStopIcon(stop),
           alt: stop.nama_selter || 'Halte Bus',
           title: stop.nama_selter || 'Halte Bus',
-        }).on('click', () => this.$emit('select-marker', {
+        }).on('click', () => this.selectMarker({
           type: 'Halte Bus',
           label: stop.nama_selter || 'Halte Bus',
           properties: { Koridor: stop.in_koridor || stop.kor, Dari: stop.origin, Tujuan: stop.toward },
-        })).addTo(layer)
+        }, [stop.lat, stop.lng], this.busStopMarkers[stop.id])).addTo(layer)
       })
       Object.entries(this.busStopMarkers).forEach(([id, marker]) => {
         if (!visibleStopIds.has(id)) {
@@ -421,7 +422,7 @@ export default {
         }).on('click', () => {
           const selectedBus = this.busData[id]
           const route = this.busRoutes[String(selectedBus.route_id)] || {}
-          this.$emit('select-marker', {
+          this.selectMarker({
             type: 'Bus',
             label: selectedBus.name || 'Bus',
             properties: {
@@ -433,7 +434,7 @@ export default {
               Arah: selectedBus.direction ? `${selectedBus.direction}°` : null,
               'Update Terakhir': selectedBus.gps_time || selectedBus.dt_server || selectedBus.stime,
             },
-          })
+          }, this.busMarkers[id].getLatLng(), this.busMarkers[id])
         }).addTo(this.layerGroups.bus)
       })
       Object.entries(this.busMarkers).forEach(([id, marker]) => {
@@ -584,11 +585,11 @@ export default {
           const label = this.featureLabel(feature, config)
           featureLayer.on('click', (event) => {
             this.leaflet.DomEvent.stopPropagation(event)
-            this.$emit('select-marker', {
+            this.selectMarker({
               type: config.label,
               label,
               properties: feature.properties || {},
-            })
+            }, event.latlng, config.type === 'point' ? featureLayer : null)
           })
         },
       })
@@ -601,6 +602,22 @@ export default {
       if (!wanted || wanted === 'semua') return true
       const roadClass = String(this.propertyValue(feature.properties || {}, ['fgsrjl']) || '').toLowerCase()
       return roadClass === wanted.replace(/_/g, ' ')
+    },
+    selectMarker(marker, latlng, mapMarker) {
+      this.highlightMarker(mapMarker)
+      if (this.map && latlng) {
+        const point = this.map.latLngToContainerPoint(latlng)
+        const size = this.map.getSize()
+        this.map.panBy(this.leaflet.point(point.x - size.x / 2, point.y - size.y * 0.36), { animate: true, duration: 0.45 })
+      }
+      this.$emit('select-marker', marker)
+    },
+    highlightMarker(mapMarker) {
+      const element = mapMarker?.getElement?.() || mapMarker?._path
+      if (!element) return
+      this.activeMarkerElement?.classList.remove('jalan-aing-marker-selected')
+      element.classList.add('jalan-aing-marker-selected')
+      this.activeMarkerElement = element
     },
     normalisePropertyKey(key) {
       return String(key).toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -727,6 +744,11 @@ export default {
   border: 2px solid white;
   border-radius: 7px;
   box-shadow: 0 1px 5px rgb(15 23 42 / 0.3);
+}
+
+.jalan-aing-leaflet .jalan-aing-marker-selected {
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 7px rgb(13 109 67 / 0.85));
+  transition: filter 150ms ease;
 }
 
 .jalan-aing-bus-line {

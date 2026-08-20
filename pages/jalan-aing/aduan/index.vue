@@ -1,6 +1,6 @@
 <template>
   <div class="ja-complaint-page">
-    <JalanAingHeader active="aduan" />
+    <JalanAingHeader active="aduan" sticky />
 
     <main class="ja-complaint-main">
       <div class="ja-complaint-intro">
@@ -195,6 +195,8 @@
         <span>{{ selectedPhoto.name }}</span>
       </dialog>
     </main>
+
+    <JalanAingFooter />
 
     <dialog v-if="submitted" ref="successDialog" class="ja-success-dialog" aria-labelledby="success-title" @cancel.prevent @close="submitted = false">
       <div class="ja-success-icon" aria-hidden="true"><Icon name="check-mark-circle" size="52px" /></div>

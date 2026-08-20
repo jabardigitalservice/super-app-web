@@ -1,6 +1,6 @@
 <template>
   <div class="ja-tracking-page">
-    <JalanAingHeader active="lacak" />
+    <JalanAingHeader active="lacak" sticky />
 
     <main class="ja-tracking-main">
       <section class="ja-tracking-intro" aria-labelledby="tracking-title">
@@ -78,6 +78,8 @@
         </ol>
       </section>
     </main>
+
+    <JalanAingFooter />
   </div>
 </template>
 
