@@ -48,7 +48,7 @@
       <div class="flex items-center gap-1">
         <button
           v-if="canEdit"
-          class="px-3 py-1.5 text-xs font-medium text-[#069550] bg-[#069550]/10 rounded-md hover:bg-[#069550]/20 transition-colors"
+          class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors"
           @click.stop="$emit('edit')"
         >
           Edit Ajuan
