@@ -2,9 +2,9 @@
   <div class="jalan-aing-leaflet relative h-full min-h-[560px] w-full overflow-hidden bg-slate-200 font-lato">
     <div ref="map" class="absolute inset-0 z-0" />
 
-    <div class="absolute right-4 top-20 z-[500] flex flex-col gap-2 md:bottom-5 md:right-5 md:top-auto">
-      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perbesar peta" @click="zoomIn"><Icon name="plus" size="18px" /></button>
-      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perkecil peta" @click="zoomOut"><Icon name="minus" size="18px" /></button>
+    <div class="absolute right-4 top-5 z-[500] flex flex-col gap-2 md:right-5">
+      <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perbesar peta" @click="zoomIn"><Icon name="plus" size="18px" /></button>
+      <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perkecil peta" @click="zoomOut"><Icon name="minus" size="18px" /></button>
       <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Lokasi saya" @click="locateMe"><Icon src="/icon/location-picker.svg" size="18px" /></button>
       <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Reset peta" @click="resetView"><Icon name="refresh" size="18px" /></button>
     </div>
@@ -21,9 +21,39 @@ import 'leaflet/dist/leaflet.css'
 const ENABLE_GEOSERVER_DATA = false
 const BUS_REFRESH_INTERVAL = 10000
 const BUS_MAX_SMOOTH_DISTANCE = 750
-const BUS_QUERY_MOVE_THRESHOLD = 1000
-const BUS_STOP_MIN_ZOOM = 12
-const BUSTER_API_URL = 'https://busterdekat.netlify.app/api'
+const BUS_STOP_MIN_ZOOM = 13
+const MJT_API_URL = 'https://tfgb-api.up.railway.app/api/mjt'
+
+function decodePolyline(encoded) {
+  const points = []
+  let index = 0
+  let lat = 0
+  let lng = 0
+
+  while (index < encoded.length) {
+    let result = 0
+    let shift = 0
+    let byte
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    lat += result & 1 ? ~(result >> 1) : result >> 1
+
+    result = 0
+    shift = 0
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    lng += result & 1 ? ~(result >> 1) : result >> 1
+    points.push([lat / 1e5, lng / 1e5])
+  }
+
+  return points
+}
 
 const GIS_LAYERS = Object.freeze({
   ruasJalan: {
@@ -85,6 +115,11 @@ const LEAFLET_MAP_CONFIG = Object.freeze({
       url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
       attribution: '&copy; OpenStreetMap &copy; CARTO',
     },
+    cartoLight: {
+      label: 'CartoDB Positron',
+      url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+    },
   },
 })
 
@@ -96,6 +131,11 @@ export default {
       required: true,
     },
     filterStatus: { type: Object, required: true },
+    basemap: { type: String, default: '' },
+    mapCenter: { type: Array, default: null },
+    mapZoom: { type: Number, default: null },
+    complaintLocation: { type: Object, default: null },
+    searchLocation: { type: Object, default: null },
   },
   data() {
     return {
@@ -110,13 +150,15 @@ export default {
       loadingGeoJson: {},
       geoJsonErrorNotified: {},
       currentLocationMarker: null,
+      complaintMarker: null,
+      searchMarker: null,
       busMarkers: {},
+      busData: {},
+      busRoutes: {},
       busHeadings: {},
       busAnimationFrames: {},
       busPollTimer: null,
       busPollInFlight: false,
-      busRefreshQueued: false,
-      busQueryCenter: null,
       busErrorNotified: false,
       busStopsLoaded: false,
       busStopErrorNotified: false,
@@ -140,6 +182,12 @@ export default {
         this.syncRoadWmsFilter()
       },
     },
+    complaintLocation(value) {
+      this.syncComplaintMarker(value)
+    },
+    searchLocation(value) {
+      this.syncSearchMarker(value)
+    },
   },
   async mounted() {
     this.mapConfig = this.readMapConfig()
@@ -158,13 +206,14 @@ export default {
   methods: {
     readMapConfig() {
       const params = new URLSearchParams(window.location.search)
-      const basemap = Object.prototype.hasOwnProperty.call(LEAFLET_MAP_CONFIG.basemaps, params.get('basemap'))
-        ? params.get('basemap')
+      const requestedBasemap = this.basemap || params.get('basemap')
+      const basemap = Object.prototype.hasOwnProperty.call(LEAFLET_MAP_CONFIG.basemaps, requestedBasemap)
+        ? requestedBasemap
         : 'osm'
 
       return {
-        center: LEAFLET_MAP_CONFIG.center,
-        zoom: LEAFLET_MAP_CONFIG.zoom,
+        center: this.mapCenter || LEAFLET_MAP_CONFIG.center,
+        zoom: this.mapZoom || LEAFLET_MAP_CONFIG.zoom,
         basemap,
       }
     },
@@ -181,6 +230,7 @@ export default {
         minZoom: LEAFLET_MAP_CONFIG.minZoom,
         maxZoom: LEAFLET_MAP_CONFIG.maxZoom,
         zoomControl: false,
+        touchZoom: true,
         preferCanvas: true,
         zoomAnimation: true,
         zoomAnimationThreshold: 8,
@@ -191,15 +241,19 @@ export default {
         fadeAnimation: true,
         markerZoomAnimation: true,
       })
+      this.map.attributionControl.setPrefix('')
       this.setBasemap(config.basemap)
       this.createDataLayers()
       this.syncLayers(this.layerVisibility)
       this.startBusPolling()
-      this.loadBusStops()
+      this.loadBusRoutes()
+      this.syncComplaintMarker(this.complaintLocation)
+      this.syncSearchMarker(this.searchLocation)
+      this.map.on('click', (event) => this.$emit('create-complaint', { lat: event.latlng.lat, lng: event.latlng.lng }))
       this.map.on('moveend zoomend', () => {
         this.renderBusStops()
-        this.updateBusQueryCenter()
       })
+      this.map.on('zoomend', () => this.refreshBusIcons())
       if (this.pendingLocate) {
         this.pendingLocate = false
         this.locateMe()
@@ -207,34 +261,66 @@ export default {
       window.setTimeout(() => this.map?.invalidateSize(), 100)
     },
     startBusPolling() {
-      this.busQueryCenter = this.map.getCenter()
       this.loadBuses()
       this.busPollTimer = window.setInterval(() => this.loadBuses(), BUS_REFRESH_INTERVAL)
     },
-    updateBusQueryCenter() {
-      const center = this.map.getCenter()
-      if (this.busQueryCenter?.distanceTo(center) < BUS_QUERY_MOVE_THRESHOLD) return
-      this.busQueryCenter = center
-      if (this.busPollInFlight) {
-        this.busRefreshQueued = true
+    syncComplaintMarker(location) {
+      if (!this.map || !this.leaflet) return
+      if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lng)) {
+        if (this.complaintMarker) {
+          this.map.removeLayer(this.complaintMarker)
+          this.complaintMarker = null
+        }
         return
       }
-      this.loadBuses()
+      const latLng = [location.lat, location.lng]
+      if (this.complaintMarker) {
+        this.complaintMarker.setLatLng(latLng)
+        return
+      }
+      this.complaintMarker = this.leaflet.marker(latLng, {
+        icon: this.leaflet.icon({
+          iconUrl: '/icon/pin-complaint.svg',
+          iconSize: [32, 38],
+          iconAnchor: [16, 38],
+        }),
+        interactive: false,
+      }).addTo(this.map)
+    },
+    syncSearchMarker(location) {
+      if (!this.map || !this.leaflet) return
+      if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lng)) {
+        if (this.searchMarker) {
+          this.map.removeLayer(this.searchMarker)
+          this.searchMarker = null
+        }
+        return
+      }
+      const latLng = [location.lat, location.lng]
+      if (this.searchMarker) {
+        this.searchMarker.setLatLng(latLng)
+        this.searchMarker.setTooltipContent(location.label || 'Hasil pencarian')
+        return
+      }
+      this.searchMarker = this.leaflet.marker(latLng, {
+        icon: this.leaflet.icon({ iconUrl: '/icon/pin-search.svg', iconSize: [30, 36], iconAnchor: [15, 36] }),
+        alt: location.label || 'Hasil pencarian',
+        title: location.label || 'Hasil pencarian',
+        interactive: false,
+      }).addTo(this.map).bindTooltip(location.label || 'Hasil pencarian', { direction: 'top', offset: [0, -28] }).openTooltip()
+    },
+    focusLocation({ lat, lng }) {
+      if (this.map && Number.isFinite(lat) && Number.isFinite(lng)) this.map.flyTo([lat, lng], 17, { animate: true, duration: 0.75 })
     },
     async loadBuses() {
       if (this.busPollInFlight) return
       this.busPollInFlight = true
       try {
-        const center = this.busQueryCenter || this.map.getCenter()
-        const queryCenter = this.leaflet.latLng(center.lat, center.lng)
-        const query = new URLSearchParams({ lat: queryCenter.lat.toFixed(6), lng: queryCenter.lng.toFixed(6) })
-        const response = await fetch(`${BUSTER_API_URL}/buses?${query}&pref=63`)
+        const response = await fetch(`${MJT_API_URL}/buses`)
         const payload = await response.json()
         if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data bus tidak tersedia')
-        if (queryCenter.distanceTo(this.busQueryCenter) < BUS_QUERY_MOVE_THRESHOLD) {
-          this.syncBusMarkers(payload.data, Math.max(1000, (Number(payload.reloadTime) || BUS_REFRESH_INTERVAL) - 500))
-          this.$emit('data-status', { bus: true })
-        }
+        this.syncBusMarkers(payload.data, BUS_REFRESH_INTERVAL - 500)
+        this.$emit('data-status', { bus: true })
         this.busErrorNotified = false
       } catch (error) {
         this.$emit('data-status', { bus: false })
@@ -244,32 +330,41 @@ export default {
         }
       } finally {
         this.busPollInFlight = false
-        if (this.busRefreshQueued) {
-          this.busRefreshQueued = false
-          this.loadBuses()
-        }
       }
     },
-    async loadBusStops() {
+    async loadBusRoutes() {
       if (this.busStopsLoaded) return
       try {
-        const response = await fetch(`${BUSTER_API_URL}/bus-stops`)
+        const response = await fetch(`${MJT_API_URL}/routes`)
         const payload = await response.json()
-        if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data halte bus tidak tersedia')
+        if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data rute bus tidak tersedia')
 
-        this.busStops = payload.data.map((stop) => {
-          const lat = Number(stop.sh_lat)
-          const lng = Number(stop.sh_lng)
-          return { ...stop, id: String(stop.sh_id), lat, lng }
-        }).filter((stop) => stop.id && Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
+        const stopIds = new Set()
+        this.busRoutes = Object.fromEntries(payload.data.map((route) => [String(route.route_id), route]))
+        this.busStops = payload.data.flatMap((route) => {
+          const color = /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'
+          const points = decodePolyline(route.points || '')
+          if (points.length > 1) {
+            this.leaflet.polyline(points, { color, weight: 4, opacity: 0.48, interactive: false }).addTo(this.layerGroups.bus)
+          }
+          return (route.shelters || []).map((shelter) => {
+            const lat = Number(shelter.latitude)
+            const lng = Number(shelter.longitude)
+            const id = `${shelter.nama_selter}:${lat}:${lng}`
+            if (stopIds.has(id)) return null
+            stopIds.add(id)
+            return { ...shelter, id, lat, lng, color, kor: route.kor, origin: route.origin, toward: route.toward }
+          }).filter(Boolean)
+        }).filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
         this.busStopsLoaded = true
+        this.refreshBusIcons()
         this.renderBusStops()
         this.$emit('data-status', { busStops: true })
       } catch (error) {
         this.$emit('data-status', { busStops: false })
         if (!this.busStopErrorNotified) {
           this.busStopErrorNotified = true
-          this.$emit('notify', 'Data halte bus belum dapat dimuat')
+          this.$emit('notify', 'Data rute bus belum dapat dimuat')
         }
       }
     },
@@ -277,7 +372,7 @@ export default {
       const layer = this.layerGroups.busStops
       if (!this.map || !layer || !this.map.hasLayer(layer)) return
 
-      if (this.map.getZoom() < BUS_STOP_MIN_ZOOM) {
+      if (this.map.getZoom() <= BUS_STOP_MIN_ZOOM) {
         Object.entries(this.busStopMarkers).forEach(([id, marker]) => {
           layer.removeLayer(marker)
           this.$delete(this.busStopMarkers, id)
@@ -294,12 +389,11 @@ export default {
 
         this.busStopMarkers[stop.id] = this.leaflet.marker([stop.lat, stop.lng], {
           icon: this.busStopIcon(stop),
-          alt: stop.sh_name || 'Halte Bus',
-          title: stop.sh_name || 'Halte Bus',
+          alt: stop.nama_selter || 'Halte Bus',
+          title: stop.nama_selter || 'Halte Bus',
         }).on('click', () => this.$emit('select-marker', {
           type: 'Halte Bus',
-          label: stop.sh_name || 'Halte Bus',
-          shelterId: stop.id,
+          label: stop.nama_selter || 'Halte Bus',
           properties: { Koridor: stop.in_koridor || stop.kor, Dari: stop.origin, Tujuan: stop.toward },
         })).addTo(layer)
       })
@@ -314,11 +408,12 @@ export default {
       const activeBusIds = new Set()
       buses.forEach((bus) => {
         const id = String(bus.id || bus.imei || '')
-        const lat = Number(bus.bs_lat)
-        const lng = Number(bus.bs_lng)
+        const lat = Number(bus.lat ?? bus.bs_lat)
+        const lng = Number(bus.lon ?? bus.bs_lng)
         if (!id || !Number.isFinite(lat) || !Number.isFinite(lng)) return
 
         activeBusIds.add(id)
+        this.$set(this.busData, id, bus)
         const latLng = [lat, lng]
         const marker = this.busMarkers[id]
         if (marker) {
@@ -333,23 +428,30 @@ export default {
           alt: bus.name || 'Bus',
           title: bus.name || 'Bus',
           zIndexOffset: 900,
-        }).on('click', () => this.$emit('select-marker', {
-          type: 'Bus',
-          label: bus.name || 'Bus',
-          properties: {
-            Koridor: bus.kor,
-            Tujuan: bus.toward,
-            'Plat Nomor': bus.plate_number,
-            Kecepatan: `${bus.speed || 0} km/jam`,
-            'Update Terakhir': bus.dt_server,
-          },
-        })).addTo(this.layerGroups.bus)
+        }).on('click', () => {
+          const selectedBus = this.busData[id]
+          const route = this.busRoutes[String(selectedBus.route_id)] || {}
+          this.$emit('select-marker', {
+            type: 'Bus',
+            label: selectedBus.name || 'Bus',
+            properties: {
+              Koridor: selectedBus.kor || route.kor,
+              Dari: route.origin || selectedBus.origin,
+              Tujuan: selectedBus.toward || route.toward,
+              'Plat Nomor': selectedBus.nopol || selectedBus.plate_number,
+              Kecepatan: `${selectedBus.speed || 0} km/jam`,
+              Arah: selectedBus.direction ? `${selectedBus.direction}°` : null,
+              'Update Terakhir': selectedBus.gps_time || selectedBus.dt_server || selectedBus.stime,
+            },
+          })
+        }).addTo(this.layerGroups.bus)
       })
       Object.entries(this.busMarkers).forEach(([id, marker]) => {
         if (!activeBusIds.has(id)) {
           window.cancelAnimationFrame(this.busAnimationFrames[id])
           this.$delete(this.busAnimationFrames, id)
           this.$delete(this.busHeadings, id)
+          this.$delete(this.busData, id)
           this.layerGroups.bus.removeLayer(marker)
           this.$delete(this.busMarkers, id)
         }
@@ -380,26 +482,38 @@ export default {
       this.busAnimationFrames[id] = window.requestAnimationFrame(move)
     },
     updateBusHeading(id, marker, bus) {
-      const image = marker.getElement()?.querySelector('img')
+      const line = marker.getElement()?.querySelector('.jalan-aing-bus-line')
       const target = this.busAngle(bus)
       const previous = this.busHeadings[id] ?? target
       const next = previous + ((((target - previous) % 360) + 540) % 360) - 180
       this.$set(this.busHeadings, id, next)
-      if (image) {
-        image.style.transform = `rotate(${next}deg)`
+      if (line) {
+        line.style.transform = `rotate(${next}deg)`
         return
       }
       marker.setIcon(this.busIcon(bus))
     },
     busAngle(bus) {
-      return (Number.isFinite(Number(bus.angle)) ? Number(bus.angle) : 0) + 90
+      const direction = Number(bus.direction ?? bus.angle)
+      return Number.isFinite(direction) ? direction : 0
     },
     busIcon(bus) {
+      const color = this.busColor(bus)
+      const zoomedOut = this.map?.getZoom() < 13
       return this.leaflet.divIcon({
-        className: 'jalan-aing-bus-icon',
-        html: `<img src="/icon/bus-metro-jabartrans.svg" alt="" style="transform:rotate(${this.busAngle(bus)}deg)">`,
-        iconSize: [24, 14],
-        iconAnchor: [12, 7],
+        className: `jalan-aing-bus-icon${zoomedOut ? ' is-zoomed-out' : ''}`,
+        html: `<span class="jalan-aing-bus-line" style="--bus-color:${color};transform:rotate(${this.busAngle(bus)}deg)"></span>`,
+        iconSize: zoomedOut ? [18, 18] : [28, 28],
+        iconAnchor: zoomedOut ? [9, 9] : [14, 14],
+      })
+    },
+    busColor(bus) {
+      const color = this.busRoutes[String(bus?.route_id)]?.color
+      return /^#[0-9a-f]{6}$/i.test(color) ? color : '#2563EB'
+    },
+    refreshBusIcons() {
+      Object.entries(this.busMarkers).forEach(([id, marker]) => {
+        if (this.busData[id]) marker.setIcon(this.busIcon(this.busData[id]))
       })
     },
     busStopIcon(stop) {
@@ -495,11 +609,14 @@ export default {
         }),
         onEachFeature: (feature, featureLayer) => {
           const label = this.featureLabel(feature, config)
-          featureLayer.on('click', () => this.$emit('select-marker', {
-            type: config.label,
-            label,
-            properties: feature.properties || {},
-          }))
+          featureLayer.on('click', (event) => {
+            this.leaflet.DomEvent.stopPropagation(event)
+            this.$emit('select-marker', {
+              type: config.label,
+              label,
+              properties: feature.properties || {},
+            })
+          })
         },
       })
       this.geoJsonLayers[id] = layer
@@ -625,8 +742,7 @@ export default {
 }
 
 .jalan-aing-leaflet .leaflet-zoom-animated {
-  transition-duration: 320ms;
-  transition-timing-function: cubic-bezier(0.22, 0.75, 0.3, 1);
+  transition: none;
 }
 
 .jalan-aing-bus-icon {
@@ -650,12 +766,20 @@ export default {
   box-shadow: 0 1px 5px rgb(15 23 42 / 0.3);
 }
 
-.jalan-aing-bus-icon img {
-  height: 14px;
-  width: 24px;
-  filter: drop-shadow(0 2px 3px rgb(15 23 42 / 0.32));
+.jalan-aing-bus-line {
+  display: block;
+  width: 28px;
+  height: 28px;
+  background: var(--bus-color);
+  -webkit-mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=') center / contain no-repeat;
+  mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=') center / contain no-repeat;
   transform-origin: center;
   transition: transform 420ms ease-out;
+}
+
+.jalan-aing-bus-icon.is-zoomed-out .jalan-aing-bus-line {
+  width: 18px;
+  height: 18px;
 }
 
 .jalan-aing-leaflet .jalan-aing-point-enter {
@@ -687,5 +811,9 @@ export default {
 @media (prefers-reduced-motion: reduce) {
   .jalan-aing-leaflet .leaflet-zoom-animated { transition-duration: 0ms; }
   .jalan-aing-bus-icon { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .jalan-aing-leaflet .ja-map-zoom-button { display: none; }
 }
 </style>
