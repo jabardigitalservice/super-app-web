@@ -5,3 +5,7 @@
 * {
   font-family: 'Lato', sans-serif;
 }
+
+.jalan-aing, .jalan-aing *, .ja-map-page, .ja-map-page *, .ja-complaint-page, .ja-complaint-page *, .ja-tracking-page, .ja-tracking-page *, .ja-header, .ja-header * {
+  font-family: Roboto, sans-serif !important;
+}
