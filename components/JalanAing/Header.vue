@@ -1,5 +1,5 @@
 <template>
-  <header class="ja-header">
+  <header class="ja-header" :class="{ 'is-sticky': sticky }">
     <NuxtLink class="ja-brand" to="/jalan-aing" aria-label="Jalan Aing, beranda">
       <svg class="ja-brand-mark" viewBox="0 0 58 64" fill="none" aria-hidden="true">
         <path d="M29 3C14.7 3 6 13.7 6 26.8c0 14.2 14.5 27 23 34.2 8.5-7.2 23-20 23-34.2C52 13.7 43.3 3 29 3Z" fill="#239CD5" />
@@ -30,12 +30,13 @@
 <script>
 export default {
   name: 'JalanAingHeader',
-  props: { active: { type: String, default: '' } },
+  props: { active: { type: String, default: '' }, sticky: { type: Boolean, default: false } },
 }
 </script>
 
 <style scoped>
 .ja-header { position: relative; z-index: 900; display: flex; min-height: 76px; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 4vw, 48px); border-bottom: 1px solid #dce7e0; background: #fffefb; font-family: Roboto, sans-serif; }
+.ja-header.is-sticky { position: sticky; top: 0; }
 .ja-brand, .ja-nav { display: flex; align-items: center; }
 .ja-brand { gap: 10px; color: #14233f; font-size: 12px; font-weight: 700; letter-spacing: .11em; line-height: 1.08; text-decoration: none; text-transform: uppercase; }
 .ja-brand-mark { display: block; width: 44px; height: 44px; flex: 0 0 auto; }
