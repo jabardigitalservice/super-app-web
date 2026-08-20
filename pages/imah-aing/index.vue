@@ -99,7 +99,15 @@
       @reject="showCancelDialog = false"
       @submit="handleCancel"
     >
-      Apakah Anda yakin ingin membatalkan usulan untuk {{ selectedIds.length }} pengajuan ini?
+      Apakah wargi yakin ingin melakukan pembatalan usulan?
+      <br /><br />
+      Jika wargi ingin melakukan perubahan atau memperbaiki data, silakan gunakan fitur
+      <b>Edit</b> terlebih dahulu. Pastikan data yang diubah sudah sesuai sebelum
+      melanjutkan proses.
+      <br /><br />
+      <span class="text-red-600 font-bold dark:text-red-400">Perlu diperhatikan:</span>
+      setelah usulan dibatalkan, untuk saat ini usulan tersebut belum dapat diajukan
+      kembali. 🙏
     </BaseDialog>
   </div>
 </template>
