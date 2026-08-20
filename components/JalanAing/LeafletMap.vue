@@ -17,6 +17,7 @@
 
 <script>
 import 'leaflet/dist/leaflet.css'
+import { getMjtRoutes } from '~/utils/jalan-aing-map-search'
 
 const ENABLE_GEOSERVER_DATA = false
 const BUS_REFRESH_INTERVAL = 10000
@@ -335,13 +336,11 @@ export default {
     async loadBusRoutes() {
       if (this.busStopsLoaded) return
       try {
-        const response = await fetch(`${MJT_API_URL}/routes`)
-        const payload = await response.json()
-        if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data rute bus tidak tersedia')
+        const routes = await getMjtRoutes()
 
         const stopIds = new Set()
-        this.busRoutes = Object.fromEntries(payload.data.map((route) => [String(route.route_id), route]))
-        this.busStops = payload.data.flatMap((route) => {
+        this.busRoutes = Object.fromEntries(routes.map((route) => [String(route.route_id), route]))
+        this.busStops = routes.flatMap((route) => {
           const color = /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'
           const points = decodePolyline(route.points || '')
           if (points.length > 1) {

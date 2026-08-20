@@ -683,6 +683,11 @@ export default {
   }
 }
 @media (max-width: 640px) {
+  .ja-map-page {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+  }
   .ja-map-header {
     min-height: 64px;
   }
@@ -697,9 +702,11 @@ export default {
     font-size: 12px;
   }
   .ja-map-shell {
-    height: calc(100svh - 128px);
-    min-height: 540px;
+    height: calc(100vh - 128px);
+    height: calc(100dvh - 128px);
+    min-height: 0;
   }
+  ::v-deep(.ja-map-leaflet) { min-height: 0 !important; }
   .ja-map-search {
     top: 16px;
     left: 16px;
