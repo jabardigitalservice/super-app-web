@@ -217,14 +217,30 @@
         @close="closeMaps"
       >
         <div class="space-y-3">
+          <div class="flex justify-end px-6">
+            <button
+              type="button"
+              class="text-sm font-semibold text-green-700 font-lato"
+              @click="useDeviceLocation"
+            >
+              Gunakan Lokasi Saya
+            </button>
+          </div>
           <JalanAingMap
             v-show="cloneLoc"
+            :key="mapKey"
             :coords="cloneLoc"
             :zoom="16"
             @set:place="getPlaceDetail"
             @dragend:marker="setCoords"
             @click:map="setCoords"
           />
+          <p
+            v-if="!hasResolvedLocation"
+            class="px-6 text-xs text-orange-500"
+          >
+            Geser pin atau ketuk peta ke lokasi rumah untuk melanjutkan
+          </p>
         </div>
 
         <div class="flex flex-col gap-2 px-6 py-4">
@@ -250,6 +266,7 @@
         <template #footer>
           <BaseButton
             class="ml-auto mr-2 text-sm font-bold text-white bg-green-700 dark:border-0 hover:bg-green-600"
+            :disabled="!hasResolvedLocation"
             @click="handleLocation"
           >
             Pilih Lokasi ini
@@ -274,7 +291,12 @@ export default {
   data() {
     return {
       showLocationModal: false,
+      hasResolvedLocation: false,
       cloneLocation: cloneDeep(this.$store.state.imahAingForm.lokasiTanah),
+      // T5: dipakai buat force-remount JalanAingMap saat coords berubah lewat
+      // "Gunakan Lokasi Saya" tanpa modal ke-close/reopen — komponen itu gak
+      // reactive ke perubahan prop `coords` setelah mount (lihat plan-2026-08-20 §3).
+      mapKey: 0,
     }
   },
   computed: {
@@ -374,7 +396,7 @@ export default {
       'handleVillageSelected',
       'prefillLocationOptions',
     ]),
-    openLocationModal() {
+    async openLocationModal() {
       this.cloneLocation = cloneDeep(this.lokasiTanah)
       const { lat, lng } = this.cloneLocation.location
       const unset =
@@ -382,9 +404,38 @@ export default {
         !Number.isFinite(lng) ||
         (lat === 0 && lng === 0)
       if (unset) {
-        this.cloneLocation.location = { ...IMAH_AING_DEFAULT_LOCATION }
+        this.hasResolvedLocation = false
+        const deviceCoords = await this.tryGetDeviceLocation()
+        this.cloneLocation.location = deviceCoords || {
+          ...IMAH_AING_DEFAULT_LOCATION,
+        }
+        if (deviceCoords) this.hasResolvedLocation = true
+      } else {
+        this.hasResolvedLocation = true
       }
       this.showLocationModal = true
+    },
+    tryGetDeviceLocation() {
+      if (!navigator.geolocation) return Promise.resolve(null)
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) =>
+            resolve({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            }),
+          () => resolve(null),
+          { timeout: 5000, maximumAge: 60000 }
+        )
+      })
+    },
+    async useDeviceLocation() {
+      const deviceCoords = await this.tryGetDeviceLocation()
+      if (deviceCoords) {
+        this.cloneLocation.location = deviceCoords
+        this.hasResolvedLocation = true
+        this.mapKey += 1
+      }
     },
     closeMaps() {
       this.showLocationModal = false
@@ -394,6 +445,7 @@ export default {
       this.cloneLocation.place.address = place.formatted_address ?? ''
     },
     setCoords({ position }) {
+      this.hasResolvedLocation = true
       this.cloneLocation.location.lat = position.lat
       this.cloneLocation.location.lng = position.lng
     },
