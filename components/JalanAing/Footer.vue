@@ -1,7 +1,7 @@
 <template>
   <footer class="ja-footer">
     <div class="ja-footer-main">
-      <a class="ja-brand" href="/jalan-aing" aria-label="Jalan Aing, beranda">
+      <NuxtLink class="ja-brand" to="/jalan-aing" aria-label="Jalan Aing, beranda">
         <svg class="ja-brand-mark" viewBox="0 0 58 64" fill="none" aria-hidden="true">
           <path d="M29 3C14.7 3 6 13.7 6 26.8c0 14.2 14.5 27 23 34.2 8.5-7.2 23-20 23-34.2C52 13.7 43.3 3 29 3Z" fill="#239CD5" />
           <path d="M29 3c14.3 0 23 10.7 23 23.8 0 14.2-14.5 27-23 34.2V3Z" fill="#356AB6" />
@@ -11,21 +11,21 @@
           <circle cx="40.5" cy="16.5" r="1.3" fill="#356AB6" />
         </svg>
         <span>Jalan<br>Aing</span>
-      </a>
-      <a class="ja-footer-cta" href="/jalan-aing/peta">Buka peta interaktif <span aria-hidden="true">→</span></a>
+      </NuxtLink>
+      <NuxtLink class="ja-footer-cta" to="/jalan-aing/peta">Buka peta interaktif <span aria-hidden="true">→</span></NuxtLink>
     </div>
     <div class="ja-footer-links">
       <p>Laporkan kondisi jalan dengan lokasi dan informasi yang jelas agar dapat ditindaklanjuti.</p>
       <nav aria-label="Layanan Jalan Aing">
         <strong>Layanan</strong>
-        <a href="/jalan-aing/peta">Peta interaktif</a>
-        <a href="/jalan-aing/aduan">Buat aduan</a>
-        <a href="/jalan-aing/lacak">Lacak status</a>
+        <NuxtLink to="/jalan-aing/peta">Peta interaktif</NuxtLink>
+        <NuxtLink to="/jalan-aing/aduan">Buat aduan</NuxtLink>
+        <NuxtLink to="/jalan-aing/lacak">Lacak status</NuxtLink>
       </nav>
       <nav aria-label="Panduan Jalan Aing">
         <strong>Panduan</strong>
-        <a href="/jalan-aing">Mulai dari sini</a>
-        <a href="/jalan-aing/aduan">Perlu bantuan?</a>
+        <NuxtLink to="/jalan-aing">Mulai dari sini</NuxtLink>
+        <NuxtLink to="/jalan-aing/aduan">Perlu bantuan?</NuxtLink>
       </nav>
     </div>
     <div class="ja-footer-bottom"><span>Copyright ©2026 UPTD PLDDIG. All Rights Reserved |</span></div>

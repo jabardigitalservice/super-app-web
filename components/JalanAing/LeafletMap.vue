@@ -154,6 +154,7 @@ export default {
       busPollInFlight: false,
       busErrorNotified: false,
       busStopsLoaded: false,
+      busRoutesLoading: false,
       busStopErrorNotified: false,
       busStops: [],
       busStopMarkers: {},
@@ -189,7 +190,7 @@ export default {
     this.initMap()
   },
   beforeDestroy() {
-    window.clearInterval(this.busPollTimer)
+    this.stopBusPolling()
     Object.values(this.busAnimationFrames).forEach((frame) => window.cancelAnimationFrame(frame))
     if (this.map) {
       this.map.remove()
@@ -238,8 +239,6 @@ export default {
       this.setBasemap(config.basemap)
       this.createDataLayers()
       this.syncLayers(this.layerVisibility)
-      this.startBusPolling()
-      this.loadBusRoutes()
       this.syncComplaintMarker(this.complaintLocation)
       this.syncSearchMarker(this.searchLocation)
       this.map.on('click', (event) => this.$emit('create-complaint', { lat: event.latlng.lat, lng: event.latlng.lng }))
@@ -254,8 +253,13 @@ export default {
       window.setTimeout(() => this.map?.invalidateSize(), 100)
     },
     startBusPolling() {
+      if (this.busPollTimer) return
       this.loadBuses()
       this.busPollTimer = window.setInterval(() => this.loadBuses(), BUS_REFRESH_INTERVAL)
+    },
+    stopBusPolling() {
+      window.clearInterval(this.busPollTimer)
+      this.busPollTimer = null
     },
     syncComplaintMarker(location) {
       if (!this.map || !this.leaflet) return
@@ -306,7 +310,7 @@ export default {
       if (this.map && Number.isFinite(lat) && Number.isFinite(lng)) this.map.flyTo([lat, lng], 17, { animate: true, duration: 0.75 })
     },
     async loadBuses() {
-      if (this.busPollInFlight) return
+      if (!this.layerVisibility.bus || this.busPollInFlight) return
       this.busPollInFlight = true
       try {
         const response = await fetch(`${MJT_API_URL}/buses`)
@@ -326,7 +330,8 @@ export default {
       }
     },
     async loadBusRoutes() {
-      if (this.busStopsLoaded) return
+      if (this.busStopsLoaded || this.busRoutesLoading) return
+      this.busRoutesLoading = true
       try {
         const routes = await getMjtRoutes()
 
@@ -357,6 +362,8 @@ export default {
           this.busStopErrorNotified = true
           this.$emit('notify', 'Data rute bus belum dapat dimuat')
         }
+      } finally {
+        this.busRoutesLoading = false
       }
     },
     renderBusStops() {
@@ -657,6 +664,9 @@ export default {
         }
         if (visibility[id] && GIS_LAYERS[id]) this.loadGeoJson(id)
       })
+      if (visibility.bus || visibility.busStops) this.loadBusRoutes()
+      if (visibility.bus) this.startBusPolling()
+      else this.stopBusPolling()
       if (visibility.busStops) this.renderBusStops()
     },
     animateLayer(layer) {

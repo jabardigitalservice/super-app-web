@@ -32,39 +32,39 @@
           <p class="ja-kicker">Mulai dari sini</p>
           <h2 id="service-title">Apa yang ingin Anda lakukan?</h2>
         </div>
-        <a href="/jalan-aing/peta">Buka peta jalan <span aria-hidden="true">→</span></a>
+        <NuxtLink to="/jalan-aing/peta">Buka peta jalan <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <div class="ja-service-grid">
-        <a href="/jalan-aing/peta" class="ja-service-card ja-service-map">
+        <NuxtLink to="/jalan-aing/peta" class="ja-service-card ja-service-map">
           <span class="ja-service-icon"><Icon src="/icon/pin-map.svg" size="26px" /></span>
           <span class="ja-label">Peta Jalan</span>
           <strong>Tandai lokasi kejadian</strong>
           <small>Pilih titik jalan rusak agar lokasi ikut masuk ke aduan.</small>
-        </a>
-        <a href="/jalan-aing/aduan" class="ja-service-card">
+        </NuxtLink>
+        <NuxtLink to="/jalan-aing/aduan" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="warning" size="24px" /></span>
           <span class="ja-label">Aduan</span>
           <strong>Laporkan jalan rusak</strong>
           <small>Isi jenis kerusakan, keterangan, dan foto pendukung.</small>
-        </a>
-        <a href="/jalan-aing/peta" class="ja-service-card">
+        </NuxtLink>
+        <NuxtLink to="/jalan-aing/peta" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="eye" size="24px" /></span>
           <span class="ja-label">Informasi Peta</span>
           <strong>Lihat ruas dan fasilitas</strong>
           <small>Aktifkan layer jalan, halte, layanan kesehatan, dan rest area.</small>
-        </a>
-        <a href="/jalan-aing/lacak" class="ja-service-card">
+        </NuxtLink>
+        <NuxtLink to="/jalan-aing/lacak" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="magnifier" size="24px" /></span>
           <span class="ja-label">Pelacakan</span>
           <strong>Periksa status aduan</strong>
           <small>Gunakan nomor tiket untuk membuka halaman pelacakan aduan.</small>
-        </a>
+        </NuxtLink>
         <aside class="ja-latest">
           <p>Siap membuat aduan?</p>
           <h3>Mulai dari titik kerusakan yang paling dekat.</h3>
           <span>Lokasi, foto, dan keterangan singkat membuat aduan lebih mudah ditindaklanjuti.</span>
-          <a href="/jalan-aing/peta">Tandai lokasi di peta <span aria-hidden="true">→</span></a>
+          <NuxtLink to="/jalan-aing/peta">Tandai lokasi di peta <span aria-hidden="true">→</span></NuxtLink>
         </aside>
       </div>
     </section>
@@ -179,6 +179,10 @@ export default {
   .ja-hero { padding-top: 72px; }
   .ja-service-grid { padding-right: 0; }
   .ja-latest { position: static; min-height: 192px; }
+}
+
+@media (max-width: 640px) {
+  .jalan-aing { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 820px) {
