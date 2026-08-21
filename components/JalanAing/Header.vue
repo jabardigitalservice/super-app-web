@@ -12,17 +12,17 @@
       <span>Jalan<br>Aing</span>
     </NuxtLink>
     <nav class="ja-nav" aria-label="Navigasi Jalan Aing">
-      <NuxtLink to="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined">Beranda</NuxtLink>
-      <NuxtLink to="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined">Peta Interaktif</NuxtLink>
-      <NuxtLink to="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined">Buat Aduan</NuxtLink>
-      <NuxtLink to="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined">Lacak Status</NuxtLink>
+      <NuxtLink to="/jalan-aing" :class="{ 'is-active': navActive === 'beranda' }" :aria-current="navActive === 'beranda' ? 'page' : undefined">Beranda</NuxtLink>
+      <NuxtLink to="/jalan-aing/peta" :class="{ 'is-active': navActive === 'peta' }" :aria-current="navActive === 'peta' ? 'page' : undefined">Peta Interaktif</NuxtLink>
+      <NuxtLink to="/jalan-aing/aduan" :class="{ 'is-active': navActive === 'aduan' }" :aria-current="navActive === 'aduan' ? 'page' : undefined">Buat Aduan</NuxtLink>
+      <NuxtLink to="/jalan-aing/lacak" :class="{ 'is-active': navActive === 'lacak' }" :aria-current="navActive === 'lacak' ? 'page' : undefined">Lacak Status</NuxtLink>
     </nav>
     <NuxtLink class="ja-help" to="/jalan-aing/aduan">Perlu bantuan?</NuxtLink>
     <nav class="ja-bottom-nav" aria-label="Navigasi utama">
-      <NuxtLink to="/jalan-aing" :aria-current="active === 'beranda' ? 'page' : undefined"><span aria-hidden="true"><Icon name="home-outline" size="18px" /></span><span>Beranda</span></NuxtLink>
-      <NuxtLink to="/jalan-aing/peta" :aria-current="active === 'peta' ? 'page' : undefined"><span aria-hidden="true"><Icon src="/icon/pin-map.svg" size="18px" /></span><span>Peta</span></NuxtLink>
-      <NuxtLink to="/jalan-aing/aduan" :aria-current="active === 'aduan' ? 'page' : undefined"><span aria-hidden="true"><Icon name="warning" size="18px" /></span><span>Aduan</span></NuxtLink>
-      <NuxtLink to="/jalan-aing/lacak" :aria-current="active === 'lacak' ? 'page' : undefined"><span aria-hidden="true"><Icon name="magnifier" size="18px" /></span><span>Lacak</span></NuxtLink>
+      <NuxtLink to="/jalan-aing" :class="{ 'is-active': navActive === 'beranda' }" :aria-current="navActive === 'beranda' ? 'page' : undefined"><span aria-hidden="true"><Icon name="home-outline" size="18px" /></span><span>Beranda</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/peta" :class="{ 'is-active': navActive === 'peta' }" :aria-current="navActive === 'peta' ? 'page' : undefined"><span aria-hidden="true" class="ja-pin-icon"><svg width="18" height="18" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.4854 4.18137C22.6885 6.38421 23.9485 9.35752 23.999 12.4726C24.0496 15.5877 22.8866 18.6003 20.7561 20.8734L20.4854 21.1534L14.8281 26.8094C14.1102 27.5267 13.1466 27.9444 12.1323 27.9779C11.118 28.0113 10.1289 27.6579 9.36541 26.9894L9.17341 26.8094L3.51474 21.152C1.26429 18.9016 0 15.8493 0 12.6667C0 9.48408 1.26429 6.43182 3.51474 4.18137C5.76519 1.93092 8.81746 0.666626 12.0001 0.666626C15.1827 0.666626 18.235 1.93092 20.4854 4.18137ZM12.0001 8.6667C11.4748 8.6667 10.9546 8.77016 10.4693 8.97118C9.98404 9.1722 9.54308 9.46684 9.17165 9.83827C8.80021 10.2097 8.50557 10.6507 8.30456 11.136C8.10354 11.6213 8.00007 12.1414 8.00007 12.6667C8.00007 13.192 8.10354 13.7121 8.30456 14.1974C8.50557 14.6827 8.80021 15.1237 9.17165 15.4951C9.54308 15.8666 9.98404 16.1612 10.4693 16.3622C10.9546 16.5632 11.4748 16.6667 12.0001 16.6667C13.0609 16.6667 14.0784 16.2453 14.8285 15.4951C15.5786 14.745 16.0001 13.7276 16.0001 12.6667C16.0001 11.6058 15.5786 10.5884 14.8285 9.83827C14.0784 9.08813 13.0609 8.6667 12.0001 8.6667Z" fill="currentColor" /></svg></span><span>Peta</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/aduan" :class="{ 'is-active': navActive === 'aduan' }" :aria-current="navActive === 'aduan' ? 'page' : undefined"><span aria-hidden="true"><Icon name="warning" size="18px" /></span><span>Aduan</span></NuxtLink>
+      <NuxtLink to="/jalan-aing/lacak" :class="{ 'is-active': navActive === 'lacak' }" :aria-current="navActive === 'lacak' ? 'page' : undefined"><span aria-hidden="true"><Icon name="magnifier" size="18px" /></span><span>Lacak</span></NuxtLink>
     </nav>
   </header>
 </template>
@@ -31,6 +31,16 @@
 export default {
   name: 'JalanAingHeader',
   props: { active: { type: String, default: '' }, sticky: { type: Boolean, default: false } },
+  computed: {
+    navActive() {
+      const path = this.$route?.path || ''
+      if (path === '/jalan-aing') return 'beranda'
+      if (path.startsWith('/jalan-aing/peta')) return 'peta'
+      if (path.startsWith('/jalan-aing/aduan')) return 'aduan'
+      if (path.startsWith('/jalan-aing/lacak')) return 'lacak'
+      return this.active
+    },
+  },
 }
 </script>
 
@@ -42,7 +52,7 @@ export default {
 .ja-brand-mark { display: block; width: 44px; height: 44px; flex: 0 0 auto; }
 .ja-nav { gap: 30px; }
 .ja-nav a, .ja-help { color: #505867; font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.ja-nav a:hover, .ja-nav a[aria-current='page'], .ja-help:hover { color: #0d6d43; }
+.ja-nav a:hover, .ja-nav a.is-active, .ja-help:hover { color: #0d6d43; }
 .ja-nav a:focus-visible, .ja-help:focus-visible { outline: 3px solid #ffcf51; outline-offset: 3px; }
 .ja-bottom-nav { display: none; }
 @media (max-width: 820px) {
@@ -60,7 +70,7 @@ export default {
   .ja-nav { display: none; }
   .ja-bottom-nav { position: fixed; z-index: 1000; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 64px; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #dce7e0; background: #fffefb; }
   .ja-bottom-nav a { display: grid; min-height: 64px; place-items: center; align-content: center; gap: 5px; padding: 6px 4px; color: #68758a; font-size: 11px; font-weight: 700; line-height: 1; text-decoration: none; white-space: nowrap; }
-  .ja-bottom-nav a[aria-current='page'] { color: #0d6d43; box-shadow: inset 0 3px #0d6d43; }
+  .ja-bottom-nav a.is-active { color: #0d6d43; box-shadow: inset 0 3px #0d6d43; }
   .ja-bottom-nav a:focus-visible { position: relative; z-index: 1; outline: 3px solid #ffcf51; outline-offset: -3px; }
   .ja-bottom-nav a:active { background: #edf4ef; }
 }

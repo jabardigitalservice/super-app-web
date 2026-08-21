@@ -5,7 +5,7 @@
     <main class="ja-complaint-main">
       <div class="ja-complaint-intro">
         <div>
-          <p>Buat aduan</p>
+          <p>BUAT ADUAN</p>
           <h1>{{ introTitle }}</h1>
           <span>{{ introDescription }}</span>
         </div>
@@ -285,6 +285,7 @@ export default {
     currentStep(step) {
       this.persistDraft()
       if (step === 3) this.lookupAddress()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     formData: { handler: 'persistDraft', deep: true },
   },
