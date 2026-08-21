@@ -228,6 +228,7 @@
           </div>
           <JalanAingMap
             v-show="cloneLoc"
+            :key="mapKey"
             :coords="cloneLoc"
             :zoom="16"
             @set:place="getPlaceDetail"
@@ -292,6 +293,10 @@ export default {
       showLocationModal: false,
       hasResolvedLocation: false,
       cloneLocation: cloneDeep(this.$store.state.imahAingForm.lokasiTanah),
+      // T5: dipakai buat force-remount JalanAingMap saat coords berubah lewat
+      // "Gunakan Lokasi Saya" tanpa modal ke-close/reopen — komponen itu gak
+      // reactive ke perubahan prop `coords` setelah mount (lihat plan-2026-08-20 §3).
+      mapKey: 0,
     }
   },
   computed: {
@@ -429,6 +434,7 @@ export default {
       if (deviceCoords) {
         this.cloneLocation.location = deviceCoords
         this.hasResolvedLocation = true
+        this.mapKey += 1
       }
     },
     closeMaps() {
