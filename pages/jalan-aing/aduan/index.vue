@@ -20,23 +20,19 @@
           <span class="ja-complaint-location-dot" aria-hidden="true" />
           <div>
             <strong>Belum ada titik dipilih</strong>
-            <a href="/jalan-aing/peta">Pilih titik di peta interaktif <span aria-hidden="true">→</span></a>
+            <NuxtLink to="/jalan-aing/peta">Pilih titik di peta interaktif <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </div>
       </div>
 
       <ol class="ja-complaint-steps" aria-label="Tahapan aduan">
-        <template v-for="(step, index) in steps">
-          <li
-            :key="step"
-            :class="{ 'is-active': index === currentStep - 1, 'is-done': index < currentStep - 1 }"
-            :aria-current="index === currentStep - 1 ? 'step' : null"
-          >
+        <li v-for="(step, index) in steps" :key="step" :class="{ 'is-active': index === currentStep - 1, 'is-done': index < currentStep - 1 }" :aria-current="index === currentStep - 1 ? 'step' : null">
+          <span class="ja-complaint-step">
             <span>{{ index < currentStep - 1 ? '✓' : index + 1 }}</span>
             <strong>{{ step }}</strong>
-          </li>
-          <li v-if="index < steps.length - 1" :key="`${step}-sep`" class="ja-complaint-steps-sep" :class="{ 'is-filled': index < currentStep - 1 }" aria-hidden="true" />
-        </template>
+          </span>
+          <span v-if="index < steps.length - 1" class="ja-complaint-steps-sep" :class="{ 'is-filled': index < currentStep - 1 }" aria-hidden="true" />
+        </li>
       </ol>
 
       <section v-if="currentStep === 1" class="ja-complaint-categories" aria-labelledby="category-heading">
@@ -219,6 +215,8 @@
 </template>
 
 <script>
+import { isJalanAingLocation } from '~/utils/jalan-aing-location'
+
 const categories = [
   { id: 'jalan_berlubang', label: 'Jalan Berlubang', description: 'Lubang atau keretakan pada aspal' },
   { id: 'jalan_rusak', label: 'Jalan Rusak', description: 'Kerusakan struktur jalan/bergelombang' },
@@ -273,7 +271,7 @@ export default {
       return 'Isi data diri Anda agar laporan dapat kami tindaklanjuti.'
     },
     hasLocation() {
-      return Number.isFinite(Number(this.$route.query.lat)) && Number.isFinite(Number(this.$route.query.lng))
+      return isJalanAingLocation(Number(this.$route.query.lat), Number(this.$route.query.lng))
     },
     latitude() {
       return Math.abs(Number(this.$route.query.lat)).toFixed(6)
@@ -474,14 +472,16 @@ export default {
 .ja-complaint-location-empty a:hover { text-decoration: underline; }
 .ja-complaint-actions-hint { color: #c94b4b; font-size: 12px; }
 .ja-complaint-steps { display: flex; align-items: center; margin: 0 0 32px; padding: 0; list-style: none; }
+.ja-complaint-steps > li { display: flex; min-width: 0; flex: 1 1 auto; align-items: center; }
+.ja-complaint-steps > li:last-child { flex: 0 0 auto; }
 .ja-complaint-steps-sep { flex: 1 1 auto; height: 1px; margin: 0 6px; background: #dce2e6; transition: background-color 200ms ease; }
 .ja-complaint-steps-sep.is-filled { background: var(--ja-green); }
-.ja-complaint-steps li:not(.ja-complaint-steps-sep) { display: flex; flex-shrink: 0; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #fff; color: #98a2b2; font-size: 12px; }
-.ja-complaint-steps span { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid #dce2e6; border-radius: 50%; background: #fff; font-size: 11px; font-weight: 700; }
+.ja-complaint-step { display: flex; flex-shrink: 0; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #fff; color: #98a2b2; font-size: 12px; }
+.ja-complaint-step > span { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid #dce2e6; border-radius: 50%; background: #fff; font-size: 11px; font-weight: 700; }
 .ja-complaint-steps strong { font-weight: 650; line-height: 1.2; white-space: nowrap; }
-.ja-complaint-steps .is-active { background: #eef4f0; color: var(--ja-green); }
-.ja-complaint-steps .is-active span { border-color: var(--ja-green); background: var(--ja-green); color: #fff; }
-.ja-complaint-steps .is-done span { border-color: var(--ja-green); background: #fff; color: var(--ja-green); }
+.ja-complaint-steps .is-active .ja-complaint-step { background: #eef4f0; color: var(--ja-green); }
+.ja-complaint-steps .is-active .ja-complaint-step > span { border-color: var(--ja-green); background: var(--ja-green); color: #fff; }
+.ja-complaint-steps .is-done .ja-complaint-step > span { border-color: var(--ja-green); background: #fff; color: var(--ja-green); }
 .ja-complaint-steps .is-done strong { color: #536176; }
 .ja-complaint-section-heading { margin-bottom: 22px; }
 .ja-complaint-section-heading h2 { margin: 7px 0 0; font-size: 22px; letter-spacing: -.025em; }
@@ -607,9 +607,9 @@ export default {
   .ja-complaint-location { margin-top: 14px; }
   .ja-complaint-steps { margin: 22px 0 28px; }
   .ja-complaint-steps-sep { margin: 0 4px; }
-  .ja-complaint-steps li:not(.ja-complaint-steps-sep) { gap: 0; padding: 4px; }
-  .ja-complaint-steps li:not(.ja-complaint-steps-sep) strong { display: none; }
-  .ja-complaint-steps span { width: 26px; height: 26px; font-size: 10px; }
+  .ja-complaint-step { gap: 0; padding: 4px; }
+  .ja-complaint-step strong { display: none; }
+  .ja-complaint-step > span { width: 26px; height: 26px; font-size: 10px; }
   .ja-complaint-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .ja-complaint-category { min-height: 146px; padding: 14px; border-radius: 14px; }
   .ja-complaint-category > span { width: 28px; height: 28px; margin-bottom: 10px; font-size: 11px; }

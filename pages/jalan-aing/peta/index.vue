@@ -30,15 +30,17 @@
         />
         <div class="ja-map-search" role="search" :class="{ 'is-searching': searching }" :aria-busy="searching">
           <span class="ja-map-search-icon"><Icon name="magnifier" size="16px" aria-hidden="true" /></span>
-          <input v-model.trim="searchQuery" type="search" aria-label="Cari lokasi" placeholder="Cari nama jalan, tempat, atau area" @input="queueSearch" />
+          <input ref="searchInput" v-model.trim="searchQuery" type="search" role="combobox" aria-label="Cari lokasi" aria-autocomplete="list" :aria-controls="searchResults.length ? 'ja-map-search-results' : undefined" :aria-expanded="String(Boolean(searchResults.length))" :aria-activedescendant="activeSearchIndex >= 0 ? `ja-map-search-result-${activeSearchIndex}` : undefined" placeholder="Cari nama jalan, tempat, atau area" @input="queueSearch" @keydown="handleSearchKeydown" />
           <button v-if="searchQuery" class="ja-map-search-clear" type="button" aria-label="Hapus pencarian" @click="clearSearch"><Icon name="times" size="13px" aria-hidden="true" /></button>
-          <span v-if="searching" class="ja-map-search-status"><i aria-hidden="true" />Mencari</span>
+          <span v-if="searching" class="ja-map-search-progress" aria-hidden="true" />
+          <span v-if="searching" class="ja-map-search-loading-text" role="status">Mencari lokasi…</span>
         </div>
-        <div v-if="searchResults.length || searchMessage" class="ja-map-search-results" aria-live="polite">
+        <div v-if="searchResults.length || searchMessage" id="ja-map-search-results" class="ja-map-search-results" :role="searchResults.length ? 'listbox' : undefined" aria-live="polite">
           <p v-if="searchResults.length" class="ja-map-search-results-label">Pilih lokasi</p>
-          <button v-for="place in searchResults" :key="place.place_id" type="button" @click="focusPlace(place)"><i class="ja-map-search-result-dot" aria-hidden="true" /><span><strong>{{ place.name }}</strong><span>{{ place.display_name }}</span></span></button>
+          <button v-for="(place, index) in searchResults" :id="`ja-map-search-result-${index}`" :key="place.place_id" type="button" role="option" :aria-selected="activeSearchIndex === index" :class="{ 'is-active': activeSearchIndex === index }" @mouseenter="activeSearchIndex = index" @click="focusPlace(place)"><i class="ja-map-search-result-dot" aria-hidden="true" /><span><strong>{{ place.name }}</strong><span>{{ place.display_name }}</span></span></button>
           <p v-if="searchMessage">{{ searchMessage }}</p>
         </div>
+        <p v-if="locationError" class="ja-map-location-error" role="alert">{{ locationError }}</p>
         <aside
           v-if="selectedMarker"
           class="ja-map-detail-card"
@@ -103,6 +105,7 @@
 
 <script>
 import { searchMapSources } from '~/utils/jalan-aing-map-search'
+import { isJalanAingLocation } from '~/utils/jalan-aing-location'
 
 export default {
   name: 'JalanAingMapPage',
@@ -137,6 +140,8 @@ export default {
       searching: false,
       searchTimer: null,
       searchRequestId: 0,
+      activeSearchIndex: -1,
+      locationError: '',
       documentOverflow: '',
     }
   },
@@ -172,11 +177,18 @@ export default {
       this.selectedMarker = marker
       this.complaintLocation = null
       this.searchLocation = null
+      this.locationError = ''
     },
     selectComplaintLocation(location) {
+      if (!isJalanAingLocation(location.lat, location.lng)) {
+        this.complaintLocation = null
+        this.locationError = 'Titik aduan harus berada di Jawa Barat.'
+        return
+      }
       this.complaintLocation = location
       this.selectedMarker = null
       this.searchLocation = null
+      this.locationError = ''
     },
     openComplaintForm() {
       this.$router.push({
@@ -188,6 +200,7 @@ export default {
       window.clearTimeout(this.searchTimer)
       this.searchMessage = ''
       this.searchResults = []
+      this.activeSearchIndex = -1
       if (this.searchQuery.length < 3) return
       this.searchTimer = window.setTimeout(() => this.searchPlaces(), 450)
     },
@@ -199,6 +212,7 @@ export default {
       this.searchMessage = ''
       this.searching = false
       this.searchLocation = null
+      this.activeSearchIndex = -1
     },
     async searchPlaces() {
       if (this.searchQuery.length < 3) return
@@ -208,6 +222,7 @@ export default {
         const { results, available } = await searchMapSources(this.searchQuery)
         if (requestId !== this.searchRequestId) return
         this.searchResults = results
+        this.activeSearchIndex = results.length ? 0 : -1
         if (!results.length) this.searchMessage = available ? 'Lokasi tidak ditemukan.' : 'Pencarian lokasi belum tersedia.'
       } catch (error) {
         if (requestId === this.searchRequestId) this.searchMessage = 'Pencarian lokasi belum tersedia.'
@@ -216,12 +231,33 @@ export default {
       }
     },
     focusPlace(place) {
+      const lat = Number(place.lat)
+      const lng = Number(place.lon)
+      if (!isJalanAingLocation(lat, lng)) {
+        this.locationError = 'Titik aduan harus berada di Jawa Barat.'
+        return
+      }
       this.selectedMarker = null
       this.complaintLocation = null
-      this.searchLocation = { lat: Number(place.lat), lng: Number(place.lon), label: place.name }
+      this.searchLocation = { lat, lng, label: place.name }
       this.$refs.leafletMap?.focusLocation(this.searchLocation)
       this.searchResults = []
       this.searchMessage = ''
+      this.activeSearchIndex = -1
+      this.locationError = ''
+    },
+    handleSearchKeydown(event) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (!this.searchResults.length) return
+        event.preventDefault()
+        const change = event.key === 'ArrowDown' ? 1 : -1
+        this.activeSearchIndex = (this.activeSearchIndex + change + this.searchResults.length) % this.searchResults.length
+      } else if (event.key === 'Enter' && this.activeSearchIndex >= 0) {
+        event.preventDefault()
+        this.focusPlace(this.searchResults[this.activeSearchIndex])
+      } else if (event.key === 'Escape') {
+        this.clearSearch()
+      }
     },
   },
 }
@@ -384,25 +420,34 @@ export default {
 }
 .ja-map-search-clear:hover { background: #e1e5ea; }
 .ja-map-search-clear:focus-visible { outline: 2px solid var(--ja-map-yellow); outline-offset: 2px; }
-.ja-map-search-status {
-  flex: 0 0 auto;
-  font-size: 10px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.ja-map-search-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #465064;
-}
-.ja-map-search-status i {
-  width: 8px;
-  height: 8px;
-  border: 2px solid #d5d9e1;
-  border-top-color: #465064;
+.ja-map-search-progress {
+  position: absolute;
+  right: 13px;
+  bottom: 5px;
+  left: 45px;
+  height: 2px;
+  overflow: hidden;
   border-radius: 999px;
-  animation: ja-map-search-spin 0.7s linear infinite;
+  background: var(--ja-map-rule);
+  pointer-events: none;
+}
+.ja-map-search-progress::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 36%;
+  border-radius: inherit;
+  background: var(--ja-map-green-dark);
+  content: '';
+  animation: ja-map-search-progress 0.9s linear infinite;
+}
+.ja-map-search-loading-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .ja-map-search:focus-within {
   border-color: #7b8595;
@@ -449,7 +494,8 @@ export default {
   text-align: left;
 }
 .ja-map-search-results button:hover,
-.ja-map-search-results button:focus-visible { background: #f5f7f9; }
+.ja-map-search-results button:focus-visible,
+.ja-map-search-results button.is-active { background: #f5f7f9; }
 .ja-map-search-results button:focus-visible { outline: 2px solid var(--ja-map-yellow); outline-offset: -2px; }
 .ja-map-search-result-dot {
   width: 8px;
@@ -472,7 +518,14 @@ export default {
   line-height: 1.35;
 }
 .ja-map-search-results p:not(.ja-map-search-results-label) { padding: 12px 13px; }
-@keyframes ja-map-search-spin { to { transform: rotate(360deg); } }
+.ja-map-location-error { position: absolute; z-index: 750; right: clamp(20px, 3vw, 48px); bottom: 24px; width: min(360px, calc(100% - 40px)); margin: 0; padding: 12px 14px; border: 1px solid #f3c1c1; border-radius: 12px; background: #fff5f5; color: #a02c2c; font-size: 13px; font-weight: 700; }
+@keyframes ja-map-search-progress {
+  from { transform: translateX(-300%); }
+  to { transform: translateX(400%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ja-map-search-progress::after { animation-duration: 1.8s; }
+}
 .ja-map-detail-card {
   position: absolute;
   z-index: 700;
@@ -760,6 +813,7 @@ export default {
     bottom: 16px;
     width: calc(100% - 32px);
   }
+  .ja-map-location-error { right: 16px; bottom: 16px; width: calc(100% - 32px); box-sizing: border-box; }
   .ja-map-complaint-card {
     padding: 16px;
     border-radius: 18px;
