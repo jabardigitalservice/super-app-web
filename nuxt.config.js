@@ -52,6 +52,7 @@ export default {
 
   serverMiddleware: [
     { path: '/api/jalan-aing/geodata', handler: '~/server-middleware/jalan-aing-geoserver.js' },
+    { path: '/imah-aing', handler: '~/server-middleware/imah-aing-frame-guard.js' },
   ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules

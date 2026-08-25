@@ -1,0 +1,7 @@
+/imah-aing
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+
+/imah-aing/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
