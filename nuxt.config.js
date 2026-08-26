@@ -52,6 +52,7 @@ export default {
 
   serverMiddleware: [
     { path: '/api/jalan-aing/geodata', handler: '~/server-middleware/jalan-aing-geoserver.js' },
+    { path: '/api/jalan-aing/complaints', handler: '~/server-middleware/jalan-aing-aduan.js' },
     { path: '/imah-aing', handler: '~/server-middleware/imah-aing-frame-guard.js' },
   ],
 
@@ -119,6 +120,13 @@ export default {
       keycloakUrl: process.env.KEYCLOAK_URL,
       keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_PARTNER,
       keycloakClientSecret: process.env.KEYCLOAK_CLIENT_SECRET_PARTNER,
+    },
+    apiAduanJalanAing: {
+      keycloakUrl: process.env.KEYCLOAK_URL,
+      keycloakClientId: process.env.KEYCLOAK_CLIENT_ID_JALAN_AING || 'jalan-aing',
+      keycloakClientSecret:
+        process.env.KEYCLOAK_CLIENT_SECRET_JALAN_AING ||
+        'xctam5pZgC4yvhMyaf5Rkc2wfGGAEdeF',
     },
     urlFile: process.env.URL_FILE,
     unleash: {

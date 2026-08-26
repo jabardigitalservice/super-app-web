@@ -176,11 +176,37 @@
               <dd>{{ addressLoading ? 'Mencari alamat…' : reverseAddress || 'Alamat belum tersedia untuk titik ini.' }}</dd>
             </div>
           </dl>
+          <div class="ja-complaint-fields">
+            <label class="ja-complaint-field" :class="{ 'has-error': formErrors.cityName }">
+              <span>Kabupaten/Kota <b class="ja-required" aria-label="wajib diisi">*</b></span>
+              <select v-model="formData.cityName" required aria-required="true" @change="handleCityChange">
+                <option value="" disabled>Pilih kabupaten/kota</option>
+                <option v-for="city in citiesOption" :key="city.value" :value="city.value">{{ city.label }}</option>
+              </select>
+              <small v-if="formErrors.cityName" class="is-error" role="alert">{{ formErrors.cityName }}</small>
+            </label>
+            <div class="ja-complaint-fields-row">
+              <label class="ja-complaint-field">
+                <span>Kecamatan</span>
+                <select v-model="formData.districtName" :disabled="!districtsOption.length" @change="handleDistrictChange">
+                  <option value="" disabled>{{ districtsOption.length ? 'Pilih kecamatan' : 'Pilih kabupaten/kota dulu' }}</option>
+                  <option v-for="district in districtsOption" :key="district.value" :value="district.value">{{ district.label }}</option>
+                </select>
+              </label>
+              <label class="ja-complaint-field">
+                <span>Kelurahan/Desa</span>
+                <select v-model="formData.villageName" :disabled="!villagesOption.length">
+                  <option value="" disabled>{{ villagesOption.length ? 'Pilih kelurahan/desa' : 'Pilih kecamatan dulu' }}</option>
+                  <option v-for="village in villagesOption" :key="village.value" :value="village.value">{{ village.label }}</option>
+                </select>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div class="ja-complaint-actions">
           <button type="button" class="ja-complaint-back" @click="currentStep = 2">Sebelumnya</button>
-          <button type="button" class="ja-complaint-next" @click="submitReport">Kirim Laporan</button>
+          <button type="button" class="ja-complaint-next" :disabled="isSubmitting" @click="submitReport">{{ isSubmitting ? 'Mengirim…' : 'Kirim Laporan' }}</button>
         </div>
       </section>
 
@@ -198,7 +224,7 @@
       <div class="ja-success-icon" aria-hidden="true"><Icon name="check-mark-circle" size="52px" /></div>
       <h1 id="success-title">Laporan Berhasil Terkirim!</h1>
       <p class="ja-success-message">Hatur nuhun atas kepedulian Anda. Laporan Anda telah tercatat ke dalam pusat kendali Dinas Bina Marga Jawa Barat untuk diverifikasi lapangan.</p>
-      <section class="ja-success-ticket" aria-label="Nomor tiket aduan">
+      <section v-if="submittedTicket" class="ja-success-ticket" aria-label="Nomor tiket aduan">
         <small>Nomor tiket aduan</small>
         <div>
           <strong>{{ submittedTicket }}</strong>
@@ -206,8 +232,9 @@
         </div>
         <p>Gunakan nomor tiket ini untuk melacak status pengerjaan aduan Anda.</p>
       </section>
+      <p v-else class="ja-success-message">Simpan bukti pengiriman ini. Nomor tiket belum diberikan oleh layanan Aduan.</p>
       <div class="ja-success-actions">
-        <button type="button" class="ja-success-track" @click="trackStatus">Lacak Status Aduan</button>
+        <button v-if="submittedTicket" type="button" class="ja-success-track" @click="trackStatus">Lacak Status Aduan</button>
         <button type="button" class="ja-success-new" @click="startNewComplaint">Buat Aduan Baru</button>
       </div>
     </dialog>
@@ -215,6 +242,7 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
 import { isJalanAingLocation } from '~/utils/jalan-aing-location'
 
 const categories = [
@@ -229,6 +257,8 @@ const categories = [
   { id: 'lainnya', label: 'Darurat Lainnya', description: 'Hambatan, kecelakaan, masalah lainnya' },
 ]
 const DRAFT_STORAGE_KEY = 'jalan-aing-aduan-draft'
+// Sementara: submit aduan belum menembak API (integrasi backend dinonaktifkan).
+const SUBMIT_API_ENABLED = false
 const emptyFormData = () => ({
   title: '',
   description: '',
@@ -237,6 +267,9 @@ const emptyFormData = () => ({
   reporterName: '',
   reporterPhone: '',
   reporterEmail: '',
+  cityName: '',
+  districtName: '',
+  villageName: '',
 })
 
 export default {
@@ -257,9 +290,17 @@ export default {
       addressLoading: false,
       photoError: '',
       selectedPhoto: null,
+      isSubmitting: false,
+      reverseLocation: {},
+      citiesReady: Promise.resolve(),
     }
   },
   computed: {
+    ...mapState('location', ['cities', 'subDistricts', 'villages']),
+    ...mapGetters('location', ['citiesOption', 'subDitrictsOption', 'villagesOption']),
+    districtsOption() {
+      return this.subDitrictsOption || []
+    },
     introTitle() {
       if (this.currentStep === 1) return 'Laporkan kondisi jalan.'
       if (this.currentStep === 2) return 'Ceritakan kondisi jalan.'
@@ -279,6 +320,18 @@ export default {
     longitude() {
       return Math.abs(Number(this.$route.query.lng)).toFixed(6)
     },
+    reverseCity() {
+      const loc = this.reverseLocation
+      return loc.city || loc.town || loc.municipality || loc.county || loc.regency || ''
+    },
+    reverseDistrict() {
+      const loc = this.reverseLocation
+      return loc.district || loc.city_district || loc.subdistrict || loc.suburb || ''
+    },
+    reverseVillage() {
+      const loc = this.reverseLocation
+      return loc.village || loc.neighbourhood || loc.hamlet || loc.quarter || ''
+    },
   },
   watch: {
     selectedCategory: 'persistDraft',
@@ -290,15 +343,18 @@ export default {
     formData: { handler: 'persistDraft', deep: true },
   },
   mounted() {
+    this.citiesReady = this.ensureCitiesLoaded()
     try {
       const draft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || '{}')
       if (!this.selectedCategory && categories.some(({ id }) => id === draft.selectedCategory)) this.selectCategory(draft.selectedCategory)
-      const draftFields = ['title', 'description', 'reporterName', 'reporterPhone', 'reporterEmail']
+      const draftFields = ['title', 'description', 'reporterName', 'reporterPhone', 'reporterEmail', 'cityName', 'districtName', 'villageName']
       draftFields.forEach((field) => {
         if (typeof draft.formData?.[field] === 'string') this.formData[field] = draft.formData[field]
       })
       if (['publik', 'privat'].includes(draft.formData?.complaintType)) this.formData.complaintType = draft.formData.complaintType
       if (this.hasLocation && [1, 2, 3].includes(draft.currentStep)) this.currentStep = draft.currentStep
+      // Restore cascade options untuk draft city/district yang tersimpan
+      if (this.formData.cityName) this.citiesReady.then(() => this.handleCityChange())
     } catch (_) {
       localStorage.removeItem(DRAFT_STORAGE_KEY)
     }
@@ -307,6 +363,21 @@ export default {
     this.formData.photos.forEach(({ src }) => URL.revokeObjectURL(src))
   },
   methods: {
+    /**
+     * Pastikan master data kota/kab termuat. Coba cache localStorage dulu
+     * (via setCitiesOption); kalau hasilnya tetap kosong — cache korup atau
+     * request gagal — fetch paksa langsung ke /area/city.
+     */
+    async ensureCitiesLoaded() {
+      if (this.cities.length) return
+      await this.$store.dispatch('location/setCitiesOption', 'cities')
+      if (!this.cities.length) {
+        await this.$store.dispatch('location/fetchAreas', {
+          params: { depth: 2, provinceId: 32 },
+          localStorageKey: 'cities',
+        })
+      }
+    },
     selectCategory(category) {
       this.selectedCategory = category
       if (this.$route.query.category !== category) this.$router.replace({ query: { ...this.$route.query, category } })
@@ -323,6 +394,9 @@ export default {
             reporterName: this.formData.reporterName,
             reporterPhone: this.formData.reporterPhone,
             reporterEmail: this.formData.reporterEmail,
+            cityName: this.formData.cityName,
+            districtName: this.formData.districtName,
+            villageName: this.formData.villageName,
           },
         }))
       } catch (_) {}
@@ -342,11 +416,84 @@ export default {
         if (!response.ok) throw new Error('Alamat tidak tersedia')
         const data = await response.json()
         this.reverseAddress = data.display_name || ''
+        this.reverseLocation = data.address || {}
       } catch (_) {
         this.reverseAddress = ''
       } finally {
         this.addressLoading = false
       }
+      // Prefill cascade di luar try/catch reverse — kegagalan master data
+      // tidak boleh menyembunyikan alamat yang sudah berhasil di-resolve.
+      try {
+        await this.citiesReady
+        await this.prefillAreaSelection()
+      } catch (error) {
+        console.error('Gagal prefill wilayah:', error)
+      }
+    },
+    /**
+     * Prefill select kab/kota, kecamatan, kelurahan dari hasil reverse geocode.
+     * Nama hasil reverse dicocokkan dengan master data `/area/*` (case-insensitive,
+     * mengabaikan prefix "Kota"/"Kabupaten"). User tetap bisa mengoreksi pilihan.
+     */
+    async prefillAreaSelection() {
+      const normalize = (value) => (value || '')
+        .toUpperCase()
+        .replace(/^(KOTA|KABUPATEN|KAB\.?)\s+/g, '')
+        .trim()
+
+      // Kota/Kabupaten
+      if (!this.formData.cityName && this.reverseCity) {
+        const target = normalize(this.reverseCity)
+        const matched = this.cities.find((city) => {
+          const name = normalize(city.name)
+          return name === target || name.includes(target) || target.includes(name)
+        })
+        if (matched) {
+          this.formData.cityName = matched.name
+          await this.handleCityChange()
+        }
+      }
+
+      // Kecamatan
+      if (this.formData.cityName && !this.formData.districtName && this.reverseDistrict) {
+        const target = normalize(this.reverseDistrict)
+        const matched = this.subDistricts.find((district) => {
+          const name = normalize(district.name)
+          return name === target || name.includes(target) || target.includes(name)
+        })
+        if (matched) {
+          this.formData.districtName = matched.name
+          await this.handleDistrictChange()
+        }
+      }
+
+      // Kelurahan/Desa
+      if (this.formData.districtName && !this.formData.villageName && this.reverseVillage) {
+        const target = normalize(this.reverseVillage)
+        const matched = this.villages.find((village) => {
+          const name = normalize(village.name)
+          return name === target || name.includes(target) || target.includes(name)
+        })
+        if (matched) this.formData.villageName = matched.name
+      }
+    },
+    async handleCityChange() {
+      const city = this.cities.find((item) => item.name === this.formData.cityName)
+      if (!city) return
+      this.$store.commit('location/SET_SUB_DISTRICT', [])
+      this.$store.commit('location/SET_VILLAGES', [])
+      await this.$store.dispatch('location/fetchAreas', {
+        params: { depth: 3, cityId: city.id },
+      })
+    },
+    async handleDistrictChange() {
+      const district = this.subDistricts.find((item) => item.name === this.formData.districtName)
+      if (!district) return
+      this.$store.commit('location/SET_VILLAGES', [])
+      await this.$store.dispatch('location/fetchAreas', {
+        params: { depth: 4, districtId: district.id },
+      })
     },
     continueFromCategory() {
       if (!this.hasLocation) {
@@ -362,6 +509,7 @@ export default {
       if (field === 'reporterName') return value.length >= 3 ? '' : 'Nama lengkap minimal 3 karakter.'
       if (field === 'reporterPhone') return /^\+?[0-9]{8,15}$/.test(value.replace(/[\s-]/g, '')) ? '' : 'Masukkan nomor HP 8–15 digit.'
       if (field === 'reporterEmail') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Masukkan alamat email yang valid.'
+      if (field === 'cityName') return value ? '' : 'Pilih kabupaten/kota lokasi aduan.'
       return ''
     },
     validateField(field) {
@@ -390,6 +538,7 @@ export default {
       this.formData.photos.push(...acceptedFiles.map((file, index) => ({
         id: `${file.name}-${file.lastModified}-${file.size}-${batchId}-${index}`,
         name: file.name,
+        file,
         src: URL.createObjectURL(file),
         isHeic: /\.(heic|heif)$/i.test(file.name) || ['image/heic', 'image/heif'].includes(file.type),
         previewFailed: false,
@@ -410,14 +559,67 @@ export default {
       URL.revokeObjectURL(photo.src)
       if (this.selectedPhoto?.id === id) this.closePhotoPreview()
     },
-    submitReport() {
-      if (!this.validateFields(['reporterName', 'reporterPhone', 'reporterEmail'])) return
+    fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result.split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    },
+    async submitReport() {
+      if (!this.validateFields(['reporterName', 'reporterPhone', 'reporterEmail', 'cityName'])) return
       this.submitError = ''
-      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-      this.submittedTicket = `JA-${date}-${Math.floor(10000 + Math.random() * 90000)}`
-      this.submitted = true
-      localStorage.removeItem(DRAFT_STORAGE_KEY)
-      this.$nextTick(() => this.$refs.successDialog.showModal())
+      this.isSubmitting = true
+      try {
+        const photos = await Promise.all(this.formData.photos.map(async (photo) => ({
+          name: photo.name,
+          mimeType: photo.file.type,
+          data: await this.fileToBase64(photo.file),
+        })))
+
+        if (!SUBMIT_API_ENABLED) {
+          // Mode non-API: anggap berhasil tanpa mengirim ke backend.
+          this.submittedTicket = ''
+          this.submitted = true
+          localStorage.removeItem(DRAFT_STORAGE_KEY)
+          this.$nextTick(() => this.$refs.successDialog.showModal())
+          return
+        }
+
+        const response = await fetch('/api/jalan-aing/complaints', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: this.formData.title,
+            description: this.formData.description,
+            photos,
+            category: this.selectedCategory,
+            complaintType: this.formData.complaintType,
+            reporterName: this.formData.reporterName,
+            reporterPhone: this.formData.reporterPhone,
+            reporterEmail: this.formData.reporterEmail,
+            latitude: this.$route.query.lat,
+            longitude: this.$route.query.lng,
+            address: this.reverseAddress,
+            cityName: this.formData.cityName,
+            districtName: this.formData.districtName,
+            villageName: this.formData.villageName,
+          }),
+        })
+        const result = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(result.error)
+
+        const complaint = result.data || {}
+        this.submittedTicket = complaint.complaint_id || complaint.ticket_number || complaint.ticket_code || complaint.id || ''
+        this.submitted = true
+        localStorage.removeItem(DRAFT_STORAGE_KEY)
+        this.$nextTick(() => this.$refs.successDialog.showModal())
+      } catch (error) {
+        this.submitError = error.message || 'Aduan belum dapat dikirim. Silakan coba lagi.'
+      } finally {
+        this.isSubmitting = false
+      }
     },
     copyTicket() {
       if (!navigator.clipboard) return
@@ -544,15 +746,17 @@ export default {
 .ja-complaint-field { display: block; }
 .ja-complaint-field > span, .ja-complaint-photo legend, .ja-complaint-privacy legend { display: block; margin-bottom: 10px; color: #536176; font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
 .ja-required { color: #c94b4b; }
-.ja-complaint-field input, .ja-complaint-field textarea { width: 100%; box-sizing: border-box; border: 1px solid #d9dfe3; border-radius: 12px; background: #fff; color: var(--ja-ink); font: inherit; font-size: 15px; line-height: 1.45; outline: 0; transition: border-color 160ms ease, box-shadow 160ms ease; }
-.ja-complaint-field input { height: 48px; padding: 0 14px; }
+.ja-complaint-field input, .ja-complaint-field textarea, .ja-complaint-field select { width: 100%; box-sizing: border-box; border: 1px solid #d9dfe3; border-radius: 12px; background: #fff; color: var(--ja-ink); font: inherit; font-size: 15px; line-height: 1.45; outline: 0; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.ja-complaint-field input, .ja-complaint-field select { height: 48px; padding: 0 14px; }
+.ja-complaint-field select { appearance: auto; cursor: pointer; }
+.ja-complaint-field select:disabled { background: #f3f5f7; color: #9aa5b5; cursor: not-allowed; }
 .ja-complaint-field textarea { min-height: 132px; padding: 13px 14px; resize: vertical; }
 .ja-complaint-field input::placeholder, .ja-complaint-field textarea::placeholder { color: #9aa5b5; }
-.ja-complaint-field input:focus, .ja-complaint-field textarea:focus { border-color: #81938a; box-shadow: 0 0 0 3px rgba(13, 109, 67, .12); }
+.ja-complaint-field input:focus, .ja-complaint-field textarea:focus, .ja-complaint-field select:focus { border-color: #81938a; box-shadow: 0 0 0 3px rgba(13, 109, 67, .12); }
 .ja-complaint-field > small { display: flex; justify-content: space-between; margin-top: 7px; color: #7c8798; font-size: 12px; }
 .ja-complaint-field > small em { font-style: normal; white-space: nowrap; }
-.ja-complaint-field.has-error input, .ja-complaint-field.has-error textarea { border-color: #c94b4b; }
-.ja-complaint-field.has-error input:focus, .ja-complaint-field.has-error textarea:focus { box-shadow: 0 0 0 3px rgba(201, 75, 75, .12); }
+.ja-complaint-field.has-error input, .ja-complaint-field.has-error textarea, .ja-complaint-field.has-error select { border-color: #c94b4b; }
+.ja-complaint-field.has-error input:focus, .ja-complaint-field.has-error textarea:focus, .ja-complaint-field.has-error select:focus { box-shadow: 0 0 0 3px rgba(201, 75, 75, .12); }
 .ja-complaint-field > small.is-error { color: #a02c2c; font-weight: 650; }
 .ja-complaint-photo, .ja-complaint-privacy { margin: 0; padding: 0; border: 0; }
 .ja-complaint-photo-picker { margin-bottom: 12px; }
