@@ -444,8 +444,16 @@ export default {
       try {
         const lng = Number(this.$route.query.lng)
         const lat = Number(this.$route.query.lat)
-        const cqlFilter = encodeURIComponent(`INTERSECTS(geom,POINT(${lng} ${lat}))`)
-        const response = await fetch(`/api/jalan-aing/geodata?layer=administrasiKeldesa&cqlFilter=${cqlFilter}`)
+        const params = new URLSearchParams({
+          service: 'WFS',
+          version: '1.0.0',
+          request: 'GetFeature',
+          typeName: 'peta_dasar:administrasi_ar_10k_keldesa_jabar_2023',
+          outputFormat: 'application/json',
+          propertyName: 'gid,objectid,namobj,fcode,kdppum,kdpkab,kdcpum,kdepum,wadmpr,wadmkk,wadmkc,wadmkd',
+          CQL_FILTER: `INTERSECTS(geom,POINT(${lng} ${lat}))`,
+        })
+        const response = await fetch(`https://geoserver.jabarprov.go.id/geoserver/peta_dasar/ows?${params}`)
         if (!response.ok) throw new Error('Wilayah administrasi tidak tersedia')
         const data = await response.json()
         const props = data?.features?.[0]?.properties
