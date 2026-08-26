@@ -172,8 +172,8 @@
               <dd>{{ longitude }}</dd>
             </div>
             <div class="ja-complaint-address">
-              <dt>Alamat geo-reverse</dt>
-              <dd>{{ addressLoading ? 'Mencari alamat…' : reverseAddress || 'Alamat belum tersedia untuk titik ini.' }}</dd>
+              <dt>Wilayah terdeteksi</dt>
+              <dd>{{ addressLoading ? 'Mencari wilayah…' : displayAddress || 'Wilayah belum tersedia untuk titik ini.' }}</dd>
             </div>
           </dl>
           <div class="ja-complaint-fields">
@@ -257,7 +257,6 @@ const categories = [
   { id: 'lainnya', label: 'Darurat Lainnya', description: 'Hambatan, kecelakaan, masalah lainnya' },
 ]
 const DRAFT_STORAGE_KEY = 'jalan-aing-aduan-draft'
-// Sementara: submit aduan belum menembak API (integrasi backend dinonaktifkan).
 const SUBMIT_API_ENABLED = false
 const emptyFormData = () => ({
   title: '',
@@ -293,6 +292,8 @@ export default {
       isSubmitting: false,
       reverseLocation: {},
       citiesReady: Promise.resolve(),
+      bigAreaReady: Promise.resolve(),
+      bigArea: null,
     }
   },
   computed: {
@@ -332,42 +333,40 @@ export default {
       const loc = this.reverseLocation
       return loc.village || loc.neighbourhood || loc.hamlet || loc.quarter || ''
     },
+    displayAddress() {
+      if (this.reverseAddress) return this.reverseAddress
+      if (this.bigArea?.village) {
+        return [this.bigArea.village, this.bigArea.district, this.bigArea.city, 'Jawa Barat']
+          .filter(Boolean)
+          .join(', ')
+      }
+      return ''
+    },
   },
   watch: {
     selectedCategory: 'persistDraft',
     currentStep(step) {
       this.persistDraft()
-      if (step === 3) this.lookupAddress()
+      if (step === 3) {
+        this.bigAreaReady = this.lookupAdministrativeArea()
+        this.lookupAddressIfNeeded()
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     formData: { handler: 'persistDraft', deep: true },
   },
   mounted() {
+    localStorage.removeItem(DRAFT_STORAGE_KEY)
     this.citiesReady = this.ensureCitiesLoaded()
-    try {
-      const draft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || '{}')
-      if (!this.selectedCategory && categories.some(({ id }) => id === draft.selectedCategory)) this.selectCategory(draft.selectedCategory)
-      const draftFields = ['title', 'description', 'reporterName', 'reporterPhone', 'reporterEmail', 'cityName', 'districtName', 'villageName']
-      draftFields.forEach((field) => {
-        if (typeof draft.formData?.[field] === 'string') this.formData[field] = draft.formData[field]
-      })
-      if (['publik', 'privat'].includes(draft.formData?.complaintType)) this.formData.complaintType = draft.formData.complaintType
-      if (this.hasLocation && [1, 2, 3].includes(draft.currentStep)) this.currentStep = draft.currentStep
-      // Restore cascade options untuk draft city/district yang tersimpan
-      if (this.formData.cityName) this.citiesReady.then(() => this.handleCityChange())
-    } catch (_) {
-      localStorage.removeItem(DRAFT_STORAGE_KEY)
+    if (this.currentStep === 3 && this.hasLocation) {
+      this.bigAreaReady = this.lookupAdministrativeArea()
+      this.lookupAddressIfNeeded()
     }
   },
   beforeDestroy() {
     this.formData.photos.forEach(({ src }) => URL.revokeObjectURL(src))
   },
   methods: {
-    /**
-     * Pastikan master data kota/kab termuat. Coba cache localStorage dulu
-     * (via setCitiesOption); kalau hasilnya tetap kosong — cache korup atau
-     * request gagal — fetch paksa langsung ke /area/city.
-     */
     async ensureCitiesLoaded() {
       if (this.cities.length) return
       await this.$store.dispatch('location/setCitiesOption', 'cities')
@@ -401,9 +400,23 @@ export default {
         }))
       } catch (_) {}
     },
-    async lookupAddress() {
-      if (!this.hasLocation || this.addressLoading || this.reverseAddress) return
+    async lookupAddressIfNeeded() {
       this.addressLoading = true
+      try {
+        await Promise.all([this.citiesReady, this.bigAreaReady])
+        if (this.bigArea?.city && this.bigArea?.district && this.bigArea?.village) {
+          await this.prefillAreaSelection()
+          return
+        }
+        await this.lookupAddress()
+      } catch (error) {
+        console.error('Gagal prefill wilayah:', error)
+      } finally {
+        this.addressLoading = false
+      }
+    },
+    async lookupAddress() {
+      if (!this.hasLocation || this.reverseAddress) return
       try {
         const params = new URLSearchParams({
           format: 'jsonv2',
@@ -419,62 +432,69 @@ export default {
         this.reverseLocation = data.address || {}
       } catch (_) {
         this.reverseAddress = ''
-      } finally {
-        this.addressLoading = false
       }
-      // Prefill cascade di luar try/catch reverse — kegagalan master data
-      // tidak boleh menyembunyikan alamat yang sudah berhasil di-resolve.
       try {
-        await this.citiesReady
         await this.prefillAreaSelection()
       } catch (error) {
         console.error('Gagal prefill wilayah:', error)
       }
     },
-    /**
-     * Prefill select kab/kota, kecamatan, kelurahan dari hasil reverse geocode.
-     * Nama hasil reverse dicocokkan dengan master data `/area/*` (case-insensitive,
-     * mengabaikan prefix "Kota"/"Kabupaten"). User tetap bisa mengoreksi pilihan.
-     */
+    async lookupAdministrativeArea() {
+      if (!this.hasLocation) return
+      try {
+        const lng = Number(this.$route.query.lng)
+        const lat = Number(this.$route.query.lat)
+        const cqlFilter = encodeURIComponent(`INTERSECTS(geom,POINT(${lng} ${lat}))`)
+        const response = await fetch(`/api/jalan-aing/geodata?layer=administrasiKeldesa&cqlFilter=${cqlFilter}`)
+        if (!response.ok) throw new Error('Wilayah administrasi tidak tersedia')
+        const data = await response.json()
+        const props = data?.features?.[0]?.properties
+        if (props) {
+          this.bigArea = {
+            city: props.wadmkk || '',
+            district: props.wadmkc || '',
+            village: props.wadmkd || '',
+            cityCode: props.kdpkab || '',
+            districtCode: props.kdcpum || '',
+            villageCode: props.kdepum || '',
+          }
+        }
+      } catch (error) {
+        console.error('Gagal resolve wilayah administrasi BIG:', error)
+      }
+    },
     async prefillAreaSelection() {
       const normalize = (value) => (value || '')
         .toUpperCase()
         .replace(/^(KOTA|KABUPATEN|KAB\.?)\s+/g, '')
         .trim()
-
-      // Kota/Kabupaten
-      if (!this.formData.cityName && this.reverseCity) {
-        const target = normalize(this.reverseCity)
-        const matched = this.cities.find((city) => {
-          const name = normalize(city.name)
+      const findMatch = (list, targetName) => {
+        const target = normalize(targetName)
+        if (!target) return null
+        return list.find((item) => {
+          const name = normalize(item.name)
           return name === target || name.includes(target) || target.includes(name)
-        })
+        }) || null
+      }
+
+      if (!this.formData.cityName) {
+        const matched = findMatch(this.cities, this.bigArea?.city) || findMatch(this.cities, this.reverseCity)
         if (matched) {
           this.formData.cityName = matched.name
           await this.handleCityChange()
         }
       }
 
-      // Kecamatan
-      if (this.formData.cityName && !this.formData.districtName && this.reverseDistrict) {
-        const target = normalize(this.reverseDistrict)
-        const matched = this.subDistricts.find((district) => {
-          const name = normalize(district.name)
-          return name === target || name.includes(target) || target.includes(name)
-        })
+      if (this.formData.cityName && !this.formData.districtName) {
+        const matched = findMatch(this.subDistricts, this.bigArea?.district) || findMatch(this.subDistricts, this.reverseDistrict)
         if (matched) {
           this.formData.districtName = matched.name
           await this.handleDistrictChange()
         }
       }
 
-      // Kelurahan/Desa
-      if (this.formData.districtName && !this.formData.villageName && this.reverseVillage) {
-        const target = normalize(this.reverseVillage)
-        const matched = this.villages.find((village) => {
-          const name = normalize(village.name)
-          return name === target || name.includes(target) || target.includes(name)
-        })
+      if (this.formData.districtName && !this.formData.villageName) {
+        const matched = findMatch(this.villages, this.bigArea?.village) || findMatch(this.villages, this.reverseVillage)
         if (matched) this.formData.villageName = matched.name
       }
     },
@@ -579,7 +599,6 @@ export default {
         })))
 
         if (!SUBMIT_API_ENABLED) {
-          // Mode non-API: anggap berhasil tanpa mengirim ke backend.
           this.submittedTicket = ''
           this.submitted = true
           localStorage.removeItem(DRAFT_STORAGE_KEY)
@@ -601,7 +620,7 @@ export default {
             reporterEmail: this.formData.reporterEmail,
             latitude: this.$route.query.lat,
             longitude: this.$route.query.lng,
-            address: this.reverseAddress,
+            address: this.displayAddress,
             cityName: this.formData.cityName,
             districtName: this.formData.districtName,
             villageName: this.formData.villageName,

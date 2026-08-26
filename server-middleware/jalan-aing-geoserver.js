@@ -41,10 +41,23 @@ const LAYERS = Object.freeze({
       outputFormat: 'application/json',
     },
   },
+  administrasiKeldesa: {
+    url: 'https://geoserver.jabarprov.go.id/geoserver/peta_dasar/ows',
+    params: {
+      service: 'WFS',
+      version: '1.0.0',
+      request: 'GetFeature',
+      typeName: 'peta_dasar:administrasi_ar_10k_keldesa_jabar_2023',
+      outputFormat: 'application/json',
+      propertyName: 'gid,objectid,namobj,fcode,kdppum,kdpkab,kdcpum,kdepum,wadmpr,wadmkk,wadmkc,wadmkd',
+    },
+    cqlFilterFromQuery: true,
+  },
 })
 
 export default async (request, response) => {
-  const layerId = new URL(request.url, 'http://localhost').searchParams.get('layer')
+  const query = new URL(request.url, 'http://localhost').searchParams
+  const layerId = query.get('layer')
   const layer = LAYERS[layerId]
   const username = process.env.JALAN_AING_GEOSERVER_USERNAME
   const password = process.env.JALAN_AING_GEOSERVER_PASSWORD
@@ -56,10 +69,22 @@ export default async (request, response) => {
     return
   }
 
+  const params = { ...layer.params }
+  if (layer.cqlFilterFromQuery) {
+    const cqlFilter = (query.get('cqlFilter') || '').slice(0, 300)
+    if (!cqlFilter) {
+      response.statusCode = 400
+      response.setHeader('Content-Type', 'application/json')
+      response.end(JSON.stringify({ error: 'Parameter cqlFilter wajib diisi' }))
+      return
+    }
+    params.CQL_FILTER = cqlFilter
+  }
+
   try {
     const result = await axios.get(layer.url, {
       auth: { username, password },
-      params: layer.params,
+      params,
       headers: {
         Accept: 'application/json,text/plain,*/*',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/150.0.0.0 Safari/537.36',
