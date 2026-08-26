@@ -668,7 +668,12 @@ export default {
     },
     async refreshToken({ state }) {
       try {
-        const newToken = await this.$getToken('refresh_token')
+        const jalanAingConfig = this.$config.apiAduanJalanAing
+        const newToken = await this.$getToken('refresh_token', {
+          keycloakUrl: jalanAingConfig.keycloakUrl,
+          clientId: jalanAingConfig.keycloakClientId,
+          clientSecret: jalanAingConfig.keycloakClientSecret,
+        })
         state.authToken = newToken
         return newToken
       } catch (error) {

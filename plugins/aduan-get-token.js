@@ -1,11 +1,18 @@
 import axios from 'axios'
 
 export default ({ store, $config }, inject) => {
-  const getToken = async (grantType) => {
+  /**
+   * Request Keycloak access token.
+   *
+   * @param {string} grantType - e.g. 'client_credentials' | 'refresh_token'
+   * @param {object} [credentials] - Optional override { clientId, clientSecret }.
+   *   When omitted, the default partner credentials (apiAduanIdeal) are used.
+   */
+  const getToken = async (grantType, credentials = null) => {
     try {
       const params = new URLSearchParams({
-        client_id: $config.apiAduanIdeal.keycloakClientId,
-        client_secret: $config.apiAduanIdeal.keycloakClientSecret,
+        client_id: credentials?.clientId || $config.apiAduanIdeal.keycloakClientId,
+        client_secret: credentials?.clientSecret || $config.apiAduanIdeal.keycloakClientSecret,
         grant_type: grantType,
         scope: 'openid',
       })
@@ -15,7 +22,7 @@ export default ({ store, $config }, inject) => {
       }
 
       const response = await axios.post(
-        $config.apiAduanIdeal.keycloakUrl,
+        credentials?.keycloakUrl || $config.apiAduanIdeal.keycloakUrl,
         params,
         {
           headers: {

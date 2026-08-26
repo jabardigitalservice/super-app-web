@@ -252,7 +252,11 @@ export default {
     this.showLoadingSkeleton()
     if (!this.hasAuthToken) {
       try {
-        const token = await this.$getToken('client_credentials')
+        const token = await this.$getToken('client_credentials', {
+          keycloakUrl: this.$config.apiAduanJalanAing.keycloakUrl,
+          clientId: this.$config.apiAduanJalanAing.keycloakClientId,
+          clientSecret: this.$config.apiAduanJalanAing.keycloakClientSecret,
+        })
         this.setAuthToken(token)
       } catch (error) {
         // eslint-disable-next-line no-console

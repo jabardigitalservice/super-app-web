@@ -61,6 +61,8 @@ jobs:
             kv-superapp-service-production-drc/data/web KEYCLOAK_URL | KEYCLOAK_URL ;
             kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_ID_PARTNER | KEYCLOAK_CLIENT_ID_PARTNER ;
             kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_SECRET_PARTNER | KEYCLOAK_CLIENT_SECRET_PARTNER ;
+            kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_ID_JALAN_AING | KEYCLOAK_CLIENT_ID_JALAN_AING ;
+            kv-superapp-service-production-drc/data/web KEYCLOAK_CLIENT_SECRET_JALAN_AING | KEYCLOAK_CLIENT_SECRET_JALAN_AING ;
             kv-superapp-service-production-drc/data/web X_PARTNER_ID | X_PARTNER_ID ;
             kv-superapp-service-production-drc/data/web GOOGLE_MAPS_API | GOOGLE_MAPS_API ;
             kv-superapp-service-production-drc/data/web URL_FILE | URL_FILE ;
@@ -95,6 +97,8 @@ jobs:
             KEYCLOAK_URL=${{env.KEYCLOAK_URL}}
             KEYCLOAK_CLIENT_ID_PARTNER=${{env.KEYCLOAK_CLIENT_ID_PARTNER}}
             KEYCLOAK_CLIENT_SECRET_PARTNER=${{env.KEYCLOAK_CLIENT_SECRET_PARTNER}}
+            KEYCLOAK_CLIENT_ID_JALAN_AING=${{env.KEYCLOAK_CLIENT_ID_JALAN_AING}}
+            KEYCLOAK_CLIENT_SECRET_JALAN_AING=${{env.KEYCLOAK_CLIENT_SECRET_JALAN_AING}}
             X_PARTNER_ID=${{env.X_PARTNER_ID}}
             GOOGLE_MAPS_API=${{env.GOOGLE_MAPS_API}}
             URL_FILE=${{env.URL_FILE}}
