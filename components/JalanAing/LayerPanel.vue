@@ -28,11 +28,11 @@
 
         <transition name="layer-expand">
           <div v-if="openSections[section.id]" class="mt-1 ml-4 space-y-3 border-l border-slate-200 pb-3 pl-4 pr-2" :class="mobileOpen ? 'mt-3 ml-2 space-y-4 pb-1 pl-4' : ''">
-          <div v-for="item in section.items" :key="item.id" class="space-y-2">
+          <div v-for="item in section.items" :key="item.id" class="space-y-2 rounded-lg border p-2 transition" :class="layerVisibility[item.id] ? 'border-jalan-aing-primary' : 'border-transparent'">
             <div class="flex items-center justify-between gap-3">
-              <span class="font-medium text-slate-600" :class="mobileOpen ? 'text-[13px]' : 'text-xs'">{{ item.label }}</span>
-              <button type="button" class="rounded-md p-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary" :disabled="!dataAvailability[item.id]" :class="!dataAvailability[item.id] ? 'cursor-not-allowed text-slate-300' : layerVisibility[item.id] ? 'bg-jalan-aing-primary-soft text-jalan-aing-primary hover:bg-jalan-aing-primary-border' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-600'" :aria-pressed="layerVisibility[item.id]" :aria-label="dataAvailability[item.id] ? `${layerVisibility[item.id] ? 'Sembunyikan' : 'Tampilkan'} ${item.label}` : `${item.label} belum tersedia`" @click="toggleLayer(item.id)">
-                <Icon :name="layerVisibility[item.id] ? 'eye' : 'eye-off'" :size="mobileOpen ? '22px' : '16px'" />
+              <span class="flex min-w-0 flex-col font-medium text-slate-600" :class="mobileOpen ? 'text-[13px]' : 'text-xs'"><span>{{ item.label }}</span><span v-if="layerLoading[item.id]" class="mt-0.5 text-[10px] font-medium text-jalan-aing-primary">Memuat…</span></span>
+              <button type="button" class="rounded-md p-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary" :disabled="!dataAvailability[item.id] || layerLoading[item.id]" :class="!dataAvailability[item.id] ? 'cursor-not-allowed text-slate-300' : layerLoading[item.id] ? 'cursor-wait bg-jalan-aing-primary-soft text-jalan-aing-primary' : layerVisibility[item.id] ? 'bg-jalan-aing-primary-soft text-jalan-aing-primary hover:bg-jalan-aing-primary-border' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-600'" :aria-busy="layerLoading[item.id]" :aria-pressed="layerVisibility[item.id]" :aria-label="layerLoading[item.id] ? `Memuat ${item.label}` : dataAvailability[item.id] ? `${layerVisibility[item.id] ? 'Sembunyikan' : 'Tampilkan'} ${item.label}` : `${item.label} belum tersedia`" @click="toggleLayer(item.id)">
+                <span v-if="layerLoading[item.id]" class="block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" /><Icon v-else :name="layerVisibility[item.id] ? 'eye' : 'eye-off'" :size="mobileOpen ? '22px' : '16px'" />
               </button>
             </div>
             <p v-if="!dataAvailability[item.id]" class="text-[11px] text-slate-400">Data belum tersedia dari OPD</p>
@@ -47,11 +47,11 @@
       </section>
     </div>
 
-    <div class="border-t border-slate-200 bg-slate-50 p-4" :class="mobileOpen ? 'px-5 py-4' : ''">
-      <h3 class="mb-2 text-xs font-semibold text-slate-500" :class="mobileOpen ? 'mb-3 text-sm text-slate-700' : ''">Legenda kondisi jalan</h3>
+    <div v-if="activeLegendItems.length" class="border-t border-slate-200 bg-slate-50 p-4" :class="mobileOpen ? 'px-5 py-4' : ''">
+      <h3 class="mb-2 text-xs font-semibold text-slate-500" :class="mobileOpen ? 'mb-3 text-sm text-slate-700' : ''">Legenda layer aktif</h3>
       <div class="space-y-2" :class="mobileOpen ? 'grid grid-cols-2 gap-x-6 gap-y-3 space-y-0' : ''">
-        <div v-for="legend in legendItems" :key="legend.label" class="flex items-center gap-3 text-xs text-slate-600">
-          <span class="h-2 w-6 rounded-full" :class="legend.color" />
+        <div v-for="legend in activeLegendItems" :key="legend.id" class="flex items-center gap-3 text-xs text-slate-600">
+          <span class="h-2 w-6 rounded-full" :style="legendStyle(legend)" />
           <span>{{ legend.label }}</span>
         </div>
       </div>
@@ -60,6 +60,12 @@
 </template>
 
 <script>
+const HAZARD_LEGEND_ITEMS = [
+  { id: 'hazard-low', label: 'Tingkat bahaya rendah', color: '#16A34A' },
+  { id: 'hazard-medium', label: 'Tingkat bahaya sedang', color: '#F59E0B' },
+  { id: 'hazard-high', label: 'Tingkat bahaya tinggi', color: '#DC2626' },
+]
+
 export default {
   name: 'JalanAingLayerPanel',
   props: {
@@ -67,6 +73,8 @@ export default {
     layerVisibility: { type: Object, required: true },
     filterStatus: { type: Object, required: true },
     dataAvailability: { type: Object, required: true },
+    layerLoading: { type: Object, default: () => ({}) },
+    legendColors: { type: Object, default: () => ({}) },
   },
   data() {
     return {
@@ -74,7 +82,7 @@ export default {
       sheetPointerId: null,
       sheetDragStartY: 0,
       sheetDragging: false,
-      openSections: { bus: true, dbmpr: false, dinkes: false, dishub: false },
+      openSections: { bus: true, dbmpr: false, dinkes: false, dishub: false, bpbd: false },
       roadStatuses: [
         { value: 'semua', label: 'Semua' },
         { value: 'arteri_primer', label: 'Arteri Primer' },
@@ -82,17 +90,20 @@ export default {
         { value: 'jalan_tol', label: 'Jalan Tol' },
       ],
       sections: [
-        { id: 'bus', label: 'Bus', color: 'bg-sky-500', items: [{ id: 'bus', label: 'Posisi Bus Real-time' }, { id: 'busStops', label: 'Halte Bus' }] },
-        { id: 'dbmpr', label: 'Dinas Bina Marga (DBMPR)', color: 'bg-emerald-600', items: [{ id: 'ruasJalan', label: 'Jalan Provinsi' }] },
-        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-red-500', items: [{ id: 'rumahSakit', label: 'Rumah Sakit' }, { id: 'puskesmas', label: 'Puskesmas' }] },
-        { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'restArea', label: 'Rest Area' }] },
-      ],
-      legendItems: [
-        { label: 'Jalan Arteri Primer', color: 'bg-jalan-aing-primary' },
-        { label: 'Jalan Kolektor Primer', color: 'bg-blue-500' },
-        { label: 'Jalan Tol', color: 'bg-orange-500' },
+        { id: 'bus', label: 'Bus', color: 'bg-sky-500', items: [{ id: 'bus', label: 'Posisi Bus Real-time', color: '#0EA5E9' }, { id: 'busStops', label: 'Halte Bus', color: '#2563EB' }] },
+        { id: 'dbmpr', label: 'Dinas Bina Marga (DBMPR)', color: 'bg-emerald-600', items: [{ id: 'ruasJalan', label: 'Jalan Provinsi', color: '#008444' }, { id: 'apj', label: 'APJ', color: '#F59E0B' }] },
+        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-red-500', items: [{ id: 'rumahSakit', label: 'Rumah Sakit', color: '#DC2626' }, { id: 'puskesmas', label: 'Puskesmas', color: '#2563EB' }] },
+        { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'restArea', label: 'Rest Area', color: '#D97706' }] },
+        { id: 'bpbd', label: 'Kebencanaan (BPBD)', color: 'bg-rose-600', items: [{ id: 'bahayaBanjir', label: 'Bahaya Banjir', color: '#0284C7' }, { id: 'bahayaBanjirBandang', label: 'Bahaya Banjir Bandang', color: '#0369A1' }, { id: 'bahayaCuacaEkstrem', label: 'Bahaya Cuaca Ekstrem', color: '#7C3AED' }, { id: 'bahayaGempaBumi', label: 'Bahaya Gempa Bumi', color: '#DC2626' }, { id: 'bahayaKebakaranHutanDanLahan', label: 'Bahaya Kebakaran Hutan dan Lahan', color: '#EA580C' }, { id: 'bahayaKekeringan', label: 'Bahaya Kekeringan', color: '#CA8A04' }, { id: 'bahayaTanahLongsor', label: 'Bahaya Tanah Longsor', color: '#92400E' }, { id: 'bahayaTsunami', label: 'Bahaya Tsunami', color: '#0891B2' }, { id: 'indeksMultibahayaBencana', label: 'Indeks Multibahaya Bencana', color: '#BE123C' }] },
       ],
     }
+  },
+  computed: {
+    activeLegendItems() {
+      const activeItems = this.sections.flatMap((section) => section.items).filter((item) => this.layerVisibility[item.id])
+      const hazardActive = activeItems.some((item) => item.id.startsWith('bahaya') || item.id === 'indeksMultibahayaBencana')
+      return [...activeItems.filter((item) => !item.id.startsWith('bahaya') && item.id !== 'indeksMultibahayaBencana'), ...(hazardActive ? HAZARD_LEGEND_ITEMS : [])]
+    },
   },
   watch: {
     mobileOpen(value) {
@@ -135,6 +146,13 @@ export default {
     toggleLayer(id) {
       this.$emit('toggle-layer', { id, value: !this.layerVisibility[id] })
     },
+    legendStyle(legend) {
+      const colors = this.legendColors[legend.id]
+      if (!colors?.length) return { backgroundColor: legend.color }
+      const width = 100 / colors.length
+      const stripes = colors.map((color, index) => `${color} ${index * width}%, ${color} ${(index + 1) * width}%`)
+      return { background: `linear-gradient(90deg, ${stripes.join(', ')})` }
+    },
     updateFilter(key, value) {
       this.$emit('update-filter', { key, value })
     },
@@ -149,7 +167,7 @@ aside {
 
 .layer-expand-enter-active,
 .layer-expand-leave-active {
-  max-height: 480px;
+  max-height: 1000px;
   overflow: hidden;
   transition: max-height 240ms ease, opacity 180ms ease, transform 180ms ease;
 }

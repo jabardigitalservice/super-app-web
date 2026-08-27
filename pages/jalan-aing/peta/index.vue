@@ -9,6 +9,8 @@
         :layer-visibility="layerVisibility"
         :filter-status="filterStatus"
         :data-availability="dataAvailability"
+        :layer-loading="layerLoading"
+        :legend-colors="legendColors"
         @toggle-layer="toggleLayer"
         @update-filter="updateFilter"
         @close="mobileLayerOpen = false"
@@ -21,12 +23,14 @@
           :map-zoom="mapZoom"
           :complaint-location="complaintLocation"
           :search-location="searchLocation"
-          basemap="cartoLight"
+          basemap="openFreeMap"
           :layer-visibility="layerVisibility"
           :filter-status="filterStatus"
           @select-marker="selectMarker"
           @create-complaint="selectComplaintLocation"
           @data-status="updateDataAvailability"
+          @loading-status="updateLayerLoading"
+          @legend-colors="updateLegendColors"
         />
         <div class="ja-map-search" role="search" :class="{ 'is-searching': searching }" :aria-busy="searching">
           <span class="ja-map-search-icon"><Icon name="magnifier" size="16px" aria-hidden="true" /></span>
@@ -40,7 +44,9 @@
           <button v-for="(place, index) in searchResults" :id="`ja-map-search-result-${index}`" :key="place.place_id" type="button" role="option" :aria-selected="activeSearchIndex === index" :class="{ 'is-active': activeSearchIndex === index }" @mouseenter="activeSearchIndex = index" @click="focusPlace(place)"><i class="ja-map-search-result-dot" aria-hidden="true" /><span><strong>{{ place.name }}</strong><span>{{ place.display_name }}</span></span></button>
           <p v-if="searchMessage">{{ searchMessage }}</p>
         </div>
-        <p v-if="locationError" class="ja-map-location-error" role="alert">{{ locationError }}</p>
+        <transition name="ja-map-notice">
+          <p v-if="locationError" class="ja-map-location-error" role="status"><Icon name="info-circle-outline" size="18px" aria-hidden="true" /><span>{{ locationError }}</span></p>
+        </transition>
         <aside
           v-if="selectedMarker"
           class="ja-map-detail-card"
@@ -121,6 +127,16 @@ export default {
         rumahSakit: false,
         puskesmas: false,
         restArea: false,
+        apj: false,
+        bahayaBanjir: false,
+        bahayaBanjirBandang: false,
+        bahayaCuacaEkstrem: false,
+        bahayaGempaBumi: false,
+        bahayaKebakaranHutanDanLahan: false,
+        bahayaKekeringan: false,
+        bahayaTanahLongsor: false,
+        bahayaTsunami: false,
+        indeksMultibahayaBencana: false,
       },
       dataAvailability: {
         bus: true,
@@ -129,7 +145,19 @@ export default {
         rumahSakit: true,
         puskesmas: true,
         restArea: true,
+        apj: true,
+        bahayaBanjir: true,
+        bahayaBanjirBandang: true,
+        bahayaCuacaEkstrem: true,
+        bahayaGempaBumi: true,
+        bahayaKebakaranHutanDanLahan: true,
+        bahayaKekeringan: true,
+        bahayaTanahLongsor: true,
+        bahayaTsunami: true,
+        indeksMultibahayaBencana: true,
       },
+      layerLoading: {},
+      legendColors: {},
       filterStatus: { roadClass: 'semua' },
       selectedMarker: null,
       complaintLocation: null,
@@ -142,6 +170,7 @@ export default {
       searchRequestId: 0,
       activeSearchIndex: -1,
       locationError: '',
+      locationErrorTimer: null,
       documentOverflow: '',
     }
   },
@@ -151,12 +180,14 @@ export default {
   computed: {
     selectedMarkerDetails() {
       return Object.entries(this.selectedMarker?.properties || {})
-        .filter(([, value]) => value !== null && value !== '')
+        .filter(([key, value]) => key.toLowerCase().replace(/[_\s]/g, '') !== 'objectid' && value !== null && value !== '')
+        .map(([key, value]) => [key.toLowerCase().replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase()), value])
         .slice(0, 7)
     },
   },
   beforeDestroy() {
     window.clearTimeout(this.searchTimer)
+    window.clearTimeout(this.locationErrorTimer)
     document.documentElement.style.overflow = this.documentOverflow
   },
   mounted() {
@@ -173,6 +204,17 @@ export default {
     updateDataAvailability(payload) {
       this.dataAvailability = { ...this.dataAvailability, ...payload }
     },
+    updateLayerLoading(payload) {
+      this.layerLoading = { ...this.layerLoading, ...payload }
+    },
+    updateLegendColors(payload) {
+      this.legendColors = { ...this.legendColors, ...payload }
+    },
+    showLocationError() {
+      window.clearTimeout(this.locationErrorTimer)
+      this.locationError = 'Titik aduan harus berada di Jawa Barat.'
+      this.locationErrorTimer = window.setTimeout(() => { this.locationError = '' }, 2000)
+    },
     selectMarker(marker) {
       this.selectedMarker = marker
       this.complaintLocation = null
@@ -182,7 +224,7 @@ export default {
     selectComplaintLocation(location) {
       if (!isJalanAingLocation(location.lat, location.lng)) {
         this.complaintLocation = null
-        this.locationError = 'Titik aduan harus berada di Jawa Barat.'
+        this.showLocationError()
         return
       }
       this.complaintLocation = location
@@ -234,7 +276,7 @@ export default {
       const lat = Number(place.lat)
       const lng = Number(place.lon)
       if (!isJalanAingLocation(lat, lng)) {
-        this.locationError = 'Titik aduan harus berada di Jawa Barat.'
+        this.showLocationError()
         return
       }
       this.selectedMarker = null
@@ -518,13 +560,23 @@ export default {
   line-height: 1.35;
 }
 .ja-map-search-results p:not(.ja-map-search-results-label) { padding: 12px 13px; }
-.ja-map-location-error { position: absolute; z-index: 750; right: clamp(20px, 3vw, 48px); bottom: 24px; width: min(360px, calc(100% - 40px)); margin: 0; padding: 12px 14px; border: 1px solid #f3c1c1; border-radius: 12px; background: #fff5f5; color: #a02c2c; font-size: 13px; font-weight: 700; }
+.ja-map-location-error { position: absolute; z-index: 750; right: clamp(20px, 3vw, 48px); bottom: 24px; display: flex; align-items: center; gap: 9px; width: min(360px, calc(100% - 40px)); margin: 0; padding: 12px 14px; border: 1px solid #d6e2da; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(37, 55, 45, .12); color: #466052; font-size: 13px; font-weight: 600; }
+.ja-map-location-error :deep(svg) { color: #2f7a50; flex: 0 0 auto; }
+.ja-map-notice-enter-active { animation: ja-map-notice-bounce 420ms cubic-bezier(.22, 1.4, .36, 1); }
+.ja-map-notice-leave-active { transition: opacity 160ms ease, transform 160ms ease; }
+.ja-map-notice-leave-to { opacity: 0; transform: translateY(8px) scale(.98); }
+@keyframes ja-map-notice-bounce {
+  0% { opacity: 0; transform: translateY(14px) scale(.9); }
+  65% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
 @keyframes ja-map-search-progress {
   from { transform: translateX(-300%); }
   to { transform: translateX(400%); }
 }
 @media (prefers-reduced-motion: reduce) {
   .ja-map-search-progress::after { animation-duration: 1.8s; }
+  .ja-map-notice-enter-active { animation: none; }
 }
 .ja-map-detail-card {
   position: absolute;

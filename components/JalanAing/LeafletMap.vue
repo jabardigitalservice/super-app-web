@@ -17,12 +17,21 @@
 
 <script>
 import 'leaflet/dist/leaflet.css'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import maplibreGL from '@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js'
 import { getMjtRoutes } from '~/utils/jalan-aing-map-search'
 
 const BUS_REFRESH_INTERVAL = 10000
 const BUS_MAX_SMOOTH_DISTANCE = 750
 const BUS_STOP_MIN_ZOOM = 13
 const MJT_API_URL = 'https://tfgb-api.up.railway.app/api/mjt'
+const HAZARD_COLORS = Object.freeze({ RENDAH: '#16A34A', SEDANG: '#F59E0B', TINGGI: '#DC2626' })
+
+function featureColor(feature, fallbackColor) {
+  const properties = feature?.properties || {}
+  const level = properties.bahaya || properties.kategori || properties.kriteria
+  return HAZARD_COLORS[String(level || '').toUpperCase()] || fallbackColor
+}
 
 function decodePolyline(encoded) {
   const points = []
@@ -83,8 +92,79 @@ const GIS_LAYERS = Object.freeze({
     label: 'Rest Area',
     type: 'point',
     color: '#D97706',
+    iconUrl: '/icon/marker-rest-area.svg',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rest-area',
     nameFields: ['namarestarea', 'namalokasi', 'restarea', 'rest_area', 'nama'],
+  },
+  apj: {
+    label: 'APJ',
+    type: 'point',
+    color: '#F59E0B',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/apj',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaBanjir: {
+    label: 'Bahaya Banjir',
+    type: 'area',
+    color: '#0284C7',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaBanjirBandang: {
+    label: 'Bahaya Banjir Bandang',
+    type: 'area',
+    color: '#0369A1',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir-bandang',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaCuacaEkstrem: {
+    label: 'Bahaya Cuaca Ekstrem',
+    type: 'area',
+    color: '#7C3AED',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-cuaca-ekstrem',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaGempaBumi: {
+    label: 'Bahaya Gempa Bumi',
+    type: 'area',
+    color: '#DC2626',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-gempa-bumi',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaKebakaranHutanDanLahan: {
+    label: 'Bahaya Kebakaran Hutan dan Lahan',
+    type: 'area',
+    color: '#EA580C',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kebakaran-hutan-dan-lahan',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaKekeringan: {
+    label: 'Bahaya Kekeringan',
+    type: 'area',
+    color: '#CA8A04',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kekeringan',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaTanahLongsor: {
+    label: 'Bahaya Tanah Longsor',
+    type: 'area',
+    color: '#92400E',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tanah-longsor',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  bahayaTsunami: {
+    label: 'Bahaya Tsunami',
+    type: 'area',
+    color: '#0891B2',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tsunami',
+    nameFields: ['nama', 'namobj', 'name'],
+  },
+  indeksMultibahayaBencana: {
+    label: 'Indeks Multibahaya Bencana',
+    type: 'area',
+    color: '#BE123C',
+    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/indeks-multibahaya-bencana',
+    nameFields: ['nama', 'namobj', 'name'],
   },
 })
 
@@ -113,6 +193,10 @@ const LEAFLET_MAP_CONFIG = Object.freeze({
       label: 'CartoDB Positron',
       url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       attribution: '&copy; OpenStreetMap &copy; CARTO',
+    },
+    openFreeMap: {
+      label: 'OpenFreeMap Positron',
+      style: 'https://tiles.openfreemap.org/styles/positron',
     },
   },
 })
@@ -352,6 +436,8 @@ export default {
             return { ...shelter, id, lat, lng, color, kor: route.kor, origin: route.origin, toward: route.toward }
           }).filter(Boolean)
         }).filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
+        const routeColors = [...new Set(routes.map((route) => /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'))]
+        this.$emit('legend-colors', { bus: routeColors, busStops: routeColors })
         this.busStopsLoaded = true
         this.refreshBusIcons()
         this.renderBusStops()
@@ -527,6 +613,10 @@ export default {
       if (!this.map || !this.leaflet || !LEAFLET_MAP_CONFIG.basemaps[id]) return
       const base = LEAFLET_MAP_CONFIG.basemaps[id]
       if (this.baseLayer) this.baseLayer.remove()
+      if (base.style) {
+        this.baseLayer = maplibreGL({ style: base.style, interactive: false }).addTo(this.map)
+        return
+      }
       this.baseLayer = this.leaflet.tileLayer(base.url, {
         attribution: base.attribution,
         maxZoom: LEAFLET_MAP_CONFIG.maxZoom,
@@ -542,6 +632,7 @@ export default {
       if (!config || this.geoJsonData[id] || this.loadingGeoJson[id]) return
 
       this.$set(this.loadingGeoJson, id, true)
+      this.$emit('loading-status', { [id]: true })
       try {
         const response = await fetch(config.geoJsonUrl)
         if (!response.ok) throw new Error('GeoJSON tidak tersedia')
@@ -558,6 +649,7 @@ export default {
         this.$emit('data-status', { [id]: false })
       } finally {
         this.$set(this.loadingGeoJson, id, false)
+        this.$emit('loading-status', { [id]: false })
       }
     },
     buildRoadIndex(data) {
@@ -584,7 +676,10 @@ export default {
 
       const layer = this.leaflet.geoJSON(data, {
         filter: (feature) => id !== 'ruasJalan' || this.roadMatchesClass(feature),
-        style: { color: config.color, weight: 4, opacity: 0.9, fillOpacity: 0.9 },
+        style: (feature) => {
+          const color = featureColor(feature, config.color)
+          return { color, fillColor: color, weight: 4, opacity: 0.9, fillOpacity: config.type === 'area' ? 0.45 : 0.9 }
+        },
         pointToLayer: (feature, latlng) => config.iconUrl
           ? this.leaflet.marker(latlng, { icon: this.leaflet.icon({ iconUrl: config.iconUrl, iconSize: [36, 44], iconAnchor: [18, 44] }) })
           : this.leaflet.circleMarker(latlng, { radius: 7, color: '#fff', weight: 2, fillColor: config.color, fillOpacity: 0.9 }),
