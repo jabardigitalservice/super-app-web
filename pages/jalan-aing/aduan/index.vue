@@ -245,17 +245,21 @@
 import { mapGetters, mapState } from 'vuex'
 import { isJalanAingLocation } from '~/utils/jalan-aing-location'
 
-const categories = [
-  { id: 'jalan_berlubang', label: 'Jalan Berlubang', description: 'Lubang atau keretakan pada aspal' },
-  { id: 'jalan_rusak', label: 'Jalan Rusak', description: 'Kerusakan struktur jalan/bergelombang' },
-  { id: 'apj_mati', label: 'APJ Mati', description: 'Lampu penerangan jalan padam' },
-  { id: 'cctv_rusak', label: 'CCTV Rusak', description: 'Kamera pengawas tidak aktif/mati' },
-  { id: 'genangan', label: 'Genangan Air', description: 'Sumbatan drainase, genangan banjir' },
-  { id: 'pohon_tumbang', label: 'Pohon Tumbang', description: 'Pohon roboh menghalangi jalan' },
-  { id: 'longsor', label: 'Tanah Longsor', description: 'Guguran tebing menutup jalan' },
-  { id: 'marka_rusak', label: 'Marka Rusak', description: 'Garis jalan pudar atau tidak jelas' },
-  { id: 'lainnya', label: 'Darurat Lainnya', description: 'Hambatan, kecelakaan, masalah lainnya' },
-]
+const CATEGORY_DESCRIPTIONS = {
+  'jalan-aing-jalan-berlubang': 'Lubang atau keretakan pada aspal',
+  'jalan-aing-jalan-rusak': 'Kerusakan struktur jalan/bergelombang',
+  'jalan-aing-apj-mati': 'Lampu penerangan jalan padam',
+  'jalan-aing-cctv-rusak': 'Kamera pengawas tidak aktif/mati',
+  'jalan-aing-genangan-air': 'Sumbatan drainase, genangan banjir',
+  'jalan-aing-pohon-tumbang': 'Pohon roboh menghalangi jalan',
+  'jalan-aing-tanah-longsor': 'Guguran tebing menutup jalan',
+  'jalan-aing-marka-rusak': 'Garis jalan pudar atau tidak jelas',
+  'jalan-aing-darurat-lainnya': 'Hambatan, kecelakaan, masalah lainnya',
+}
+const CATEGORY_ALIASES = {
+  jalan_berlubang: 'jalan-aing-jalan-berlubang', jalan_rusak: 'jalan-aing-jalan-rusak', apj_mati: 'jalan-aing-apj-mati', cctv_rusak: 'jalan-aing-cctv-rusak', genangan: 'jalan-aing-genangan-air', pohon_tumbang: 'jalan-aing-pohon-tumbang', longsor: 'jalan-aing-tanah-longsor', marka_rusak: 'jalan-aing-marka-rusak', lainnya: 'jalan-aing-darurat-lainnya',
+}
+const categories = Object.entries(CATEGORY_DESCRIPTIONS).map(([id, description]) => ({ id, label: id.replace('jalan-aing-', '').split('-').map((word) => word.toUpperCase() === 'APJ' || word.toUpperCase() === 'CCTV' ? word.toUpperCase() : word[0].toUpperCase() + word.slice(1)).join(' '), description }))
 const DRAFT_STORAGE_KEY = 'jalan-aing-aduan-draft'
 const SUBMIT_API_ENABLED = false
 const emptyFormData = () => ({
@@ -274,11 +278,12 @@ const emptyFormData = () => ({
 export default {
   name: 'JalanAingComplaintPage',
   data() {
+    const routeCategory = CATEGORY_ALIASES[this.$route.query.category] || this.$route.query.category
     return {
       steps: ['Kategori', 'Detail & Foto', 'Data Pelapor'],
       categories,
       currentStep: 1,
-      selectedCategory: categories.some(({ id }) => id === this.$route.query.category) ? this.$route.query.category : '',
+      selectedCategory: categories.some(({ id }) => id === routeCategory) ? routeCategory : '',
       formData: emptyFormData(),
       submitError: '',
       formErrors: {},
@@ -357,6 +362,7 @@ export default {
   },
   mounted() {
     localStorage.removeItem(DRAFT_STORAGE_KEY)
+    this.fetchCategories()
     this.citiesReady = this.ensureCitiesLoaded()
     if (this.currentStep === 3 && this.hasLocation) {
       this.bigAreaReady = this.lookupAdministrativeArea()
@@ -367,6 +373,20 @@ export default {
     this.formData.photos.forEach(({ src }) => URL.revokeObjectURL(src))
   },
   methods: {
+    async fetchCategories() {
+      try {
+        const token = await this.$getToken('client_credentials')
+        const response = await this.$gatewayPartnerAPI.get('/aduan/complaints/subcategories', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { complaint_category_id: 'jalan-aing' },
+        })
+        const { data } = response.data
+        if (!Array.isArray(data) || !data.length) throw new Error('Kategori tidak tersedia')
+        this.categories = data.map((category) => ({ id: category.id, label: category.name, description: CATEGORY_DESCRIPTIONS[category.id] || 'Laporkan permasalahan jalan' }))
+        const selected = CATEGORY_ALIASES[this.selectedCategory] || this.selectedCategory
+        if (selected && this.categories.some((category) => category.id === selected)) this.selectCategory(selected)
+      } catch (_) {}
+    },
     async ensureCitiesLoaded() {
       if (this.cities.length) return
       await this.$store.dispatch('location/setCitiesOption', 'cities')

@@ -17,6 +17,7 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
     "@jabardigitalservice/jds-design-system": "^0.0.3-beta.13",
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/svg": "^0.4.0",
     "core-js": "^3.19.3",
@@ -24,6 +25,7 @@
     "date-fns-tz": "^2.0.0",
     "eslint-config-prettier": "^10.0.1",
     "leaflet": "^1.9.4",
+    "maplibre-gl": "^4.7.1",
     "nuxt": "^2.15.8",
     "swiper-vue2": "^1.0.10",
     "unleash-proxy-client": "^3.7.3",

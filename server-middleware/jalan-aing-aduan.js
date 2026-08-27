@@ -17,6 +17,7 @@ const JALAN_AING_SUBCATEGORY_MAP = {
   marka_rusak: 'jalan-aing-marka-rusak',
   lainnya: 'jalan-aing-darurat-lainnya',
 }
+const JALAN_AING_SUBCATEGORY_IDS = new Set(Object.values(JALAN_AING_SUBCATEGORY_MAP))
 
 const sendJson = (response, statusCode, body) => {
   response.statusCode = statusCode
@@ -145,7 +146,7 @@ export default async (request, response) => {
       jotform_id: '',
       sp4n_id: '',
       category_id: 'jalan-aing',
-      sub_category_id: JALAN_AING_SUBCATEGORY_MAP[text(body.category)] || 'jalan-aing-darurat-lainnya',
+      sub_category_id: JALAN_AING_SUBCATEGORY_MAP[text(body.category)] || (JALAN_AING_SUBCATEGORY_IDS.has(text(body.category)) ? text(body.category) : 'jalan-aing-darurat-lainnya'),
       photos: uploadedPhotos,
       title,
       description,
