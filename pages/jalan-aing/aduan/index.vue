@@ -224,15 +224,16 @@
       <div class="ja-success-icon" aria-hidden="true"><Icon name="check-mark-circle" size="52px" /></div>
       <h1 id="success-title">Laporan Berhasil Terkirim!</h1>
       <p class="ja-success-message">Hatur nuhun atas kepedulian Anda. Laporan Anda telah tercatat ke dalam pusat kendali Dinas Bina Marga Jawa Barat untuk diverifikasi lapangan.</p>
+      <p v-if="photoUploadFailed" class="ja-success-photo-warning" role="status">Foto belum dapat diunggah karena layanan unggah sedang bermasalah. Laporan Anda tetap terkirim tanpa foto.</p>
       <section v-if="submittedTicket" class="ja-success-ticket" aria-label="Nomor tiket aduan">
         <small>Nomor tiket aduan</small>
         <div>
           <strong>{{ submittedTicket }}</strong>
           <button type="button" :aria-label="copied ? 'Nomor tiket tersalin' : 'Salin nomor tiket'" @click="copyTicket"><Icon :name="copied ? 'check-mark' : 'share'" size="18px" aria-hidden="true" /></button>
         </div>
-        <p>Gunakan nomor tiket ini untuk melacak status pengerjaan aduan Anda.</p>
+        <p>Gunakan nomor tiket ini untuk melacak status penanganan aduan Anda.</p>
       </section>
-      <p v-else class="ja-success-message">Simpan bukti pengiriman ini. Nomor tiket belum diberikan oleh layanan Aduan.</p>
+      <p v-else class="ja-success-message">Simpan bukti aduan ini. Nomor tiket belum diterbitkan oleh layanan Aduan.</p>
       <div class="ja-success-actions">
         <button v-if="submittedTicket" type="button" class="ja-success-track" @click="trackStatus">Lacak Status Aduan</button>
         <button type="button" class="ja-success-new" @click="startNewComplaint">Buat Aduan Baru</button>
@@ -261,7 +262,11 @@ const CATEGORY_ALIASES = {
 }
 const categories = Object.entries(CATEGORY_DESCRIPTIONS).map(([id, description]) => ({ id, label: id.replace('jalan-aing-', '').split('-').map((word) => word.toUpperCase() === 'APJ' || word.toUpperCase() === 'CCTV' ? word.toUpperCase() : word[0].toUpperCase() + word.slice(1)).join(' '), description }))
 const DRAFT_STORAGE_KEY = 'jalan-aing-aduan-draft'
-const SUBMIT_API_ENABLED = false
+const SUBMIT_API_ENABLED = true
+// SEMENTARA DINONAKTIFKAN: foto cadangan hardcode yang dipakai saat endpoint
+// /file/upload staging bermasalah dan backend mewajibkan minimal 1 foto.
+// Aktifkan lagi bila diperlukan untuk testing tanpa upload nyata.
+// const FALLBACK_PHOTO_URL = 'https://file.digitalservice.id/superapp-utilities-public/utilities/uploads/2026/04/c3pTFZ4gUHNMU8vy.jpg'
 const emptyFormData = () => ({
   title: '',
   description: '',
@@ -295,6 +300,7 @@ export default {
       photoError: '',
       selectedPhoto: null,
       isSubmitting: false,
+      photoUploadFailed: false,
       reverseLocation: {},
       citiesReady: Promise.resolve(),
       bigAreaReady: Promise.resolve(),
@@ -619,13 +625,8 @@ export default {
       if (!this.validateFields(['reporterName', 'reporterPhone', 'reporterEmail', 'cityName'])) return
       this.submitError = ''
       this.isSubmitting = true
+      this.photoUploadFailed = false
       try {
-        const photos = await Promise.all(this.formData.photos.map(async (photo) => ({
-          name: photo.name,
-          mimeType: photo.file.type,
-          data: await this.fileToBase64(photo.file),
-        })))
-
         if (!SUBMIT_API_ENABLED) {
           this.submittedTicket = ''
           this.submitted = true
@@ -634,36 +635,83 @@ export default {
           return
         }
 
-        const response = await fetch('/api/jalan-aing/complaints', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: this.formData.title,
-            description: this.formData.description,
-            photos,
-            category: this.selectedCategory,
-            complaintType: this.formData.complaintType,
-            reporterName: this.formData.reporterName,
-            reporterPhone: this.formData.reporterPhone,
-            reporterEmail: this.formData.reporterEmail,
-            latitude: this.$route.query.lat,
-            longitude: this.$route.query.lng,
-            address: this.displayAddress,
-            cityName: this.formData.cityName,
-            districtName: this.formData.districtName,
-            villageName: this.formData.villageName,
-          }),
-        })
-        const result = await response.json().catch(() => ({}))
-        if (!response.ok) throw new Error(result.error)
+        // Pola sama dengan imah-aing: token Keycloak + request langsung dari browser
+        const token = await this.$getToken('client_credentials')
+        const authHeaders = { Authorization: `Bearer ${token}` }
 
-        const complaint = result.data || {}
-        this.submittedTicket = complaint.complaint_id || complaint.ticket_number || complaint.ticket_code || complaint.id || ''
+        // Upload foto (jika ada) ke /file/upload — sama seperti imah-aing.
+        // Foto bersifat opsional: jika upload gagal (mis. endpoint storage sedang
+        // bermasalah), laporan tetap dikirim tanpa foto.
+        let photos = []
+        let photoUploadFailed = false
+        if (this.formData.photos.length) {
+          try {
+            photos = await Promise.all(this.formData.photos.map(async (photo) => {
+              const base64Data = await this.fileToBase64(photo.file)
+              const response = await this.$gatewayPartnerAPI.post('/file/upload', {
+                name: photo.name,
+                isConfidental: false,
+                mimeType: photo.file.type || 'image/jpeg',
+                roles: ['admin', 'rw'],
+                data: base64Data,
+              }, { headers: authHeaders })
+              return { url: `${this.$config.urlFile}/${response.data.data.path}` }
+            }))
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Unggah foto gagal, laporan dikirim tanpa foto:', error)
+            photoUploadFailed = true
+            photos = []
+          }
+        }
+
+        // SEMENTARA DINONAKTIFKAN: backend mewajibkan minimal 1 foto (422
+        // "photos: Gambar harus berisi minimal 1 item"). Selama /file/upload
+        // bermasalah, foto cadangan hardcode dipakai agar submit tetap lolos.
+        // if (!photos.length) {
+        //   photoUploadFailed = true
+        //   photos = [{ url: FALLBACK_PHOTO_URL }]
+        // }
+
+        const city = this.cities.find((item) => item.name === this.formData.cityName) || {}
+        const district = this.subDistricts.find((item) => item.name === this.formData.districtName) || {}
+        const village = this.villages.find((item) => item.name === this.formData.villageName) || {}
+
+        const payload = {
+          source_id: 'sapawarga',
+          category_id: 'jalan-aing',
+          complaint_subcategory_id: this.selectedCategory,
+          title: this.formData.title,
+          description: this.formData.description,
+          type: this.formData.complaintType === 'privat' ? 'private' : 'public',
+          photos,
+          user_name: this.formData.reporterName,
+          user_email: this.formData.reporterEmail,
+          user_phone: this.formData.reporterPhone,
+          longitude: `${this.$route.query.lng}`,
+          latitude: `${this.$route.query.lat}`,
+          address_title: this.formData.cityName,
+          address: this.displayAddress,
+          address_detail: '',
+          city_id: city.id || '',
+          city_name: this.formData.cityName,
+          district_id: district.id || '',
+          district_name: this.formData.districtName,
+          village_id: village.id || '',
+          village_name: this.formData.villageName,
+        }
+
+        const response = await this.$gatewayPartnerAPI.post('/aduan/complaints', payload, { headers: authHeaders })
+
+        const complaint = response.data?.data || {}
+        this.submittedTicket = complaint.complaint_number || complaint.complaint_id || complaint.ticket_number || complaint.ticket_code || complaint.id || ''
+        this.photoUploadFailed = photoUploadFailed
         this.submitted = true
         localStorage.removeItem(DRAFT_STORAGE_KEY)
         this.$nextTick(() => this.$refs.successDialog.showModal())
       } catch (error) {
-        this.submitError = error.message || 'Aduan belum dapat dikirim. Silakan coba lagi.'
+        const apiMessage = error.response?.data?.message || error.response?.data?.error
+        this.submitError = apiMessage || error.message || 'Aduan belum dapat dikirim. Silakan coba lagi.'
       } finally {
         this.isSubmitting = false
       }
@@ -675,7 +723,8 @@ export default {
       window.setTimeout(() => { this.copied = false }, 2000)
     },
     trackStatus() {
-      this.$router.push({ path: '/jalan-aing/lacak', query: { ticket: this.submittedTicket } })
+      this.$store.commit('aduan/setLastComplaintTicket', this.submittedTicket)
+      this.$router.push({ path: '/jalan-aing/lacak' })
     },
     startNewComplaint() {
       this.formData.photos.forEach(({ src }) => URL.revokeObjectURL(src))
@@ -686,6 +735,7 @@ export default {
       this.photoError = ''
       this.submittedTicket = ''
       this.copied = false
+      this.photoUploadFailed = false
       this.$router.replace({ path: '/jalan-aing/aduan' })
       this.$refs.successDialog.close()
     },
@@ -772,16 +822,21 @@ export default {
 .ja-success-icon { display: grid; margin: 0 auto 18px; place-items: center; color: var(--ja-green); }
 .ja-success-dialog h1 { margin: 0; font-size: clamp(26px, 3vw, 32px); font-weight: 650; letter-spacing: -.03em; line-height: 1.12; }
 .ja-success-message { max-width: 500px; margin: 16px auto 26px; color: #536176; font-size: 16px; font-weight: 400; letter-spacing: 0; line-height: 1.55; }
+.ja-success-photo-warning { max-width: 500px; margin: -12px auto 20px; padding: 10px 14px; border: 1px solid #f0dfb1; border-radius: 10px; background: #fdf6e3; color: #8a6b12; font-size: 13px; line-height: 1.5; }
 .ja-success-ticket { padding: 22px; border: 1px solid #dce5ee; border-radius: 12px; background: #f8fafc; }
 .ja-success-ticket > small { display: block; color: #8c9bb3; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .ja-success-ticket > div { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 12px 0; }
-.ja-success-ticket strong { color: var(--ja-green); font-family: Roboto, sans-serif; font-size: clamp(21px, 3.5vw, 28px); font-weight: 700; letter-spacing: .055em; }
+.ja-success-ticket strong { color: var(--ja-green); font-family: Roboto, sans-serif; font-size: clamp(19px, 3vw, 24px); font-weight: 700; letter-spacing: .04em; overflow-wrap: anywhere; }
 .ja-success-ticket button { display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #64748b; font-size: 25px; cursor: pointer; }
 .ja-success-ticket p { margin: 0; color: #627798; font-size: 13px; line-height: 1.45; }
 .ja-success-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
-.ja-success-actions button { min-height: 48px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.2; cursor: pointer; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 160ms cubic-bezier(.2, .8, .2, 1); }
-.ja-success-track { border: 1px solid var(--ja-green); background: var(--ja-green); color: #fff; box-shadow: 0 8px 18px rgba(13, 109, 67, .18); }
+.ja-success-actions button { min-height: 48px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.2; cursor: pointer; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 160ms cubic-bezier(.2, .8, .2, 1), border-color 160ms cubic-bezier(.2, .8, .2, 1); }
+.ja-success-track { border: 1px solid var(--ja-green); background: var(--ja-green); color: #fff; }
 .ja-success-new { border: 1px solid #d9dfe3; background: #fff; color: #465064; }
+@media (hover: hover) and (pointer: fine) {
+  .ja-success-track:hover { border-color: #095b38; background: #095b38; }
+  .ja-success-new:hover { border-color: var(--ja-green); color: var(--ja-green); }
+}
 .ja-success-ticket button:focus-visible, .ja-success-actions button:focus-visible { outline: 3px solid #ffcf51; outline-offset: 3px; }
 .ja-success-ticket button:active, .ja-success-actions button:active { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) {

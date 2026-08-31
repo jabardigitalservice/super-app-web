@@ -10,6 +10,15 @@ export default ({ store, $config }, inject) => {
    */
   const getToken = async (grantType, credentials = null) => {
     try {
+      // Pakai ulang access token yang masih berlaku untuk menghindari
+      // request berulang ke Keycloak (client_credentials)
+      if (grantType === 'client_credentials' && !credentials) {
+        const { accessTokenKeycloak, accessTokenExpiresAt } = store.state.aduan
+        if (accessTokenKeycloak && Date.now() < accessTokenExpiresAt) {
+          return accessTokenKeycloak
+        }
+      }
+
       const params = new URLSearchParams({
         client_id: credentials?.clientId || $config.apiAduanIdeal.keycloakClientId,
         client_secret: credentials?.clientSecret || $config.apiAduanIdeal.keycloakClientSecret,
@@ -23,15 +32,14 @@ export default ({ store, $config }, inject) => {
 
       const response = await axios.post(
         credentials?.keycloakUrl || $config.apiAduanIdeal.keycloakUrl,
-        params,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
+        params
       )
 
       store.commit('aduan/setRefreshTokenKeycloak', response.data.refresh_token)
+      store.commit('aduan/setAccessTokenKeycloak', {
+        accessToken: response.data.access_token,
+        expiresIn: response.data.expires_in,
+      })
 
       return response.data.access_token
     } catch (error) {
