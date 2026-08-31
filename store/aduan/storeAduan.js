@@ -3,6 +3,9 @@ const state = () => ({
   fileAduan: [],
   fileDokumenBukti: [],
   refreshTokenKeycloak: '',
+  accessTokenKeycloak: '',
+  accessTokenExpiresAt: 0,
+  lastComplaintTicket: '',
 })
 
 const mutations = {
@@ -17,6 +20,14 @@ const mutations = {
   },
   setRefreshTokenKeycloak(state, refreshTokenKeycloak) {
     state.refreshTokenKeycloak = refreshTokenKeycloak
+  },
+  setAccessTokenKeycloak(state, { accessToken, expiresIn }) {
+    state.accessTokenKeycloak = accessToken
+    // Cadangan 15 detik sebelum kedaluwarsa agar tidak memakai token basi
+    state.accessTokenExpiresAt = Date.now() + Math.max((expiresIn || 0) - 15, 0) * 1000
+  },
+  setLastComplaintTicket(state, ticket) {
+    state.lastComplaintTicket = ticket
   },
 }
 
