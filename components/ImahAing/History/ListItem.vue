@@ -108,7 +108,8 @@ export default {
   computed: {
     /** Kunci status — satu sumber untuk isNonEditable dan statusStyle */
     statusKey() {
-      return this.item.complaint_status?.id
+      return this.item.latest_complaint_status?.id
+        || this.item.complaint_status?.id
         || this.item.complaint_status_id
         || this.item.phase
         || this.item.status
@@ -119,7 +120,7 @@ export default {
     },
     /** Objek style guide (name + hex) dari mapping 13 status */
     statusStyle() {
-      return getImahAingStatus(this.statusKey)
+      return getImahAingStatus(this.statusKey, this.item.latest_complaint_status?.name)
     },
     /** Label status dari mapping style guide */
     statusLabel() {

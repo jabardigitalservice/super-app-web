@@ -242,7 +242,10 @@ export default {
 
     canEdit(item) {
       const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
-      const statusId = item.complaint_status?.id || item.complaint_status_id || ''
+      const statusId = item.latest_complaint_status?.id
+        || item.complaint_status?.id
+        || item.complaint_status_id
+        || ''
       return this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
     },
 
