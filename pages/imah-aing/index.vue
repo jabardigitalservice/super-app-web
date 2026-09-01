@@ -114,7 +114,7 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
-import { decodeMetaQueryParam } from '~/utils/decode-meta'
+import { decryptMetaQueryParam } from '~/utils/decode-meta'
 
 export default {
   data() {
@@ -122,7 +122,8 @@ export default {
       previewOpen: false,
       previewItem: null,
       showCancelDialog: false,
-      showInfoSnackbar: false
+      showInfoSnackbar: false,
+      decodedMeta: null
     }
   },
   computed: {
@@ -143,31 +144,29 @@ export default {
       return (this.metaPayload?.role || '').trim().toLowerCase() === 'warga'
     }
   },
-  created() {
-    // Decode meta query param di created (sama seperti form page)
+  async mounted() {
+    // Dekripsi meta query param (async — Web Crypto). Sebelumnya di created(),
+    // dipindah ke sini karena decrypt tidak bisa di-await di created().
     const { meta } = this.$route.query
     const metaStr = Array.isArray(meta) ? meta[0] : meta
-    const decoded = metaStr ? decodeMetaQueryParam(metaStr) : null
+    const decoded = metaStr
+      ? await decryptMetaQueryParam(metaStr, this.$config.metadataSecret)
+      : null
 
     if (decoded) {
-      this.$store.commit('imahAingHistory/SET_META_PAYLOAD', decoded)
+      this.SET_META_PAYLOAD(decoded)
       this.decodedMeta = decoded
     }
 
-    // Mode mock (?use_mock=true) → lewati guard token
+    // Mode mock → tampilkan data mock tanpa API & tanpa redirect
     if (this.useMock) {
+      this.loadMockData()
       return
     }
 
     // Guard #1 — tidak ada token dari meta → redirect ke form
     if (!decoded || !decoded.token) {
       this.redirectToForm()
-    }
-  },
-  async mounted() {
-    // Mode mock → tampilkan data mock tanpa API & tanpa redirect
-    if (this.useMock) {
-      this.loadMockData()
       return
     }
 
@@ -195,7 +194,7 @@ export default {
   },
   methods: {
     ...mapActions('imahAingHistory', ['fetchHistory', 'cancelSubmissions', 'loadMockData']),
-    ...mapMutations('imahAingHistory', ['TOGGLE_SELECT_ID', 'SET_PAGINATION', 'RESET_STATE']),
+    ...mapMutations('imahAingHistory', ['TOGGLE_SELECT_ID', 'SET_PAGINATION', 'RESET_STATE', 'SET_META_PAYLOAD']),
 
     async loadMore() {
       this.SET_PAGINATION({ page: this.pagination.page + 1 })

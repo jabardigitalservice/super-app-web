@@ -1,4 +1,4 @@
-import { decodeMetaQueryParam } from '~/utils/decode-meta'
+import { decryptMetaQueryParam } from '~/utils/decode-meta'
 
 /**
  * Pusat peta default / fallback Geolocation
@@ -359,12 +359,12 @@ export default {
     setAuthToken({ commit }, token) {
       commit('SET_AUTH_TOKEN', token)
     },
-    initForm({ commit }, payload) {
+    async initForm({ commit }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
 
       if (meta) {
-        const decoded = decodeMetaQueryParam(meta)
+        const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
           applyQueryMetaToDataPengusul(commit, decoded)
           applyQueryMetaToProposerMeta(commit, decoded)

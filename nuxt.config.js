@@ -128,6 +128,7 @@ export default {
         'xctam5pZgC4yvhMyaf5Rkc2wfGGAEdeF',
     },
     urlFile: process.env.URL_FILE,
+    metadataSecret: process.env.METADATA_SECRET,
     unleash: {
       unleashURL: process.env.UNLEASH_URL,
       unleashToken: process.env.UNLEASH_TOKEN,
