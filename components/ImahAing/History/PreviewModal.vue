@@ -189,28 +189,25 @@ export default {
       const photos = this.resolvedItem?.photos || this.resolvedItem?.images || []
       return Array.isArray(photos) ? photos : []
     },
-    isRejected() {
-      const key =
+    statusKey() {
+      return (
+        this.item?.latest_complaint_status?.id ||
+        this.item?.complaint_status?.id ||
+        this.item?.complaint_status_id ||
         this.resolvedItem?.complaint_status_id ||
         this.resolvedItem?.phase ||
-        this.resolvedItem?.status ||
         ''
-      return ['rejected_appeal', 'rejected_criteria'].includes(key)
+      )
+    },
+    isRejected() {
+      return ['rejected_appeal', 'rejected_criteria'].includes(this.statusKey)
     },
     rejectionNote() {
       if (!this.isRejected) return ''
-      return this.resolvedItem?.complaint_status_note || ''
+      return this.resolvedItem?.complaint_status_note || this.item?.complaint_status_note || ''
     },
     statusLabel() {
-      if (this.resolvedItem?.complaint_status?.name) {
-        return this.resolvedItem.complaint_status.name
-      }
-      const key =
-        this.resolvedItem?.complaint_status_id ||
-        this.resolvedItem?.phase ||
-        this.resolvedItem?.status ||
-        ''
-      return getImahAingStatus(key).name
+      return getImahAingStatus(this.statusKey, this.item?.latest_complaint_status?.name).name
     },
     formattedDate() {
       const date = this.resolvedItem?.created_at || this.resolvedItem?.submitted_at || ''

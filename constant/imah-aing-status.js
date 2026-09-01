@@ -30,6 +30,10 @@ export const IMAH_AING_STATUS = {
   aid_received:            { id: 'aid_received',            phase: 'coordination', name: 'Telah Menerima Bantuan',    color: 'green',      hex: '#166534' },
 }
 
-/** Fallback aman untuk status yang tidak dikenal */
-export const getImahAingStatus = (key) =>
-  IMAH_AING_STATUS[key] || { id: key, name: key || '-', color: 'gray', hex: '#94A3B8' }
+/**
+ * Fallback aman untuk status yang tidak dikenal.
+ * @param {string} key - id status (mis. dari latest_complaint_status.id)
+ * @param {string} [fallbackName] - nama tampilan dari BE saat key belum terdaftar di IMAH_AING_STATUS
+ */
+export const getImahAingStatus = (key, fallbackName) =>
+  IMAH_AING_STATUS[key] || { id: key, name: fallbackName || key || '-', color: 'gray', hex: '#94A3B8' }
