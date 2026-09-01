@@ -654,7 +654,7 @@ export default {
                 mimeType: photo.file.type || 'image/jpeg',
                 roles: ['admin', 'rw'],
                 data: base64Data,
-              }, { headers: authHeaders })
+              })
               return { url: `${this.$config.urlFile}/${response.data.data.path}` }
             }))
           } catch (error) {

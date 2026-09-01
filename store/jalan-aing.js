@@ -697,7 +697,11 @@ export default {
         }
 
         try {
-          const response = await this.$gatewayPartnerAPI.post('/file/upload', formData, {})
+          const response = await this.$gatewayPartnerAPI.post('/file/upload', formData, {
+            headers: {
+              Authorization: `Bearer ${state.authToken}`,
+            },
+          })
 
           if (response) {
             return {
