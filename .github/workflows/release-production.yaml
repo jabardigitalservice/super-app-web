@@ -69,7 +69,10 @@ jobs:
             kv-superapp-service-production-drc/data/web NODE_ENV | NODE_ENV ;
             kv-superapp-service-production-drc/data/web UNLEASH_URL | UNLEASH_URL ;
             kv-superapp-service-production-drc/data/web UNLEASH_TOKEN | UNLEASH_TOKEN ;
-            kv-superapp-service-production-drc/data/web LINK_PORTAL_JABAR | LINK_PORTAL_JABAR
+            kv-superapp-service-production-drc/data/web LINK_PORTAL_JABAR | LINK_PORTAL_JABAR ;
+            kv-superapp-service-production-drc/data/web METADATA_SECRET | METADATA_SECRET ;
+            kv-superapp-service-production-drc/data/web JALAN_AING_GEOSERVER_USERNAME | JALAN_AING_GEOSERVER_USERNAME ;
+            kv-superapp-service-production-drc/data/web JALAN_AING_GEOSERVER_PASSWORD | JALAN_AING_GEOSERVER_PASSWORD
 
       - name: 🔨 Build and Push 📦
         uses: docker/build-push-action@v4
@@ -106,6 +109,9 @@ jobs:
             UNLEASH_URL=${{env.UNLEASH_URL}}
             UNLEASH_TOKEN=${{env.UNLEASH_TOKEN}}
             LINK_PORTAL_JABAR=${{env.LINK_PORTAL_JABAR}}
+            METADATA_SECRET=${{env.METADATA_SECRET}}
+            JALAN_AING_GEOSERVER_USERNAME=${{env.JALAN_AING_GEOSERVER_USERNAME}}
+            JALAN_AING_GEOSERVER_PASSWORD=${{env.JALAN_AING_GEOSERVER_PASSWORD}}
 
       ## GitOps
       - name: ⚙️ GitOps ArgoCD Setup
