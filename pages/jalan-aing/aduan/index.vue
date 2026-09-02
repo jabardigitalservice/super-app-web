@@ -229,7 +229,10 @@
         <small>Nomor tiket aduan</small>
         <div>
           <strong>{{ submittedTicket }}</strong>
-          <button type="button" :aria-label="copied ? 'Nomor tiket tersalin' : 'Salin nomor tiket'" @click="copyTicket"><Icon :name="copied ? 'check-mark' : 'share'" size="18px" aria-hidden="true" /></button>
+          <button type="button" :aria-label="copied ? 'Nomor tiket tersalin' : 'Salin nomor tiket'" @click="copyTicket">
+            <Icon v-if="copied" name="check-mark" size="18px" aria-hidden="true" />
+            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+          </button>
         </div>
         <p>Gunakan nomor tiket ini untuk melacak status penanganan aduan Anda.</p>
       </section>
@@ -498,17 +501,24 @@ export default {
       }
     },
     async prefillAreaSelection() {
-      const normalize = (value) => (value || '')
+      const normalizeFull = (value) => (value || '')
         .toUpperCase()
-        .replace(/^(KOTA|KABUPATEN|KAB\.?)\s+/g, '')
+        .replace(/^KAB\.?\s+/, 'KABUPATEN ')
         .trim()
+      const bareName = (value) => normalizeFull(value).replace(/^(KOTA|KABUPATEN)\s+/, '').trim()
       const findMatch = (list, targetName) => {
-        const target = normalize(targetName)
-        if (!target) return null
-        return list.find((item) => {
-          const name = normalize(item.name)
-          return name === target || name.includes(target) || target.includes(name)
-        }) || null
+        const targetFull = normalizeFull(targetName)
+        if (!targetFull) return null
+        const targetBare = bareName(targetName)
+        return (
+          list.find((item) => normalizeFull(item.name) === targetFull) ||
+          list.find((item) => bareName(item.name) === targetBare) ||
+          list.find((item) => {
+            const name = bareName(item.name)
+            return name.includes(targetBare) || targetBare.includes(name)
+          }) ||
+          null
+        )
       }
 
       if (!this.formData.cityName) {

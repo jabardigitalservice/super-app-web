@@ -71,6 +71,16 @@ const GIS_LAYERS = Object.freeze({
     color: '#008444',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/jalan-provinsi',
     nameFields: ['namaruasjalan', 'namaruas', 'namajalan', 'namobj', 'remark', 'nama'],
+    // Overrides the generic property-label rendering in the detail popup: a string
+    // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
+    // non-alphanumeric stripped) to match `normalisePropertyKey`.
+    fieldLabels: {
+      fcode: 'Kode',
+      fgsrjl: null,
+      metadata: null,
+      namobj: 'Nama Object',
+      remark: 'Catatan',
+    },
   },
   rumahSakit: {
     label: 'Rumah Sakit',
@@ -79,6 +89,18 @@ const GIS_LAYERS = Object.freeze({
     iconUrl: '/icon/marker-hospital.svg',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rumah-sakit',
     nameFields: ['namarumahsakit', 'namars', 'namafaskes', 'namobj', 'nama'],
+    // Overrides the generic property-label rendering in the detail popup: a string
+    // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
+    // non-alphanumeric stripped) to match `normalisePropertyKey`.
+    fieldLabels: {
+      objectid: 'Object ID',
+      namobj: 'Nama Object',
+      fcode: null,
+      remark: 'Catatan',
+      metadata: null,
+      srsid: null,
+      jplyrs: null,
+    },
   },
   puskesmas: {
     label: 'Puskesmas',
@@ -87,6 +109,18 @@ const GIS_LAYERS = Object.freeze({
     iconUrl: '/icon/marker-puskesmas.svg',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/puskesmas',
     nameFields: ['namapuskesmas', 'namafaskes', 'namobj', 'nama'],
+    // Overrides the generic property-label rendering in the detail popup: a string
+    // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
+    // non-alphanumeric stripped) to match `normalisePropertyKey`.
+    fieldLabels: {
+      objectid: 'Object ID',
+      namobj: 'Nama Object',
+      fcode: null,
+      metadata: null,
+      srsid: null,
+      jplpkm: null,
+      kmppkm: null,
+    },
   },
   restArea: {
     label: 'Rest Area',
@@ -95,6 +129,15 @@ const GIS_LAYERS = Object.freeze({
     iconUrl: '/icon/marker-rest-area.svg',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rest-area',
     nameFields: ['namarestarea', 'namalokasi', 'restarea', 'rest_area', 'nama'],
+    // Overrides the generic property-label rendering in the detail popup: a string
+    // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
+    // non-alphanumeric stripped) to match `normalisePropertyKey`.
+    fieldLabels: {
+      objectid: 'Object ID',
+      restarea: 'Nama Object',
+      mosque: 'Masjid',
+      parkingfa: 'Area Parkir',
+    },
   },
   apj: {
     label: 'APJ',
@@ -691,6 +734,7 @@ export default {
               type: config.label,
               label,
               properties: feature.properties || {},
+              fieldLabels: config.fieldLabels || null,
             }, event.latlng, config.type === 'point' ? featureLayer : null)
           })
         },

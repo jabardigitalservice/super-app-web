@@ -179,9 +179,22 @@ export default {
   },
   computed: {
     selectedMarkerDetails() {
+      const fieldLabels = this.selectedMarker?.fieldLabels || null
+      const normaliseKey = (key) => key.toLowerCase().replace(/[^a-z0-9]/g, '')
+      const defaultLabel = (key) => key.toLowerCase().replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase())
+
       return Object.entries(this.selectedMarker?.properties || {})
-        .filter(([key, value]) => key.toLowerCase().replace(/[_\s]/g, '') !== 'objectid' && value !== null && value !== '')
-        .map(([key, value]) => [key.toLowerCase().replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase()), value])
+        .filter(([, value]) => value !== null && value !== '')
+        .reduce((details, [key, value]) => {
+          const normalised = normaliseKey(key)
+          const override = fieldLabels && normalised in fieldLabels ? fieldLabels[normalised] : undefined
+          // Explicit `null` in a layer's fieldLabels hides the field entirely.
+          if (override === null) return details
+          // With no per-layer override, OBJECTID stays hidden (legacy default behaviour).
+          if (override === undefined && normalised === 'objectid') return details
+          details.push([override || defaultLabel(key), value])
+          return details
+        }, [])
         .slice(0, 7)
     },
   },
