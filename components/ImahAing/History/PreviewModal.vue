@@ -200,9 +200,11 @@ export default {
     },
     statusKey() {
       return (
+        this.item?.latest_complaint_status?.id ||
+        this.item?.complaint_status?.id ||
+        this.item?.complaint_status_id ||
         this.resolvedItem?.complaint_status_id ||
         this.resolvedItem?.phase ||
-        this.resolvedItem?.status ||
         ''
       )
     },
@@ -211,7 +213,7 @@ export default {
     },
     rejectionNote() {
       if (!this.isRejected) return ''
-      return this.resolvedItem?.complaint_status_note || ''
+      return this.resolvedItem?.complaint_status_note || this.item?.complaint_status_note || ''
     },
     stepFlowData() {
       return getImahAingStepFlow(this.statusKey)
@@ -223,7 +225,7 @@ export default {
       if (this.resolvedItem?.complaint_status?.name) {
         return this.resolvedItem.complaint_status.name
       }
-      return getImahAingStatus(this.statusKey).name
+      return getImahAingStatus(this.statusKey, this.item?.latest_complaint_status?.name).name
     },
     formattedDate() {
       const date = this.resolvedItem?.created_at || this.resolvedItem?.submitted_at || ''
