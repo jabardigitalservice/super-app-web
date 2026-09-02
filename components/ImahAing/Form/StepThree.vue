@@ -220,7 +220,7 @@ export default {
           desc: 'Jenis bencana alam meliputi banjir, banjir bandang,  gempa bumi, cuaca ekstrem, angin puting beliung, kebakaran hutan dan lahan.',
         },
       },
-      accept: '.jpg, .jpeg, .png, .pdf',
+      accept: 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
     }
   },
