@@ -40,7 +40,7 @@
           </header>
           <dl>
             <div><dt><Icon name="calendar-date-outline" size="21px" aria-hidden="true" /> Dibuat</dt><dd>{{ complaint.createdAt }}</dd></div>
-            <div><dt><Icon src="/icon/pin-complaint.svg" size="21px" aria-hidden="true" /> Lokasi</dt><dd>{{ complaint.address }}</dd></div>
+            <div class="ja-complaint-location"><dt>Lokasi</dt><dd>{{ complaint.address }}</dd></div>
             <div v-if="complaint.coordinates"><dt><Icon src="/icon/pin-complaint.svg" size="21px" aria-hidden="true" /> Koordinat</dt><dd>{{ complaint.coordinates }}</dd></div>
             <div v-if="complaint.source"><dt><Icon name="share" size="21px" aria-hidden="true" /> Sumber</dt><dd>{{ complaint.source }}</dd></div>
           </dl>
@@ -199,7 +199,7 @@ export default {
             status: statusName,
             icon: 'verfication.svg',
             time: formatTimestamp(item.updated_at || item.created_at),
-            description: 'Laporan Anda sedang menunggu verifikasi oleh tim Dinas Bina Marga.',
+            description: 'Laporan Anda sedang diverifikasi oleh tim Jalan Aing.',
           })
         }
       } catch (error) {
@@ -241,7 +241,7 @@ export default {
 </script>
 
 <style scoped>
-.ja-tracking-page { --ja-ink: #14233f; --ja-rule: #dce7e0; --ja-green: #0d6d43; min-height: 100vh; background: #f5f5f7; color: var(--ja-ink); font-family: Roboto, sans-serif; }
+.ja-tracking-page { --ja-ink: #022B55; --ja-rule: #E3E7ED; --ja-green: #069550; --ja-green-dark: #006430; --ja-yellow: #FFC800; min-height: 100vh; background: #f5f5f7; color: var(--ja-ink); font-family: Roboto, sans-serif; }
 .ja-tracking-main { width: min(1000px, calc(100% - 48px)); margin: 0 auto; padding: clamp(38px, 6vw, 74px) 0 80px; }
 .ja-tracking-intro { max-width: 620px; margin-bottom: 32px; }
 .ja-tracking-intro p, .ja-tracking-result-head p { margin: 0; color: var(--ja-green); font-size: 12px; font-weight: 650; letter-spacing: .01em; }
@@ -257,10 +257,10 @@ export default {
 .ja-tracking-search input { min-width: 0; flex: 1; height: 48px; box-sizing: border-box; padding: 0 14px; border: 1px solid #d9dfe3; border-radius: 10px; background: #fff; color: var(--ja-ink); font: inherit; font-size: 15px; font-weight: 600; letter-spacing: .03em; outline: 0; text-transform: uppercase; }
 .ja-tracking-search input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #fff inset; -webkit-text-fill-color: var(--ja-ink); }
 .ja-tracking-search input::placeholder { color: #9aa5b5; font-weight: 400; letter-spacing: 0; text-transform: none; }
-.ja-tracking-search input:focus { border-color: #81938a; box-shadow: 0 0 0 3px rgba(13, 109, 67, .12); }
+.ja-tracking-search input:focus { border-color: #81938a; box-shadow: 0 0 0 3px rgba(6, 149, 80, .12); }
 .ja-tracking-search input[aria-invalid='true'] { border-color: #c94b4b; }
 .ja-tracking-search button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 7px; padding: 0 17px; border: 1px solid var(--ja-green); border-radius: 10px; background: var(--ja-green); color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 160ms ease, transform 120ms ease-out; white-space: nowrap; }
-.ja-tracking-search button:hover { background: #095b38; }
+.ja-tracking-search button:hover { background: var(--ja-green-dark); }
 .ja-tracking-search button:disabled { border-color: #d9dfe3; background: #e5e8eb; color: #9aa5b5; cursor: not-allowed; }
 .ja-tracking-search button:active { transform: scale(.97); }
 .ja-tracking-search small { display: block; margin-top: 8px; color: #7c8798; font-size: 12px; }
@@ -283,6 +283,7 @@ export default {
 .ja-complaint-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 18px; }
 .ja-complaint-summary dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 22px 0; padding: 18px 0; border-top: 1px solid #edf0f2; border-bottom: 1px solid #edf0f2; }
 .ja-complaint-summary dl div { display: flex; align-items: center; gap: 10px; }
+.ja-complaint-summary dl div.ja-complaint-location { align-items: flex-start; flex-direction: column; gap: 6px; }
 .ja-complaint-summary dt { display: inline-flex; align-items: center; gap: 7px; color: #536176; font-size: 14px; font-weight: 700; }
 .ja-complaint-summary dd { margin: 0; color: var(--ja-ink); font-size: 14px; font-weight: 600; }
 .ja-complaint-summary dt :deep(img) { object-fit: contain; }
@@ -296,12 +297,12 @@ export default {
   .ja-complaint-photo:hover img { transform: scale(1.04); }
   .ja-complaint-photo:hover .ja-complaint-photo-zoom { opacity: 1; }
 }
-.ja-complaint-photo:focus-visible { outline: 3px solid #ffcf51; outline-offset: 3px; }
+.ja-complaint-photo:focus-visible { outline: 3px solid var(--ja-yellow); outline-offset: 3px; }
 .ja-photo-dialog { position: relative; max-width: min(920px, calc(100vw - 48px)); max-height: calc(100vh - 64px); margin: auto; padding: 0; border: 0; border-radius: 14px; background: #0c1526; overflow: hidden; }
 .ja-photo-dialog::backdrop { background: rgba(20, 35, 63, .55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .ja-photo-dialog img { display: block; max-width: 100%; max-height: calc(100vh - 64px); object-fit: contain; }
 .ja-photo-dialog-close { position: absolute; top: 12px; right: 12px; display: grid; width: 40px; height: 40px; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .94); color: var(--ja-ink); cursor: pointer; box-shadow: 0 1px 5px rgba(20, 35, 63, .16); }
-.ja-photo-dialog-close:focus-visible { outline: 3px solid #ffcf51; outline-offset: 3px; }
+.ja-photo-dialog-close:focus-visible { outline: 3px solid var(--ja-yellow); outline-offset: 3px; }
 .ja-complaint-photo-placeholder { display: grid; min-height: 144px; place-items: center; gap: 8px; margin: 18px 0 0; border: 1px dashed #c7d3dc; border-radius: 12px; background: linear-gradient(135deg, #edf6f1, #f6f8fa); color: #68758a; text-align: center; }
 .ja-complaint-photo-placeholder figcaption { font-size: 13px; font-weight: 600; }
 .ja-tracking-result-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--ja-rule); }
@@ -321,7 +322,7 @@ export default {
 .ja-timeline aside { display: flex; gap: 10px; margin-top: 12px; padding: 14px 16px; border: 1px solid #dce5ee; border-radius: 10px; background: #f8fafc; color: #2962ba; }
 .ja-timeline aside strong { display: block; color: #334155; font-size: 14px; }
 .ja-timeline aside p { margin: 4px 0 0; color: #52627b; font-size: 14px; line-height: 1.45; }
-.ja-tracking-search input:focus-visible, .ja-tracking-search button:focus-visible { outline: 3px solid #ffcf51; outline-offset: 3px; }
+.ja-tracking-search button:focus-visible { outline: 3px solid var(--ja-yellow); outline-offset: 3px; }
 @media (max-width: 640px) { .ja-tracking-main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); } }
 @media (max-width: 700px) { .ja-tracking-main { width: min(100% - 32px, 560px); padding-top: 22px; } .ja-tracking-intro { margin-bottom: 18px; } .ja-tracking-intro p { font-weight: 650; letter-spacing: .02em; } .ja-tracking-intro h1 { font-size: 24px; letter-spacing: -.03em; } .ja-tracking-intro span { font-size: 13px; } .ja-tracking-search { grid-template-columns: 1fr; gap: 22px; } .ja-tracking-search form > div { display: grid; grid-template-columns: 1fr; } .ja-complaint-summary > header { display: block; } .ja-complaint-summary > header > span { display: inline-block; margin-top: 12px; } .ja-complaint-summary dl { grid-template-columns: 1fr; gap: 12px; } .ja-tracking-result-head { display: block; } .ja-tracking-result-head > span { display: block; margin-top: 9px; } .ja-timeline li { grid-template-columns: 34px 1fr; gap: 10px; } .ja-timeline-marker { width: 32px; height: 32px; border-width: 4px; } .ja-timeline li:not(:last-child)::before { top: 28px; left: 16px; } .ja-timeline article header { display: block; } .ja-timeline time { display: block; margin-top: 4px; } }
 @media (prefers-reduced-motion: reduce) { .ja-tracking-search button { transition: none; } .ja-tracking-search button:active { transform: none; } .ja-tracking-loading span { animation: none; } }
