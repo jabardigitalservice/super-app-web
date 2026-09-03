@@ -139,7 +139,7 @@ export default {
       return (this.proposerName || '').trim()
     },
     editTooltipText() {
-      return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi atau Tahap Verifikasi'
+      return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi'
     }
   },
   methods: {
