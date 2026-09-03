@@ -1,7 +1,7 @@
 export const IMAH_AING_STATUS = {
   // verification
-  unverified:                { id: 'unverified',                phase: 'verification',  name: 'Menunggu Verifikasi',             color: 'yellow',  hex: '#FF7500' },
-  verified:                  { id: 'verified',                  phase: 'verification',  name: 'Terverifikasi',                   color: 'green',   hex: '#166534' },
+  unverified:                { id: 'unverified',                phase: 'verification',  name: 'Menunggu Verifikasi Data',        color: 'yellow',  hex: '#FF7500' },
+  verified:                  { id: 'verified',                  phase: 'verification',  name: 'Lolos Verifikasi Data',           color: 'green',   hex: '#166534' },
   canceled:                  { id: 'canceled',                  phase: 'verification',  name: 'Dibatalkan',                      color: 'red',     hex: '#DD5E5E' },
   rejected_appeal:           { id: 'rejected_appeal',           phase: 'verification',  name: 'Ditolak (Sanggah)',               color: 'red',     hex: '#DD5E5E' },
   rejected_criteria:         { id: 'rejected_criteria',         phase: 'verification',  name: 'Ditolak',                         color: 'red',     hex: '#DD5E5E' },
@@ -44,7 +44,7 @@ export const getImahAingStatus = (key, fallbackName) =>
  * `statuses` = daftar `complaint_status_id` yang memetakan ke step tsb.
  */
 export const IMAH_AING_STEP_FLOW = Object.freeze([
-  { id: 'waiting_verification',   label: 'Menunggu Verifikasi',                 statuses: ['unverified'] },
+  { id: 'waiting_verification',   label: 'Menunggu Verifikasi Data',            statuses: ['unverified'] },
   { id: 'verification_process',   label: 'Proses Verifikasi dan Validasi Data', statuses: ['verified'] },
   { id: 'nominative',             label: 'Penentuan Nominatif',                 statuses: ['central_nominative', 'provincial_nominative', 'regency_nominative', 'other_nominative'] },
   { id: 'aid_submission',         label: 'Pengajuan Calon Penerima Bantuan',    statuses: ['regency_aid_submission', 'provincial_aid_submission', 'central_aid_submission', 'other_aid_submission'] },
