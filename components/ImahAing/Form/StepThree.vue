@@ -34,6 +34,13 @@
           <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
         </ValidationProvider>
 
+        <span
+          v-if="isConverting(item.key)"
+          class="font-lato text-[13px] text-gray-600 dark:text-dark-emphasis-high"
+        >
+          Mengonversi foto HEIC…
+        </span>
+
         <transition name="slide-fade">
           <div v-if="slotFor(item.key)" class="flex flex-col gap-2">
             <BaseDropzoneUploadProgress
@@ -77,6 +84,13 @@
           />
           <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
         </ValidationProvider>
+
+        <span
+          v-if="isConverting(item.key)"
+          class="font-lato text-[13px] text-gray-600 dark:text-dark-emphasis-high"
+        >
+          Mengonversi foto HEIC…
+        </span>
 
         <transition name="slide-fade">
           <div v-if="slotFor(item.key)" class="flex flex-col gap-2">
@@ -168,6 +182,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { convertHeicToJpg, isLikelyHeic } from '~/utils/heic'
 
 export default {
   data() {
@@ -222,6 +237,7 @@ export default {
       },
       accept: 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
+      convertingKeys: [],
     }
   },
   computed: {
@@ -231,6 +247,9 @@ export default {
     },
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
+    },
+    isConverting() {
+      return (key) => this.convertingKeys.includes(key)
     },
     selectedPenyebabDetail() {
       const key = this.kondisiRumah.penyebabKerusakan
@@ -261,12 +280,30 @@ export default {
   methods: {
     ...mapActions('imahAingForm', ['uploadDocument']),
     async handleUpload(key, file) {
-      const selectedFile = file instanceof FileList ? file[0] : file
+      let selectedFile = file instanceof FileList ? file[0] : file
       if (!selectedFile) return
 
       const refName = `documentUploader_${key}`
       const provider = this.$refs[refName]
       const p = Array.isArray(provider) ? provider[0] : provider
+
+      if (isLikelyHeic(selectedFile)) {
+        this.convertingKeys = [...this.convertingKeys, key]
+        try {
+          selectedFile = await convertHeicToJpg(selectedFile, { quality: 0.85 })
+        } catch (err) {
+          this.setFieldError(p, 'Gagal mengonversi foto HEIC. Coba foto lain atau simpan sebagai JPG dulu.')
+          return
+        } finally {
+          this.convertingKeys = this.convertingKeys.filter((k) => k !== key)
+        }
+
+        if (selectedFile.size > this.maxSize) {
+          this.setFieldError(p, 'Ukuran foto melebihi 2 MB setelah dikonversi. Pakai foto beresolusi lebih kecil.')
+          return
+        }
+      }
+
       if (p && typeof p.validate === 'function') {
         const { valid } = await p.validate(selectedFile)
         if (!valid) return
@@ -287,6 +324,11 @@ export default {
       } catch (err) {
         const errPayload = { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] }
         this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: errPayload })
+      }
+    },
+    setFieldError(provider, message) {
+      if (provider && typeof provider.setErrors === 'function') {
+        provider.setErrors([message])
       }
     },
     handleDelete(key) {

@@ -24,6 +24,7 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "eslint-config-prettier": "^10.0.1",
+    "heic-to": "^1.5.2",
     "leaflet": "^1.9.4",
     "maplibre-gl": "^4.7.1",
     "nuxt": "^2.15.8",
