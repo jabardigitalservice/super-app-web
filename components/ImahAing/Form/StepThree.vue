@@ -34,13 +34,6 @@
           <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
         </ValidationProvider>
 
-        <span
-          v-if="isConverting(item.key)"
-          class="font-lato text-[13px] text-gray-600 dark:text-dark-emphasis-high"
-        >
-          Mengonversi foto HEIC…
-        </span>
-
         <transition name="slide-fade">
           <div v-if="slotFor(item.key)" class="flex flex-col gap-2">
             <BaseDropzoneUploadProgress
@@ -84,13 +77,6 @@
           />
           <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
         </ValidationProvider>
-
-        <span
-          v-if="isConverting(item.key)"
-          class="font-lato text-[13px] text-gray-600 dark:text-dark-emphasis-high"
-        >
-          Mengonversi foto HEIC…
-        </span>
 
         <transition name="slide-fade">
           <div v-if="slotFor(item.key)" class="flex flex-col gap-2">
@@ -237,7 +223,6 @@ export default {
       },
       accept: 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf',
       maxSize: 2 * 1024 * 1024, // 2 MB
-      convertingKeys: [],
     }
   },
   computed: {
@@ -247,9 +232,6 @@ export default {
     },
     hasUploadError() {
       return (key) => !!(this.dokumen?.[key]?.errors && this.dokumen[key].errors.length > 0)
-    },
-    isConverting() {
-      return (key) => this.convertingKeys.includes(key)
     },
     selectedPenyebabDetail() {
       const key = this.kondisiRumah.penyebabKerusakan
@@ -288,14 +270,11 @@ export default {
       const p = Array.isArray(provider) ? provider[0] : provider
 
       if (isLikelyHeic(selectedFile)) {
-        this.convertingKeys = [...this.convertingKeys, key]
         try {
           selectedFile = await convertHeicToJpg(selectedFile, { quality: 0.85 })
         } catch (err) {
           this.setFieldError(p, 'Gagal mengonversi foto HEIC. Coba foto lain atau simpan sebagai JPG dulu.')
           return
-        } finally {
-          this.convertingKeys = this.convertingKeys.filter((k) => k !== key)
         }
 
         if (selectedFile.size > this.maxSize) {
