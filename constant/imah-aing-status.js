@@ -45,7 +45,7 @@ export const getImahAingStatus = (key, fallbackName) =>
  * `statuses` = daftar `complaint_status_id` yang memetakan ke step tsb.
  */
 export const IMAH_AING_STEP_FLOW = Object.freeze([
-  { id: 'waiting_verification',   label: 'Menunggu Verifikasi',                 statuses: ['unverified'] },
+  { id: 'waiting_verification',   label: 'Menunggu Verifikasi Data',                 statuses: ['unverified'] },
   { id: 'verification_process',   label: 'Proses Verifikasi dan Validasi Data', statuses: ['verified'] },
   { id: 'nominative',             label: 'Penentuan Nominatif',                 statuses: ['central_nominative', 'provincial_nominative', 'regency_nominative', 'other_nominative'] },
   { id: 'aid_submission',         label: 'Pengajuan Calon Penerima Bantuan',    statuses: ['regency_aid_submission', 'provincial_aid_submission', 'central_aid_submission', 'other_aid_submission'] },
