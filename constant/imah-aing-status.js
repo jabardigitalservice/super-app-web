@@ -39,21 +39,24 @@ export const getImahAingStatus = (key, fallbackName) =>
   IMAH_AING_STATUS[key] || { id: key, name: fallbackName || key || '-', color: 'gray', hex: '#94A3B8' }
 
 /**
- * 7 tahapan proses ImahAing untuk horizontal step flow di History (PreviewModal).
- * Step 1–5 port dari step flow CMS; step 6–7 tambahan (belum ada di CMS).
+ * 9 tahapan proses ImahAing untuk horizontal step flow di History (PreviewModal).
+ * Tahap Verval Lapangan dan Penyerahan Bantuan belum punya status backend,
+ * sehingga keduanya tetap tampil sebagai tahap visual sampai mapping tersedia.
  * `statuses` = daftar `complaint_status_id` yang memetakan ke step tsb.
  */
 export const IMAH_AING_STEP_FLOW = Object.freeze([
-  { id: 'waiting_verification',   label: 'Menunggu Verifikasi Data',            statuses: ['unverified'] },
+  { id: 'waiting_verification',   label: 'Menunggu Verifikasi',                 statuses: ['unverified'] },
   { id: 'verification_process',   label: 'Proses Verifikasi dan Validasi Data', statuses: ['verified'] },
   { id: 'nominative',             label: 'Penentuan Nominatif',                 statuses: ['central_nominative', 'provincial_nominative', 'regency_nominative', 'other_nominative'] },
   { id: 'aid_submission',         label: 'Pengajuan Calon Penerima Bantuan',    statuses: ['regency_aid_submission', 'provincial_aid_submission', 'central_aid_submission', 'other_aid_submission'] },
+  { id: 'field_verification',     label: 'Verval Lapangan',                     statuses: [] },
   { id: 'aid_determination',      label: 'Penetapan Penerima Bantuan',          statuses: ['regency_aid_determination', 'provincial_aid_determination', 'central_aid_determination', 'other_aid_determination'] },
-  { id: 'rutilahu_repair',        label: 'Proses Perbaikan Rutilahu',           statuses: ['rutilahu_repair_process'] },
-  { id: 'aid_received',           label: 'Telah Menerima Bantuan',              statuses: ['aid_received'] },
+  { id: 'aid_handover',           label: 'Penyerahan Bantuan',                  statuses: [] },
+  { id: 'rutilahu_repair',        label: 'Pelaksanaan Perbaikan',               statuses: ['rutilahu_repair_process'] },
+  { id: 'aid_received',           label: 'Selesai',                             statuses: ['aid_received'] },
 ])
 
-/** Status yang bukan bagian jalur normal 7 step — step flow disembunyikan */
+/** Status yang bukan bagian jalur normal 9 step — step flow disembunyikan */
 export const IMAH_AING_STEP_FLOW_HIDDEN_STATUSES = Object.freeze([
   'rejected_appeal',
   'rejected_criteria',
