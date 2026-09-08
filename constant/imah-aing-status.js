@@ -30,6 +30,15 @@ export const IMAH_AING_STATUS = {
   aid_received:            { id: 'aid_received',            phase: 'coordination', name: 'Telah Menerima Bantuan',    color: 'green',      hex: '#166534' },
 }
 
+/** Status key dari satu item response list; tidak membaca response detail. */
+export const getImahAingStatusKey = (item = {}) =>
+  item.latest_complaint_status?.id
+  || item.complaint_status?.id
+  || item.complaint_status_id
+  || item.phase
+  || item.status
+  || ''
+
 /**
  * Fallback aman untuk status yang tidak dikenal.
  * @param {string} key - id status (mis. dari latest_complaint_status.id)
