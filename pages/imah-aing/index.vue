@@ -106,8 +106,8 @@
       melanjutkan proses.
       <br /><br />
       <span class="text-red-600 font-bold dark:text-red-400">Perlu diperhatikan:</span>
-      usulan yang sudah dibatalkan tidak dapat dilanjutkan kembali. Wargi tetap dapat
-      mengajukan usulan baru setelah seluruh usulan dibatalkan. 🙏
+      setelah usulan dibatalkan, untuk saat ini usulan tersebut belum dapat diajukan
+      kembali. 🙏
     </BaseDialog>
   </div>
 </template>
