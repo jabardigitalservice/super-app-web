@@ -115,6 +115,7 @@
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
+import { getImahAingStatusKey } from '~/constant/imah-aing-status'
 
 export default {
   data() {
@@ -242,10 +243,7 @@ export default {
 
     canEdit(item) {
       const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
-      const statusId = item.latest_complaint_status?.id
-        || item.complaint_status?.id
-        || item.complaint_status_id
-        || ''
+      const statusId = getImahAingStatusKey(item)
       return this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
     },
 
@@ -275,4 +273,3 @@ export default {
   }
 }
 </script>
-

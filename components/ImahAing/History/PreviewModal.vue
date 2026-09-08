@@ -150,7 +150,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { getImahAingStatus, getImahAingStepFlow } from '~/constant/imah-aing-status'
+import { getImahAingStatus, getImahAingStatusKey, getImahAingStepFlow } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryPreviewModal',
@@ -199,14 +199,7 @@ export default {
       return Array.isArray(photos) ? photos : []
     },
     statusKey() {
-      return (
-        this.item?.latest_complaint_status?.id ||
-        this.item?.complaint_status?.id ||
-        this.item?.complaint_status_id ||
-        this.resolvedItem?.complaint_status_id ||
-        this.resolvedItem?.phase ||
-        ''
-      )
+      return getImahAingStatusKey(this.item)
     },
     isRejected() {
       return ['rejected_appeal', 'rejected_criteria'].includes(this.statusKey)
@@ -222,9 +215,6 @@ export default {
       return !this.stepFlowData.hidden
     },
     statusLabel() {
-      if (this.resolvedItem?.complaint_status?.name) {
-        return this.resolvedItem.complaint_status.name
-      }
       return getImahAingStatus(this.statusKey, this.item?.latest_complaint_status?.name).name
     },
     formattedDate() {

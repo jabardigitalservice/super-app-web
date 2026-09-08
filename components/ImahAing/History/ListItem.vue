@@ -75,7 +75,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { getImahAingStatus } from '~/constant/imah-aing-status'
+import { getImahAingStatus, getImahAingStatusKey } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -108,12 +108,7 @@ export default {
   computed: {
     /** Kunci status — satu sumber untuk isNonEditable dan statusStyle */
     statusKey() {
-      return this.item.latest_complaint_status?.id
-        || this.item.complaint_status?.id
-        || this.item.complaint_status_id
-        || this.item.phase
-        || this.item.status
-        || ''
+      return getImahAingStatusKey(this.item)
     },
     isNonEditable() {
       return !['unverified', 'rejected_appeal'].includes(this.statusKey)
