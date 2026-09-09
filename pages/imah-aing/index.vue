@@ -15,7 +15,7 @@
         <div class="px-4 py-4 md:px-7 md:py-5">
           <!-- Add new submission -->
           <div class="flex justify-end mb-4">
-            <Button v-if="!isWarga" variant="primary" @click="goToForm">
+            <Button v-if="canAddUsulan" variant="primary" @click="goToForm">
               + Tambah
             </Button>
           </div>
@@ -143,6 +143,18 @@ export default {
     },
     isWarga() {
       return (this.metaPayload?.role || '').trim().toLowerCase() === 'warga'
+    },
+    // Warga hanya boleh mengajukan usulan baru ketika seluruh usulannya sudah
+    // dibatalkan. Semua guard di bawah fail-closed: saat ragu, tombol disembunyikan.
+    canAddUsulan() {
+      if (!this.isWarga) return true
+      // Status transisi (IDLE / LOADING / ERROR / CANCELLING) belum bisa dipercaya.
+      if (this.status !== 'SUCCESS') return false
+      // `every` mengembalikan true pada array kosong — tutup lubang itu.
+      if (this.items.length === 0) return false
+      // Halaman berikutnya belum dimuat → belum tahu status seluruh usulan.
+      if (this.items.length < this.pagination.total) return false
+      return this.items.every((item) => getImahAingStatusKey(item) === 'canceled')
     }
   },
   async mounted() {

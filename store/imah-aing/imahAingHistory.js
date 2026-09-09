@@ -41,7 +41,7 @@ const getDefaultState = () => ({
   authToken: null,
 
   /** Status */
-  status: 'IDLE', // IDLE | LOADING | SUCCESS | ERROR | CANCELLING | CANCELLED
+  status: 'IDLE', // IDLE | LOADING | SUCCESS | ERROR | CANCELLING
   errorMessage: '',
 
 })
@@ -76,9 +76,6 @@ export const mutations = {
     } else {
       state.selectedIds.splice(idx, 1)
     }
-  },
-  REMOVE_ITEMS(state, ids) {
-    state.items = state.items.filter((item) => !ids.includes(item.id))
   },
   SET_PAGINATION(state, pagination) {
     state.pagination = { ...state.pagination, ...pagination }
@@ -188,7 +185,7 @@ export const actions = {
     return res.data?.data || null
   },
 
-  async cancelSubmissions({ commit, state }) {
+  async cancelSubmissions({ commit, dispatch, state }) {
     const { selectedIds, metaPayload } = state
     if (!selectedIds.length) {
       return
@@ -218,9 +215,13 @@ export const actions = {
         )
       )
 
-      commit('REMOVE_ITEMS', selectedIds)
+      // Refetch dari halaman 1 — item yang dibatalkan tetap dikirim backend
+      // (status `canceled` berada di fase `verification`), sehingga list setelah
+      // pembatalan konsisten dengan hasil reload halaman. fetchHistory mengatur
+      // statusnya sendiri sampai SUCCESS.
       commit('SET_SELECTED_IDS', [])
-      commit('SET_STATUS', 'CANCELLED')
+      commit('SET_PAGINATION', { page: 1 })
+      await dispatch('fetchHistory')
     } catch (error) {
       commit('SET_STATUS', 'ERROR')
       commit(
