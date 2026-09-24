@@ -40,6 +40,13 @@ export const getImahAingStatusKey = (item = {}) =>
   || ''
 
 /**
+ * ID Usulan tampilan — resolve dari field yang tersedia di response.
+ * @param {object} item - record dari list (fetchHistory) atau detail (fetchDetail)
+ */
+export const getImahAingDisplayId = (item = {}) =>
+  item.complaint_id || item.id || `IA-${item.user_nik || item.nik || '-'}`
+
+/**
  * Fallback aman untuk status yang tidak dikenal.
  * @param {string} key - id status (mis. dari latest_complaint_status.id)
  * @param {string} [fallbackName] - nama tampilan dari BE saat key belum terdaftar di IMAH_AING_STATUS

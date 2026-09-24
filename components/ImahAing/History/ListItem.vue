@@ -22,7 +22,7 @@
     <!-- Kolom Konten: NIK, nama, status (tanpa tanggal) -->
     <div class="flex-1 min-w-0 pt-1">
       <div class="text-xs text-gray-500 font-roboto">
-        IA-{{ item.user_nik || item.nik || '-' }}
+        {{ displayId }}
       </div>
       <div class="text-sm font-semibold text-gray-900 mt-0.5 dark:text-dark-emphasis-high">
         {{ displayName }}
@@ -75,7 +75,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { getImahAingStatus, getImahAingStatusKey } from '~/constant/imah-aing-status'
+import { getImahAingStatus, getImahAingStatusKey, getImahAingDisplayId } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -109,6 +109,9 @@ export default {
     /** Kunci status — satu sumber untuk isNonEditable dan statusStyle */
     statusKey() {
       return getImahAingStatusKey(this.item)
+    },
+    displayId() {
+      return getImahAingDisplayId(this.item)
     },
     isNonEditable() {
       return !['unverified', 'rejected_appeal'].includes(this.statusKey)
