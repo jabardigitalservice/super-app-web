@@ -182,7 +182,7 @@ export default {
   },
   computed: {
     resolvedItem() {
-      return this.detail || this.item
+      return this.detail || this.item || {}
     },
     displayId() {
       return getImahAingDisplayId(this.resolvedItem)
@@ -208,7 +208,7 @@ export default {
       return Array.isArray(photos) ? photos : []
     },
     statusKey() {
-      return getImahAingStatusKey(this.item)
+      return getImahAingStatusKey(this.item || {})
     },
     isRejected() {
       return ['rejected_appeal', 'rejected_criteria'].includes(this.statusKey)
