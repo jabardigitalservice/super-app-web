@@ -64,6 +64,12 @@
         <div class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-1">
+              <span class="text-xs text-gray-500 uppercase font-bold">ID Usulan</span>
+              <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
+                {{ displayId }}
+              </p>
+            </div>
+            <div class="space-y-1">
               <span class="text-xs text-gray-500 uppercase font-bold">NIK</span>
               <p class="text-sm font-medium text-gray-900 dark:text-dark-emphasis-high">
                 {{ displayNik }}
@@ -150,7 +156,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { getImahAingStatus, getImahAingStatusKey, getImahAingStepFlow } from '~/constant/imah-aing-status'
+import { getImahAingStatus, getImahAingStatusKey, getImahAingStepFlow, getImahAingDisplayId } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryPreviewModal',
@@ -177,6 +183,9 @@ export default {
   computed: {
     resolvedItem() {
       return this.detail || this.item
+    },
+    displayId() {
+      return getImahAingDisplayId(this.resolvedItem)
     },
     displayName() {
       const raw = this.item?.user_name || this.item?.name || ''
