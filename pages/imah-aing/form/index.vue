@@ -149,6 +149,30 @@
     />
 
     <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'CLOSED'"
+      header="Pengusulan Sudah Ditutup"
+      label-primary-button="Lihat Informasi"
+      label-secondary-button="Tutup"
+      name-icon="warning"
+      size="16px"
+      description="Pengusulan baru sudah ditutup, data Anda belum terkirim. Informasi lengkap ada di halaman penutupan."
+      @close="cancelSubmit"
+      @click="goToClosedPage"
+    />
+
+    <TrackingComplaintModal
+      :open="statusSubmitForm.status === 'CHECK_FAILED'"
+      header="Gagal Memeriksa Status Pengusulan"
+      label-primary-button="Coba lagi"
+      label-secondary-button="Tutup"
+      name-icon="warning"
+      size="16px"
+      description="Kami belum bisa memastikan pengusulan masih dibuka. Data Anda belum terkirim dan tidak hilang. Periksa koneksi Anda lalu coba lagi."
+      @close="cancelSubmit"
+      @click="submitComplaintForm"
+    />
+
+    <TrackingComplaintModal
       :open="statusSubmitForm.status === 'SESSION_EXPIRED'"
       header="Sesi Anda Telah Habis"
       label-primary-button="Masuk Kembali"
@@ -169,6 +193,11 @@ import ImahAingFormStepOne from '~/components/ImahAing/Form/StepOne.vue'
 import ImahAingFormStepTwo from '~/components/ImahAing/Form/StepTwo.vue'
 import ImahAingFormStepThree from '~/components/ImahAing/Form/StepThree.vue'
 import ImahAingFormStepFour from '~/components/ImahAing/Form/StepFour.vue'
+import {
+  IMAH_AING_CLOSED_PATH,
+  checkImahAingFormForSubmit,
+  isImahAingFormOpen,
+} from '~/constant/imah-aing-closure'
 
 export default {
   components: {
@@ -182,10 +211,7 @@ export default {
     this.resetForm()
     next()
   },
-  // middleware: 'unleash',
-  meta: {
-    featureFlag: 'SAPAWARGA-WEB__IMAH-AING--FORM',
-  },
+  middleware: 'imah-aing-closure',
   data() {
     return {
       isLoading: true,
@@ -335,6 +361,21 @@ export default {
       this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'NONE')
     },
     async submitComplaintForm() {
+      // Usulan baru: cek ulang flag (dengan refresh paksa) tepat sebelum POST, karena form bisa
+      // sudah terbuka saat flag berubah OFF. LOADING dulu supaya tidak bisa double-klik selama
+      // refresh. Tanpa redirect otomatis: `beforeRouteLeave` memanggil `resetForm()`, isian
+      // warga harus tetap utuh. Mode edit tidak bergantung ke Unleash.
+      if (!this.$route.query.edit) {
+        this.$store.commit('imahAingForm/SET_STATUS_SUBMIT', 'LOADING')
+        const status = await checkImahAingFormForSubmit(this.$unleash)
+        if (status !== 'open') {
+          this.$store.commit(
+            'imahAingForm/SET_STATUS_SUBMIT',
+            status === 'closed' ? 'CLOSED' : 'CHECK_FAILED'
+          )
+          return
+        }
+      }
       try {
         await this.submitForm()
       } catch (error) {
@@ -344,7 +385,15 @@ export default {
     async retrySubmitComplaintForm() {
       await this.submitComplaintForm()
     },
+    goToClosedPage() {
+      this.$router.push({ path: IMAH_AING_CLOSED_PATH, query: this.$route.query })
+    },
     async backToFormPage() {
+      // Form create baru di-init ulang tanpa lewat middleware, jadi gate di sini (baca cache).
+      if (!this.$route.query.edit && !(await isImahAingFormOpen(this.$unleash))) {
+        this.goToClosedPage()
+        return
+      }
       this.resetForm()
       this.showLoadingSkeleton()
       if (!this.hasAuthToken) {
