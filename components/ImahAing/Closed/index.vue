@@ -3,8 +3,6 @@
     <div
       class="md:max-w-[650px] md:mx-auto md:overflow-hidden md:rounded-lg md:border md:border-gray-300 md:bg-white md:dark:border-dark-emphasis-medium md:dark:bg-dark-emphasis-low"
     >
-      <h1 class="sr-only">Pembuatan usulan baru Bedah Rumah ditutup</h1>
-
       <img
         v-for="(image, index) in images"
         :key="image.src"
