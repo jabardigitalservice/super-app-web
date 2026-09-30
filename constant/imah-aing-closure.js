@@ -9,6 +9,10 @@ export const IMAH_AING_CLOSED_PATH = '/imah-aing/closed'
 // Batas tunggu SDK Unleash siap. Lewat batas ini dianggap tertutup (fail-closed).
 export const IMAH_AING_CLOSURE_READY_TIMEOUT_MS = 3000
 
+// Batas tunggu refresh toggle tepat sebelum submit usulan baru. Lewat batas ini dianggap
+// tidak terverifikasi (fail-closed).
+export const IMAH_AING_SUBMIT_REFRESH_TIMEOUT_MS = 3000
+
 // Aset landing penutupan, urut sesuai tampilan (export Canva). `alt` meringkas isi pesan
 // di gambar; `width`/`height` diisi supaya tidak ada layout shift.
 export const IMAH_AING_CLOSED_IMAGES = [
@@ -51,6 +55,58 @@ function waitUnleashReady(unleash, timeoutMs) {
     }, timeoutMs)
     unleash.once('ready', onReady)
   })
+}
+
+// Paksa fetch toggle terbaru, dibatasi timeout. Resolve `{ failed }`, tidak pernah reject.
+// SDK menelan error fetch (hanya emit event `error`) dan tidak punya timeout sendiri, jadi
+// kegagalan dideteksi lewat listener `error` + timeout.
+function refreshToggles(unleash, timeoutMs) {
+  return new Promise((resolve) => {
+    let failed = false
+    let timer = null
+    const onError = () => {
+      failed = true
+    }
+    const done = (timedOut) => {
+      clearTimeout(timer)
+      unleash.off('error', onError)
+      resolve({ failed: failed || timedOut })
+    }
+    unleash.on('error', onError)
+    timer = setTimeout(() => done(true), timeoutMs)
+    Promise.resolve()
+      .then(() => unleash.updateToggles())
+      .catch(() => {
+        failed = true
+      })
+      .then(() => done(false))
+  })
+}
+
+/**
+ * Cek flag tepat sebelum submit usulan baru. Beda dari `isImahAingFormOpen` (baca cache),
+ * ini paksa refresh dulu supaya toggle OFF yang baru terjadi langsung terdeteksi.
+ *
+ * - `'closed'`     flag OFF / tidak ada (menang atas refresh gagal: cache OFF tetap OFF).
+ * - `'unverified'` tidak bisa memastikan: client tidak ada, SDK belum ready, `isEnabled`
+ *                  error, atau flag ON di cache tapi refresh gagal / timeout (fail-closed).
+ * - `'open'`       flag ON dan refresh sukses.
+ */
+export async function checkImahAingFormForSubmit(
+  unleash,
+  timeoutMs = IMAH_AING_SUBMIT_REFRESH_TIMEOUT_MS
+) {
+  if (!unleash) return 'unverified'
+
+  try {
+    if (!(await waitUnleashReady(unleash, timeoutMs))) return 'unverified'
+
+    const { failed } = await refreshToggles(unleash, timeoutMs)
+    if (unleash.isEnabled(IMAH_AING_FORM_FLAG) !== true) return 'closed'
+    return failed ? 'unverified' : 'open'
+  } catch (error) {
+    return 'unverified'
+  }
 }
 
 /**
