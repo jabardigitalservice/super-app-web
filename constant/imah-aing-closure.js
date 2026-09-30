@@ -1,20 +1,34 @@
-// Flag Unleash penutupan pembuatan usulan baru Imah Aing.
-// Semantik "CLOSED": ON = ditutup. OFF / flag tidak ada / Unleash down = terbuka (fail-open).
-// Jangan dibalik — flag yang belum di-setup di sebuah env tidak boleh mematikan form.
-export const IMAH_AING_CLOSURE_FLAG = 'SAPAWARGA-WEB__IMAH-AING--CREATE-CLOSED'
+// Flag Unleash akses form pembuatan usulan baru Imah Aing.
+// Semantik "FORM": ON = form bisa diakses. OFF / flag tidak ada / Unleash down = ditutup
+// (fail-closed) dan diarahkan ke landing penutupan. Flag WAJIB sudah ada & ON di env
+// target sebelum deploy, kalau tidak form langsung tertutup.
+export const IMAH_AING_FORM_FLAG = 'SAPAWARGA-IMAHAING__FORM'
 
 export const IMAH_AING_CLOSED_PATH = '/imah-aing/closed'
 
-// Batas tunggu SDK Unleash siap. Lewat batas ini dianggap terbuka (fail-open).
+// Batas tunggu SDK Unleash siap. Lewat batas ini dianggap tertutup (fail-closed).
 export const IMAH_AING_CLOSURE_READY_TIMEOUT_MS = 3000
 
-// Aset landing penutupan, urut sesuai tampilan. Sesuaikan dengan hasil export Canva:
-// jumlah, ekstensi, dan `alt` (ringkas isi pesan di gambar). `width`/`height` opsional
-// (isi kalau ukuran aset diketahui, supaya tidak ada layout shift).
+// Aset landing penutupan, urut sesuai tampilan (export Canva). `alt` meringkas isi pesan
+// di gambar; `width`/`height` diisi supaya tidak ada layout shift.
 export const IMAH_AING_CLOSED_IMAGES = [
   {
     src: '/images/imah-aing/closed/penutupan-batch-1-01.webp',
-    alt: 'Informasi penutupan pembuatan usulan Bedah Rumah Batch 1',
+    alt: 'Pengusulan Imah Aing ditutup pada 1 Oktober 2026 pukul 00.00 WIB untuk masuk tahap verifikasi dan validasi, dan dibuka kembali 1 November 2026',
+    width: 1080,
+    height: 1350,
+  },
+  {
+    src: '/images/imah-aing/closed/penutupan-batch-1-02.webp',
+    alt: 'Sekitar 12 ribu usulan masuk sedang diproses: pengajuan, verifikasi validasi, lalu penentuan nominatif',
+    width: 1080,
+    height: 1350,
+  },
+  {
+    src: '/images/imah-aing/closed/penutupan-batch-1-03.webp',
+    alt: 'Terima kasih warga atas penggunaan Sapawarga dan Hotline Jabar. Pertanyaan lebih lanjut hubungi Hotline Jabar 0821-2603-0038',
+    width: 1080,
+    height: 1350,
   },
 ]
 
@@ -40,12 +54,13 @@ function waitUnleashReady(unleash, timeoutMs) {
 }
 
 /**
- * Apakah pembuatan usulan baru Imah Aing sedang ditutup.
+ * Apakah form pembuatan usulan baru Imah Aing boleh diakses.
  *
- * Fail-open di semua jalur gagal (client tidak ada, belum ready sampai timeout,
- * `isEnabled` melempar error): hasilnya `false` supaya form tetap bisa diakses.
+ * Fail-closed di semua jalur gagal (client tidak ada, belum ready sampai timeout,
+ * `isEnabled` melempar error, flag tidak ada): hasilnya `false` sehingga warga
+ * diarahkan ke landing penutupan. Hanya flag ON yang membuka form.
  */
-export async function isImahAingCreationClosed(
+export async function isImahAingFormOpen(
   unleash,
   timeoutMs = IMAH_AING_CLOSURE_READY_TIMEOUT_MS
 ) {
@@ -54,7 +69,7 @@ export async function isImahAingCreationClosed(
   try {
     const ready = await waitUnleashReady(unleash, timeoutMs)
     if (!ready) return false
-    return unleash.isEnabled(IMAH_AING_CLOSURE_FLAG) === true
+    return unleash.isEnabled(IMAH_AING_FORM_FLAG) === true
   } catch (error) {
     return false
   }

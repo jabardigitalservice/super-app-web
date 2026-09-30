@@ -183,9 +183,6 @@ export default {
     next()
   },
   middleware: 'imah-aing-closure',
-  meta: {
-    featureFlag: 'SAPAWARGA-WEB__IMAH-AING--FORM',
-  },
   data() {
     return {
       isLoading: true,
