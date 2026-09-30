@@ -182,7 +182,7 @@ export default {
     this.resetForm()
     next()
   },
-  // middleware: 'unleash',
+  middleware: 'imah-aing-closure',
   meta: {
     featureFlag: 'SAPAWARGA-WEB__IMAH-AING--FORM',
   },
