@@ -17,19 +17,13 @@ export const IMAH_AING_SUBMIT_REFRESH_TIMEOUT_MS = 3000
 // di gambar; `width`/`height` diisi supaya tidak ada layout shift.
 export const IMAH_AING_CLOSED_IMAGES = [
   {
-    src: '/images/imah-aing/closed/penutupan-batch-1-01.webp',
-    alt: 'Pengusulan Imah Aing ditutup pada 1 Oktober 2026 pukul 00.00 WIB untuk masuk tahap verifikasi dan validasi, dan dibuka kembali 1 November 2026',
+    src: '/images/imah-aing/closed/penutupan-batch-1-v2-01.webp',
+    alt: 'Wargi, catat tanggalnya! Usulan Imah Aing telah ditutup untuk masuk tahap verifikasi dan validasi selanjutnya, terhitung tanggal 1 Oktober 2026. Pengusulan akan dibuka kembali 1 November 2026',
     width: 1080,
-    height: 1350,
+    height: 1738,
   },
   {
-    src: '/images/imah-aing/closed/penutupan-batch-1-02.webp',
-    alt: 'Sekitar 12 ribu usulan masuk sedang diproses: pengajuan, verifikasi validasi, lalu penentuan nominatif',
-    width: 1080,
-    height: 1350,
-  },
-  {
-    src: '/images/imah-aing/closed/penutupan-batch-1-03.webp',
+    src: '/images/imah-aing/closed/penutupan-batch-1-v2-02.webp',
     alt: 'Terima kasih warga atas penggunaan Sapawarga dan Hotline Jabar. Pertanyaan lebih lanjut hubungi Hotline Jabar 0821-2603-0038',
     width: 1080,
     height: 1350,
