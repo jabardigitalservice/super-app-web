@@ -32,20 +32,96 @@
           @loading-status="updateLayerLoading"
           @legend-colors="updateLegendColors"
         />
-        <div class="ja-map-search" role="search" :class="{ 'is-searching': searching }" :aria-busy="searching">
-          <span class="ja-map-search-icon"><Icon name="magnifier" size="16px" aria-hidden="true" /></span>
-          <input ref="searchInput" v-model.trim="searchQuery" type="search" role="combobox" :aria-label="hospitalMode ? 'Cari nama rumah sakit' : 'Cari lokasi'" aria-autocomplete="list" :aria-controls="searchResults.length ? 'ja-map-search-results' : undefined" :aria-expanded="String(Boolean(searchResults.length))" :aria-activedescendant="activeSearchIndex >= 0 ? `ja-map-search-result-${activeSearchIndex}` : undefined" :placeholder="hospitalMode ? 'Cari nama rumah sakit' : 'Cari nama jalan, tempat, atau area'" @input="queueSearch($event.target.value)" @keydown="handleSearchKeydown" />
-          <button v-if="searchQuery" class="ja-map-search-clear" type="button" aria-label="Hapus pencarian" @click="clearSearch"><Icon name="times" size="13px" aria-hidden="true" /></button>
-          <span v-if="searching" class="ja-map-search-progress" aria-hidden="true" />
-          <span v-if="searching" class="ja-map-search-loading-text" role="status">Mencari lokasi…</span>
+        <div
+          class="ja-map-search"
+          role="search"
+          :class="{ 'is-searching': searching }"
+          :aria-busy="searching"
+        >
+          <span class="ja-map-search-icon"
+            ><Icon name="magnifier" size="16px" aria-hidden="true"
+          /></span>
+          <input
+            ref="searchInput"
+            v-model.trim="searchQuery"
+            type="search"
+            role="combobox"
+            :aria-label="hospitalMode ? 'Cari nama puskesmas' : 'Cari lokasi'"
+            aria-autocomplete="list"
+            :aria-controls="
+              searchResults.length ? 'ja-map-search-results' : undefined
+            "
+            :aria-expanded="String(Boolean(searchResults.length))"
+            :aria-activedescendant="
+              activeSearchIndex >= 0
+                ? `ja-map-search-result-${activeSearchIndex}`
+                : undefined
+            "
+            :placeholder="
+              hospitalMode
+                ? 'Cari nama puskesmas'
+                : 'Cari nama jalan, tempat, atau area'
+            "
+            @input="queueSearch($event.target.value)"
+            @keydown="handleSearchKeydown"
+          />
+          <button
+            v-if="searchQuery"
+            class="ja-map-search-clear"
+            type="button"
+            aria-label="Hapus pencarian"
+            @click="clearSearch"
+          >
+            <Icon name="times" size="13px" aria-hidden="true" />
+          </button>
+          <span
+            v-if="searching"
+            class="ja-map-search-progress"
+            aria-hidden="true"
+          />
+          <span
+            v-if="searching"
+            class="ja-map-search-loading-text"
+            role="status"
+            >Mencari lokasi…</span
+          >
         </div>
-        <div v-if="searchResults.length || searchMessage" id="ja-map-search-results" class="ja-map-search-results" :role="searchResults.length ? 'listbox' : undefined" aria-live="polite">
-          <p v-if="searchResults.length" class="ja-map-search-results-label">Pilih lokasi</p>
-          <button v-for="(place, index) in searchResults" :id="`ja-map-search-result-${index}`" :key="place.place_id" type="button" role="option" :aria-selected="activeSearchIndex === index" :class="{ 'is-active': activeSearchIndex === index }" @mouseenter="activeSearchIndex = index" @click="focusPlace(place)"><i class="ja-map-search-result-dot" aria-hidden="true" /><span><strong>{{ place.name }}</strong><span>{{ place.display_name }}</span></span></button>
+        <div
+          v-if="searchResults.length || searchMessage"
+          id="ja-map-search-results"
+          class="ja-map-search-results"
+          :role="searchResults.length ? 'listbox' : undefined"
+          aria-live="polite"
+        >
+          <p v-if="searchResults.length" class="ja-map-search-results-label">
+            Pilih lokasi
+          </p>
+          <button
+            v-for="(place, index) in searchResults"
+            :id="`ja-map-search-result-${index}`"
+            :key="place.place_id"
+            type="button"
+            role="option"
+            :aria-selected="activeSearchIndex === index"
+            :class="{ 'is-active': activeSearchIndex === index }"
+            @mouseenter="activeSearchIndex = index"
+            @click="focusPlace(place)"
+          >
+            <i class="ja-map-search-result-dot" aria-hidden="true" /><span
+              ><strong>{{ place.name }}</strong
+              ><span>{{ place.display_name }}</span></span
+            >
+          </button>
           <p v-if="searchMessage">{{ searchMessage }}</p>
         </div>
         <transition name="ja-map-notice">
-          <p v-if="locationError" class="ja-map-location-error" role="status"><Icon name="info-circle-outline" size="18px" aria-hidden="true" /><span>{{ locationError }}</span></p>
+          <p v-if="locationError" class="ja-map-location-error" role="status">
+            <Icon
+              name="info-circle-outline"
+              size="18px"
+              aria-hidden="true"
+            /><span>{{ locationError }}</span>
+          </p>
         </transition>
         <aside
           v-if="selectedMarker"
@@ -183,17 +259,25 @@ export default {
     selectedMarkerDetails() {
       const fieldLabels = this.selectedMarker?.fieldLabels || null
       const normaliseKey = (key) => key.toLowerCase().replace(/[^a-z0-9]/g, '')
-      const defaultLabel = (key) => key.toLowerCase().replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase())
+      const defaultLabel = (key) =>
+        key
+          .toLowerCase()
+          .replace(/_/g, ' ')
+          .replace(/^./, (letter) => letter.toUpperCase())
 
       return Object.entries(this.selectedMarker?.properties || {})
         .filter(([, value]) => value !== null && value !== '')
         .reduce((details, [key, value]) => {
           const normalised = normaliseKey(key)
-          const override = fieldLabels && normalised in fieldLabels ? fieldLabels[normalised] : undefined
+          const override =
+            fieldLabels && normalised in fieldLabels
+              ? fieldLabels[normalised]
+              : undefined
           // Explicit `null` in a layer's fieldLabels hides the field entirely.
           if (override === null) return details
           // With no per-layer override, OBJECTID stays hidden (legacy default behaviour).
-          if (override === undefined && normalised === 'objectid') return details
+          if (override === undefined && normalised === 'objectid')
+            return details
           details.push([override || defaultLabel(key), value])
           return details
         }, [])
@@ -234,7 +318,12 @@ export default {
     },
     updateLayerLoading(payload) {
       this.layerLoading = { ...this.layerLoading, ...payload }
-      if (this.hospitalMode && payload.rumahSakit === false) this.queueSearch()
+      if (
+        this.hospitalMode &&
+        payload.puskesmas === false &&
+        this.dataAvailability.puskesmas
+      )
+        this.queueSearch()
     },
     updateLegendColors(payload) {
       this.legendColors = { ...this.legendColors, ...payload }
@@ -242,7 +331,9 @@ export default {
     showLocationError() {
       window.clearTimeout(this.locationErrorTimer)
       this.locationError = 'Titik aduan harus berada di Jawa Barat.'
-      this.locationErrorTimer = window.setTimeout(() => { this.locationError = '' }, 2000)
+      this.locationErrorTimer = window.setTimeout(() => {
+        this.locationError = ''
+      }, 2000)
     },
     selectMarker(marker) {
       this.selectedMarker = marker
@@ -265,7 +356,11 @@ export default {
     openComplaintForm() {
       this.$router.push({
         path: '/jalan-aing/aduan',
-        query: { mode: this.$route.query.mode, ...this.complaintLocation, category: this.$route.query.category },
+        query: {
+          mode: this.$route.query.mode,
+          ...this.complaintLocation,
+          category: this.$route.query.category,
+        },
       })
     },
     queueSearch(query = this.searchQuery) {
@@ -295,18 +390,25 @@ export default {
       this.searching = true
       try {
         const { results, available } = this.hospitalMode
-          ? this.$refs.leafletMap.searchHospitals(this.searchQuery)
+          ? await this.$refs.leafletMap.searchPuskesmas(this.searchQuery)
           : await searchMapSources(this.searchQuery)
         if (requestId !== this.searchRequestId) return
         this.searchResults = results
         this.activeSearchIndex = results.length ? 0 : -1
         if (!results.length) {
           this.searchMessage = this.hospitalMode
-            ? (available ? 'Rumah sakit tidak ditemukan.' : this.layerLoading.rumahSakit ? 'Data rumah sakit sedang dimuat.' : 'Data rumah sakit belum tersedia.')
-            : (available ? 'Lokasi tidak ditemukan.' : 'Pencarian lokasi belum tersedia.')
+            ? available
+              ? 'Puskesmas tidak ditemukan.'
+              : this.layerLoading.puskesmas
+              ? 'Data puskesmas sedang dimuat.'
+              : 'Data puskesmas belum tersedia.'
+            : available
+            ? 'Lokasi tidak ditemukan.'
+            : 'Pencarian lokasi belum tersedia.'
         }
       } catch (error) {
-        if (requestId === this.searchRequestId) this.searchMessage = 'Pencarian lokasi belum tersedia.'
+        if (requestId === this.searchRequestId)
+          this.searchMessage = 'Pencarian lokasi belum tersedia.'
       } finally {
         if (requestId === this.searchRequestId) this.searching = false
       }
@@ -332,7 +434,9 @@ export default {
         if (!this.searchResults.length) return
         event.preventDefault()
         const change = event.key === 'ArrowDown' ? 1 : -1
-        this.activeSearchIndex = (this.activeSearchIndex + change + this.searchResults.length) % this.searchResults.length
+        this.activeSearchIndex =
+          (this.activeSearchIndex + change + this.searchResults.length) %
+          this.searchResults.length
       } else if (event.key === 'Enter' && this.activeSearchIndex >= 0) {
         event.preventDefault()
         this.focusPlace(this.searchResults[this.activeSearchIndex])
@@ -445,7 +549,9 @@ export default {
   font-weight: 700;
   box-shadow: 0 10px 24px rgba(20, 35, 63, 0.16);
 }
-::v-deep(.ja-map-leaflet) { min-height: 0 !important; }
+::v-deep(.ja-map-leaflet) {
+  min-height: 0 !important;
+}
 .ja-map-search {
   --ja-map-search-muted: #6f7785;
   position: absolute;
@@ -485,7 +591,9 @@ export default {
   font-size: 13px;
   font-weight: 400;
 }
-.ja-map-search input::placeholder { color: #8791a3; }
+.ja-map-search input::placeholder {
+  color: #8791a3;
+}
 .ja-map-search-clear {
   display: grid;
   width: 22px;
@@ -499,8 +607,13 @@ export default {
   color: #596273;
   cursor: pointer;
 }
-.ja-map-search-clear:hover { background: #e1e5ea; }
-.ja-map-search-clear:focus-visible { outline: 2px solid var(--ja-map-yellow); outline-offset: 2px; }
+.ja-map-search-clear:hover {
+  background: #e1e5ea;
+}
+.ja-map-search-clear:focus-visible {
+  outline: 2px solid var(--ja-map-yellow);
+  outline-offset: 2px;
+}
 .ja-map-search-progress {
   position: absolute;
   right: 13px;
@@ -532,9 +645,12 @@ export default {
 }
 .ja-map-search:focus-within {
   border-color: #7b8595;
-  box-shadow: 0 0 0 3px rgba(70, 80, 100, 0.14), 0 6px 20px rgba(20, 35, 63, 0.12);
+  box-shadow: 0 0 0 3px rgba(70, 80, 100, 0.14),
+    0 6px 20px rgba(20, 35, 63, 0.12);
 }
-.ja-map-search input:focus-visible { outline: 0; }
+.ja-map-search input:focus-visible {
+  outline: 0;
+}
 .ja-map-search-results {
   position: absolute;
   top: 74px;
@@ -576,8 +692,13 @@ export default {
 }
 .ja-map-search-results button:hover,
 .ja-map-search-results button:focus-visible,
-.ja-map-search-results button.is-active { background: #f5f7f9; }
-.ja-map-search-results button:focus-visible { outline: 2px solid var(--ja-map-yellow); outline-offset: -2px; }
+.ja-map-search-results button.is-active {
+  background: #f5f7f9;
+}
+.ja-map-search-results button:focus-visible {
+  outline: 2px solid var(--ja-map-yellow);
+  outline-offset: -2px;
+}
 .ja-map-search-result-dot {
   width: 8px;
   height: 8px;
@@ -589,8 +710,12 @@ export default {
   box-shadow: 0 0 0 1px #c4cad4;
 }
 .ja-map-search-results strong,
-.ja-map-search-results span { display: block; }
-.ja-map-search-results strong { font-size: 12px; }
+.ja-map-search-results span {
+  display: block;
+}
+.ja-map-search-results strong {
+  font-size: 12px;
+}
 .ja-map-search-results span,
 .ja-map-search-results p {
   margin: 3px 0 0;
@@ -598,24 +723,70 @@ export default {
   font-size: 11px;
   line-height: 1.35;
 }
-.ja-map-search-results p:not(.ja-map-search-results-label) { padding: 12px 13px; }
-.ja-map-location-error { position: absolute; z-index: 750; right: clamp(20px, 3vw, 48px); bottom: 24px; display: flex; align-items: center; gap: 9px; width: min(360px, calc(100% - 40px)); margin: 0; padding: 12px 14px; border: 1px solid #d6e2da; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(37, 55, 45, .12); color: #466052; font-size: 13px; font-weight: 600; }
-.ja-map-location-error :deep(svg) { color: #2f7a50; flex: 0 0 auto; }
-.ja-map-notice-enter-active { animation: ja-map-notice-bounce 420ms cubic-bezier(.22, 1.4, .36, 1); }
-.ja-map-notice-leave-active { transition: opacity 160ms ease, transform 160ms ease; }
-.ja-map-notice-leave-to { opacity: 0; transform: translateY(8px) scale(.98); }
+.ja-map-search-results p:not(.ja-map-search-results-label) {
+  padding: 12px 13px;
+}
+.ja-map-location-error {
+  position: absolute;
+  z-index: 750;
+  right: clamp(20px, 3vw, 48px);
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: min(360px, calc(100% - 40px));
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #d6e2da;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(37, 55, 45, 0.12);
+  color: #466052;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ja-map-location-error :deep(svg) {
+  color: #2f7a50;
+  flex: 0 0 auto;
+}
+.ja-map-notice-enter-active {
+  animation: ja-map-notice-bounce 420ms cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+.ja-map-notice-leave-active {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.ja-map-notice-leave-to {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+}
 @keyframes ja-map-notice-bounce {
-  0% { opacity: 0; transform: translateY(14px) scale(.9); }
-  65% { opacity: 1; transform: translateY(-3px) scale(1.02); }
-  100% { transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.9);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes ja-map-search-progress {
-  from { transform: translateX(-300%); }
-  to { transform: translateX(400%); }
+  from {
+    transform: translateX(-300%);
+  }
+  to {
+    transform: translateX(400%);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ja-map-search-progress::after { animation-duration: 1.8s; }
-  .ja-map-notice-enter-active { animation: none; }
+  .ja-map-search-progress::after {
+    animation-duration: 1.8s;
+  }
+  .ja-map-notice-enter-active {
+    animation: none;
+  }
 }
 .ja-map-detail-card {
   position: absolute;
@@ -882,7 +1053,9 @@ export default {
     height: calc(100dvh - 128px);
     min-height: 0;
   }
-  ::v-deep(.ja-map-leaflet) { min-height: 0 !important; }
+  ::v-deep(.ja-map-leaflet) {
+    min-height: 0 !important;
+  }
   .ja-map-search {
     top: 16px;
     left: 16px;
@@ -890,7 +1063,9 @@ export default {
     min-width: 0;
     transform: none;
   }
-  .ja-map-search input { font-size: 16px; }
+  .ja-map-search input {
+    font-size: 16px;
+  }
   .ja-map-search-results {
     top: 70px;
     left: 16px;
@@ -904,7 +1079,12 @@ export default {
     bottom: 16px;
     width: calc(100% - 32px);
   }
-  .ja-map-location-error { right: 16px; bottom: 16px; width: calc(100% - 32px); box-sizing: border-box; }
+  .ja-map-location-error {
+    right: 16px;
+    bottom: 16px;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+  }
   .ja-map-complaint-card {
     padding: 16px;
     border-radius: 18px;
@@ -940,9 +1120,19 @@ export default {
     width: 46px;
     padding: 0;
   }
-  .ja-map-mobile-layers > span { display: none; }
-  ::v-deep(.ja-map-leaflet .right-4.top-5) { top: 76px; right: 16px; gap: 8px; }
-  ::v-deep(.ja-map-leaflet .h-10.w-10) { width: 42px; height: 42px; border-radius: 12px; }
+  .ja-map-mobile-layers > span {
+    display: none;
+  }
+  ::v-deep(.ja-map-leaflet .right-4.top-5) {
+    top: 76px;
+    right: 16px;
+    gap: 8px;
+  }
+  ::v-deep(.ja-map-leaflet .h-10.w-10) {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
 }
 .ja-map-page.is-hospital-mode .ja-map-shell {
   height: 100vh;

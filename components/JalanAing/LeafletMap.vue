@@ -1,16 +1,51 @@
 <template>
-  <div class="jalan-aing-leaflet relative h-full min-h-[560px] w-full overflow-hidden bg-slate-200 font-lato">
+  <div
+    class="jalan-aing-leaflet relative h-full min-h-[560px] w-full overflow-hidden bg-slate-200 font-lato"
+  >
     <div ref="map" class="absolute inset-0 z-0" />
 
     <div class="absolute right-4 top-5 z-[500] flex flex-col gap-2 md:right-5">
-      <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perbesar peta" @click="zoomIn"><Icon name="plus" size="18px" /></button>
-      <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perkecil peta" @click="zoomOut"><Icon name="minus" size="18px" /></button>
-      <button v-if="$route.query.mode !== 'rumah-sakit'" type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Lokasi saya" @click="locateMe"><Icon src="/icon/location-picker.svg" size="18px" /></button>
-      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Reset peta" @click="resetView"><Icon name="refresh" size="18px" /></button>
+      <button
+        type="button"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg ja-map-zoom-button rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        aria-label="Perbesar peta"
+        @click="zoomIn"
+      >
+        <Icon name="plus" size="18px" />
+      </button>
+      <button
+        type="button"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg ja-map-zoom-button rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        aria-label="Perkecil peta"
+        @click="zoomOut"
+      >
+        <Icon name="minus" size="18px" />
+      </button>
+      <button
+        v-if="$route.query.mode !== 'rumah-sakit'"
+        type="button"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        aria-label="Lokasi saya"
+        @click="locateMe"
+      >
+        <Icon src="/icon/location-picker.svg" size="18px" />
+      </button>
+      <button
+        type="button"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        aria-label="Reset peta"
+        @click="resetView"
+      >
+        <Icon name="refresh" size="18px" />
+      </button>
     </div>
 
-    <div v-if="mapConfig" class="absolute bottom-4 left-4 z-[500] rounded-xl border border-slate-200 bg-white px-4 py-2 font-mono text-xs font-bold text-slate-500 shadow-lg md:hidden">
-      Lng: {{ mapConfig.center[1].toFixed(4) }}° E&nbsp; | &nbsp;Lat: {{ mapConfig.center[0].toFixed(4) }}° S
+    <div
+      v-if="mapConfig"
+      class="absolute bottom-4 left-4 z-[500] rounded-xl border border-slate-200 bg-white px-4 py-2 font-mono text-xs font-bold text-slate-500 shadow-lg md:hidden"
+    >
+      Lng: {{ mapConfig.center[1].toFixed(4) }}° E&nbsp; | &nbsp;Lat:
+      {{ mapConfig.center[0].toFixed(4) }}° S
     </div>
   </div>
 </template>
@@ -25,7 +60,11 @@ const BUS_REFRESH_INTERVAL = 10000
 const BUS_MAX_SMOOTH_DISTANCE = 750
 const BUS_STOP_MIN_ZOOM = 13
 const MJT_API_URL = 'https://tfgb-api.up.railway.app/api/mjt'
-const HAZARD_COLORS = Object.freeze({ RENDAH: '#16A34A', SEDANG: '#F59E0B', TINGGI: '#DC2626' })
+const HAZARD_COLORS = Object.freeze({
+  RENDAH: '#16A34A',
+  SEDANG: '#F59E0B',
+  TINGGI: '#DC2626',
+})
 
 function featureColor(feature, fallbackColor) {
   const properties = feature?.properties || {}
@@ -69,8 +108,16 @@ const GIS_LAYERS = Object.freeze({
     label: 'Jalan Provinsi',
     type: 'line',
     color: '#008444',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/jalan-provinsi',
-    nameFields: ['namaruasjalan', 'namaruas', 'namajalan', 'namobj', 'remark', 'nama'],
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/jalan-provinsi',
+    nameFields: [
+      'namaruasjalan',
+      'namaruas',
+      'namajalan',
+      'namobj',
+      'remark',
+      'nama',
+    ],
     // Overrides the generic property-label rendering in the detail popup: a string
     // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
     // non-alphanumeric stripped) to match `normalisePropertyKey`.
@@ -87,7 +134,8 @@ const GIS_LAYERS = Object.freeze({
     type: 'point',
     color: '#0F766E',
     iconUrl: '/icon/marker-hospital.svg',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rumah-sakit',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rumah-sakit',
     nameFields: ['namarumahsakit', 'namars', 'namafaskes', 'namobj', 'nama'],
     // Overrides the generic property-label rendering in the detail popup: a string
     // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
@@ -111,7 +159,8 @@ const GIS_LAYERS = Object.freeze({
     type: 'point',
     color: '#2563EB',
     iconUrl: '/icon/marker-puskesmas.svg',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/puskesmas',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/puskesmas',
     nameFields: ['namapuskesmas', 'namafaskes', 'namobj', 'nama'],
     // Overrides the generic property-label rendering in the detail popup: a string
     // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
@@ -136,7 +185,8 @@ const GIS_LAYERS = Object.freeze({
     type: 'point',
     color: '#D97706',
     iconUrl: '/icon/marker-rest-area.svg',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rest-area',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rest-area',
     nameFields: ['namarestarea', 'namalokasi', 'restarea', 'rest_area', 'nama'],
     // Overrides the generic property-label rendering in the detail popup: a string
     // renames the field, `null` hides it entirely. Keys are normalised (lowercase,
@@ -152,70 +202,80 @@ const GIS_LAYERS = Object.freeze({
     label: 'APJ',
     type: 'point',
     color: '#F59E0B',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/apj',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/apj',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaBanjir: {
     label: 'Bahaya Banjir',
     type: 'area',
     color: '#0284C7',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaBanjirBandang: {
     label: 'Bahaya Banjir Bandang',
     type: 'area',
     color: '#0369A1',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir-bandang',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-banjir-bandang',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaCuacaEkstrem: {
     label: 'Bahaya Cuaca Ekstrem',
     type: 'area',
     color: '#7C3AED',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-cuaca-ekstrem',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-cuaca-ekstrem',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaGempaBumi: {
     label: 'Bahaya Gempa Bumi',
     type: 'area',
     color: '#DC2626',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-gempa-bumi',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-gempa-bumi',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaKebakaranHutanDanLahan: {
     label: 'Bahaya Kebakaran Hutan dan Lahan',
     type: 'area',
     color: '#EA580C',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kebakaran-hutan-dan-lahan',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kebakaran-hutan-dan-lahan',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaKekeringan: {
     label: 'Bahaya Kekeringan',
     type: 'area',
     color: '#CA8A04',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kekeringan',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-kekeringan',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaTanahLongsor: {
     label: 'Bahaya Tanah Longsor',
     type: 'area',
     color: '#92400E',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tanah-longsor',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tanah-longsor',
     nameFields: ['nama', 'namobj', 'name'],
   },
   bahayaTsunami: {
     label: 'Bahaya Tsunami',
     type: 'area',
     color: '#0891B2',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tsunami',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/bahaya-tsunami',
     nameFields: ['nama', 'namobj', 'name'],
   },
   indeksMultibahayaBencana: {
     label: 'Indeks Multibahaya Bencana',
     type: 'area',
     color: '#BE123C',
-    geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/indeks-multibahaya-bencana',
+    geoJsonUrl:
+      'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/indeks-multibahaya-bencana',
     nameFields: ['nama', 'namobj', 'name'],
   },
 })
@@ -329,7 +389,9 @@ export default {
     window.cancelAnimationFrame(this.wheelZoomFrame)
     this.leaflet?.DomEvent.off(this.$refs.map, 'wheel', this.onWheel, this)
     this.stopBusPolling()
-    Object.values(this.busAnimationFrames).forEach((frame) => window.cancelAnimationFrame(frame))
+    Object.values(this.busAnimationFrames).forEach((frame) =>
+      window.cancelAnimationFrame(frame)
+    )
     if (this.map) {
       this.map.remove()
       this.map = null
@@ -339,7 +401,10 @@ export default {
     readMapConfig() {
       const params = new URLSearchParams(window.location.search)
       const requestedBasemap = this.basemap || params.get('basemap')
-      const basemap = Object.prototype.hasOwnProperty.call(LEAFLET_MAP_CONFIG.basemaps, requestedBasemap)
+      const basemap = Object.prototype.hasOwnProperty.call(
+        LEAFLET_MAP_CONFIG.basemaps,
+        requestedBasemap
+      )
         ? requestedBasemap
         : 'osm'
 
@@ -379,7 +444,12 @@ export default {
       this.syncLayers(this.layerVisibility)
       this.syncComplaintMarker(this.complaintLocation)
       this.syncSearchMarker(this.searchLocation)
-      this.map.on('click', (event) => this.$emit('create-complaint', { lat: event.latlng.lat, lng: event.latlng.lng }))
+      this.map.on('click', (event) =>
+        this.$emit('create-complaint', {
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+        })
+      )
       this.map.on('moveend zoomend', () => {
         this.renderBusStops()
       })
@@ -395,7 +465,10 @@ export default {
     startBusPolling() {
       if (this.busPollTimer) return
       this.loadBuses()
-      this.busPollTimer = window.setInterval(() => this.loadBuses(), BUS_REFRESH_INTERVAL)
+      this.busPollTimer = window.setInterval(
+        () => this.loadBuses(),
+        BUS_REFRESH_INTERVAL
+      )
     },
     stopBusPolling() {
       window.clearInterval(this.busPollTimer)
@@ -403,7 +476,11 @@ export default {
     },
     syncComplaintMarker(location) {
       if (!this.map || !this.leaflet) return
-      if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lng)) {
+      if (
+        !location ||
+        !Number.isFinite(location.lat) ||
+        !Number.isFinite(location.lng)
+      ) {
         if (this.complaintMarker) {
           this.map.removeLayer(this.complaintMarker)
           this.complaintMarker = null
@@ -415,18 +492,24 @@ export default {
         this.complaintMarker.setLatLng(latLng)
         return
       }
-      this.complaintMarker = this.leaflet.marker(latLng, {
-        icon: this.leaflet.icon({
-          iconUrl: '/icon/pin-complaint.svg',
-          iconSize: [32, 38],
-          iconAnchor: [16, 38],
-        }),
-        interactive: false,
-      }).addTo(this.map)
+      this.complaintMarker = this.leaflet
+        .marker(latLng, {
+          icon: this.leaflet.icon({
+            iconUrl: '/icon/pin-complaint.svg',
+            iconSize: [32, 38],
+            iconAnchor: [16, 38],
+          }),
+          interactive: false,
+        })
+        .addTo(this.map)
     },
     syncSearchMarker(location) {
       if (!this.map || !this.leaflet) return
-      if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lng)) {
+      if (
+        !location ||
+        !Number.isFinite(location.lat) ||
+        !Number.isFinite(location.lng)
+      ) {
         if (this.searchMarker) {
           this.map.removeLayer(this.searchMarker)
           this.searchMarker = null
@@ -439,15 +522,27 @@ export default {
         this.searchMarker.setTooltipContent(location.label || 'Hasil pencarian')
         return
       }
-      this.searchMarker = this.leaflet.marker(latLng, {
-        icon: this.leaflet.icon({ iconUrl: '/icon/pin-search.svg', iconSize: [30, 36], iconAnchor: [15, 36] }),
-        alt: location.label || 'Hasil pencarian',
-        title: location.label || 'Hasil pencarian',
-        interactive: false,
-      }).addTo(this.map).bindTooltip(location.label || 'Hasil pencarian', { direction: 'top', offset: [0, -28] }).openTooltip()
+      this.searchMarker = this.leaflet
+        .marker(latLng, {
+          icon: this.leaflet.icon({
+            iconUrl: '/icon/pin-search.svg',
+            iconSize: [30, 36],
+            iconAnchor: [15, 36],
+          }),
+          alt: location.label || 'Hasil pencarian',
+          title: location.label || 'Hasil pencarian',
+          interactive: false,
+        })
+        .addTo(this.map)
+        .bindTooltip(location.label || 'Hasil pencarian', {
+          direction: 'top',
+          offset: [0, -28],
+        })
+        .openTooltip()
     },
     focusLocation({ lat, lng }) {
-      if (this.map && Number.isFinite(lat) && Number.isFinite(lng)) this.map.flyTo([lat, lng], 17, { animate: true, duration: 0.75 })
+      if (this.map && Number.isFinite(lat) && Number.isFinite(lng))
+        this.map.flyTo([lat, lng], 17, { animate: true, duration: 0.75 })
     },
     async loadBuses() {
       if (!this.layerVisibility.bus || this.busPollInFlight) return
@@ -455,7 +550,8 @@ export default {
       try {
         const response = await fetch(`${MJT_API_URL}/buses`)
         const payload = await response.json()
-        if (!response.ok || !Array.isArray(payload.data)) throw new Error('Data bus tidak tersedia')
+        if (!response.ok || !Array.isArray(payload.data))
+          throw new Error('Data bus tidak tersedia')
         this.syncBusMarkers(payload.data, BUS_REFRESH_INTERVAL - 500)
         this.$emit('data-status', { bus: true })
         this.busErrorNotified = false
@@ -476,23 +572,55 @@ export default {
         const routes = await getMjtRoutes()
 
         const stopIds = new Set()
-        this.busRoutes = Object.fromEntries(routes.map((route) => [String(route.route_id), route]))
-        this.busStops = routes.flatMap((route) => {
-          const color = /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'
-          const points = decodePolyline(route.points || '')
-          if (points.length > 1) {
-            this.leaflet.polyline(points, { color, weight: 4, opacity: 0.48, interactive: false }).addTo(this.layerGroups.bus)
-          }
-          return (route.shelters || []).map((shelter) => {
-            const lat = Number(shelter.latitude)
-            const lng = Number(shelter.longitude)
-            const id = `${shelter.nama_selter}:${lat}:${lng}`
-            if (stopIds.has(id)) return null
-            stopIds.add(id)
-            return { ...shelter, id, lat, lng, color, kor: route.kor, origin: route.origin, toward: route.toward }
-          }).filter(Boolean)
-        }).filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
-        const routeColors = [...new Set(routes.map((route) => /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'))]
+        this.busRoutes = Object.fromEntries(
+          routes.map((route) => [String(route.route_id), route])
+        )
+        this.busStops = routes
+          .flatMap((route) => {
+            const color = /^#[0-9a-f]{6}$/i.test(route.color)
+              ? route.color
+              : '#2563EB'
+            const points = decodePolyline(route.points || '')
+            if (points.length > 1) {
+              this.leaflet
+                .polyline(points, {
+                  color,
+                  weight: 4,
+                  opacity: 0.48,
+                  interactive: false,
+                })
+                .addTo(this.layerGroups.bus)
+            }
+            return (route.shelters || [])
+              .map((shelter) => {
+                const lat = Number(shelter.latitude)
+                const lng = Number(shelter.longitude)
+                const id = `${shelter.nama_selter}:${lat}:${lng}`
+                if (stopIds.has(id)) return null
+                stopIds.add(id)
+                return {
+                  ...shelter,
+                  id,
+                  lat,
+                  lng,
+                  color,
+                  kor: route.kor,
+                  origin: route.origin,
+                  toward: route.toward,
+                }
+              })
+              .filter(Boolean)
+          })
+          .filter(
+            (stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng)
+          )
+        const routeColors = [
+          ...new Set(
+            routes.map((route) =>
+              /^#[0-9a-f]{6}$/i.test(route.color) ? route.color : '#2563EB'
+            )
+          ),
+        ]
         this.$emit('legend-colors', { bus: routeColors, busStops: routeColors })
         this.busStopsLoaded = true
         this.refreshBusIcons()
@@ -527,15 +655,28 @@ export default {
         visibleStopIds.add(stop.id)
         if (this.busStopMarkers[stop.id]) return
 
-        this.busStopMarkers[stop.id] = this.leaflet.marker([stop.lat, stop.lng], {
-          icon: this.busStopIcon(stop),
-          alt: stop.nama_selter || 'Halte Bus',
-          title: stop.nama_selter || 'Halte Bus',
-        }).on('click', () => this.selectMarker({
-          type: 'Halte Bus',
-          label: stop.nama_selter || 'Halte Bus',
-          properties: { Koridor: stop.in_koridor || stop.kor, Dari: stop.origin, Tujuan: stop.toward },
-        }, [stop.lat, stop.lng], this.busStopMarkers[stop.id])).addTo(layer)
+        this.busStopMarkers[stop.id] = this.leaflet
+          .marker([stop.lat, stop.lng], {
+            icon: this.busStopIcon(stop),
+            alt: stop.nama_selter || 'Halte Bus',
+            title: stop.nama_selter || 'Halte Bus',
+          })
+          .on('click', () =>
+            this.selectMarker(
+              {
+                type: 'Halte Bus',
+                label: stop.nama_selter || 'Halte Bus',
+                properties: {
+                  Koridor: stop.in_koridor || stop.kor,
+                  Dari: stop.origin,
+                  Tujuan: stop.toward,
+                },
+              },
+              [stop.lat, stop.lng],
+              this.busStopMarkers[stop.id]
+            )
+          )
+          .addTo(layer)
       })
       Object.entries(this.busStopMarkers).forEach(([id, marker]) => {
         if (!visibleStopIds.has(id)) {
@@ -563,28 +704,40 @@ export default {
         }
 
         this.$set(this.busHeadings, id, this.busAngle(bus))
-        this.busMarkers[id] = this.leaflet.marker(latLng, {
-          icon: this.busIcon(bus),
-          alt: bus.name || 'Bus',
-          title: bus.name || 'Bus',
-          zIndexOffset: 900,
-        }).on('click', () => {
-          const selectedBus = this.busData[id]
-          const route = this.busRoutes[String(selectedBus.route_id)] || {}
-          this.selectMarker({
-            type: 'Bus',
-            label: selectedBus.name || 'Bus',
-            properties: {
-              Koridor: selectedBus.kor || route.kor,
-              Dari: route.origin || selectedBus.origin,
-              Tujuan: selectedBus.toward || route.toward,
-              'Plat Nomor': selectedBus.nopol || selectedBus.plate_number,
-              Kecepatan: `${selectedBus.speed || 0} km/jam`,
-              Arah: selectedBus.direction ? `${selectedBus.direction}°` : null,
-              'Update Terakhir': selectedBus.gps_time || selectedBus.dt_server || selectedBus.stime,
-            },
-          }, this.busMarkers[id].getLatLng(), this.busMarkers[id])
-        }).addTo(this.layerGroups.bus)
+        this.busMarkers[id] = this.leaflet
+          .marker(latLng, {
+            icon: this.busIcon(bus),
+            alt: bus.name || 'Bus',
+            title: bus.name || 'Bus',
+            zIndexOffset: 900,
+          })
+          .on('click', () => {
+            const selectedBus = this.busData[id]
+            const route = this.busRoutes[String(selectedBus.route_id)] || {}
+            this.selectMarker(
+              {
+                type: 'Bus',
+                label: selectedBus.name || 'Bus',
+                properties: {
+                  Koridor: selectedBus.kor || route.kor,
+                  Dari: route.origin || selectedBus.origin,
+                  Tujuan: selectedBus.toward || route.toward,
+                  'Plat Nomor': selectedBus.nopol || selectedBus.plate_number,
+                  Kecepatan: `${selectedBus.speed || 0} km/jam`,
+                  Arah: selectedBus.direction
+                    ? `${selectedBus.direction}°`
+                    : null,
+                  'Update Terakhir':
+                    selectedBus.gps_time ||
+                    selectedBus.dt_server ||
+                    selectedBus.stime,
+                },
+              },
+              this.busMarkers[id].getLatLng(),
+              this.busMarkers[id]
+            )
+          })
+          .addTo(this.layerGroups.bus)
       })
       Object.entries(this.busMarkers).forEach(([id, marker]) => {
         if (!activeBusIds.has(id)) {
@@ -610,8 +763,8 @@ export default {
       const move = (now) => {
         const progress = Math.min((now - startedAt) / duration, 1)
         marker.setLatLng([
-          start.lat + ((target.lat - start.lat) * progress),
-          start.lng + ((target.lng - start.lng) * progress),
+          start.lat + (target.lat - start.lat) * progress,
+          start.lng + (target.lng - start.lng) * progress,
         ])
         if (progress < 1) {
           this.busAnimationFrames[id] = window.requestAnimationFrame(move)
@@ -642,7 +795,9 @@ export default {
       const zoomedOut = this.map?.getZoom() < 13
       return this.leaflet.divIcon({
         className: `jalan-aing-bus-icon${zoomedOut ? ' is-zoomed-out' : ''}`,
-        html: `<span class="jalan-aing-bus-line" style="--bus-color:${color};transform:rotate(${this.busAngle(bus)}deg)"></span>`,
+        html: `<span class="jalan-aing-bus-line" style="--bus-color:${color};transform:rotate(${this.busAngle(
+          bus
+        )}deg)"></span>`,
         iconSize: zoomedOut ? [18, 18] : [28, 28],
         iconAnchor: zoomedOut ? [9, 9] : [14, 14],
       })
@@ -670,18 +825,28 @@ export default {
       const base = LEAFLET_MAP_CONFIG.basemaps[id]
       if (this.baseLayer) this.baseLayer.remove()
       if (base.style) {
-        this.baseLayer = maplibreGL({ style: base.style, interactive: false }).addTo(this.map)
+        this.baseLayer = maplibreGL({
+          style: base.style,
+          interactive: false,
+        }).addTo(this.map)
         return
       }
-      this.baseLayer = this.leaflet.tileLayer(base.url, {
-        attribution: base.attribution,
-        maxZoom: LEAFLET_MAP_CONFIG.maxZoom,
-      }).addTo(this.map)
+      this.baseLayer = this.leaflet
+        .tileLayer(base.url, {
+          attribution: base.attribution,
+          maxZoom: LEAFLET_MAP_CONFIG.maxZoom,
+        })
+        .addTo(this.map)
     },
     createDataLayers() {
       const L = this.leaflet
-      this.layerGroups = Object.fromEntries(Object.keys(this.layerVisibility).map((id) => [id, L.layerGroup()]))
-      this.$emit('data-status', Object.fromEntries(Object.keys(GIS_LAYERS).map((id) => [id, true])))
+      this.layerGroups = Object.fromEntries(
+        Object.keys(this.layerVisibility).map((id) => [id, L.layerGroup()])
+      )
+      this.$emit(
+        'data-status',
+        Object.fromEntries(Object.keys(GIS_LAYERS).map((id) => [id, true]))
+      )
     },
     async loadGeoJson(id) {
       const config = GIS_LAYERS[id]
@@ -693,7 +858,8 @@ export default {
         const response = await fetch(config.geoJsonUrl)
         if (!response.ok) throw new Error('GeoJSON tidak tersedia')
         const { data } = await response.json()
-        if (data?.type !== 'FeatureCollection') throw new Error('Format GeoJSON tidak valid')
+        if (data?.type !== 'FeatureCollection')
+          throw new Error('Format GeoJSON tidak valid')
         this.$set(this.geoJsonData, id, data)
         if (id === 'ruasJalan') this.buildRoadIndex(data)
         this.renderGeoJson(id)
@@ -709,19 +875,41 @@ export default {
       }
     },
     buildRoadIndex(data) {
-      this.roads = (data.features || []).map((feature, index) => {
-        const properties = feature.properties || {}
-        return {
-          id: feature.id || `ruas-jalan-${index}`,
-          name: this.featureLabel(feature, GIS_LAYERS.ruasJalan),
-          number: this.propertyValue(properties, ['nomorruasjalan', 'nomorruas', 'kodejalan', 'kode']),
-          city: this.propertyValue(properties, ['namakabupatenkota', 'kabupatenkota', 'kabupaten', 'kota']),
-          condition: this.propertyValue(properties, ['kondisijalan', 'kondisi']),
-          surface: this.propertyValue(properties, ['jenispermukaan', 'permukaan']),
-          length: this.propertyValue(properties, ['panjangruasjalan', 'panjangruas', 'panjang']),
-          feature,
-        }
-      }).filter((road) => road.name)
+      this.roads = (data.features || [])
+        .map((feature, index) => {
+          const properties = feature.properties || {}
+          return {
+            id: feature.id || `ruas-jalan-${index}`,
+            name: this.featureLabel(feature, GIS_LAYERS.ruasJalan),
+            number: this.propertyValue(properties, [
+              'nomorruasjalan',
+              'nomorruas',
+              'kodejalan',
+              'kode',
+            ]),
+            city: this.propertyValue(properties, [
+              'namakabupatenkota',
+              'kabupatenkota',
+              'kabupaten',
+              'kota',
+            ]),
+            condition: this.propertyValue(properties, [
+              'kondisijalan',
+              'kondisi',
+            ]),
+            surface: this.propertyValue(properties, [
+              'jenispermukaan',
+              'permukaan',
+            ]),
+            length: this.propertyValue(properties, [
+              'panjangruasjalan',
+              'panjangruas',
+              'panjang',
+            ]),
+            feature,
+          }
+        })
+        .filter((road) => road.name)
     },
     renderGeoJson(id) {
       const data = this.geoJsonData[id]
@@ -731,24 +919,48 @@ export default {
       if (this.geoJsonLayers[id]) group.removeLayer(this.geoJsonLayers[id])
 
       const layer = this.leaflet.geoJSON(data, {
-        filter: (feature) => id !== 'ruasJalan' || this.roadMatchesClass(feature),
+        filter: (feature) =>
+          id !== 'ruasJalan' || this.roadMatchesClass(feature),
         style: (feature) => {
           const color = featureColor(feature, config.color)
-          return { color, fillColor: color, weight: 4, opacity: 0.9, fillOpacity: config.type === 'area' ? 0.45 : 0.9 }
+          return {
+            color,
+            fillColor: color,
+            weight: 4,
+            opacity: 0.9,
+            fillOpacity: config.type === 'area' ? 0.45 : 0.9,
+          }
         },
-        pointToLayer: (feature, latlng) => config.iconUrl
-          ? this.leaflet.marker(latlng, { icon: this.leaflet.icon({ iconUrl: config.iconUrl, iconSize: [36, 44], iconAnchor: [18, 44] }) })
-          : this.leaflet.circleMarker(latlng, { radius: 7, color: '#fff', weight: 2, fillColor: config.color, fillOpacity: 0.9 }),
+        pointToLayer: (feature, latlng) =>
+          config.iconUrl
+            ? this.leaflet.marker(latlng, {
+                icon: this.leaflet.icon({
+                  iconUrl: config.iconUrl,
+                  iconSize: [36, 44],
+                  iconAnchor: [18, 44],
+                }),
+              })
+            : this.leaflet.circleMarker(latlng, {
+                radius: 7,
+                color: '#fff',
+                weight: 2,
+                fillColor: config.color,
+                fillOpacity: 0.9,
+              }),
         onEachFeature: (feature, featureLayer) => {
           const label = this.featureLabel(feature, config)
           featureLayer.on('click', (event) => {
             this.leaflet.DomEvent.stopPropagation(event)
-            this.selectMarker({
-              type: config.label,
-              label,
-              properties: feature.properties || {},
-              fieldLabels: config.fieldLabels || null,
-            }, event.latlng, config.type === 'point' ? featureLayer : null)
+            this.selectMarker(
+              {
+                type: config.label,
+                label,
+                properties: feature.properties || {},
+                fieldLabels: config.fieldLabels || null,
+              },
+              event.latlng,
+              config.type === 'point' ? featureLayer : null
+            )
           })
         },
       })
@@ -759,7 +971,9 @@ export default {
     roadMatchesClass(feature) {
       const wanted = this.filterStatus.roadClass
       if (!wanted || wanted === 'semua') return true
-      const roadClass = String(this.propertyValue(feature.properties || {}, ['fgsrjl']) || '').toLowerCase()
+      const roadClass = String(
+        this.propertyValue(feature.properties || {}, ['fgsrjl']) || ''
+      ).toLowerCase()
       return roadClass === wanted.replace(/_/g, ' ')
     },
     selectMarker(marker, latlng, mapMarker) {
@@ -767,7 +981,10 @@ export default {
       if (this.map && latlng) {
         const point = this.map.latLngToContainerPoint(latlng)
         const size = this.map.getSize()
-        this.map.panBy(this.leaflet.point(point.x - size.x / 2, point.y - size.y * 0.36), { animate: true, duration: 0.45 })
+        this.map.panBy(
+          this.leaflet.point(point.x - size.x / 2, point.y - size.y * 0.36),
+          { animate: true, duration: 0.45 }
+        )
       }
       this.$emit('select-marker', marker)
     },
@@ -779,42 +996,77 @@ export default {
       this.activeMarkerElement = element
     },
     normalisePropertyKey(key) {
-      return String(key).toLowerCase().replace(/[^a-z0-9]/g, '')
+      return String(key)
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
     },
     propertyValue(properties, aliases) {
       const wanted = aliases.map((alias) => this.normalisePropertyKey(alias))
-      const entry = Object.entries(properties).find(([key, value]) => wanted.includes(this.normalisePropertyKey(key)) && value !== null && value !== '')
+      const entry = Object.entries(properties).find(
+        ([key, value]) =>
+          wanted.includes(this.normalisePropertyKey(key)) &&
+          value !== null &&
+          value !== ''
+      )
       return entry?.[1]
     },
     featureLabel(feature, config) {
       const properties = feature.properties || {}
       const value = this.propertyValue(properties, config.nameFields)
       if (value) return String(value)
-      const fallback = Object.entries(properties).find(([key, value]) => value && !/(^|_)(id|gid|objectid|shape|geom)(_|$)/i.test(key))
+      const fallback = Object.entries(properties).find(
+        ([key, value]) =>
+          value && !/(^|_)(id|gid|objectid|shape|geom)(_|$)/i.test(key)
+      )
       return fallback ? String(fallback[1]) : config.label
     },
-    searchHospitals(query) {
-      const data = this.geoJsonData.rumahSakit
+    async searchPuskesmas(query) {
+      await this.loadGeoJson('puskesmas')
+      const data = this.geoJsonData.puskesmas
       const terms = query.trim().toLocaleLowerCase('id-ID').split(/\s+/)
-      const results = (data?.features || []).flatMap((feature, index) => {
-        if (feature.geometry?.type !== 'Point') return []
-        const [lon, lat] = feature.geometry.coordinates
-        const name = this.featureLabel(feature, GIS_LAYERS.rumahSakit)
-        if (!Number.isFinite(lat) || !Number.isFinite(lon) || !terms.every((term) => name.toLocaleLowerCase('id-ID').includes(term))) return []
-        return [{ place_id: `rumah-sakit-${index}`, name, display_name: 'Rumah Sakit', lat, lon }]
-      }).slice(0, 5)
+      const results = (data?.features || [])
+        .flatMap((feature, index) => {
+          if (feature.geometry?.type !== 'Point') return []
+          const [lon, lat] = feature.geometry.coordinates
+          const name = this.featureLabel(feature, GIS_LAYERS.puskesmas)
+          if (
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lon) ||
+            !terms.every((term) =>
+              name.toLocaleLowerCase('id-ID').includes(term)
+            )
+          )
+            return []
+          return [
+            {
+              place_id: `puskesmas-${index}`,
+              name,
+              display_name: 'Puskesmas',
+              lat,
+              lon,
+            },
+          ]
+        })
+        .slice(0, 5)
       return { results, available: Boolean(data) }
     },
     search(query) {
       const term = query.trim().toLowerCase()
-      const results = term ? this.roads.filter((road) => `${road.name} ${road.city}`.toLowerCase().includes(term)).slice(0, 6) : []
+      const results = term
+        ? this.roads
+            .filter((road) =>
+              `${road.name} ${road.city}`.toLowerCase().includes(term)
+            )
+            .slice(0, 6)
+        : []
       this.$emit('search-results', results)
     },
     focusRoad(id) {
       const road = this.roads.find((item) => item.id === id)
       if (!road || !this.map) return
       const bounds = this.leaflet.geoJSON(road.feature).getBounds()
-      if (bounds.isValid()) this.map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
+      if (bounds.isValid())
+        this.map.fitBounds(bounds, { padding: [32, 32], maxZoom: 15 })
     },
     syncLayers(visibility) {
       if (!this.map) return
@@ -840,19 +1092,33 @@ export default {
       const path = point?._path
       if (!path) return
       path.classList.remove('jalan-aing-point-enter')
-      window.requestAnimationFrame(() => path.classList.add('jalan-aing-point-enter'))
+      window.requestAnimationFrame(() =>
+        path.classList.add('jalan-aing-point-enter')
+      )
     },
     onWheel(event) {
       this.leaflet.DomEvent.stop(event)
-      const pixels = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.map.getSize().y : 1
-      const zoom = this.wheelZoomFrame ? this.wheelZoomTarget : this.map.getZoom()
-      this.wheelZoomTarget = Math.max(this.map.getMinZoom(), Math.min(this.map.getMaxZoom(), zoom - event.deltaY * pixels / 100))
+      const pixels =
+        event.deltaMode === 1
+          ? 16
+          : event.deltaMode === 2
+          ? this.map.getSize().y
+          : 1
+      const zoom = this.wheelZoomFrame
+        ? this.wheelZoomTarget
+        : this.map.getZoom()
+      this.wheelZoomTarget = Math.max(
+        this.map.getMinZoom(),
+        Math.min(this.map.getMaxZoom(), zoom - (event.deltaY * pixels) / 100)
+      )
       this.wheelZoomPoint = this.map.mouseEventToContainerPoint(event)
       if (this.wheelZoomFrame) return
       this.wheelZoomFrame = window.requestAnimationFrame(() => {
         this.wheelZoomFrame = null
         // Wheel input already includes touchpad momentum; CSS zoom would drop subsequent deltas.
-        this.map.setZoomAround(this.wheelZoomPoint, this.wheelZoomTarget, { animate: false })
+        this.map.setZoomAround(this.wheelZoomPoint, this.wheelZoomTarget, {
+          animate: false,
+        })
       })
     },
     zoomIn() {
@@ -867,7 +1133,9 @@ export default {
     },
     async locateInitially() {
       try {
-        const permission = await navigator.permissions?.query({ name: 'geolocation' })
+        const permission = await navigator.permissions?.query({
+          name: 'geolocation',
+        })
         if (permission?.state === 'granted' && this.map) this.locateMe()
       } catch {
         // Keep Gedung Sate when the browser cannot check location permission.
@@ -878,24 +1146,36 @@ export default {
         this.pendingLocate = true
         return
       }
-      this.map.once('locationfound', (event) => {
+      this.map
+        .once('locationfound', (event) => {
           this.map.setView(event.latlng, 16)
           if (this.currentLocationMarker) {
             this.currentLocationMarker.setLatLng(event.latlng)
           } else {
-            this.currentLocationMarker = this.leaflet.marker(event.latlng, {
-              icon: this.leaflet.icon({ iconUrl: '/icon/pin-map.svg', iconSize: [24, 28], iconAnchor: [12, 28] }),
-              alt: 'Lokasi saya',
-              title: 'Lokasi saya',
-              zIndexOffset: 1000,
-            }).addTo(this.map)
+            this.currentLocationMarker = this.leaflet
+              .marker(event.latlng, {
+                icon: this.leaflet.icon({
+                  iconUrl: '/icon/pin-map.svg',
+                  iconSize: [24, 28],
+                  iconAnchor: [12, 28],
+                }),
+                alt: 'Lokasi saya',
+                title: 'Lokasi saya',
+                zIndexOffset: 1000,
+              })
+              .addTo(this.map)
           }
           this.$emit('location-found', event.latlng)
         })
         .once('locationerror', (error) => {
           this.$emit('location-error', error)
         })
-        .locate({ setView: false, enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 })
+        .locate({
+          setView: false,
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 60000,
+        })
     },
   },
 }
@@ -947,8 +1227,10 @@ export default {
   width: 28px;
   height: 28px;
   background: var(--bus-color);
-  -webkit-mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=') center / contain no-repeat;
-  mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=') center / contain no-repeat;
+  -webkit-mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=')
+    center / contain no-repeat;
+  mask: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iMzMiIHZpZXdCb3g9IjAgMCAzMyAzMyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfYnVzKSI+PHBhdGggZD0iTTAuNTYxNzE0IDI3LjMwNTlMMTQuNjY2OSAxLjkzMDM0QzE1LjUxMzIgMC41MjA1NjQgMTcuNDg2NCAwLjUxOTY5OCAxOC4zMzE0IDEuOTI4NzRMMzIuNDE0MyAyNy4yOTE5QzMzLjI1OTIgMjguOTgyOCAzMS43MDgxIDMwLjgxNTcgMjkuODc2MiAzMC4xMTE4TDE2LjYzMDEgMjQuNzYxOUwzLjM3OTI5IDMwLjEyMzRDMS4yNjQ4NyAzMC44MjkxIC0wLjI4NDY3MiAyOC45OTc1IDAuNTYxNzE0IDI3LjMwNTlaIiBmaWxsPSIjYmQwMDAwIi8+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDBfYnVzIj48cmVjdCB3aWR0aD0iMzMiIGhlaWdodD0iMzAuNSIgZmlsbD0id2hpdGUiLz48L2NsaXBQYXRoPjwvZGVmcz48L3N2Zz4=')
+    center / contain no-repeat;
   transform-origin: center;
   transition: transform 420ms ease-out;
 }
@@ -980,16 +1262,26 @@ export default {
 }
 
 @keyframes jalan-aing-bus-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .jalan-aing-leaflet .leaflet-zoom-animated { transition-duration: 0ms; }
-  .jalan-aing-bus-icon { animation: none; }
+  .jalan-aing-leaflet .leaflet-zoom-animated {
+    transition-duration: 0ms;
+  }
+  .jalan-aing-bus-icon {
+    animation: none;
+  }
 }
 
 @media (max-width: 640px) {
-  .jalan-aing-leaflet .ja-map-zoom-button { display: none; }
+  .jalan-aing-leaflet .ja-map-zoom-button {
+    display: none;
+  }
 }
 </style>
