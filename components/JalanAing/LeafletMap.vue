@@ -100,6 +100,10 @@ const GIS_LAYERS = Object.freeze({
       metadata: null,
       srsid: null,
       jplyrs: null,
+      rsalmat: 'Alamat',
+      rsalamat: 'Alamat',
+      wadmkk: 'Kota/Kab',
+      tiprst: 'Tipe',
     },
   },
   puskesmas: {
@@ -120,6 +124,11 @@ const GIS_LAYERS = Object.freeze({
       srsid: null,
       jplpkm: null,
       kmppkm: null,
+      pkmkat: null,
+      pkmkode: null,
+      kwkpkm: null,
+      pkmlmt: 'Alamat',
+      remark: 'Catatan',
     },
   },
   restArea: {
