@@ -379,20 +379,25 @@ export default {
       this.syncSearchMarker(value)
     },
   },
+  created() {
+    this.requestController = new AbortController()
+    this.geoJsonRequests = {}
+  },
   async mounted() {
     this.mapConfig = this.readMapConfig()
     const module = await import('leaflet')
+    if (this.requestController.signal.aborted) return
     this.leaflet = module.default || module
     this.initMap()
   },
   beforeDestroy() {
+    this.requestController.abort()
+    window.clearTimeout(this.resizeTimer)
     window.cancelAnimationFrame(this.wheelZoomFrame)
     this.leaflet?.DomEvent.off(this.$refs.map, 'wheel', this.onWheel, this)
     this.stopBusPolling()
-    Object.values(this.busAnimationFrames).forEach((frame) =>
-      window.cancelAnimationFrame(frame)
-    )
     if (this.map) {
+      this.map.stopLocate()
       this.map.remove()
       this.map = null
     }
@@ -450,17 +455,21 @@ export default {
           lng: event.latlng.lng,
         })
       )
-      this.map.on('moveend zoomend', () => {
+      this.map.on('locationfound', this.onLocationFound)
+      this.map.on('locationerror', this.onLocationError)
+      this.map.on('moveend', () => {
         this.renderBusStops()
       })
-      this.map.on('zoomend', () => this.refreshBusIcons())
+      this.map.on('zoomend', () => {
+        if (this.busIconsZoomedOut !== (this.map.getZoom() < 13)) this.refreshBusIcons()
+      })
       if (this.pendingLocate) {
         this.pendingLocate = false
         this.locateMe()
       } else {
         this.locateInitially()
       }
-      window.setTimeout(() => this.map?.invalidateSize(), 100)
+      this.resizeTimer = window.setTimeout(() => this.map?.invalidateSize(), 100)
     },
     startBusPolling() {
       if (this.busPollTimer) return
@@ -473,6 +482,8 @@ export default {
     stopBusPolling() {
       window.clearInterval(this.busPollTimer)
       this.busPollTimer = null
+      Object.values(this.busAnimationFrames).forEach((frame) => window.cancelAnimationFrame(frame))
+      this.busAnimationFrames = {}
     },
     syncComplaintMarker(location) {
       if (!this.map || !this.leaflet) return
@@ -548,14 +559,16 @@ export default {
       if (!this.layerVisibility.bus || this.busPollInFlight) return
       this.busPollInFlight = true
       try {
-        const response = await fetch(`${MJT_API_URL}/buses`)
+        const response = await fetch(`${MJT_API_URL}/buses`, { signal: this.requestController.signal })
         const payload = await response.json()
+        if (this.requestController.signal.aborted || !this.layerVisibility.bus) return
         if (!response.ok || !Array.isArray(payload.data))
           throw new Error('Data bus tidak tersedia')
         this.syncBusMarkers(payload.data, BUS_REFRESH_INTERVAL - 500)
         this.$emit('data-status', { bus: true })
         this.busErrorNotified = false
       } catch (error) {
+        if (this.requestController.signal.aborted) return
         this.$emit('data-status', { bus: false })
         if (!this.busErrorNotified) {
           this.busErrorNotified = true
@@ -570,6 +583,7 @@ export default {
       this.busRoutesLoading = true
       try {
         const routes = await getMjtRoutes()
+        if (this.requestController.signal.aborted) return
 
         const stopIds = new Set()
         this.busRoutes = Object.fromEntries(
@@ -627,6 +641,7 @@ export default {
         this.renderBusStops()
         this.$emit('data-status', { busStops: true })
       } catch (error) {
+        if (this.requestController.signal.aborted) return
         this.$emit('data-status', { busStops: false })
         if (!this.busStopErrorNotified) {
           this.busStopErrorNotified = true
@@ -807,6 +822,7 @@ export default {
       return /^#[0-9a-f]{6}$/i.test(color) ? color : '#2563EB'
     },
     refreshBusIcons() {
+      this.busIconsZoomedOut = this.map?.getZoom() < 13
       Object.entries(this.busMarkers).forEach(([id, marker]) => {
         if (this.busData[id]) marker.setIcon(this.busIcon(this.busData[id]))
       })
@@ -848,22 +864,31 @@ export default {
         Object.fromEntries(Object.keys(GIS_LAYERS).map((id) => [id, true]))
       )
     },
-    async loadGeoJson(id) {
+    loadGeoJson(id) {
+      if (this.requestController.signal.aborted || !GIS_LAYERS[id] || this.geoJsonData[id]) return
+      if (!this.geoJsonRequests[id]) {
+        this.geoJsonRequests[id] = this.fetchGeoJson(id).finally(() => { delete this.geoJsonRequests[id] })
+      }
+      return this.geoJsonRequests[id]
+    },
+    async fetchGeoJson(id) {
       const config = GIS_LAYERS[id]
-      if (!config || this.geoJsonData[id] || this.loadingGeoJson[id]) return
 
       this.$set(this.loadingGeoJson, id, true)
       this.$emit('loading-status', { [id]: true })
       try {
-        const response = await fetch(config.geoJsonUrl)
+        const response = await fetch(config.geoJsonUrl, { signal: this.requestController.signal })
         if (!response.ok) throw new Error('GeoJSON tidak tersedia')
         const { data } = await response.json()
-        if (data?.type !== 'FeatureCollection')
+        if (this.requestController.signal.aborted) return
+        if (data?.type !== 'FeatureCollection' || !Array.isArray(data.features))
           throw new Error('Format GeoJSON tidak valid')
         this.$set(this.geoJsonData, id, data)
         if (id === 'ruasJalan') this.buildRoadIndex(data)
-        this.renderGeoJson(id)
+        if (this.layerVisibility[id]) this.renderGeoJson(id)
+        this.$emit('data-status', { [id]: true })
       } catch (error) {
+        if (this.requestController.signal.aborted) return
         if (!this.geoJsonErrorNotified[id]) {
           this.$set(this.geoJsonErrorNotified, id, true)
           this.$emit('notify', `Detail ${config.label} belum dapat dimuat`)
@@ -871,7 +896,7 @@ export default {
         this.$emit('data-status', { [id]: false })
       } finally {
         this.$set(this.loadingGeoJson, id, false)
-        this.$emit('loading-status', { [id]: false })
+        if (!this.requestController.signal.aborted) this.$emit('loading-status', { [id]: false })
       }
     },
     buildRoadIndex(data) {
@@ -915,8 +940,11 @@ export default {
       const data = this.geoJsonData[id]
       const config = GIS_LAYERS[id]
       const group = this.layerGroups[id]
-      if (!data || !config || !group || !this.leaflet) return
-      if (this.geoJsonLayers[id]) group.removeLayer(this.geoJsonLayers[id])
+      if (!this.map || !data || !config || !group || !this.leaflet) return
+      if (this.geoJsonLayers[id]) {
+        group.removeLayer(this.geoJsonLayers[id])
+        if (!this.activeMarkerElement?.isConnected) this.activeMarkerElement = null
+      }
 
       const layer = this.leaflet.geoJSON(data, {
         filter: (feature) =>
@@ -1020,35 +1048,30 @@ export default {
       )
       return fallback ? String(fallback[1]) : config.label
     },
-    async searchPuskesmas(query) {
-      await this.loadGeoJson('puskesmas')
-      const data = this.geoJsonData.puskesmas
+    async searchHealthFacilities(query) {
+      const ids = ['rumahSakit', 'puskesmas']
+      await Promise.all(ids.map((id) => this.loadGeoJson(id)))
       const terms = query.trim().toLocaleLowerCase('id-ID').split(/\s+/)
-      const results = (data?.features || [])
-        .flatMap((feature, index) => {
-          if (feature.geometry?.type !== 'Point') return []
+      if (this.requestController.signal.aborted) return { results: [], available: false }
+      const results = ids.flatMap((id) => {
+        const matches = []
+        const features = this.geoJsonData[id]?.features || []
+        for (let index = 0; index < features.length && matches.length < 5; index++) {
+          const feature = features[index]
+          if (feature.geometry?.type !== 'Point' || !Array.isArray(feature.geometry.coordinates)) continue
           const [lon, lat] = feature.geometry.coordinates
-          const name = this.featureLabel(feature, GIS_LAYERS.puskesmas)
-          if (
-            !Number.isFinite(lat) ||
-            !Number.isFinite(lon) ||
-            !terms.every((term) =>
-              name.toLocaleLowerCase('id-ID').includes(term)
-            )
-          )
-            return []
-          return [
-            {
-              place_id: `puskesmas-${index}`,
-              name,
-              display_name: 'Puskesmas',
-              lat,
-              lon,
-            },
-          ]
-        })
-        .slice(0, 5)
-      return { results, available: Boolean(data) }
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue
+          const name = this.featureLabel(feature, GIS_LAYERS[id])
+          const normalizedName = name.toLocaleLowerCase('id-ID')
+          if (!terms.every((term) => normalizedName.includes(term))) continue
+          matches.push({ place_id: `${id}-${index}`, name, display_name: GIS_LAYERS[id].label, lat, lon })
+        }
+        return matches
+      })
+      return {
+        results,
+        available: ids.some((id) => Boolean(this.geoJsonData[id])),
+      }
     },
     search(query) {
       const term = query.trim().toLowerCase()
@@ -1074,6 +1097,7 @@ export default {
         const isVisible = this.map.hasLayer(layer)
         if (visibility[id] && !isVisible) {
           layer.addTo(this.map)
+          if (this.geoJsonData[id] && !this.geoJsonLayers[id]) this.renderGeoJson(id)
           this.animateLayer(layer)
         } else if (!visibility[id] && isVisible) {
           layer.remove()
@@ -1146,36 +1170,23 @@ export default {
         this.pendingLocate = true
         return
       }
-      this.map
-        .once('locationfound', (event) => {
-          this.map.setView(event.latlng, 16)
-          if (this.currentLocationMarker) {
-            this.currentLocationMarker.setLatLng(event.latlng)
-          } else {
-            this.currentLocationMarker = this.leaflet
-              .marker(event.latlng, {
-                icon: this.leaflet.icon({
-                  iconUrl: '/icon/pin-map.svg',
-                  iconSize: [24, 28],
-                  iconAnchor: [12, 28],
-                }),
-                alt: 'Lokasi saya',
-                title: 'Lokasi saya',
-                zIndexOffset: 1000,
-              })
-              .addTo(this.map)
-          }
-          this.$emit('location-found', event.latlng)
-        })
-        .once('locationerror', (error) => {
-          this.$emit('location-error', error)
-        })
-        .locate({
-          setView: false,
-          enableHighAccuracy: true,
-          timeout: 8000,
-          maximumAge: 60000,
-        })
+      this.map.locate({ setView: false, enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 })
+    },
+    onLocationFound(event) {
+      if (!this.map) return
+      this.map.setView(event.latlng, 16)
+      if (this.currentLocationMarker) {
+        this.currentLocationMarker.setLatLng(event.latlng)
+      } else {
+        this.currentLocationMarker = this.leaflet.marker(event.latlng, {
+          icon: this.leaflet.icon({ iconUrl: '/icon/pin-map.svg', iconSize: [24, 28], iconAnchor: [12, 28] }),
+          alt: 'Lokasi saya', title: 'Lokasi saya', zIndexOffset: 1000,
+        }).addTo(this.map)
+      }
+      this.$emit('location-found', event.latlng)
+    },
+    onLocationError(error) {
+      if (this.map) this.$emit('location-error', error)
     },
   },
 }

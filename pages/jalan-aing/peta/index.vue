@@ -46,7 +46,7 @@
             v-model.trim="searchQuery"
             type="search"
             role="combobox"
-            :aria-label="hospitalMode ? 'Cari nama puskesmas' : 'Cari lokasi'"
+            :aria-label="hospitalMode ? 'Cari nama rumah sakit dan puskesmas' : 'Cari lokasi'"
             aria-autocomplete="list"
             :aria-controls="
               searchResults.length ? 'ja-map-search-results' : undefined
@@ -59,7 +59,7 @@
             "
             :placeholder="
               hospitalMode
-                ? 'Cari nama puskesmas'
+                ? 'Cari nama rumah sakit dan puskesmas'
                 : 'Cari nama jalan, tempat, atau area'
             "
             @input="queueSearch($event.target.value)"
@@ -298,6 +298,7 @@ export default {
     },
   },
   beforeDestroy() {
+    this.clearSearch()
     window.clearTimeout(this.searchTimer)
     window.clearTimeout(this.locationErrorTimer)
     document.documentElement.style.overflow = this.documentOverflow
@@ -318,12 +319,6 @@ export default {
     },
     updateLayerLoading(payload) {
       this.layerLoading = { ...this.layerLoading, ...payload }
-      if (
-        this.hospitalMode &&
-        payload.puskesmas === false &&
-        this.dataAvailability.puskesmas
-      )
-        this.queueSearch()
     },
     updateLegendColors(payload) {
       this.legendColors = { ...this.legendColors, ...payload }
@@ -367,6 +362,7 @@ export default {
       this.searchQuery = query.trim()
       window.clearTimeout(this.searchTimer)
       this.searchRequestId += 1
+      this.searchController?.abort()
       this.searching = false
       this.searchMessage = ''
       this.searchResults = []
@@ -377,6 +373,7 @@ export default {
     clearSearch() {
       window.clearTimeout(this.searchTimer)
       this.searchRequestId += 1
+      this.searchController?.abort()
       this.searchQuery = ''
       this.searchResults = []
       this.searchMessage = ''
@@ -387,21 +384,24 @@ export default {
     async searchPlaces() {
       if (this.searchQuery.length < 3) return
       const requestId = ++this.searchRequestId
+      this.searchController?.abort()
+      this.searchController = new AbortController()
       this.searching = true
       try {
         const { results, available } = this.hospitalMode
-          ? await this.$refs.leafletMap.searchPuskesmas(this.searchQuery)
-          : await searchMapSources(this.searchQuery)
+          ? await this.$refs.leafletMap.searchHealthFacilities(this.searchQuery)
+          : await searchMapSources(this.searchQuery, { signal: this.searchController.signal })
         if (requestId !== this.searchRequestId) return
+        this.searchMessage = ''
         this.searchResults = results
         this.activeSearchIndex = results.length ? 0 : -1
         if (!results.length) {
           this.searchMessage = this.hospitalMode
             ? available
-              ? 'Puskesmas tidak ditemukan.'
-              : this.layerLoading.puskesmas
-              ? 'Data puskesmas sedang dimuat.'
-              : 'Data puskesmas belum tersedia.'
+              ? 'Rumah sakit atau puskesmas tidak ditemukan.'
+              : this.layerLoading.rumahSakit || this.layerLoading.puskesmas
+              ? 'Data rumah sakit dan puskesmas sedang dimuat.'
+              : 'Data rumah sakit dan puskesmas belum tersedia.'
             : available
             ? 'Lokasi tidak ditemukan.'
             : 'Pencarian lokasi belum tersedia.'
@@ -414,6 +414,10 @@ export default {
       }
     },
     focusPlace(place) {
+      window.clearTimeout(this.searchTimer)
+      this.searchRequestId += 1
+      this.searchController?.abort()
+      this.searching = false
       const lat = Number(place.lat)
       const lng = Number(place.lon)
       if (!isJalanAingLocation(lat, lng)) {

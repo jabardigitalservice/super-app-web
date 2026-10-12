@@ -49,9 +49,9 @@ const normalize = (value) => String(value || '')
 const unique = (results) => [...new Map(results.map((result) => [result.place_id, result])).values()]
 const matchesQuery = (value, query) => normalize(query).split(/\s+/).every((token) => normalize(value).includes(token))
 
-async function searchPlaces(query, limit) {
+async function searchPlaces(query, limit, signal) {
   const params = new URLSearchParams({ q: `${query}, Jawa Barat`, limit: String(limit), lat: '-6.9', lon: '107.6' })
-  const response = await fetch(`${PHOTON_URL}?${params}`)
+  const response = await fetch(`${PHOTON_URL}?${params}`, { signal })
   if (!response.ok) throw new Error('Pencarian lokasi tidak tersedia')
 
   const payload = await response.json()
@@ -98,8 +98,8 @@ export const mapSearchSources = [
   { search: searchBusStops },
 ]
 
-export async function searchMapSources(query, { sources = mapSearchSources, limit = 5 } = {}) {
-  const responses = await Promise.allSettled(sources.map((source) => source.search(query, limit)))
+export async function searchMapSources(query, { sources = mapSearchSources, limit = 5, signal } = {}) {
+  const responses = await Promise.allSettled(sources.map((source) => source.search(query, limit, signal)))
   return {
     results: unique(responses.flatMap((response) => response.status === 'fulfilled' ? response.value : [])),
     available: responses.some((response) => response.status === 'fulfilled'),
