@@ -46,7 +46,11 @@
             v-model.trim="searchQuery"
             type="search"
             role="combobox"
-            :aria-label="hospitalMode ? 'Cari nama rumah sakit dan puskesmas' : 'Cari lokasi'"
+            :aria-label="
+              hospitalMode
+                ? 'Cari nama rumah sakit dan puskesmas'
+                : 'Cari lokasi'
+            "
             aria-autocomplete="list"
             :aria-controls="
               searchResults.length ? 'ja-map-search-results' : undefined
@@ -186,7 +190,10 @@
 </template>
 
 <script>
-import { searchMapSources } from '~/utils/jalan-aing-map-search'
+import {
+  mapSearchSources,
+  searchMapSources,
+} from '~/utils/jalan-aing-map-search'
 import { isJalanAingLocation } from '~/utils/jalan-aing-location'
 
 export default {
@@ -285,6 +292,19 @@ export default {
     },
   },
   watch: {
+    layerVisibility: {
+      deep: true,
+      handler() {
+        this.searchLocation = null
+        this.queueSearch()
+      },
+    },
+    filterStatus: {
+      deep: true,
+      handler() {
+        this.queueSearch()
+      },
+    },
     hospitalMode: {
       immediate: true,
       handler(value) {
@@ -316,6 +336,12 @@ export default {
     },
     updateDataAvailability(payload) {
       this.dataAvailability = { ...this.dataAvailability, ...payload }
+      if (
+        (this.searching || this.searchResults.length || this.searchMessage) &&
+        ((payload.bus && this.layerVisibility.bus) ||
+          (payload.busStops && this.layerVisibility.busStops))
+      )
+        this.queueSearch()
     },
     updateLayerLoading(payload) {
       this.layerLoading = { ...this.layerLoading, ...payload }
@@ -388,22 +414,42 @@ export default {
       this.searchController = new AbortController()
       this.searching = true
       try {
-        const { results, available } = this.hospitalMode
-          ? await this.$refs.leafletMap.searchHealthFacilities(this.searchQuery)
-          : await searchMapSources(this.searchQuery, { signal: this.searchController.signal })
+        if (
+          this.hospitalMode &&
+          !Object.values(this.layerVisibility).some(Boolean)
+        ) {
+          this.searchResults = []
+          this.activeSearchIndex = -1
+          this.searchMessage = 'Aktifkan layer untuk mencari data.'
+          return
+        }
+        const sources = await Promise.all([
+          this.$refs.leafletMap.searchActiveLayers(
+            this.searchQuery,
+            this.searchController.signal
+          ),
+          ...(this.hospitalMode
+            ? []
+            : [
+                searchMapSources(this.searchQuery, {
+                  sources: mapSearchSources.filter(
+                    (source) => source.id === 'places'
+                  ),
+                  signal: this.searchController.signal,
+                }),
+              ]),
+        ])
+        const results = sources.flatMap((source) => source.results)
+        const available = sources.some((source) => source.available)
         if (requestId !== this.searchRequestId) return
         this.searchMessage = ''
         this.searchResults = results
         this.activeSearchIndex = results.length ? 0 : -1
         if (!results.length) {
-          this.searchMessage = this.hospitalMode
-            ? available
-              ? 'Rumah sakit atau puskesmas tidak ditemukan.'
-              : this.layerLoading.rumahSakit || this.layerLoading.puskesmas
-              ? 'Data rumah sakit dan puskesmas sedang dimuat.'
-              : 'Data rumah sakit dan puskesmas belum tersedia.'
-            : available
-            ? 'Lokasi tidak ditemukan.'
+          this.searchMessage = available
+            ? this.hospitalMode
+              ? 'Data tidak ditemukan pada layer aktif.'
+              : 'Lokasi tidak ditemukan.'
             : 'Pencarian lokasi belum tersedia.'
         }
       } catch (error) {
