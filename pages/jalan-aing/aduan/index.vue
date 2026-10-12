@@ -20,7 +20,7 @@
           <span class="ja-complaint-location-dot" aria-hidden="true" />
           <div>
             <strong>Belum ada titik dipilih</strong>
-            <NuxtLink to="/jalan-aing/peta">Pilih titik di peta interaktif <span aria-hidden="true">→</span></NuxtLink>
+            <NuxtLink :to="{ path: '/jalan-aing/peta', query: { mode: $route.query.mode } }">Pilih titik di peta interaktif <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </div>
       </div>
@@ -561,7 +561,7 @@ export default {
     },
     continueFromCategory() {
       if (!this.hasLocation) {
-        this.$router.push({ path: '/jalan-aing/peta', query: { category: this.selectedCategory } })
+        this.$router.push({ path: '/jalan-aing/peta', query: { mode: this.$route.query.mode, category: this.selectedCategory } })
         return
       }
       this.currentStep = 2
@@ -734,7 +734,7 @@ export default {
     },
     trackStatus() {
       this.$store.commit('aduan/setLastComplaintTicket', this.submittedTicket)
-      this.$router.push({ path: '/jalan-aing/lacak' })
+      this.$router.push({ path: '/jalan-aing/lacak', query: { mode: this.$route.query.mode } })
     },
     startNewComplaint() {
       this.formData.photos.forEach(({ src }) => URL.revokeObjectURL(src))
@@ -746,7 +746,7 @@ export default {
       this.submittedTicket = ''
       this.copied = false
       this.photoUploadFailed = false
-      this.$router.replace({ path: '/jalan-aing/aduan' })
+      this.$router.replace({ path: '/jalan-aing/aduan', query: { mode: this.$route.query.mode } })
       this.$refs.successDialog.close()
     },
   },

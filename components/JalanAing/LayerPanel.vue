@@ -8,16 +8,16 @@
           <path d="m3 16 9 5 9-5" />
         </svg>
         <Icon v-else name="info-circle-outline" size="18px" />
-        {{ mobileOpen ? 'Layer Jalan Aing' : 'Layer Jalan Aing' }}
+        Layer Peta
         <button v-if="mobileOpen" type="button" class="ml-auto rounded-lg p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup layer" @pointerdown.stop @click="$emit('close')">
           <Icon name="times" size="18px" />
         </button>
       </h2>
-      <p v-if="!mobileOpen" class="mt-1 text-xs leading-normal text-slate-500">Aktifkan layer untuk menganalisis data geospasial</p>
+      <p v-if="!mobileOpen" class="mt-1 text-xs leading-normal text-slate-500">Pilih layer untuk melihat informasi pada peta.</p>
     </div>
 
     <div class="flex min-h-0 flex-1 flex-col divide-y divide-slate-100 overflow-y-auto">
-      <section v-for="section in sections" :key="section.id" class="p-2" :class="mobileOpen ? 'border-b border-slate-100 px-5 py-3 last:border-b-0' : ''">
+      <section v-for="section in visibleSections" :key="section.id" class="p-2" :class="mobileOpen ? 'border-b border-slate-100 px-5 py-3 last:border-b-0' : ''">
         <button type="button" class="flex w-full items-center justify-between rounded-lg p-3 text-left font-semibold text-slate-700 transition hover:bg-slate-50" :class="mobileOpen ? 'p-1 text-sm' : 'text-sm'" :aria-expanded="openSections[section.id]" @click="toggleSection(section.id)">
           <span class="flex min-w-0 items-center gap-2" :class="mobileOpen ? 'gap-3' : ''">
             <span class="h-2.5 w-2.5 shrink-0 rounded-full" :class="[section.color, mobileOpen ? 'h-3 w-3' : '']" />
@@ -69,6 +69,7 @@ const HAZARD_LEGEND_ITEMS = [
 export default {
   name: 'JalanAingLayerPanel',
   props: {
+    hospitalMode: { type: Boolean, default: false },
     mobileOpen: { type: Boolean, default: false },
     layerVisibility: { type: Object, required: true },
     filterStatus: { type: Object, required: true },
@@ -92,20 +93,29 @@ export default {
       sections: [
         { id: 'bus', label: 'Bus', color: 'bg-sky-500', items: [{ id: 'bus', label: 'Posisi Bus Real-time', color: '#0EA5E9' }, { id: 'busStops', label: 'Halte Bus', color: '#2563EB' }] },
         { id: 'dbmpr', label: 'Dinas Bina Marga (DBMPR)', color: 'bg-emerald-600', items: [{ id: 'ruasJalan', label: 'Jalan Provinsi', color: '#008444' }, { id: 'apj', label: 'APJ', color: '#F59E0B' }] },
-        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-red-500', items: [{ id: 'rumahSakit', label: 'Rumah Sakit', color: '#DC2626' }, { id: 'puskesmas', label: 'Puskesmas', color: '#2563EB' }] },
+        { id: 'dinkes', label: 'Dinas Kesehatan (Dinkes)', color: 'bg-teal-700', items: [{ id: 'rumahSakit', label: 'Rumah Sakit', color: '#0F766E' }, { id: 'puskesmas', label: 'Puskesmas', color: '#2563EB' }] },
         { id: 'dishub', label: 'Dinas Perhubungan (Dishub)', color: 'bg-amber-500', items: [{ id: 'restArea', label: 'Rest Area', color: '#D97706' }] },
         { id: 'bpbd', label: 'Kebencanaan (BPBD)', color: 'bg-rose-600', items: [{ id: 'bahayaBanjir', label: 'Bahaya Banjir', color: '#0284C7' }, { id: 'bahayaBanjirBandang', label: 'Bahaya Banjir Bandang', color: '#0369A1' }, { id: 'bahayaCuacaEkstrem', label: 'Bahaya Cuaca Ekstrem', color: '#7C3AED' }, { id: 'bahayaGempaBumi', label: 'Bahaya Gempa Bumi', color: '#DC2626' }, { id: 'bahayaKebakaranHutanDanLahan', label: 'Bahaya Kebakaran Hutan dan Lahan', color: '#EA580C' }, { id: 'bahayaKekeringan', label: 'Bahaya Kekeringan', color: '#CA8A04' }, { id: 'bahayaTanahLongsor', label: 'Bahaya Tanah Longsor', color: '#92400E' }, { id: 'bahayaTsunami', label: 'Bahaya Tsunami', color: '#0891B2' }, { id: 'indeksMultibahayaBencana', label: 'Indeks Multibahaya Bencana', color: '#BE123C' }] },
       ],
     }
   },
   computed: {
+    visibleSections() {
+      return this.hospitalMode ? this.sections.filter((section) => section.id === 'dinkes') : this.sections
+    },
     activeLegendItems() {
-      const activeItems = this.sections.flatMap((section) => section.items).filter((item) => this.layerVisibility[item.id])
+      const activeItems = this.visibleSections.flatMap((section) => section.items).filter((item) => this.layerVisibility[item.id])
       const hazardActive = activeItems.some((item) => item.id.startsWith('bahaya') || item.id === 'indeksMultibahayaBencana')
       return [...activeItems.filter((item) => !item.id.startsWith('bahaya') && item.id !== 'indeksMultibahayaBencana'), ...(hazardActive ? HAZARD_LEGEND_ITEMS : [])]
     },
   },
   watch: {
+    hospitalMode: {
+      immediate: true,
+      handler(value) {
+        this.openSections.dinkes = value
+      },
+    },
     mobileOpen(value) {
       if (value) this.openSections.bus = true
     },

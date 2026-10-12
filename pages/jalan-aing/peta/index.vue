@@ -1,11 +1,12 @@
 <template>
-  <main class="ja-map-page">
+  <main class="ja-map-page" :class="{ 'is-hospital-mode': hospitalMode }">
     <JalanAingHeader active="peta" />
 
     <section class="ja-map-shell" aria-label="Peta interaktif Jalan Aing">
       <JalanAingLayerPanel
         class="ja-map-layer-card"
         :mobile-open="mobileLayerOpen"
+        :hospital-mode="hospitalMode"
         :layer-visibility="layerVisibility"
         :filter-status="filterStatus"
         :data-availability="dataAvailability"
@@ -19,7 +20,6 @@
         <JalanAingLeafletMap
           ref="leafletMap"
           class="ja-map-leaflet"
-          :map-center="mapCenter"
           :map-zoom="mapZoom"
           :complaint-location="complaintLocation"
           :search-location="searchLocation"
@@ -34,7 +34,7 @@
         />
         <div class="ja-map-search" role="search" :class="{ 'is-searching': searching }" :aria-busy="searching">
           <span class="ja-map-search-icon"><Icon name="magnifier" size="16px" aria-hidden="true" /></span>
-          <input ref="searchInput" v-model.trim="searchQuery" type="search" role="combobox" aria-label="Cari lokasi" aria-autocomplete="list" :aria-controls="searchResults.length ? 'ja-map-search-results' : undefined" :aria-expanded="String(Boolean(searchResults.length))" :aria-activedescendant="activeSearchIndex >= 0 ? `ja-map-search-result-${activeSearchIndex}` : undefined" placeholder="Cari nama jalan, tempat, atau area" @input="queueSearch" @keydown="handleSearchKeydown" />
+          <input ref="searchInput" v-model.trim="searchQuery" type="search" role="combobox" :aria-label="hospitalMode ? 'Cari nama rumah sakit' : 'Cari lokasi'" aria-autocomplete="list" :aria-controls="searchResults.length ? 'ja-map-search-results' : undefined" :aria-expanded="String(Boolean(searchResults.length))" :aria-activedescendant="activeSearchIndex >= 0 ? `ja-map-search-result-${activeSearchIndex}` : undefined" :placeholder="hospitalMode ? 'Cari nama rumah sakit' : 'Cari nama jalan, tempat, atau area'" @input="queueSearch($event.target.value)" @keydown="handleSearchKeydown" />
           <button v-if="searchQuery" class="ja-map-search-clear" type="button" aria-label="Hapus pencarian" @click="clearSearch"><Icon name="times" size="13px" aria-hidden="true" /></button>
           <span v-if="searching" class="ja-map-search-progress" aria-hidden="true" />
           <span v-if="searching" class="ja-map-search-loading-text" role="status">Mencari lokasi…</span>
@@ -118,7 +118,6 @@ export default {
   data() {
     return {
       mobileLayerOpen: false,
-      mapCenter: [-6.9025, 107.6187],
       mapZoom: 16,
       layerVisibility: {
         bus: false,
@@ -178,6 +177,9 @@ export default {
     return { title: 'Peta Interaktif — Jalan Aing' }
   },
   computed: {
+    hospitalMode() {
+      return this.$route.query.mode === 'rumah-sakit'
+    },
     selectedMarkerDetails() {
       const fieldLabels = this.selectedMarker?.fieldLabels || null
       const normaliseKey = (key) => key.toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -196,6 +198,19 @@ export default {
           return details
         }, [])
         .slice(0, 7)
+    },
+  },
+  watch: {
+    hospitalMode: {
+      immediate: true,
+      handler(value) {
+        Object.keys(this.layerVisibility).forEach((id) => {
+          this.layerVisibility[id] = value && id === 'rumahSakit'
+        })
+        this.selectedMarker = null
+        this.complaintLocation = null
+        this.clearSearch()
+      },
     },
   },
   beforeDestroy() {
@@ -219,6 +234,7 @@ export default {
     },
     updateLayerLoading(payload) {
       this.layerLoading = { ...this.layerLoading, ...payload }
+      if (this.hospitalMode && payload.rumahSakit === false) this.queueSearch()
     },
     updateLegendColors(payload) {
       this.legendColors = { ...this.legendColors, ...payload }
@@ -235,6 +251,7 @@ export default {
       this.locationError = ''
     },
     selectComplaintLocation(location) {
+      if (this.hospitalMode) return
       if (!isJalanAingLocation(location.lat, location.lng)) {
         this.complaintLocation = null
         this.showLocationError()
@@ -248,11 +265,14 @@ export default {
     openComplaintForm() {
       this.$router.push({
         path: '/jalan-aing/aduan',
-        query: { ...this.complaintLocation, category: this.$route.query.category },
+        query: { mode: this.$route.query.mode, ...this.complaintLocation, category: this.$route.query.category },
       })
     },
-    queueSearch() {
+    queueSearch(query = this.searchQuery) {
+      this.searchQuery = query.trim()
       window.clearTimeout(this.searchTimer)
+      this.searchRequestId += 1
+      this.searching = false
       this.searchMessage = ''
       this.searchResults = []
       this.activeSearchIndex = -1
@@ -274,11 +294,17 @@ export default {
       const requestId = ++this.searchRequestId
       this.searching = true
       try {
-        const { results, available } = await searchMapSources(this.searchQuery)
+        const { results, available } = this.hospitalMode
+          ? this.$refs.leafletMap.searchHospitals(this.searchQuery)
+          : await searchMapSources(this.searchQuery)
         if (requestId !== this.searchRequestId) return
         this.searchResults = results
         this.activeSearchIndex = results.length ? 0 : -1
-        if (!results.length) this.searchMessage = available ? 'Lokasi tidak ditemukan.' : 'Pencarian lokasi belum tersedia.'
+        if (!results.length) {
+          this.searchMessage = this.hospitalMode
+            ? (available ? 'Rumah sakit tidak ditemukan.' : this.layerLoading.rumahSakit ? 'Data rumah sakit sedang dimuat.' : 'Data rumah sakit belum tersedia.')
+            : (available ? 'Lokasi tidak ditemukan.' : 'Pencarian lokasi belum tersedia.')
+        }
       } catch (error) {
         if (requestId === this.searchRequestId) this.searchMessage = 'Pencarian lokasi belum tersedia.'
       } finally {
@@ -917,5 +943,14 @@ export default {
   .ja-map-mobile-layers > span { display: none; }
   ::v-deep(.ja-map-leaflet .right-4.top-5) { top: 76px; right: 16px; gap: 8px; }
   ::v-deep(.ja-map-leaflet .h-10.w-10) { width: 42px; height: 42px; border-radius: 12px; }
+}
+.ja-map-page.is-hospital-mode .ja-map-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+@media (max-width: 767px) {
+  .ja-map-page.is-hospital-mode .ja-map-layer-card {
+    bottom: env(safe-area-inset-bottom);
+  }
 }
 </style>

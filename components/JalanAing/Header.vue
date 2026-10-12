@@ -1,5 +1,5 @@
 <template>
-  <header class="ja-header" :class="{ 'is-sticky': sticky }">
+  <header v-if="$route.query.mode !== 'rumah-sakit'" class="ja-header" :class="{ 'is-sticky': sticky }">
     <NuxtLink class="ja-brand" to="/jalan-aing" aria-label="Jalan Aing, beranda">
       <svg class="ja-brand-mark" viewBox="0 0 58 64" fill="none" aria-hidden="true">
         <path d="M29 3C14.7 3 6 13.7 6 26.8c0 14.2 14.5 27 23 34.2 8.5-7.2 23-20 23-34.2C52 13.7 43.3 3 29 3Z" fill="#239CD5" />
