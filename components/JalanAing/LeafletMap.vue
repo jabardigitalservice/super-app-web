@@ -5,7 +5,7 @@
     <div class="absolute right-4 top-5 z-[500] flex flex-col gap-2 md:right-5">
       <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perbesar peta" @click="zoomIn"><Icon name="plus" size="18px" /></button>
       <button type="button" class="ja-map-zoom-button flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Perkecil peta" @click="zoomOut"><Icon name="minus" size="18px" /></button>
-      <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Lokasi saya" @click="locateMe"><Icon src="/icon/location-picker.svg" size="18px" /></button>
+      <button v-if="$route.query.mode !== 'rumah-sakit'" type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Lokasi saya" @click="locateMe"><Icon src="/icon/location-picker.svg" size="18px" /></button>
       <button type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50" aria-label="Reset peta" @click="resetView"><Icon name="refresh" size="18px" /></button>
     </div>
 
@@ -85,7 +85,7 @@ const GIS_LAYERS = Object.freeze({
   rumahSakit: {
     label: 'Rumah Sakit',
     type: 'point',
-    color: '#DC2626',
+    color: '#0F766E',
     iconUrl: '/icon/marker-hospital.svg',
     geoJsonUrl: 'https://api-superapp-backend.staging.digitalservice.id/v1/jalanaing/geojson/rumah-sakit',
     nameFields: ['namarumahsakit', 'namars', 'namafaskes', 'namobj', 'nama'],
@@ -212,7 +212,7 @@ const GIS_LAYERS = Object.freeze({
 })
 
 const LEAFLET_MAP_CONFIG = Object.freeze({
-  center: [-6.9175, 107.6191],
+  center: [-6.9025, 107.6187],
   zoom: 9,
   minZoom: 7,
   maxZoom: 19,
@@ -317,6 +317,8 @@ export default {
     this.initMap()
   },
   beforeDestroy() {
+    window.cancelAnimationFrame(this.wheelZoomFrame)
+    this.leaflet?.DomEvent.off(this.$refs.map, 'wheel', this.onWheel, this)
     this.stopBusPolling()
     Object.values(this.busAnimationFrames).forEach((frame) => window.cancelAnimationFrame(frame))
     if (this.map) {
@@ -357,12 +359,12 @@ export default {
         zoomAnimationThreshold: 8,
         zoomSnap: 0,
         zoomDelta: 1,
-        wheelPxPerZoomLevel: 100,
-        wheelDebounceTime: 24,
+        scrollWheelZoom: false,
         fadeAnimation: true,
         markerZoomAnimation: true,
       })
       this.map.attributionControl.setPrefix('')
+      L.DomEvent.on(this.$refs.map, 'wheel', this.onWheel, this)
       this.setBasemap(config.basemap)
       this.createDataLayers()
       this.syncLayers(this.layerVisibility)
@@ -376,6 +378,8 @@ export default {
       if (this.pendingLocate) {
         this.pendingLocate = false
         this.locateMe()
+      } else {
+        this.locateInitially()
       }
       window.setTimeout(() => this.map?.invalidateSize(), 100)
     },
@@ -780,6 +784,18 @@ export default {
       const fallback = Object.entries(properties).find(([key, value]) => value && !/(^|_)(id|gid|objectid|shape|geom)(_|$)/i.test(key))
       return fallback ? String(fallback[1]) : config.label
     },
+    searchHospitals(query) {
+      const data = this.geoJsonData.rumahSakit
+      const terms = query.trim().toLocaleLowerCase('id-ID').split(/\s+/)
+      const results = (data?.features || []).flatMap((feature, index) => {
+        if (feature.geometry?.type !== 'Point') return []
+        const [lon, lat] = feature.geometry.coordinates
+        const name = this.featureLabel(feature, GIS_LAYERS.rumahSakit)
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || !terms.every((term) => name.toLocaleLowerCase('id-ID').includes(term))) return []
+        return [{ place_id: `rumah-sakit-${index}`, name, display_name: 'Rumah Sakit', lat, lon }]
+      }).slice(0, 5)
+      return { results, available: Boolean(data) }
+    },
     search(query) {
       const term = query.trim().toLowerCase()
       const results = term ? this.roads.filter((road) => `${road.name} ${road.city}`.toLowerCase().includes(term)).slice(0, 6) : []
@@ -817,6 +833,19 @@ export default {
       path.classList.remove('jalan-aing-point-enter')
       window.requestAnimationFrame(() => path.classList.add('jalan-aing-point-enter'))
     },
+    onWheel(event) {
+      this.leaflet.DomEvent.stop(event)
+      const pixels = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.map.getSize().y : 1
+      const zoom = this.wheelZoomFrame ? this.wheelZoomTarget : this.map.getZoom()
+      this.wheelZoomTarget = Math.max(this.map.getMinZoom(), Math.min(this.map.getMaxZoom(), zoom - event.deltaY * pixels / 100))
+      this.wheelZoomPoint = this.map.mouseEventToContainerPoint(event)
+      if (this.wheelZoomFrame) return
+      this.wheelZoomFrame = window.requestAnimationFrame(() => {
+        this.wheelZoomFrame = null
+        // Wheel input already includes touchpad momentum; CSS zoom would drop subsequent deltas.
+        this.map.setZoomAround(this.wheelZoomPoint, this.wheelZoomTarget, { animate: false })
+      })
+    },
     zoomIn() {
       this.map?.zoomIn()
     },
@@ -827,13 +856,21 @@ export default {
       const config = this.mapConfig || LEAFLET_MAP_CONFIG
       this.map?.setView(config.center, config.zoom)
     },
+    async locateInitially() {
+      try {
+        const permission = await navigator.permissions?.query({ name: 'geolocation' })
+        if (permission?.state === 'granted' && this.map) this.locateMe()
+      } catch {
+        // Keep Gedung Sate when the browser cannot check location permission.
+      }
+    },
     locateMe() {
       if (!this.map) {
         this.pendingLocate = true
         return
       }
-      this.map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true })
-        .once('locationfound', (event) => {
+      this.map.once('locationfound', (event) => {
+          this.map.setView(event.latlng, 16)
           if (this.currentLocationMarker) {
             this.currentLocationMarker.setLatLng(event.latlng)
           } else {
@@ -849,6 +886,7 @@ export default {
         .once('locationerror', (error) => {
           this.$emit('location-error', error)
         })
+        .locate({ setView: false, enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 })
     },
   },
 }
@@ -868,10 +906,6 @@ export default {
   font-size: 11px;
   font-weight: 700;
   padding: 5px 8px;
-}
-
-.jalan-aing-leaflet .leaflet-zoom-animated {
-  transition: none;
 }
 
 .jalan-aing-bus-icon {
@@ -897,7 +931,6 @@ export default {
 
 .jalan-aing-leaflet .jalan-aing-marker-selected {
   filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 7px rgb(13 109 67 / 0.85));
-  transition: filter 150ms ease;
 }
 
 .jalan-aing-bus-line {

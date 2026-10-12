@@ -32,29 +32,29 @@
           <p class="ja-kicker">Mulai dari sini</p>
           <h2 id="service-title">Apa yang ingin Anda lakukan?</h2>
         </div>
-        <NuxtLink to="/jalan-aing/peta">Buka peta jalan <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink :to="{ path: '/jalan-aing/peta', query: { mode: $route.query.mode } }">Buka peta jalan <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <div class="ja-service-grid">
-        <NuxtLink to="/jalan-aing/peta" class="ja-service-card ja-service-map">
+        <NuxtLink :to="{ path: '/jalan-aing/peta', query: { mode: $route.query.mode } }" class="ja-service-card ja-service-map">
           <span class="ja-service-icon"><Icon src="/icon/pin-map.svg" size="26px" /></span>
           <span class="ja-label">Peta Jalan</span>
           <strong>Tandai lokasi kejadian</strong>
           <small>Pilih titik jalan rusak agar lokasi ikut masuk ke aduan.</small>
         </NuxtLink>
-        <NuxtLink to="/jalan-aing/aduan" class="ja-service-card">
+        <NuxtLink :to="{ path: '/jalan-aing/aduan', query: { mode: $route.query.mode } }" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="warning" size="24px" /></span>
           <span class="ja-label">Aduan</span>
           <strong>Laporkan jalan rusak</strong>
           <small>Isi jenis kerusakan, keterangan, dan foto pendukung.</small>
         </NuxtLink>
-        <NuxtLink to="/jalan-aing/peta" class="ja-service-card">
+        <NuxtLink :to="{ path: '/jalan-aing/peta', query: { mode: $route.query.mode } }" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="eye" size="24px" /></span>
           <span class="ja-label">Informasi Peta</span>
           <strong>Lihat ruas dan fasilitas</strong>
           <small>Aktifkan layer jalan, halte, layanan kesehatan, dan rest area.</small>
         </NuxtLink>
-        <NuxtLink to="/jalan-aing/lacak" class="ja-service-card">
+        <NuxtLink :to="{ path: '/jalan-aing/lacak', query: { mode: $route.query.mode } }" class="ja-service-card">
           <span class="ja-service-icon"><Icon name="magnifier" size="24px" /></span>
           <span class="ja-label">Pelacakan</span>
           <strong>Periksa status aduan</strong>
@@ -64,7 +64,7 @@
           <p>Siap membuat aduan?</p>
           <h3>Mulai dari titik kerusakan yang paling dekat.</h3>
           <span>Lokasi, foto, dan keterangan singkat membuat aduan lebih mudah ditindaklanjuti.</span>
-          <NuxtLink to="/jalan-aing/peta">Tandai lokasi di peta <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink :to="{ path: '/jalan-aing/peta', query: { mode: $route.query.mode } }">Tandai lokasi di peta <span aria-hidden="true">→</span></NuxtLink>
         </aside>
       </div>
     </section>
