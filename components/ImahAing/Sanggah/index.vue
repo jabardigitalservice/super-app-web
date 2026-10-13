@@ -91,6 +91,48 @@
             </div>
           </ValidationProvider>
 
+          <div class="flex flex-col gap-2">
+            <span class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high">
+              Bukti Sanggah
+            </span>
+            <p class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
+              Ukuran maksimal file 2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
+            </p>
+            <ValidationProvider
+              ref="buktiProvider"
+              v-slot="{ errors }"
+              tag="div"
+              class="flex flex-col gap-y-2"
+              name="Bukti Sanggah"
+            >
+              <BaseDropzone
+                id="sanggahBuktiDropzone"
+                :accept="buktiAccept"
+                :max-size="buktiMaxSize"
+                :multiple="false"
+                :is-error="errors.length > 0"
+                @change="handleUpload"
+              />
+              <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
+            </ValidationProvider>
+
+            <transition name="slide-fade">
+              <div v-if="bukti" class="flex flex-col gap-2">
+                <BaseDropzoneUploadProgress
+                  :file="bukti.file"
+                  :progress="bukti.progress"
+                  :status="bukti.status"
+                  :image-url="bukti.url"
+                  @delete="handleDelete"
+                  @retry="handleRetry"
+                />
+                <span v-if="bukti.errors && bukti.errors.length" class="font-lato text-[13px] text-red-700">
+                  {{ bukti.errors[0] }}
+                </span>
+              </div>
+            </transition>
+          </div>
+
           <ValidationProvider
             v-slot="{ errors }"
             tag="div"
@@ -120,8 +162,8 @@
               class="w-full md:w-fit !justify-center order-1 md:order-2"
               variant="primary"
               type="submit"
-              :disabled="invalid"
-              :style="[invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' }]"
+              :disabled="invalid || uploadBlocking"
+              :style="[(invalid || uploadBlocking) && { backgroundColor: '#E0E0E0', color: '#FFFFFF' }]"
             >
               Ajukan Sanggahan
             </Button>
@@ -133,8 +175,12 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
+import { convertHeicToJpg, isLikelyHeic } from '~/utils/heic'
 import {
+  SANGGAH_BUKTI_ACCEPT,
+  SANGGAH_BUKTI_MAX_SIZE,
+  isSanggahBuktiFormatAllowed,
   SANGGAH_AGREEMENT_TEXT,
   SANGGAH_CATEGORY_OPTIONS,
   SANGGAH_DESCRIPTION_MAX,
@@ -171,15 +217,22 @@ export default {
       categoryOptions: SANGGAH_CATEGORY_OPTIONS,
       descriptionMin: SANGGAH_DESCRIPTION_MIN,
       descriptionMax: SANGGAH_DESCRIPTION_MAX,
-      agreementText: SANGGAH_AGREEMENT_TEXT
+      agreementText: SANGGAH_AGREEMENT_TEXT,
+      buktiAccept: SANGGAH_BUKTI_ACCEPT,
+      buktiMaxSize: SANGGAH_BUKTI_MAX_SIZE
     }
   },
   computed: {
     ...mapState('imahAingSanggah', {
       storeCategory: 'category',
       storeDescription: 'description',
-      storeAgreement: 'agreement'
+      storeAgreement: 'agreement',
+      bukti: 'bukti'
     }),
+    // Submit tertahan selama upload berjalan atau gagal (hapus/ulangi dulu)
+    uploadBlocking() {
+      return !!this.bukti && this.bukti.status !== 'SUCCESS'
+    },
     category: {
       get() {
         return this.storeCategory
@@ -222,10 +275,83 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('imahAingSanggah', ['SET_CATEGORY', 'SET_DESCRIPTION', 'SET_AGREEMENT']),
+    ...mapMutations('imahAingSanggah', [
+      'SET_CATEGORY',
+      'SET_DESCRIPTION',
+      'SET_AGREEMENT',
+      'SET_BUKTI'
+    ]),
+    ...mapActions('imahAingSanggah', ['uploadBukti']),
+    setBuktiError(message) {
+      const provider = this.$refs.buktiProvider
+      if (provider && typeof provider.setErrors === 'function') {
+        provider.setErrors([message])
+      }
+    },
+    async handleUpload(file) {
+      let selected = file instanceof FileList ? file[0] : file
+      if (!selected || (Array.isArray(selected) && !selected.length)) return
+      this.setBuktiError('')
+      this.$refs.buktiProvider?.reset?.()
+
+      if (isLikelyHeic(selected)) {
+        try {
+          selected = await convertHeicToJpg(selected, { quality: 0.85 })
+        } catch (err) {
+          this.setBuktiError('Gagal mengonversi foto HEIC. Coba foto lain atau simpan sebagai JPG dulu.')
+          return
+        }
+      }
+
+      // Cek format & ukuran SETELAH konversi HEIC (hasil konversi bisa melebihi batas)
+      if (!isSanggahBuktiFormatAllowed(selected)) {
+        this.setBuktiError('Format file harus .jpg, .jpeg, .png, atau .pdf.')
+        return
+      }
+      if (selected.size > this.buktiMaxSize) {
+        this.setBuktiError('Ukuran file melebihi 2 MB.')
+        return
+      }
+
+      try {
+        await this.uploadBukti(selected)
+      } catch (err) {
+        // Status error sudah diset di slot oleh store
+      }
+    },
+    handleDelete() {
+      this.SET_BUKTI(null)
+      const input = document.querySelector('#sanggahBuktiDropzone input')
+      if (input) input.value = ''
+      this.$refs.buktiProvider?.reset?.()
+    },
+    async handleRetry() {
+      if (!this.bukti || !this.bukti.file) return
+      try {
+        await this.uploadBukti(this.bukti.file)
+      } catch (err) {
+        // Status error sudah diset di slot oleh store
+      }
+    },
     onSubmit() {
       // Submit dihubungkan di slice S4
     }
   }
 }
 </script>
+
+<style scoped>
+.slide-fade-enter-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
+}
+</style>

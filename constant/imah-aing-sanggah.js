@@ -27,3 +27,17 @@ export const SANGGAH_DESCRIPTION_MAX = 500
 
 export const SANGGAH_AGREEMENT_TEXT =
   'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'
+
+export const SANGGAH_BUKTI_FIELD = 'bukti_sanggah'
+export const SANGGAH_BUKTI_ACCEPT = 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf'
+export const SANGGAH_BUKTI_MAX_SIZE = 2 * 1024 * 1024 // 2 MB
+const SANGGAH_BUKTI_ALLOWED_MIME = ['image/jpeg', 'image/png', 'application/pdf']
+const SANGGAH_BUKTI_ALLOWED_EXT = /\.(jpe?g|png|pdf)$/i
+
+/** Format file bukti didukung (cek MIME, fallback ekstensi bila MIME kosong). */
+export const isSanggahBuktiFormatAllowed = (file) => {
+  if (!file) return false
+  const type = (file.type || '').toLowerCase()
+  if (type) return SANGGAH_BUKTI_ALLOWED_MIME.includes(type)
+  return SANGGAH_BUKTI_ALLOWED_EXT.test(file.name || '')
+}
