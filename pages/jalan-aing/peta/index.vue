@@ -129,7 +129,7 @@
         </transition>
         <aside
           v-if="selectedMarker"
-          class="ja-map-detail-card"
+          class="ja-map-detail-card ja-map-marker-card"
           aria-live="polite"
         >
           <button
@@ -1299,6 +1299,17 @@ export default {
   height: 100dvh;
 }
 @media (max-width: 767px) {
+  .ja-map-marker-card {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: calc(100% - 72px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+  }
   .ja-map-page.is-hospital-mode .ja-map-layer-card {
     bottom: env(safe-area-inset-bottom);
   }
