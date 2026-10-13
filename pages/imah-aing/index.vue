@@ -34,12 +34,14 @@
               :item="item"
               :selected="selectedIds.includes(item.id)"
               :can-edit="canEdit(item)"
+              :can-sanggah="canSanggah(item)"
               :is-self-item="isSelfItem(item)"
               :proposer-role="item.proposer?.role || ''"
               :proposer-name="item.proposer?.name || ''"
               @toggle="toggleSelect(item.id)"
               @click="openPreview(item)"
               @edit="editUsulan(item)"
+              @sanggah="sanggahUsulan(item)"
               @show-info="showEditInfo"
             />
 
@@ -115,7 +117,8 @@
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
-import { getImahAingStatusKey } from '~/constant/imah-aing-status'
+import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
+import { isImahAingSelfItem } from '~/constant/imah-aing-sanggah'
 
 export default {
   data() {
@@ -242,21 +245,27 @@ export default {
     },
 
     isSelfItem(item) {
-      if (!item) return false
-      const { id, kk } = this.metaPayload || {}
-      // Check as proposer (non-warga submitting on behalf of warga)
-      if (item.proposer?.id && id && item.proposer.id === id) return true
-      // Check as beneficiary (warga self-submit)
-      if (item.user_id && id && item.user_id === id) return true
-      // KK fallback for warga without user_id
-      if (this.isWarga && item.user_kk && kk && item.user_kk === kk) return true
-      return false
+      return isImahAingSelfItem(item, this.metaPayload)
     },
 
     canEdit(item) {
       const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
       const statusId = getImahAingStatusKey(item)
       return this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
+    },
+
+    canSanggah(item) {
+      return this.isSelfItem(item) && canSanggahStatus(getImahAingStatusKey(item))
+    },
+
+    sanggahUsulan(item) {
+      this.$router.push({
+        path: '/imah-aing/sanggah',
+        query: {
+          ...this.$route.query,
+          id: item.id,
+        },
+      })
     },
 
     editUsulan(item) {

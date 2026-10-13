@@ -55,6 +55,25 @@ export const imahAingMockData = [
       },
     ],
   },
+  {
+    // Milik mock user `user-warga-001` (lihat docs/web/script/token-generator.js)
+    // → tombol Ajukan Sanggah muncul bila ?meta= memakai user tsb.
+    id: 'mock-003',
+    user_id: 'user-warga-001',
+    user_nik: '3273012345670001',
+    user_kk: '3273012345670002',
+    user_name: 'Budi Santoso',
+    user_phone: '081234567890',
+    phase: 'rejected_criteria',
+    status: 'rejected_criteria',
+    complaint_status_note: 'Data tidak memenuhi kriteria desil penerima bantuan.',
+    created_at: '2026-05-10T08:00:00.000Z',
+    description: 'Mengusulkan perbaikan rumah tidak layak huni.',
+    city_name: 'Kabupaten Kuningan',
+    district_name: 'Cilimus',
+    village_name: 'Sukakerta',
+    photos: [],
+  },
 ]
 
 export default imahAingMockData

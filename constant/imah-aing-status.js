@@ -30,6 +30,12 @@ export const IMAH_AING_STATUS = {
   aid_received:            { id: 'aid_received',            phase: 'coordination', name: 'Telah Menerima Bantuan',    color: 'green',      hex: '#166534' },
 }
 
+/** Status yang boleh memicu tombol Ajukan Sanggah di Riwayat */
+export const SANGGAH_ELIGIBLE_STATUSES = Object.freeze(['rejected_criteria'])
+
+export const canSanggahStatus = (statusKey) =>
+  SANGGAH_ELIGIBLE_STATUSES.includes(statusKey)
+
 /** Status key dari satu item response list; tidak membaca response detail. */
 export const getImahAingStatusKey = (item = {}) =>
   item.latest_complaint_status?.id

@@ -43,7 +43,7 @@
     <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit + Info Icon (bawah) -->
     <div
       class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
-      :class="{ 'justify-center': !canEdit }"
+      :class="{ 'justify-center': !canEdit && !canSanggah }"
     >
       <div class="flex items-center gap-1">
         <button
@@ -52,6 +52,13 @@
           @click.stop="$emit('edit')"
         >
           Edit Ajuan
+        </button>
+        <button
+          v-if="canSanggah"
+          class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors"
+          @click.stop="$emit('sanggah')"
+        >
+          Ajukan Sanggah
         </button>
         <button
           type="button"
@@ -75,7 +82,7 @@
 
 <script>
 import { formatDate } from '~/utils'
-import { getImahAingStatus, getImahAingStatusKey, getImahAingDisplayId } from '~/constant/imah-aing-status'
+import { getImahAingStatus, getImahAingStatusKey, getImahAingDisplayId, canSanggahStatus } from '~/constant/imah-aing-status'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -89,6 +96,10 @@ export default {
       default: false
     },
     canEdit: {
+      type: Boolean,
+      default: false
+    },
+    canSanggah: {
       type: Boolean,
       default: false
     },
@@ -112,6 +123,9 @@ export default {
     },
     displayId() {
       return getImahAingDisplayId(this.item)
+    },
+    canSanggahStatus() {
+      return canSanggahStatus(this.statusKey)
     },
     isNonEditable() {
       return !['unverified', 'rejected_appeal'].includes(this.statusKey)
@@ -137,6 +151,9 @@ export default {
       return (this.proposerName || '').trim()
     },
     editTooltipText() {
+      if (this.canSanggahStatus) {
+        return 'Usulan ditolak. Pengusul dapat mengajukan sanggahan melalui tombol Ajukan Sanggah.'
+      }
       return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi'
     }
   },
