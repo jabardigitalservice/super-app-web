@@ -1,6 +1,7 @@
 <template>
   <div
     class="jalan-aing-leaflet relative h-full min-h-[560px] w-full overflow-hidden bg-slate-200 font-lato"
+    :class="{ 'is-attribution-visible': showAttribution }"
   >
     <div ref="map" class="absolute inset-0 z-0" />
 
@@ -24,7 +25,7 @@
       <button
         v-if="$route.query.mode !== 'rumah-sakit'"
         type="button"
-        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg ja-map-location-button rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
         aria-label="Lokasi saya"
         @click="locateMe"
       >
@@ -32,7 +33,7 @@
       </button>
       <button
         type="button"
-        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
+        class="flex items-center justify-center w-10 h-10 transition bg-white border shadow-lg ja-map-reset-button rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50"
         aria-label="Reset peta"
         @click="resetView"
       >
@@ -41,11 +42,25 @@
     </div>
 
     <div
-      v-if="mapConfig"
-      class="absolute bottom-4 left-4 z-[500] rounded-xl border border-slate-200 bg-white px-4 py-2 font-mono text-xs font-bold text-slate-500 shadow-lg md:hidden"
+      class="jalan-aing-map-footer absolute bottom-4 left-4 right-4 z-[500] md:hidden"
     >
-      Lng: {{ mapConfig.center[1].toFixed(4) }}° E&nbsp; | &nbsp;Lat:
-      {{ mapConfig.center[0].toFixed(4) }}° S
+      <div
+        v-if="mapConfig"
+        class="jalan-aing-map-coordinates inline-block rounded-xl border border-slate-200 bg-white px-4 py-2 font-mono text-xs font-bold text-slate-500 shadow-lg"
+      >
+        Lng: {{ mapConfig.center[1].toFixed(4) }}° E&nbsp; | &nbsp;Lat:
+        {{ mapConfig.center[0].toFixed(4) }}° S
+      </div>
+      <button
+        type="button"
+        class="jalan-aing-attribution-toggle shrink-0 border border-slate-200 bg-white text-slate-700 shadow-lg hover:bg-slate-50 active:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary"
+        :aria-expanded="String(showAttribution)"
+        aria-label="Tampilkan sumber peta"
+        @click="showAttribution = !showAttribution"
+      >
+        <Icon name="info-circle-outline" size="14px" aria-hidden="true" />
+        <span>Sumber peta</span>
+      </button>
     </div>
   </div>
 </template>
@@ -355,7 +370,8 @@ export default {
       busStops: [],
       busStopMarkers: {},
       activeMarkerElement: null,
-      pendingLocate: false,
+      pendingLocation: null,
+      showAttribution: true,
       roads: [],
     }
   },
@@ -386,6 +402,7 @@ export default {
   },
   async mounted() {
     this.mapConfig = this.readMapConfig()
+    this.locateMe()
     const module = await import('leaflet')
     if (this.requestController.signal.aborted) return
     this.leaflet = module.default || module
@@ -395,11 +412,11 @@ export default {
     this.requestController.abort()
     this.searchFeatureCache = new WeakMap()
     window.clearTimeout(this.resizeTimer)
+    window.clearTimeout(this.attributionTimer)
     window.cancelAnimationFrame(this.wheelZoomFrame)
     this.leaflet?.DomEvent.off(this.$refs.map, 'wheel', this.onWheel, this)
     this.stopBusPolling()
     if (this.map) {
-      this.map.stopLocate()
       this.map.remove()
       this.map = null
     }
@@ -445,6 +462,9 @@ export default {
         markerZoomAnimation: true,
       })
       this.map.attributionControl.setPrefix('')
+      this.attributionTimer = window.setTimeout(() => {
+        this.showAttribution = false
+      }, 5000)
       L.DomEvent.on(this.$refs.map, 'wheel', this.onWheel, this)
       this.setBasemap(config.basemap)
       this.createDataLayers()
@@ -457,8 +477,6 @@ export default {
           lng: event.latlng.lng,
         })
       )
-      this.map.on('locationfound', this.onLocationFound)
-      this.map.on('locationerror', this.onLocationError)
       this.map.on('moveend', () => {
         this.renderBusStops()
       })
@@ -466,11 +484,9 @@ export default {
         if (this.busIconsZoomedOut !== this.map.getZoom() < 13)
           this.refreshBusIcons()
       })
-      if (this.pendingLocate) {
-        this.pendingLocate = false
-        this.locateMe()
-      } else {
-        this.locateInitially()
+      if (this.pendingLocation) {
+        this.onLocationFound(this.pendingLocation)
+        this.pendingLocation = null
       }
       this.resizeTimer = window.setTimeout(
         () => this.map?.invalidateSize(),
@@ -1259,30 +1275,26 @@ export default {
       const config = this.mapConfig || LEAFLET_MAP_CONFIG
       this.map?.setView(config.center, config.zoom)
     },
-    async locateInitially() {
-      try {
-        const permission = await navigator.permissions?.query({
-          name: 'geolocation',
-        })
-        if (permission?.state === 'granted' && this.map) this.locateMe()
-      } catch {
-        // Keep Gedung Sate when the browser cannot check location permission.
-      }
-    },
     locateMe() {
-      if (!this.map) {
-        this.pendingLocate = true
+      if (!navigator.geolocation) {
+        this.onLocationError({ code: 0, message: 'Geolocation not supported.' })
         return
       }
-      this.map.locate({
-        setView: false,
-        enableHighAccuracy: true,
-        timeout: 8000,
-        maximumAge: 60000,
-      })
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) =>
+          this.onLocationFound({
+            latlng: { lat: coords.latitude, lng: coords.longitude },
+          }),
+        this.onLocationError,
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      )
     },
     onLocationFound(event) {
-      if (!this.map) return
+      if (this.requestController.signal.aborted) return
+      if (!this.map) {
+        this.pendingLocation = event
+        return
+      }
       this.map.setView(event.latlng, 16)
       if (this.currentLocationMarker) {
         this.currentLocationMarker.setLatLng(event.latlng)
@@ -1303,7 +1315,8 @@ export default {
       this.$emit('location-found', event.latlng)
     },
     onLocationError(error) {
-      if (this.map) this.$emit('location-error', error)
+      if (!this.requestController.signal.aborted)
+        this.$emit('location-error', error)
     },
   },
 }
@@ -1314,6 +1327,92 @@ export default {
   background: rgba(255, 255, 255, 0.8);
   font-family: Lato, sans-serif;
   font-size: 12px;
+}
+
+.jalan-aing-attribution-toggle {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .jalan-aing-map-footer {
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .jalan-aing-map-coordinates {
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 16px;
+    white-space: nowrap;
+  }
+
+  .jalan-aing-attribution-toggle {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    box-shadow: none;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+    pointer-events: auto;
+  }
+
+  .jalan-aing-attribution-toggle::before {
+    @apply border border-slate-200 bg-white shadow-sm;
+    position: absolute;
+    inset: 6px 0;
+    z-index: -1;
+    border-radius: inherit;
+    content: '';
+  }
+
+  .jalan-aing-attribution-toggle:hover,
+  .jalan-aing-attribution-toggle:active {
+    background: transparent;
+  }
+
+  .jalan-aing-attribution-toggle:hover::before,
+  .jalan-aing-attribution-toggle:active::before {
+    @apply bg-slate-50;
+  }
+
+  .jalan-aing-leaflet .leaflet-bottom.leaflet-right {
+    right: 12px;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    left: 12px;
+  }
+
+  .jalan-aing-leaflet .leaflet-control-attribution {
+    max-width: calc(100% - 56px);
+    margin: 0 56px 0 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    line-height: 1.4;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .jalan-aing-leaflet.is-attribution-visible .leaflet-control-attribution {
+    pointer-events: auto;
+    visibility: visible;
+  }
 }
 
 .jalan-aing-leaflet .leaflet-tooltip {
