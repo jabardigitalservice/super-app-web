@@ -60,7 +60,7 @@
 
           <ValidationProvider
             v-slot="{ errors }"
-            :rules="`required|min:${descriptionMin}|max:${descriptionMax}`"
+            rules="required"
             name="Deskripsi"
             tag="div"
             class="flex flex-col gap-2"
@@ -83,12 +83,7 @@
               "
               placeholder="Jelaskan alasan sanggahan"
             />
-            <div class="flex justify-between gap-2">
-              <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
-              <span class="font-lato text-[12px] text-gray-500 whitespace-nowrap dark:text-dark-text-medium">
-                {{ description.length }}/{{ descriptionMax }}
-              </span>
-            </div>
+            <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
           </ValidationProvider>
 
           <div class="flex flex-col gap-2">
@@ -219,9 +214,7 @@ import {
   SANGGAH_BUKTI_MAX_SIZE,
   isSanggahBuktiFormatAllowed,
   SANGGAH_AGREEMENT_TEXT,
-  SANGGAH_CATEGORY_OPTIONS,
-  SANGGAH_DESCRIPTION_MAX,
-  SANGGAH_DESCRIPTION_MIN
+  SANGGAH_CATEGORY_OPTIONS
 } from '~/constant/imah-aing-sanggah'
 import {
   getImahAingStatus,
@@ -252,8 +245,6 @@ export default {
   data() {
     return {
       categoryOptions: SANGGAH_CATEGORY_OPTIONS,
-      descriptionMin: SANGGAH_DESCRIPTION_MIN,
-      descriptionMax: SANGGAH_DESCRIPTION_MAX,
       agreementText: SANGGAH_AGREEMENT_TEXT,
       buktiAccept: SANGGAH_BUKTI_ACCEPT,
       buktiMaxSize: SANGGAH_BUKTI_MAX_SIZE

@@ -22,9 +22,6 @@ export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
   { value: 'kebencanaan', label: 'Kebencanaan' },
 ])
 
-export const SANGGAH_DESCRIPTION_MIN = 10
-export const SANGGAH_DESCRIPTION_MAX = 500
-
 export const SANGGAH_AGREEMENT_TEXT =
   'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'
 
