@@ -35,7 +35,7 @@
         <div
           class="ja-map-search"
           role="search"
-          :class="{ 'is-searching': searching }"
+          :class="{ 'is-searching': searching, 'has-query': searchQuery }"
           :aria-busy="searching"
         >
           <span class="ja-map-search-icon"
@@ -63,8 +63,8 @@
             "
             :placeholder="
               hospitalMode
-                ? 'Cari nama rumah sakit dan puskesmas'
-                : 'Cari nama jalan, tempat, atau area'
+                ? 'Cari fasilitas kesehatan'
+                : 'Cari lokasi'
             "
             @input="queueSearch($event.target.value)"
             @keydown="handleSearchKeydown"
@@ -180,6 +180,7 @@
           type="button"
           class="ja-map-mobile-layers"
           aria-label="Buka layer dan legenda"
+          :aria-expanded="String(mobileLayerOpen)"
           @click="mobileLayerOpen = true"
         >
           <Icon name="filter" size="18px" /><span>Layer & legenda</span>
@@ -1107,32 +1108,125 @@ export default {
     min-height: 0 !important;
   }
   .ja-map-search {
-    top: 16px;
-    left: 16px;
-    width: calc(100% - 32px);
+    top: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
     min-width: 0;
+    height: 44px;
+    min-height: 44px;
+    gap: 6px;
+    padding: 0 10px;
     transform: none;
+  }
+  .ja-map-search.has-query {
+    padding-right: 0;
+  }
+  .ja-map-search:focus-within {
+    border-color: var(--ja-map-green-dark);
+    box-shadow: 0 0 0 1px var(--ja-map-green-dark);
+  }
+  .ja-map-search-icon {
+    width: 18px;
+    height: 18px;
   }
   .ja-map-search input {
     font-size: 16px;
   }
+  .ja-map-search input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .ja-map-search-clear {
+    position: relative;
+    isolation: isolate;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: transparent;
+  }
+  .ja-map-search-clear::before {
+    position: absolute;
+    inset: 8px;
+    z-index: -1;
+    border-radius: 50%;
+    content: '';
+  }
+  .ja-map-search-clear:hover,
+  .ja-map-search-clear:active {
+    background: transparent;
+  }
+  .ja-map-search-clear:hover::before,
+  .ja-map-search-clear:active::before {
+    background: var(--ja-map-rule);
+  }
+  .ja-map-search-clear:focus-visible {
+    outline-color: var(--ja-map-green-dark);
+    outline-offset: -3px;
+  }
+  .ja-map-search-progress {
+    left: 34px;
+    right: 10px;
+    bottom: 3px;
+  }
   .ja-map-search-results {
-    top: 70px;
-    left: 16px;
-    width: calc(100% - 32px);
+    top: 64px;
+    left: 12px;
+    width: calc(100% - 24px);
     min-width: 0;
-    max-height: calc(100dvh - 220px);
+    max-height: min(360px, calc(100% - 136px));
     transform: none;
   }
+  .ja-map-search-results button {
+    min-height: 44px;
+    padding: 12px;
+  }
+  .ja-map-search-results button > span {
+    flex: 1;
+    min-width: 0;
+  }
+  .ja-map-search-results strong {
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ja-map-search-results span {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
   .ja-map-detail-card {
-    right: 16px;
-    bottom: 16px;
-    width: calc(100% - 32px);
+    right: 12px;
+    bottom: calc(124px + env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+    max-height: calc(100% - 196px - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .ja-map-detail-card h2 {
+    margin-right: 44px;
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+  .ja-map-detail-close {
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+  }
+  .ja-map-detail-card dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .ja-map-detail-close:focus-visible,
+  .ja-map-report-button:focus-visible,
+  .ja-map-search-results button:focus-visible {
+    outline-color: var(--ja-map-green-dark);
   }
   .ja-map-location-error {
-    right: 16px;
-    bottom: 16px;
-    width: calc(100% - 32px);
+    right: 12px;
+    bottom: calc(124px + env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
     box-sizing: border-box;
   }
   .ja-map-complaint-card {
@@ -1164,24 +1258,40 @@ export default {
     font-size: 13px;
   }
   .ja-map-mobile-layers {
-    bottom: 78px;
-    left: 16px;
+    right: 12px;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    left: auto;
     display: grid;
-    width: 46px;
+    width: 44px;
+    min-height: 44px;
     padding: 0;
+    border-radius: 12px;
   }
   .ja-map-mobile-layers > span {
     display: none;
   }
+  .ja-map-mobile-layers:active {
+    background: var(--ja-map-rule);
+  }
+  .ja-map-mobile-layers:focus-visible {
+    outline-color: var(--ja-map-green-dark);
+  }
   ::v-deep(.ja-map-leaflet .right-4.top-5) {
-    top: 76px;
-    right: 16px;
+    top: 64px;
+    right: 12px;
     gap: 8px;
   }
   ::v-deep(.ja-map-leaflet .h-10.w-10) {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
+  }
+  ::v-deep(.ja-map-leaflet .ja-map-reset-button) {
+    order: -1;
+  }
+  ::v-deep(.ja-map-leaflet .h-10.w-10:focus-visible) {
+    outline: 2px solid var(--ja-map-green-dark);
+    outline-offset: 3px;
   }
 }
 .ja-map-page.is-hospital-mode .ja-map-shell {
