@@ -35,7 +35,7 @@
       </dl>
 
       <ValidationObserver v-slot="{ invalid }" slim>
-        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
+        <form class="sanggah__form flex flex-col gap-5" @submit.prevent="onSubmit">
           <ValidationProvider
             v-slot="{ errors }"
             rules="required"
@@ -394,5 +394,42 @@ export default {
 .slide-fade-leave-to {
   transform: translateY(10px);
   opacity: 0;
+}
+</style>
+
+<!--
+  Override JDS select — disalin dari pages/imah-aing/form/index.vue (`.citizen__form`),
+  karena style itu hanya aktif di dalam form pengajuan. Tanpa ini teks opsi dropdown
+  tidak terlihat (warna default JDS) dan popover bisa terpotong.
+-->
+<style>
+.sanggah__form .jds-popover,
+.sanggah__form .jds-popover__activator,
+.sanggah__form .jds-select,
+.sanggah__form .jds-input-text {
+  width: 100% !important;
+}
+
+.sanggah__form .jds-popover__content {
+  z-index: 50 !important;
+  position: fixed !important;
+}
+
+.sanggah__form .jds-popover__content .jds-options__option-list-item {
+  height: fit-content !important;
+}
+
+.sanggah__form .jds-options__option-list-item__text {
+  color: black;
+  white-space: unset !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.sanggah__form .jds-input-text input {
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 14px !important;
+  color: #616161 !important;
 }
 </style>
