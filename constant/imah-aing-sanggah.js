@@ -41,3 +41,10 @@ export const isSanggahBuktiFormatAllowed = (file) => {
   if (type) return SANGGAH_BUKTI_ALLOWED_MIME.includes(type)
   return SANGGAH_BUKTI_ALLOWED_EXT.test(file.name || '')
 }
+
+/**
+ * Saklar tunggal stub submit sanggah. BE (endpoint, kontrak payload, status baru) belum ready:
+ * `true` → submit disimulasikan sukses tanpa memanggil BE. Ganti ke implementasi
+ * sungguhan di `imahAingSanggah.submitSanggah` lalu matikan sebelum production.
+ */
+export const SANGGAH_SUBMIT_STUB = true

@@ -163,6 +163,7 @@
               variant="primary"
               type="submit"
               :disabled="invalid || uploadBlocking"
+              :loading="statusSubmit === 'LOADING'"
               :style="[(invalid || uploadBlocking) && { backgroundColor: '#E0E0E0', color: '#FFFFFF' }]"
             >
               Ajukan Sanggahan
@@ -170,6 +171,42 @@
           </div>
         </form>
       </ValidationObserver>
+
+      <TrackingComplaintModal
+        :open="statusSubmit === 'SUCCESS'"
+        header="Berhasil!"
+        label-primary-button="Kembali ke Riwayat"
+        label-secondary-button="Tutup"
+        name-icon="check-mark-circle"
+        size="16px"
+        description="Sanggahan berhasil diajukan. Warga dapat melakukan pengecekan melalui Hotline Jabar di Nomor WhatsApp 082126030038."
+        @close="$emit('back')"
+        @click="$emit('back')"
+      />
+
+      <TrackingComplaintModal
+        :open="statusSubmit === 'ERROR'"
+        header="Gagal Mengajukan Sanggahan!"
+        label-primary-button="Coba lagi"
+        label-secondary-button="Tutup"
+        name-icon="warning"
+        size="16px"
+        description="Kami mengalami kendala dalam mengirim sanggahan Anda. Silakan coba lagi nanti atau periksa koneksi internet Anda."
+        @close="SET_STATUS_SUBMIT('NONE')"
+        @click="onSubmit"
+      />
+
+      <TrackingComplaintModal
+        :open="statusSubmit === 'SESSION_EXPIRED'"
+        header="Sesi Anda Telah Habis"
+        label-primary-button="Masuk Kembali"
+        label-secondary-button="Tutup"
+        name-icon="warning"
+        size="16px"
+        description="Maaf, sesi Anda telah habis. Untuk melanjutkan, silakan masuk kembali dan kirim ulang sanggahan Anda."
+        @close="handleSessionExpired"
+        @click="$emit('back')"
+      />
     </template>
   </div>
 </template>
@@ -227,7 +264,8 @@ export default {
       storeCategory: 'category',
       storeDescription: 'description',
       storeAgreement: 'agreement',
-      bukti: 'bukti'
+      bukti: 'bukti',
+      statusSubmit: 'statusSubmit'
     }),
     // Submit tertahan selama upload berjalan atau gagal (hapus/ulangi dulu)
     uploadBlocking() {
@@ -279,9 +317,10 @@ export default {
       'SET_CATEGORY',
       'SET_DESCRIPTION',
       'SET_AGREEMENT',
-      'SET_BUKTI'
+      'SET_BUKTI',
+      'SET_STATUS_SUBMIT'
     ]),
-    ...mapActions('imahAingSanggah', ['uploadBukti']),
+    ...mapActions('imahAingSanggah', ['uploadBukti', 'submitSanggah']),
     setBuktiError(message) {
       const provider = this.$refs.buktiProvider
       if (provider && typeof provider.setErrors === 'function') {
@@ -333,8 +372,19 @@ export default {
         // Status error sudah diset di slot oleh store
       }
     },
-    onSubmit() {
-      // Submit dihubungkan di slice S4
+    async onSubmit() {
+      // Cegah double submit (klik ganda / retry saat masih loading)
+      if (this.statusSubmit === 'LOADING' || this.uploadBlocking) return
+      try {
+        await this.submitSanggah()
+      } catch (error) {
+        // Status error sudah diset di store
+      }
+    },
+    handleSessionExpired() {
+      if (process.client) {
+        window.location.reload()
+      }
     }
   }
 }

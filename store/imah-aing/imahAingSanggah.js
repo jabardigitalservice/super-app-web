@@ -1,3 +1,6 @@
+import { SANGGAH_BUKTI_FIELD, SANGGAH_SUBMIT_STUB } from '~/constant/imah-aing-sanggah'
+import delay from '~/utils/delay'
+
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
 const getDefaultState = () => ({
@@ -8,6 +11,17 @@ const getDefaultState = () => ({
   /** Slot upload bukti: null | { file, url, progress, status: UPLOADING|SUCCESS|ERROR, errors } */
   bukti: null,
   statusSubmit: 'NONE', // NONE | LOADING | SUCCESS | ERROR | SESSION_EXPIRED
+})
+
+/**
+ * Payload sanggah (kontrak FE, belum dikonfirmasi BE). `photos` maks 1 objek `{ url, field }`.
+ */
+export const buildPayload = (state) => ({
+  complaint_id: state.complaintId,
+  category: state.category,
+  description: (state.description || '').trim(),
+  photos: state.bukti?.url ? [{ url: state.bukti.url, field: SANGGAH_BUKTI_FIELD }] : [],
+  agreement: state.agreement,
 })
 
 export const state = () => getDefaultState()
@@ -47,6 +61,32 @@ export const actions = {
       reader.onerror = reject
       reader.readAsDataURL(file)
     })
+  },
+
+  async submitSanggah({ commit, state }) {
+    if (state.statusSubmit === 'LOADING') return
+    commit('SET_STATUS_SUBMIT', 'LOADING')
+
+    try {
+      const payload = buildPayload(state)
+
+      if (!SANGGAH_SUBMIT_STUB) {
+        // TODO(plan integrasi BE): panggil endpoint sanggah + token yang benar di sini.
+        throw new Error('Submit sanggah belum terintegrasi dengan BE')
+      }
+
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[sanggah:stub] payload', payload)
+      }
+      await delay(800)
+      commit('SET_STATUS_SUBMIT', 'SUCCESS')
+    } catch (error) {
+      if (state.statusSubmit !== 'SESSION_EXPIRED') {
+        commit('SET_STATUS_SUBMIT', 'ERROR')
+      }
+      throw error
+    }
   },
 
   /** Upload bukti sanggah ke /file/upload (meniru imahAingForm.uploadDocument). */
