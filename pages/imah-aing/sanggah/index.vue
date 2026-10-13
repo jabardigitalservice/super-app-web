@@ -53,6 +53,9 @@ export default {
       return this.metaPayload?.phone || ''
     }
   },
+  beforeDestroy() {
+    this.RESET_SANGGAH()
+  },
   async mounted() {
     const { meta } = this.$route.query
     const metaStr = Array.isArray(meta) ? meta[0] : meta
@@ -84,6 +87,10 @@ export default {
   methods: {
     ...mapActions('imahAingHistory', ['fetchDetail', 'setAuthToken']),
     ...mapMutations('imahAingHistory', ['SET_META_PAYLOAD']),
+    ...mapMutations('imahAingSanggah', {
+      SET_COMPLAINT_ID: 'SET_COMPLAINT_ID',
+      RESET_SANGGAH: 'RESET_STATE'
+    }),
 
     async loadItem() {
       if (!this.complaintId) {
@@ -110,6 +117,7 @@ export default {
         }
 
         this.item = detail
+        this.SET_COMPLAINT_ID(detail.id || this.complaintId)
       } catch (error) {
         this.loadError =
           error?.response?.data?.message || error.message || 'Gagal memuat data usulan'

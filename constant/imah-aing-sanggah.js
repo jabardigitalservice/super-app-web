@@ -11,3 +11,19 @@ export const isImahAingSelfItem = (item, metaPayload = {}) => {
   if (isWarga && item.user_kk && kk && item.user_kk === kk) return true
   return false
 }
+
+/**
+ * Kategori sanggah — placeholder slug FE, enum final dari BE (belum dikonfirmasi).
+ */
+export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
+  { value: 'data-kependudukan', label: 'Data Kependudukan' },
+  { value: 'desil', label: 'Desil' },
+  { value: 'tata-ruang', label: 'Tata Ruang' },
+  { value: 'kebencanaan', label: 'Kebencanaan' },
+])
+
+export const SANGGAH_DESCRIPTION_MIN = 10
+export const SANGGAH_DESCRIPTION_MAX = 500
+
+export const SANGGAH_AGREEMENT_TEXT =
+  'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'

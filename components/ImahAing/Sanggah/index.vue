@@ -33,11 +33,113 @@
           </dd>
         </div>
       </dl>
+
+      <ValidationObserver v-slot="{ invalid }" slim>
+        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
+          <ValidationProvider
+            v-slot="{ errors }"
+            rules="required"
+            name="Kategori Sanggah"
+            tag="div"
+            class="flex flex-col gap-2"
+          >
+            <label
+              for="sanggahCategory"
+              class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+            >
+              Kategori Sanggah <span class="text-red-500">*</span>
+            </label>
+            <JdsSelect
+              id="sanggahCategory"
+              v-model="category"
+              placeholder="Pilih Kategori Sanggah"
+              :options="categoryOptions"
+              :error-message="errors[0]"
+            />
+          </ValidationProvider>
+
+          <ValidationProvider
+            v-slot="{ errors }"
+            :rules="`required|min:${descriptionMin}|max:${descriptionMax}`"
+            name="Deskripsi"
+            tag="div"
+            class="flex flex-col gap-2"
+          >
+            <label
+              for="sanggahDescription"
+              class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+            >
+              Deskripsi <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="sanggahDescription"
+              v-model="description"
+              rows="4"
+              class="w-full rounded-lg border px-3 py-2 text-sm text-gray-800 dark:bg-dark-emphasis-low dark:text-dark-emphasis-high"
+              :class="
+                errors[0]
+                  ? 'border-red-700 dark:border-red-600'
+                  : 'border-gray-300 dark:border-dark-emphasis-medium'
+              "
+              placeholder="Jelaskan alasan sanggahan"
+            />
+            <div class="flex justify-between gap-2">
+              <span class="font-lato text-[13px] text-red-700">{{ errors[0] }}</span>
+              <span class="font-lato text-[12px] text-gray-500 whitespace-nowrap dark:text-dark-text-medium">
+                {{ description.length }}/{{ descriptionMax }}
+              </span>
+            </div>
+          </ValidationProvider>
+
+          <ValidationProvider
+            v-slot="{ errors }"
+            tag="div"
+            class="flex flex-col gap-2"
+            name="Pernyataan"
+            :rules="{ required: { allowFalse: false } }"
+          >
+            <div class="flex items-start gap-2">
+              <JdsCheckbox v-model="agreement" />
+              <label class="text-gray-800 dark:text-dark-emphasis-high font-roboto text-sm">
+                {{ agreementText }}
+              </label>
+            </div>
+            <p v-if="errors[0]" class="text-xs text-red-500">{{ errors[0] }}</p>
+          </ValidationProvider>
+
+          <div class="grid grid-cols-1 gap-2 md:flex md:justify-between">
+            <Button
+              class="w-full md:w-fit !justify-center order-2 md:order-1"
+              variant="secondary"
+              type="button"
+              @click="$emit('back')"
+            >
+              Kembali
+            </Button>
+            <Button
+              class="w-full md:w-fit !justify-center order-1 md:order-2"
+              variant="primary"
+              type="submit"
+              :disabled="invalid"
+              :style="[invalid && { backgroundColor: '#E0E0E0', color: '#FFFFFF' }]"
+            >
+              Ajukan Sanggahan
+            </Button>
+          </div>
+        </form>
+      </ValidationObserver>
     </template>
   </div>
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
+import {
+  SANGGAH_AGREEMENT_TEXT,
+  SANGGAH_CATEGORY_OPTIONS,
+  SANGGAH_DESCRIPTION_MAX,
+  SANGGAH_DESCRIPTION_MIN
+} from '~/constant/imah-aing-sanggah'
 import {
   getImahAingStatus,
   getImahAingStatusKey,
@@ -64,7 +166,44 @@ export default {
       default: ''
     }
   },
+  data() {
+    return {
+      categoryOptions: SANGGAH_CATEGORY_OPTIONS,
+      descriptionMin: SANGGAH_DESCRIPTION_MIN,
+      descriptionMax: SANGGAH_DESCRIPTION_MAX,
+      agreementText: SANGGAH_AGREEMENT_TEXT
+    }
+  },
   computed: {
+    ...mapState('imahAingSanggah', {
+      storeCategory: 'category',
+      storeDescription: 'description',
+      storeAgreement: 'agreement'
+    }),
+    category: {
+      get() {
+        return this.storeCategory
+      },
+      set(val) {
+        this.SET_CATEGORY(val != null ? String(val) : '')
+      }
+    },
+    description: {
+      get() {
+        return this.storeDescription
+      },
+      set(val) {
+        this.SET_DESCRIPTION(val)
+      }
+    },
+    agreement: {
+      get() {
+        return this.storeAgreement
+      },
+      set(val) {
+        this.SET_AGREEMENT(val)
+      }
+    },
     infoRows() {
       const item = this.item || {}
       return [
@@ -80,6 +219,12 @@ export default {
         { label: 'No HP', value: item.user_phone || this.fallbackPhone },
         { label: 'Catatan', value: item.complaint_status_note, wide: true }
       ]
+    }
+  },
+  methods: {
+    ...mapMutations('imahAingSanggah', ['SET_CATEGORY', 'SET_DESCRIPTION', 'SET_AGREEMENT']),
+    onSubmit() {
+      // Submit dihubungkan di slice S4
     }
   }
 }
