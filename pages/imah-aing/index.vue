@@ -118,7 +118,7 @@
 import { mapState, mapActions, mapMutations } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
-import { isImahAingSelfItem } from '~/constant/imah-aing-sanggah'
+import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
 
 export default {
   data() {
@@ -255,7 +255,12 @@ export default {
     },
 
     canSanggah(item) {
-      return this.isSelfItem(item) && canSanggahStatus(getImahAingStatusKey(item))
+      return (
+        this.isSelfItem(item) &&
+        isImahAingOwnerItem(item, this.metaPayload) &&
+        canSanggahStatus(getImahAingStatusKey(item)) &&
+        canAppealItem(item)
+      )
     },
 
     sanggahUsulan(item) {

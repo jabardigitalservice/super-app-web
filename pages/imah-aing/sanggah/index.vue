@@ -27,7 +27,7 @@
 import { mapActions, mapMutations, mapState } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
-import { isImahAingSelfItem } from '~/constant/imah-aing-sanggah'
+import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
 import { imahAingMockData } from '~/constant/imah-aing-mock-data'
 
 export default {
@@ -89,6 +89,7 @@ export default {
     ...mapMutations('imahAingHistory', ['SET_META_PAYLOAD']),
     ...mapMutations('imahAingSanggah', {
       SET_COMPLAINT_ID: 'SET_COMPLAINT_ID',
+      SET_STATUS_NOTE: 'SET_STATUS_NOTE',
       RESET_SANGGAH: 'RESET_STATE'
     }),
 
@@ -106,11 +107,13 @@ export default {
           ? imahAingMockData.find((row) => row.id === this.complaintId) || null
           : await this.fetchDetail(this.complaintId)
 
-        // Guard: usulan tidak ada / bukan milik sendiri / status tidak eligible
+        // Guard: usulan tidak ada / bukan pemilik / status tidak eligible / can_appeal bukan true
         if (
           !detail ||
           !isImahAingSelfItem(detail, this.metaPayload) ||
-          !canSanggahStatus(getImahAingStatusKey(detail))
+          !isImahAingOwnerItem(detail, this.metaPayload) ||
+          !canSanggahStatus(getImahAingStatusKey(detail)) ||
+          !canAppealItem(detail)
         ) {
           this.backToHistory(true)
           return
@@ -118,6 +121,7 @@ export default {
 
         this.item = detail
         this.SET_COMPLAINT_ID(detail.id || this.complaintId)
+        this.SET_STATUS_NOTE(detail.complaint_status_note)
       } catch (error) {
         this.loadError =
           error?.response?.data?.message || error.message || 'Gagal memuat data usulan'

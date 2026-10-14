@@ -1,27 +1,42 @@
-import { SANGGAH_BUKTI_FIELD, SANGGAH_SUBMIT_STUB } from '~/constant/imah-aing-sanggah'
-import delay from '~/utils/delay'
+import { SANGGAH_USER_NOTES_FALLBACK, mapSanggahError } from '~/constant/imah-aing-sanggah'
 
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
 const getDefaultState = () => ({
   complaintId: '',
+  /** Catatan penolakan usulan (`complaint_status_note`) — dikirim sebagai `user_notes`, bukan input user */
+  statusNote: '',
   category: '',
   description: '',
   agreement: false,
   /** Slot upload bukti: null | { file, url, progress, status: UPLOADING|SUCCESS|ERROR, errors } */
   bukti: null,
   statusSubmit: 'NONE', // NONE | LOADING | SUCCESS | ERROR | SESSION_EXPIRED
+  errorMessage: '',
+  errorRetryable: true,
 })
 
+const isImageFile = (file) => (file?.type || '').toLowerCase().startsWith('image/')
+
 /**
- * Payload sanggah (kontrak FE, belum dikonfirmasi BE). `photos` maks 1 objek `{ url, field }`.
+ * Payload sanggah sesuai kontrak BE (`POST /aduan/appeals/complaints/{id}`).
+ * `complaint_id` ada di path, `agreement` hanya FE (tidak dikirim). `user_notes` = catatan
+ * penolakan usulan, bukan input user. Kategori/bukti tambahan BE ditambahkan di sini.
  */
-export const buildPayload = (state) => ({
-  complaint_id: state.complaintId,
+export const buildPayload = (state, userId) => ({
+  user_id: userId,
   category: state.category,
   description: (state.description || '').trim(),
-  photos: state.bukti?.url ? [{ url: state.bukti.url, field: SANGGAH_BUKTI_FIELD }] : [],
-  agreement: state.agreement,
+  user_notes: state.statusNote || SANGGAH_USER_NOTES_FALLBACK,
+  ...(state.bukti?.url && {
+    evidence_documents: [
+      {
+        ...(isImageFile(state.bukti.file) && { type: 'image' }),
+        url: state.bukti.url,
+        name: state.bukti.file?.name,
+      },
+    ],
+  }),
 })
 
 export const state = () => getDefaultState()
@@ -29,6 +44,13 @@ export const state = () => getDefaultState()
 export const mutations = {
   SET_COMPLAINT_ID(state, id) {
     state.complaintId = id
+  },
+  SET_STATUS_NOTE(state, note) {
+    state.statusNote = note || ''
+  },
+  SET_ERROR_INFO(state, { message, retryable }) {
+    state.errorMessage = message
+    state.errorRetryable = retryable
   },
   SET_CATEGORY(state, category) {
     state.category = category
@@ -63,23 +85,30 @@ export const actions = {
     })
   },
 
-  async submitSanggah({ commit, state }) {
+  async submitSanggah({ commit, state, rootState }) {
     if (state.statusSubmit === 'LOADING') return
     commit('SET_STATUS_SUBMIT', 'LOADING')
 
     try {
-      const payload = buildPayload(state)
+      const { metaPayload, authToken } = rootState.imahAingHistory
+      // user_id = user login (bukan item.user_id) — BE mencocokkan dengan pemilik aduan
+      const payload = buildPayload(state, metaPayload.id)
 
-      if (!SANGGAH_SUBMIT_STUB) {
-        // TODO(plan integrasi BE): panggil endpoint sanggah + token yang benar di sini.
-        throw new Error('Submit sanggah belum terintegrasi dengan BE')
+      try {
+        await this.$gatewayPartnerAPI.post(
+          `/aduan/appeals/complaints/${state.complaintId}`,
+          payload,
+          { headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} }
+        )
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
+        } else {
+          commit('SET_ERROR_INFO', mapSanggahError(error))
+        }
+        throw error
       }
 
-      if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.log('[sanggah:stub] payload', payload)
-      }
-      await delay(800)
       commit('SET_STATUS_SUBMIT', 'SUCCESS')
     } catch (error) {
       if (state.statusSubmit !== 'SESSION_EXPIRED') {
