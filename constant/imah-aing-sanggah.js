@@ -27,7 +27,7 @@ export const isImahAingOwnerItem = (item, metaPayload = {}) => {
 export const canAppealItem = (item) => item?.can_appeal === true
 
 /**
- * Kategori sanggah — placeholder slug FE, enum final dari BE (belum dikonfirmasi).
+ * Kategori sanggah — slug identik dengan enum BE (`aduan-service` AppealCategories).
  */
 export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
   { value: 'data-kependudukan', label: 'Data Kependudukan' },
@@ -39,7 +39,6 @@ export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
 export const SANGGAH_AGREEMENT_TEXT =
   'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'
 
-export const SANGGAH_BUKTI_FIELD = 'bukti_sanggah'
 export const SANGGAH_BUKTI_ACCEPT = 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf'
 export const SANGGAH_BUKTI_MAX_SIZE = 2 * 1024 * 1024 // 2 MB
 const SANGGAH_BUKTI_ALLOWED_MIME = ['image/jpeg', 'image/png', 'application/pdf']
@@ -53,9 +52,39 @@ export const isSanggahBuktiFormatAllowed = (file) => {
   return SANGGAH_BUKTI_ALLOWED_EXT.test(file.name || '')
 }
 
+/** Nilai `user_notes` bila usulan tidak punya catatan penolakan (BE mewajibkan `user_notes`). */
+export const SANGGAH_USER_NOTES_FALLBACK = '-'
+
+const SANGGAH_ERROR_DEFAULT =
+  'Kami mengalami kendala dalam mengirim sanggahan Anda. Silakan coba lagi nanti atau periksa koneksi internet Anda.'
+
 /**
- * Saklar tunggal stub submit sanggah. BE (endpoint, kontrak payload, status baru) belum ready:
- * `true` → submit disimulasikan sukses tanpa memanggil BE. Ganti ke implementasi
- * sungguhan di `imahAingSanggah.submitSanggah` lalu matikan sebelum production.
+ * Petakan error BE submit sanggah (400 berisi pesan teks, tanpa kode khusus) ke pesan FE.
+ * `retryable: false` → coba lagi tidak akan berhasil, arahkan kembali ke Riwayat.
  */
-export const SANGGAH_SUBMIT_STUB = true
+export const mapSanggahError = (error) => {
+  const status = error?.response?.status
+  const raw = String(error?.response?.data?.message || '').toLowerCase()
+
+  if (status === 404) {
+    return { message: 'Usulan tidak ditemukan.', retryable: false }
+  }
+  if (status === 400) {
+    if (raw.includes('sanggahan aktif')) {
+      return { message: 'Sanggahan untuk usulan ini sudah diajukan dan sedang menunggu verifikasi.', retryable: false }
+    }
+    if (raw.includes('ditolak sebelumnya')) {
+      return { message: 'Sanggahan untuk usulan ini sebelumnya sudah ditolak dan tidak dapat diajukan kembali.', retryable: false }
+    }
+    if (raw.includes('pemilik aduan')) {
+      return { message: 'Hanya pemilik usulan yang dapat mengajukan sanggahan.', retryable: false }
+    }
+    if (raw.includes('rejected_criteria')) {
+      return { message: 'Usulan ini tidak dapat disanggah.', retryable: false }
+    }
+    if (raw.includes('kategori')) {
+      return { message: 'Kategori sanggahan tidak valid. Silakan pilih ulang kategori.', retryable: true }
+    }
+  }
+  return { message: SANGGAH_ERROR_DEFAULT, retryable: true }
+}

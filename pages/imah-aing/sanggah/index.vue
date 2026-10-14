@@ -89,6 +89,7 @@ export default {
     ...mapMutations('imahAingHistory', ['SET_META_PAYLOAD']),
     ...mapMutations('imahAingSanggah', {
       SET_COMPLAINT_ID: 'SET_COMPLAINT_ID',
+      SET_STATUS_NOTE: 'SET_STATUS_NOTE',
       RESET_SANGGAH: 'RESET_STATE'
     }),
 
@@ -120,6 +121,7 @@ export default {
 
         this.item = detail
         this.SET_COMPLAINT_ID(detail.id || this.complaintId)
+        this.SET_STATUS_NOTE(detail.complaint_status_note)
       } catch (error) {
         this.loadError =
           error?.response?.data?.message || error.message || 'Gagal memuat data usulan'

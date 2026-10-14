@@ -182,13 +182,13 @@
       <TrackingComplaintModal
         :open="statusSubmit === 'ERROR'"
         header="Gagal Mengajukan Sanggahan!"
-        label-primary-button="Coba lagi"
+        :label-primary-button="errorRetryable ? 'Coba lagi' : 'Kembali ke Riwayat'"
         label-secondary-button="Tutup"
         name-icon="warning"
         size="16px"
-        description="Kami mengalami kendala dalam mengirim sanggahan Anda. Silakan coba lagi nanti atau periksa koneksi internet Anda."
+        :description="errorMessage"
         @close="SET_STATUS_SUBMIT('NONE')"
-        @click="onSubmit"
+        @click="errorRetryable ? onSubmit() : $emit('back')"
       />
 
       <TrackingComplaintModal
@@ -256,7 +256,9 @@ export default {
       storeDescription: 'description',
       storeAgreement: 'agreement',
       bukti: 'bukti',
-      statusSubmit: 'statusSubmit'
+      statusSubmit: 'statusSubmit',
+      errorMessage: 'errorMessage',
+      errorRetryable: 'errorRetryable'
     }),
     // Submit tertahan selama upload berjalan atau gagal (hapus/ulangi dulu)
     uploadBlocking() {
