@@ -13,6 +13,20 @@ export const isImahAingSelfItem = (item, metaPayload = {}) => {
 }
 
 /**
+ * True bila user login adalah pemilik aduan (`item.user_id`). BE hanya menerima sanggahan
+ * dari pemilik; pengusul/anggota KK yang bukan pemilik ditolak. Bila `user_id` aduan kosong,
+ * BE melewati cek kepemilikan sehingga di sini ikut dilewati.
+ */
+export const isImahAingOwnerItem = (item, metaPayload = {}) => {
+  if (!item) return false
+  if (!item.user_id) return true
+  return !!metaPayload?.id && item.user_id === metaPayload.id
+}
+
+/** Fail-closed: tombol/halaman sanggah hanya bila BE mengirim `can_appeal === true`. */
+export const canAppealItem = (item) => item?.can_appeal === true
+
+/**
  * Kategori sanggah — placeholder slug FE, enum final dari BE (belum dikonfirmasi).
  */
 export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
