@@ -27,7 +27,7 @@
 import { mapActions, mapMutations, mapState } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
-import { isImahAingSelfItem } from '~/constant/imah-aing-sanggah'
+import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
 import { imahAingMockData } from '~/constant/imah-aing-mock-data'
 
 export default {
@@ -106,11 +106,13 @@ export default {
           ? imahAingMockData.find((row) => row.id === this.complaintId) || null
           : await this.fetchDetail(this.complaintId)
 
-        // Guard: usulan tidak ada / bukan milik sendiri / status tidak eligible
+        // Guard: usulan tidak ada / bukan pemilik / status tidak eligible / can_appeal bukan true
         if (
           !detail ||
           !isImahAingSelfItem(detail, this.metaPayload) ||
-          !canSanggahStatus(getImahAingStatusKey(detail))
+          !isImahAingOwnerItem(detail, this.metaPayload) ||
+          !canSanggahStatus(getImahAingStatusKey(detail)) ||
+          !canAppealItem(detail)
         ) {
           this.backToHistory(true)
           return
