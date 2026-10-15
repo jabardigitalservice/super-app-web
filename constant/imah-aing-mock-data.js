@@ -66,6 +66,7 @@ export const imahAingMockData = [
     user_phone: '081234567890',
     phase: 'rejected_criteria',
     status: 'rejected_criteria',
+    can_appeal: true,
     complaint_status_note: 'Data tidak memenuhi kriteria desil penerima bantuan.',
     created_at: '2026-05-10T08:00:00.000Z',
     description: 'Mengusulkan perbaikan rumah tidak layak huni.',
@@ -75,7 +76,7 @@ export const imahAingMockData = [
     photos: [],
   },
   // mock-004..007: usulan dengan objek `appeal` (bentuk sama dengan response list/detail BE,
-  // tanpa `verified_by_name`). Tanpa `can_appeal` → tombol Ajukan Sanggah tidak muncul (fail-closed).
+  // tanpa `verified_by_name`). `can_appeal: false` seperti BE (sudah pernah/sedang disanggah).
   {
     id: 'mock-004',
     user_id: 'user-warga-001',
@@ -85,6 +86,7 @@ export const imahAingMockData = [
     phase: 'rejected_criteria',
     status: 'rejected_criteria',
     complaint_status_note: 'Data tidak memenuhi kriteria desil penerima bantuan.',
+    can_appeal: false,
     created_at: '2026-05-09T08:00:00.000Z',
     city_name: 'Kabupaten Kuningan',
     district_name: 'Cilimus',
@@ -110,6 +112,7 @@ export const imahAingMockData = [
     phase: 'rejected_criteria',
     status: 'rejected_criteria',
     complaint_status_note: 'Data tidak memenuhi kriteria desil penerima bantuan.',
+    can_appeal: false,
     created_at: '2026-05-08T08:00:00.000Z',
     city_name: 'Kabupaten Kuningan',
     district_name: 'Cilimus',
@@ -135,6 +138,7 @@ export const imahAingMockData = [
     user_name: 'Budi Santoso',
     phase: 'verified',
     status: 'verified',
+    can_appeal: false,
     created_at: '2026-05-07T08:00:00.000Z',
     city_name: 'Kabupaten Kuningan',
     district_name: 'Cilimus',
@@ -159,6 +163,7 @@ export const imahAingMockData = [
     user_name: 'Budi Santoso',
     phase: 'unverified',
     status: 'unverified',
+    can_appeal: false,
     created_at: '2026-05-06T08:00:00.000Z',
     city_name: 'Kabupaten Kuningan',
     district_name: 'Cilimus',
