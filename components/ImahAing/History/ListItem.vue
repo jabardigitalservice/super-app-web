@@ -30,12 +30,19 @@
       <div v-if="proposerLabel" class="text-xs text-gray-400 mt-0.5">
         Pengusul: {{ proposerLabel }}
       </div>
-      <div class="mt-1">
+      <div class="mt-1 flex flex-wrap gap-1">
         <span
           class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
           :style="{ color: statusStyle.hex, backgroundColor: statusStyle.hex + '1A' }"
         >
           {{ statusStyle.name }}
+        </span>
+        <span
+          v-if="appealInfo"
+          class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
+          :style="{ color: appealInfo.hex, backgroundColor: appealInfo.hex + '1A' }"
+        >
+          {{ appealInfo.label }}
         </span>
       </div>
     </div>
@@ -83,7 +90,7 @@
 <script>
 import { formatDate } from '~/utils'
 import { getImahAingStatus, getImahAingStatusKey, getImahAingDisplayId, canSanggahStatus } from '~/constant/imah-aing-status'
-import { SANGGAH_INFO_TEXT } from '~/constant/imah-aing-sanggah'
+import { SANGGAH_INFO_TEXT, getSanggahAppealInfo } from '~/constant/imah-aing-sanggah'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -127,6 +134,10 @@ export default {
     },
     canSanggahStatus() {
       return canSanggahStatus(this.statusKey)
+    },
+    /** Chip status sanggah — hanya untuk usulan milik sendiri (appeal memuat data pribadi) */
+    appealInfo() {
+      return this.isSelfItem ? getSanggahAppealInfo(this.item.appeal) : null
     },
     isNonEditable() {
       return !['unverified', 'rejected_appeal'].includes(this.statusKey)
