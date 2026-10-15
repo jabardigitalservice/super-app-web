@@ -58,6 +58,73 @@
             />
           </ValidationProvider>
 
+          <!-- Field dinamis: Data Kependudukan → jenis data + nomor koreksi -->
+          <template v-if="showIdFields">
+            <ValidationProvider
+              v-slot="{ errors }"
+              rules="required"
+              name="Jenis Data"
+              tag="div"
+              class="flex flex-col gap-2"
+            >
+              <label
+                for="sanggahIdType"
+                class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high"
+              >
+                Jenis Data yang Dikoreksi <span class="text-red-500">*</span>
+              </label>
+              <JdsSelect
+                id="sanggahIdType"
+                v-model="idType"
+                placeholder="Pilih NIK atau No KK"
+                :options="idTypeOptions"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+
+            <ValidationProvider
+              v-if="idType"
+              v-slot="{ errors }"
+              :rules="`required|numeric|max:${idMaxLength}`"
+              :name="idTypeLabel"
+              tag="div"
+              class="flex flex-col gap-2"
+            >
+              <BaseInputText
+                v-model="idNumber"
+                type="text"
+                :label="`${idTypeLabel} yang Benar`"
+                required
+                :maxlength="idMaxLength"
+                :placeholder="`Masukkan ${idTypeLabel} yang benar`"
+                autocomplete="off"
+                :error="!!errors[0]"
+                :error-message="errors[0]"
+              />
+            </ValidationProvider>
+          </template>
+
+          <!-- Field dinamis: Desil → nilai desil yang benar -->
+          <ValidationProvider
+            v-if="showDesilField"
+            v-slot="{ errors }"
+            rules="required|numeric"
+            name="Desil"
+            tag="div"
+            class="flex flex-col gap-2"
+          >
+            <BaseInputText
+              v-model="desil"
+              type="text"
+              label="Desil yang Benar"
+              required
+              placeholder="Masukkan desil yang benar"
+              autocomplete="off"
+              :error="!!errors[0]"
+              :error-message="errors[0]"
+            />
+          </ValidationProvider>
+
           <ValidationProvider
             v-slot="{ errors }"
             rules="required"
@@ -214,7 +281,9 @@ import {
   SANGGAH_BUKTI_MAX_SIZE,
   isSanggahBuktiFormatAllowed,
   SANGGAH_AGREEMENT_TEXT,
-  SANGGAH_CATEGORY_OPTIONS
+  SANGGAH_CATEGORY_OPTIONS,
+  SANGGAH_ID_TYPE_OPTIONS,
+  SANGGAH_ID_MAX_LENGTH
 } from '~/constant/imah-aing-sanggah'
 import {
   getImahAingStatus,
@@ -245,6 +314,8 @@ export default {
   data() {
     return {
       categoryOptions: SANGGAH_CATEGORY_OPTIONS,
+      idTypeOptions: SANGGAH_ID_TYPE_OPTIONS,
+      idMaxLength: SANGGAH_ID_MAX_LENGTH,
       agreementText: SANGGAH_AGREEMENT_TEXT,
       buktiAccept: SANGGAH_BUKTI_ACCEPT,
       buktiMaxSize: SANGGAH_BUKTI_MAX_SIZE
@@ -253,6 +324,9 @@ export default {
   computed: {
     ...mapState('imahAingSanggah', {
       storeCategory: 'category',
+      storeIdType: 'idType',
+      storeIdNumber: 'idNumber',
+      storeDesil: 'desil',
       storeDescription: 'description',
       storeAgreement: 'agreement',
       bukti: 'bukti',
@@ -270,6 +344,40 @@ export default {
       },
       set(val) {
         this.SET_CATEGORY(val != null ? String(val) : '')
+      }
+    },
+    showIdFields() {
+      return this.category === 'data-kependudukan'
+    },
+    showDesilField() {
+      return this.category === 'desil'
+    },
+    idTypeLabel() {
+      const option = this.idTypeOptions.find((opt) => opt.value === this.idType)
+      return option ? option.label : ''
+    },
+    idType: {
+      get() {
+        return this.storeIdType
+      },
+      set(val) {
+        this.SET_ID_TYPE(val != null ? String(val) : '')
+      }
+    },
+    idNumber: {
+      get() {
+        return this.storeIdNumber
+      },
+      set(val) {
+        this.SET_ID_NUMBER(val)
+      }
+    },
+    desil: {
+      get() {
+        return this.storeDesil
+      },
+      set(val) {
+        this.SET_DESIL(val)
       }
     },
     description: {
@@ -308,6 +416,9 @@ export default {
   methods: {
     ...mapMutations('imahAingSanggah', [
       'SET_CATEGORY',
+      'SET_ID_TYPE',
+      'SET_ID_NUMBER',
+      'SET_DESIL',
       'SET_DESCRIPTION',
       'SET_AGREEMENT',
       'SET_BUKTI',

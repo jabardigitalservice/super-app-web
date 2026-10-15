@@ -1,4 +1,8 @@
-import { SANGGAH_USER_NOTES_FALLBACK, mapSanggahError } from '~/constant/imah-aing-sanggah'
+import {
+  SANGGAH_EXTRA_FIELDS_SUBMIT,
+  SANGGAH_USER_NOTES_FALLBACK,
+  mapSanggahError,
+} from '~/constant/imah-aing-sanggah'
 
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
@@ -7,6 +11,10 @@ const getDefaultState = () => ({
   /** Catatan penolakan usulan (`complaint_status_note`) — dikirim sebagai `user_notes`, bukan input user */
   statusNote: '',
   category: '',
+  /** Field dinamis per kategori: data-kependudukan → idType + idNumber, desil → desil */
+  idType: '', // 'nik' | 'kk'
+  idNumber: '',
+  desil: '',
   description: '',
   agreement: false,
   /** Slot upload bukti: null | { file, url, progress, status: UPLOADING|SUCCESS|ERROR, errors } */
@@ -19,6 +27,16 @@ const getDefaultState = () => ({
 const isImageFile = (file) => (file?.type || '').toLowerCase().startsWith('image/')
 
 /**
+ * Field tambahan per kategori (NIK/KK koreksi, Desil). Belum dikirim: kontrak BE belum ada
+ * (flag `SANGGAH_EXTRA_FIELDS_SUBMIT`). Nama field BE jangan ditebak.
+ */
+const buildExtraFields = () => {
+  if (!SANGGAH_EXTRA_FIELDS_SUBMIT) return {}
+  // TODO(B5): petakan `state.idType`/`state.idNumber`/`state.desil` ke field BE setelah kontrak final
+  return {}
+}
+
+/**
  * Payload sanggah sesuai kontrak BE (`POST /aduan/appeals/complaints/{id}`).
  * `complaint_id` ada di path, `agreement` hanya FE (tidak dikirim). `user_notes` = catatan
  * penolakan usulan, bukan input user. Kategori/bukti tambahan BE ditambahkan di sini.
@@ -28,6 +46,7 @@ export const buildPayload = (state, userId) => ({
   category: state.category,
   description: (state.description || '').trim(),
   user_notes: state.statusNote || SANGGAH_USER_NOTES_FALLBACK,
+  ...buildExtraFields(state),
   ...(state.bukti?.url && {
     evidence_documents: [
       {
@@ -53,7 +72,23 @@ export const mutations = {
     state.errorRetryable = retryable
   },
   SET_CATEGORY(state, category) {
+    // Ganti kategori → buang isian field dinamis kategori sebelumnya
+    if (state.category !== category) {
+      state.idType = ''
+      state.idNumber = ''
+      state.desil = ''
+    }
     state.category = category
+  },
+  SET_ID_TYPE(state, idType) {
+    state.idType = idType
+    state.idNumber = ''
+  },
+  SET_ID_NUMBER(state, idNumber) {
+    state.idNumber = idNumber
+  },
+  SET_DESIL(state, desil) {
+    state.desil = desil
   },
   SET_DESCRIPTION(state, description) {
     state.description = description
