@@ -36,6 +36,10 @@ export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
   { value: 'kebencanaan', label: 'Kebencanaan' },
 ])
 
+/** Copy info sanggah di Riwayat (tooltip desktop + snackbar HP) untuk usulan berstatus Ditolak. */
+export const SANGGAH_INFO_TEXT =
+  'Sanggahan untuk usulan yang Ditolak hanya dapat diajukan 1 (satu) kali oleh Pengusul, dan keputusan akhir sepenuhnya menjadi kewenangan Tim Imah Aing serta bersifat mutlak.'
+
 export const SANGGAH_AGREEMENT_TEXT =
   'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'
 

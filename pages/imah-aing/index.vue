@@ -88,7 +88,7 @@
       v-if="showInfoSnackbar"
       class="fixed bottom-20 left-4 right-4 z-20 md:max-w-[650px] md:mx-auto md:left-1/2 md:-translate-x-1/2 md:right-auto md:w-[calc(650px-2rem)] bg-gray-700 text-white text-sm rounded-lg px-4 py-3 shadow-lg"
     >
-      Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi.
+      {{ infoSnackbarText }}
     </div>
 
     <!-- Cancel Confirmation Dialog -->
@@ -120,6 +120,9 @@ import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
 import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
 
+const EDIT_INFO_TEXT =
+  'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi.'
+
 export default {
   data() {
     return {
@@ -127,6 +130,8 @@ export default {
       previewItem: null,
       showCancelDialog: false,
       showInfoSnackbar: false,
+      infoSnackbarText: EDIT_INFO_TEXT,
+      infoSnackbarTimer: null,
       decodedMeta: null
     }
   },
@@ -283,9 +288,12 @@ export default {
       })
     },
 
-    showEditInfo() {
+    // `text` dari ListItem: copy sanggah untuk usulan Ditolak, kosong → teks batasan Edit
+    showEditInfo(text) {
+      this.infoSnackbarText = text || EDIT_INFO_TEXT
       this.showInfoSnackbar = true
-      setTimeout(() => { this.showInfoSnackbar = false }, 4000)
+      clearTimeout(this.infoSnackbarTimer)
+      this.infoSnackbarTimer = setTimeout(() => { this.showInfoSnackbar = false }, text ? 6000 : 4000)
     },
 
     async handleCancel() {
