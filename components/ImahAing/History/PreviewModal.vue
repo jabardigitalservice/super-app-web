@@ -40,6 +40,33 @@
           </div>
         </div>
 
+        <!-- Sanggahan (hanya usulan milik sendiri yang sudah pernah disanggah) -->
+        <div
+          v-if="appealInfo"
+          class="p-3 border border-gray-200 rounded-lg space-y-2 dark:border-dark-emphasis-medium"
+        >
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="text-xs font-bold text-gray-500 uppercase">Sanggahan</p>
+            <span
+              class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
+              :style="{ color: appealInfo.hex, backgroundColor: appealInfo.hex + '1A' }"
+            >
+              {{ appealInfo.label }}
+            </span>
+          </div>
+          <p class="text-sm text-gray-900 dark:text-dark-emphasis-high">
+            {{ appealInfo.description }}
+          </p>
+          <div v-if="appealInfo.notes" class="space-y-0.5">
+            <span class="text-xs text-gray-500 uppercase font-bold">Catatan Verifikator</span>
+            <p class="text-sm text-gray-900 dark:text-dark-emphasis-high">{{ appealInfo.notes }}</p>
+          </div>
+          <div v-if="appealVerifiedAt" class="space-y-0.5">
+            <span class="text-xs text-gray-500 uppercase font-bold">Tanggal Verifikasi</span>
+            <p class="text-sm text-gray-900 dark:text-dark-emphasis-high">{{ appealVerifiedAt }}</p>
+          </div>
+        </div>
+
         <!-- Foto Rumah (jika ada) -->
         <div v-if="photos.length" class="flex gap-2 overflow-x-auto pb-2">
           <img
@@ -157,6 +184,7 @@
 <script>
 import { formatDate } from '~/utils'
 import { getImahAingStatus, getImahAingStatusKey, getImahAingStepFlow, getImahAingDisplayId } from '~/constant/imah-aing-status'
+import { getSanggahAppealInfo } from '~/constant/imah-aing-sanggah'
 
 export default {
   name: 'ImahAingHistoryPreviewModal',
@@ -216,6 +244,14 @@ export default {
     rejectionNote() {
       if (!this.isRejected) return ''
       return this.resolvedItem?.complaint_status_note || this.item?.complaint_status_note || ''
+    },
+    /** Info sanggah dari `appeal` (list/detail). Berisi data pribadi → hanya untuk usulan milik sendiri. */
+    appealInfo() {
+      return this.isSelfItem ? getSanggahAppealInfo(this.resolvedItem?.appeal) : null
+    },
+    appealVerifiedAt() {
+      const at = this.appealInfo?.verifiedAt
+      return at ? formatDate(at, 'dd MMMM yyyy') : ''
     },
     stepFlowData() {
       return getImahAingStepFlow(this.statusKey)
