@@ -7,6 +7,10 @@ const getDefaultState = () => ({
   /** Catatan penolakan usulan (`complaint_status_note`) — dikirim sebagai `user_notes`, bukan input user */
   statusNote: '',
   category: '',
+  /** Field dinamis per kategori: data-kependudukan → idType + idNumber, desil → desil */
+  idType: '', // 'nik' | 'no_kk'
+  idNumber: '',
+  desil: '',
   description: '',
   agreement: false,
   /** Slot upload bukti: null | { file, url, progress, status: UPLOADING|SUCCESS|ERROR, errors } */
@@ -19,6 +23,22 @@ const getDefaultState = () => ({
 const isImageFile = (file) => (file?.type || '').toLowerCase().startsWith('image/')
 
 /**
+ * Field tambahan per kategori. Di luar kategori yang sesuai, nilainya `null` (default BE):
+ * - data-kependudukan → `identity_number` (NIK/No KK koreksi, string) + `flagging` (`nik` | `no_kk`)
+ * - desil → `desil` (number)
+ */
+const buildExtraFields = (state) => {
+  const isIdentity = state.category === 'data-kependudukan'
+  const isDesil = state.category === 'desil'
+  const desil = Number(state.desil)
+  return {
+    identity_number: isIdentity && state.idNumber ? String(state.idNumber) : null,
+    flagging: isIdentity && state.idType ? state.idType : null,
+    desil: isDesil && state.desil !== '' && Number.isFinite(desil) ? desil : null,
+  }
+}
+
+/**
  * Payload sanggah sesuai kontrak BE (`POST /aduan/appeals/complaints/{id}`).
  * `complaint_id` ada di path, `agreement` hanya FE (tidak dikirim). `user_notes` = catatan
  * penolakan usulan, bukan input user. Kategori/bukti tambahan BE ditambahkan di sini.
@@ -28,6 +48,7 @@ export const buildPayload = (state, userId) => ({
   category: state.category,
   description: (state.description || '').trim(),
   user_notes: state.statusNote || SANGGAH_USER_NOTES_FALLBACK,
+  ...buildExtraFields(state),
   ...(state.bukti?.url && {
     evidence_documents: [
       {
@@ -53,7 +74,23 @@ export const mutations = {
     state.errorRetryable = retryable
   },
   SET_CATEGORY(state, category) {
+    // Ganti kategori → buang isian field dinamis kategori sebelumnya
+    if (state.category !== category) {
+      state.idType = ''
+      state.idNumber = ''
+      state.desil = ''
+    }
     state.category = category
+  },
+  SET_ID_TYPE(state, idType) {
+    state.idType = idType
+    state.idNumber = ''
+  },
+  SET_ID_NUMBER(state, idNumber) {
+    state.idNumber = idNumber
+  },
+  SET_DESIL(state, desil) {
+    state.desil = desil
   },
   SET_DESCRIPTION(state, description) {
     state.description = description

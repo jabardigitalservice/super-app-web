@@ -36,6 +36,62 @@ export const SANGGAH_CATEGORY_OPTIONS = Object.freeze([
   { value: 'kebencanaan', label: 'Kebencanaan' },
 ])
 
+/** Copy info sanggah di Riwayat (tooltip desktop + snackbar HP) untuk usulan berstatus Ditolak. */
+export const SANGGAH_INFO_TEXT =
+  'Sanggahan untuk usulan yang Ditolak hanya dapat diajukan 1 (satu) kali oleh Pengusul, dan keputusan akhir sepenuhnya menjadi kewenangan Tim Imah Aing serta bersifat mutlak.'
+
+/**
+ * Status sanggah (`appeal.status` dari BE) → label chip, warna, dan teks detail.
+ * Status usulan terpisah: `rejected` tetap Ditolak, `verified` → usulan Lolos Verifikasi,
+ * `postponed` → usulan kembali Menunggu Verifikasi (bisa di-Edit Ajuan).
+ */
+export const SANGGAH_APPEAL_STATUS = Object.freeze({
+  unverified: {
+    label: 'Sanggah: Menunggu Verifikasi',
+    hex: '#FF7500',
+    description: 'Sanggahan Anda sedang diverifikasi oleh Tim Imah Aing.',
+  },
+  rejected: {
+    label: 'Sanggah: Ditolak',
+    hex: '#DD5E5E',
+    description: 'Sanggahan Anda ditolak.',
+  },
+  verified: {
+    label: 'Sanggah: Diterima',
+    hex: '#166534',
+    description: 'Sanggahan Anda diterima dan usulan dilanjutkan ke tahap berikutnya.',
+  },
+  postponed: {
+    label: 'Sanggah: Ditunda',
+    hex: '#1E88E5',
+    description: 'Sanggahan ditunda. Perbarui data usulan melalui Edit Ajuan.',
+  },
+})
+
+const SANGGAH_APPEAL_STATUS_FALLBACK = Object.freeze({
+  label: 'Sanggah: Diajukan',
+  hex: '#6B7280',
+  description: 'Sanggahan telah diajukan.',
+})
+
+/**
+ * Info tampilan sanggah dari objek `appeal` (list/detail usulan). `null` bila belum pernah sanggah.
+ * Sengaja tidak mengembalikan `verified_by`/`verified_by_name` (belum ditampilkan ke warga)
+ * maupun `user_notes` (makna di BE belum jelas).
+ */
+export const getSanggahAppealInfo = (appeal) => {
+  if (!appeal || typeof appeal !== 'object') return null
+  const known = SANGGAH_APPEAL_STATUS[appeal.status] || SANGGAH_APPEAL_STATUS_FALLBACK
+  return {
+    key: appeal.status || '',
+    label: known.label,
+    hex: known.hex,
+    description: known.description,
+    notes: appeal.verification_notes || '',
+    verifiedAt: appeal.verification_at || '',
+  }
+}
+
 export const SANGGAH_AGREEMENT_TEXT =
   'Saya bersedia dibatalkan jika data yang saya masukkan tidak benar'
 
@@ -51,6 +107,15 @@ export const isSanggahBuktiFormatAllowed = (file) => {
   if (type) return SANGGAH_BUKTI_ALLOWED_MIME.includes(type)
   return SANGGAH_BUKTI_ALLOWED_EXT.test(file.name || '')
 }
+
+/** Jenis data koreksi pada kategori Data Kependudukan. `value` = nilai `flagging` di BE. */
+export const SANGGAH_ID_TYPE_OPTIONS = Object.freeze([
+  { value: 'nik', label: 'NIK' },
+  { value: 'no_kk', label: 'No KK' },
+])
+
+/** Panjang maksimal NIK/KK koreksi. */
+export const SANGGAH_ID_MAX_LENGTH = 16
 
 /** Nilai `user_notes` bila usulan tidak punya catatan penolakan (BE mewajibkan `user_notes`). */
 export const SANGGAH_USER_NOTES_FALLBACK = '-'

@@ -30,12 +30,19 @@
       <div v-if="proposerLabel" class="text-xs text-gray-400 mt-0.5">
         Pengusul: {{ proposerLabel }}
       </div>
-      <div class="mt-1">
+      <div class="mt-1 flex flex-wrap gap-1">
         <span
           class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
           :style="{ color: statusStyle.hex, backgroundColor: statusStyle.hex + '1A' }"
         >
           {{ statusStyle.name }}
+        </span>
+        <span
+          v-if="appealInfo"
+          class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded"
+          :style="{ color: appealInfo.hex, backgroundColor: appealInfo.hex + '1A' }"
+        >
+          {{ appealInfo.label }}
         </span>
       </div>
     </div>
@@ -64,7 +71,7 @@
           type="button"
           class="w-5 h-5 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
           :title="editTooltipText"
-          @click.stop="$emit('show-info')"
+          @click.stop="$emit('show-info', canSanggahStatus ? editTooltipText : '')"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
@@ -83,6 +90,7 @@
 <script>
 import { formatDate } from '~/utils'
 import { getImahAingStatus, getImahAingStatusKey, getImahAingDisplayId, canSanggahStatus } from '~/constant/imah-aing-status'
+import { SANGGAH_INFO_TEXT, getSanggahAppealInfo } from '~/constant/imah-aing-sanggah'
 
 export default {
   name: 'ImahAingHistoryListItem',
@@ -127,6 +135,10 @@ export default {
     canSanggahStatus() {
       return canSanggahStatus(this.statusKey)
     },
+    /** Chip status sanggah — hanya untuk usulan milik sendiri (appeal memuat data pribadi) */
+    appealInfo() {
+      return this.isSelfItem ? getSanggahAppealInfo(this.item.appeal) : null
+    },
     isNonEditable() {
       return !['unverified', 'rejected_appeal'].includes(this.statusKey)
     },
@@ -152,7 +164,7 @@ export default {
     },
     editTooltipText() {
       if (this.canSanggahStatus) {
-        return 'Usulan ditolak. Pengusul dapat mengajukan sanggahan melalui tombol Ajukan Sanggah.'
+        return SANGGAH_INFO_TEXT
       }
       return 'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi'
     }
