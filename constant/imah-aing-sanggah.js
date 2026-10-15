@@ -108,16 +108,10 @@ export const isSanggahBuktiFormatAllowed = (file) => {
   return SANGGAH_BUKTI_ALLOWED_EXT.test(file.name || '')
 }
 
-/**
- * Kirim field dinamis form sanggah (NIK/KK koreksi, Desil) ke BE. `false` sampai kontrak BE final
- * (plan 2026-10-15 B5). Jangan tag release produksi selagi `false`: isian warga tidak terkirim.
- */
-export const SANGGAH_EXTRA_FIELDS_SUBMIT = false
-
-/** Jenis data koreksi pada kategori Data Kependudukan. */
+/** Jenis data koreksi pada kategori Data Kependudukan. `value` = nilai `flagging` di BE. */
 export const SANGGAH_ID_TYPE_OPTIONS = Object.freeze([
   { value: 'nik', label: 'NIK' },
-  { value: 'kk', label: 'No KK' },
+  { value: 'no_kk', label: 'No KK' },
 ])
 
 /** Panjang maksimal NIK/KK koreksi. */

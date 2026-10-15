@@ -1,8 +1,4 @@
-import {
-  SANGGAH_EXTRA_FIELDS_SUBMIT,
-  SANGGAH_USER_NOTES_FALLBACK,
-  mapSanggahError,
-} from '~/constant/imah-aing-sanggah'
+import { SANGGAH_USER_NOTES_FALLBACK, mapSanggahError } from '~/constant/imah-aing-sanggah'
 
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
@@ -12,7 +8,7 @@ const getDefaultState = () => ({
   statusNote: '',
   category: '',
   /** Field dinamis per kategori: data-kependudukan → idType + idNumber, desil → desil */
-  idType: '', // 'nik' | 'kk'
+  idType: '', // 'nik' | 'no_kk'
   idNumber: '',
   desil: '',
   description: '',
@@ -27,13 +23,19 @@ const getDefaultState = () => ({
 const isImageFile = (file) => (file?.type || '').toLowerCase().startsWith('image/')
 
 /**
- * Field tambahan per kategori (NIK/KK koreksi, Desil). Belum dikirim: kontrak BE belum ada
- * (flag `SANGGAH_EXTRA_FIELDS_SUBMIT`). Nama field BE jangan ditebak.
+ * Field tambahan per kategori. Di luar kategori yang sesuai, nilainya `null` (default BE):
+ * - data-kependudukan → `identity_number` (NIK/No KK koreksi, string) + `flagging` (`nik` | `no_kk`)
+ * - desil → `desil` (number)
  */
-const buildExtraFields = () => {
-  if (!SANGGAH_EXTRA_FIELDS_SUBMIT) return {}
-  // TODO(B5): petakan `state.idType`/`state.idNumber`/`state.desil` ke field BE setelah kontrak final
-  return {}
+const buildExtraFields = (state) => {
+  const isIdentity = state.category === 'data-kependudukan'
+  const isDesil = state.category === 'desil'
+  const desil = Number(state.desil)
+  return {
+    identity_number: isIdentity && state.idNumber ? String(state.idNumber) : null,
+    flagging: isIdentity && state.idType ? state.idType : null,
+    desil: isDesil && state.desil !== '' && Number.isFinite(desil) ? desil : null,
+  }
 }
 
 /**
