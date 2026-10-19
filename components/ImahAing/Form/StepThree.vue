@@ -169,7 +169,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { convertHeicToJpg, isLikelyHeic } from '~/utils/heic'
-import { mapUploadError } from '~/constant/imah-aing-upload'
+import { mapUploadError } from '~/utils/upload'
 
 export default {
   data() {

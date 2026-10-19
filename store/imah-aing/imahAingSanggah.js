@@ -1,5 +1,6 @@
 import { SANGGAH_USER_NOTES_FALLBACK, mapSanggahError } from '~/constant/imah-aing-sanggah'
-import { IMAH_AING_UPLOAD_TIMEOUT_MS, mapUploadError } from '~/constant/imah-aing-upload'
+import { UPLOAD_TIMEOUT_MS } from '~/constant/upload'
+import { mapUploadError } from '~/utils/upload'
 
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
@@ -176,7 +177,7 @@ export const actions = {
           mimeType: file.type,
           roles: ['admin', 'rw'],
           data: base64Data,
-        }, { timeout: IMAH_AING_UPLOAD_TIMEOUT_MS })
+        }, { timeout: UPLOAD_TIMEOUT_MS })
       } catch (error) {
         if (isUnauthorizedError(error)) {
           commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
