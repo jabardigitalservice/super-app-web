@@ -132,7 +132,7 @@ export const actions = {
       const payload = buildPayload(state, metaPayload.id)
 
       try {
-        await this.$gatewayPartnerAPI.post(
+        await this.$gatewayPartnerMainAPI.post(
           `/aduan/appeals/complaints/${state.complaintId}`,
           payload,
           { headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} }
