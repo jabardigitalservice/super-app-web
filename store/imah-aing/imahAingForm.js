@@ -1,4 +1,5 @@
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
+import { IMAH_AING_UPLOAD_TIMEOUT_MS, mapUploadError } from '~/constant/imah-aing-upload'
 
 /**
  * Pusat peta default / fallback Geolocation
@@ -744,7 +745,9 @@ export default {
 
         let response
         try {
-          response = await this.$gatewayPartnerAPI.post('/file/upload', formData)
+          response = await this.$gatewayPartnerAPI.post('/file/upload', formData, {
+            timeout: IMAH_AING_UPLOAD_TIMEOUT_MS,
+          })
         } catch (error) {
           if (isUnauthorizedError(error)) {
             commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
@@ -758,8 +761,7 @@ export default {
 
         return fileUrl
       } catch (error) {
-        const errMsg = error?.response?.data?.message || error.message || 'upload_failed'
-        setSlot({ file, url: '', progress: 0, status: 'ERROR', errors: [errMsg] })
+        setSlot({ file, url: '', progress: 0, status: 'ERROR', errors: [mapUploadError(error)] })
         throw error
       }
     },
