@@ -169,6 +169,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { convertHeicToJpg, isLikelyHeic } from '~/utils/heic'
+import { mapUploadError } from '~/utils/upload'
 
 export default {
   data() {
@@ -301,7 +302,7 @@ export default {
       try {
         await this.uploadDocument({ key, file: selectedFile })
       } catch (err) {
-        const errPayload = { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] }
+        const errPayload = { ...payload, status: 'ERROR', errors: [mapUploadError(err)] }
         this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: errPayload })
       }
     },
@@ -328,7 +329,7 @@ export default {
       try {
         await this.uploadDocument({ key, file: slot.file })
       } catch (err) {
-        const errPayload = { ...payload, status: 'ERROR', errors: [err.message || 'upload_failed'] }
+        const errPayload = { ...payload, status: 'ERROR', errors: [mapUploadError(err)] }
         this.$store.commit('imahAingForm/SET_DOKUMEN_SLOT', { key, payload: errPayload })
       }
     },

@@ -1,4 +1,6 @@
 import { SANGGAH_USER_NOTES_FALLBACK, mapSanggahError } from '~/constant/imah-aing-sanggah'
+import { UPLOAD_TIMEOUT_MS } from '~/constant/upload'
+import { mapUploadError } from '~/utils/upload'
 
 const isUnauthorizedError = (error) => error?.response?.status === 401
 
@@ -175,7 +177,7 @@ export const actions = {
           mimeType: file.type,
           roles: ['admin', 'rw'],
           data: base64Data,
-        })
+        }, { timeout: UPLOAD_TIMEOUT_MS })
       } catch (error) {
         if (isUnauthorizedError(error)) {
           commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
@@ -187,8 +189,7 @@ export const actions = {
       setSlot({ file, url: fileUrl, progress: 100, status: 'SUCCESS', errors: [] })
       return fileUrl
     } catch (error) {
-      const errMsg = error?.response?.data?.message || error.message || 'upload_failed'
-      setSlot({ file, url: '', progress: 0, status: 'ERROR', errors: [errMsg] })
+      setSlot({ file, url: '', progress: 0, status: 'ERROR', errors: [mapUploadError(error)] })
       throw error
     }
   },
