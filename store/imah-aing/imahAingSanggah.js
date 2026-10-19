@@ -132,7 +132,6 @@ export const actions = {
       const payload = buildPayload(state, metaPayload.id)
 
       try {
-        // Route appeals hanya terdaftar di gateway main (BASE_URL_MAIN), bukan gateway partner.
         await this.$gatewayPartnerMainAPI.post(
           `/aduan/appeals/complaints/${state.complaintId}`,
           payload,
