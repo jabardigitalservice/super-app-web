@@ -129,7 +129,9 @@ export const actions = {
     commit('SET_STATUS_SUBMIT', 'LOADING')
 
     try {
-      const { metaPayload, authToken } = rootState.imahAingHistory
+      const { metaPayload } = rootState.imahAingHistory
+      // BASE_URL_MAIN hanya menerima token user dari query `meta`, bukan Keycloak client_credentials
+      const metaToken = metaPayload?.token || ''
       // user_id = user login (bukan item.user_id) — BE mencocokkan dengan pemilik aduan
       const payload = buildPayload(state, metaPayload.id)
 
@@ -137,7 +139,7 @@ export const actions = {
         await this.$gatewayPartnerMainAPI.post(
           `/aduan/appeals/complaints/${state.complaintId}`,
           payload,
-          { headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} }
+          { headers: metaToken ? { Authorization: `Bearer ${metaToken}` } : {} }
         )
       } catch (error) {
         if (isUnauthorizedError(error)) {
