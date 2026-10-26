@@ -158,7 +158,7 @@
               Bukti Sanggah <span class="text-red-500">*</span>
             </span>
             <p class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
-              Wajib diunggah. Ukuran maksimal file 2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
+              Ukuran maksimal file 2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
             </p>
             <ValidationProvider
               ref="buktiProvider"
