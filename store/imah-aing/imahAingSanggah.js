@@ -126,6 +126,12 @@ export const actions = {
 
   async submitSanggah({ commit, state, rootState }) {
     if (state.statusSubmit === 'LOADING') return
+    // Bukti wajib; tombol submit sudah diblok di UI, ini pengaman tambahan
+    if (!state.bukti?.url) {
+      commit('SET_ERROR_INFO', { message: 'Bukti sanggah wajib diunggah.', retryable: false })
+      commit('SET_STATUS_SUBMIT', 'ERROR')
+      throw new Error('Bukti sanggah wajib diunggah.')
+    }
     commit('SET_STATUS_SUBMIT', 'LOADING')
 
     try {

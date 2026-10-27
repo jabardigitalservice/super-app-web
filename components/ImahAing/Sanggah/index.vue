@@ -155,7 +155,7 @@
 
           <div class="flex flex-col gap-2">
             <span class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high">
-              Bukti Sanggah
+              Bukti Sanggah <span class="text-red-500">*</span>
             </span>
             <p class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
               Ukuran maksimal file 2 MB. Format yang didukung adalah .jpg, .jpeg, .png, dan .pdf.
@@ -334,9 +334,9 @@ export default {
       errorMessage: 'errorMessage',
       errorRetryable: 'errorRetryable'
     }),
-    // Submit tertahan selama upload berjalan atau gagal (hapus/ulangi dulu)
+    // Bukti wajib: submit tertahan bila belum ada file, atau upload berjalan/gagal (hapus/ulangi dulu)
     uploadBlocking() {
-      return !!this.bukti && this.bukti.status !== 'SUCCESS'
+      return !this.bukti || this.bukti.status !== 'SUCCESS'
     },
     category: {
       get() {
