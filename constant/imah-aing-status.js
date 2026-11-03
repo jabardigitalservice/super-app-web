@@ -14,10 +14,10 @@ export const IMAH_AING_STATUS = {
   other_nominative:          { id: 'other_nominative',          phase: 'authorization', name: 'Nominatif Lainnya (CSR)',         color: 'yellow',  hex: '#FF7500' },
 
   // coordination (pengajuan bantuan)
-  regency_aid_submission:    { id: 'regency_aid_submission',    phase: 'coordination',  name: 'Pengajuan Bantuan Kabupaten/Kota', color: 'light-blue', hex: '#1E88E5' },
-  provincial_aid_submission: { id: 'provincial_aid_submission', phase: 'coordination',  name: 'Pengajuan Bantuan Provinsi',      color: 'light-blue', hex: '#1E88E5' },
-  central_aid_submission:    { id: 'central_aid_submission',    phase: 'coordination',  name: 'Pengajuan Bantuan Pusat',         color: 'light-blue', hex: '#1E88E5' },
-  other_aid_submission:      { id: 'other_aid_submission',      phase: 'coordination',  name: 'Pengajuan Bantuan Lainnya',       color: 'light-blue', hex: '#1E88E5' },
+  regency_aid_submission:    { id: 'regency_aid_submission',    phase: 'coordination',  name: 'Pengajuan Nominatif Kota/Kabupaten', color: 'light-blue', hex: '#1E88E5' },
+  provincial_aid_submission: { id: 'provincial_aid_submission', phase: 'coordination',  name: 'Pengajuan Nominatif Provinsi',      color: 'light-blue', hex: '#1E88E5' },
+  central_aid_submission:    { id: 'central_aid_submission',    phase: 'coordination',  name: 'Pengajuan Nominatif Pusat',         color: 'light-blue', hex: '#1E88E5' },
+  other_aid_submission:      { id: 'other_aid_submission',      phase: 'coordination',  name: 'Pengajuan Nominatif Lainnya',       color: 'light-blue', hex: '#1E88E5' },
 
   // coordination (penetapan bantuan)
   regency_aid_determination:    { id: 'regency_aid_determination',    phase: 'coordination', name: 'Penetapan Bantuan Kabupaten/Kota', color: 'purple', hex: '#691B9A' },
