@@ -1,4 +1,3 @@
-
 const getDefaultState = () => ({
   /** Data dari decoded meta query param */
   metaPayload: {
