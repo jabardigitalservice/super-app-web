@@ -28,10 +28,10 @@ import { mapActions, mapMutations, mapState } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
 import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
-import { imahAingMockData } from '~/constant/imah-aing-mock-data'
 
 export default {
   name: 'ImahAingSanggahPage',
+  middleware: 'imah-aing-access',
   data() {
     return {
       item: null,
@@ -41,9 +41,6 @@ export default {
   },
   computed: {
     ...mapState('imahAingHistory', ['authToken', 'metaPayload']),
-    useMock() {
-      return this.$route.query.use_mock === 'true'
-    },
     complaintId() {
       const { id } = this.$route.query
       return Array.isArray(id) ? id[0] : id
@@ -67,12 +64,12 @@ export default {
       this.SET_META_PAYLOAD(decoded)
     }
 
-    if (!this.useMock && (!decoded || !decoded.token)) {
+    if (!decoded || !decoded.token) {
       this.backToHistory(true)
       return
     }
 
-    if (!this.useMock && !this.authToken) {
+    if (!this.authToken) {
       try {
         const token = await this.$getToken('client_credentials')
         this.setAuthToken(token)
@@ -103,9 +100,7 @@ export default {
       this.loadError = ''
 
       try {
-        const detail = this.useMock
-          ? imahAingMockData.find((row) => row.id === this.complaintId) || null
-          : await this.fetchDetail(this.complaintId)
+        const detail = await this.fetchDetail(this.complaintId)
 
         // Guard: usulan tidak ada / bukan pemilik / status tidak eligible / can_appeal bukan true
         if (

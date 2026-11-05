@@ -124,6 +124,7 @@ const EDIT_INFO_TEXT =
   'Usulan hanya dapat di-update oleh Pengusul. Proses Update hanya berlaku selama Usulan masih dalam status Menunggu Verifikasi Data atau Tahap Verifikasi.'
 
 export default {
+  middleware: 'imah-aing-access',
   data() {
     return {
       previewOpen: false,
@@ -145,9 +146,6 @@ export default {
     },
     hasMore() {
       return this.pagination.hasMore
-    },
-    useMock() {
-      return this.$route.query.use_mock === 'true'
     },
     isWarga() {
       return (this.metaPayload?.role || '').trim().toLowerCase() === 'warga'
@@ -179,12 +177,6 @@ export default {
       this.decodedMeta = decoded
     }
 
-    // Mode mock → tampilkan data mock tanpa API & tanpa redirect
-    if (this.useMock) {
-      this.loadMockData()
-      return
-    }
-
     // Guard #1 — tidak ada token dari meta → redirect ke form
     if (!decoded || !decoded.token) {
       this.redirectToForm()
@@ -214,7 +206,7 @@ export default {
     this.RESET_STATE()
   },
   methods: {
-    ...mapActions('imahAingHistory', ['fetchHistory', 'cancelSubmissions', 'loadMockData']),
+    ...mapActions('imahAingHistory', ['fetchHistory', 'cancelSubmissions']),
     ...mapMutations('imahAingHistory', ['TOGGLE_SELECT_ID', 'SET_PAGINATION', 'RESET_STATE', 'SET_META_PAYLOAD']),
 
     async loadMore() {

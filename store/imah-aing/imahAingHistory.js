@@ -1,5 +1,3 @@
-import { imahAingMockData } from '~/constant/imah-aing-mock-data'
-
 const getDefaultState = () => ({
   /** Data dari decoded meta query param */
   metaPayload: {
@@ -97,16 +95,6 @@ export const mutations = {
 export const actions = {
   setAuthToken({ commit }, token) {
     commit('SET_AUTH_TOKEN', token)
-  },
-
-  /** Muat data mock tanpa memanggil API (dipakai saat ?use_mock=true) */
-  loadMockData({ commit }) {
-    commit('SET_ITEMS', imahAingMockData)
-    commit('SET_PAGINATION', {
-      total: imahAingMockData.length,
-      hasMore: false,
-    })
-    commit('SET_STATUS', 'SUCCESS')
   },
 
   async fetchHistory({ commit, state }) {
