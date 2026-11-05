@@ -6,6 +6,11 @@ export const IMAH_AING_FORM_FLAG = 'SAPAWARGA-IMAHAING__FORM'
 
 export const IMAH_AING_CLOSED_PATH = '/imah-aing/closed'
 
+// Landing akses tidak valid (URL tanpa `meta`/`source_id` sah dari Sapawarga/Hotline Jabar).
+export const IMAH_AING_INVALID_ACCESS_PATH = '/imah-aing/invalid-access'
+export const IMAH_AING_INVALID_ACCESS_MESSAGE =
+  'Silahkan akses melalui Hotline Jabar atau Sapawarga'
+
 // Batas tunggu SDK Unleash siap. Lewat batas ini dianggap tertutup (fail-closed).
 export const IMAH_AING_CLOSURE_READY_TIMEOUT_MS = 3000
 

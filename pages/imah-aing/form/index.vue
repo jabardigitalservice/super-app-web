@@ -211,7 +211,7 @@ export default {
     this.resetForm()
     next()
   },
-  middleware: 'imah-aing-closure',
+  middleware: ['imah-aing-access', 'imah-aing-closure'],
   data() {
     return {
       isLoading: true,
