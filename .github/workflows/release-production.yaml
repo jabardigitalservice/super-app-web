@@ -180,4 +180,4 @@ jobs:
 
             <b>Merge Request:</b> ${{ steps.create_mr.outputs.mr_url }}
 
-            ⚠️ Please review and merge the deployment MR @feriahmd
+            ⚠️ Please review and merge the deployment MR ${{ vars.TELEGRAM_MR_REVIEWER }}
