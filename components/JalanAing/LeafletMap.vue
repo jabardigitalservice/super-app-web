@@ -58,8 +58,8 @@
         aria-label="Tampilkan sumber peta"
         @click="showAttribution = !showAttribution"
       >
-        <Icon name="info-circle-outline" size="14px" aria-hidden="true" />
-        <span>Sumber peta</span>
+        <Icon name="info-circle-outline" size="16px" aria-hidden="true" />
+        <span class="jalan-aing-attribution-label">Sumber peta</span>
       </button>
     </div>
   </div>
@@ -393,6 +393,9 @@ export default {
     },
     searchLocation(value) {
       this.syncSearchMarker(value)
+    },
+    basemap(value) {
+      this.setBasemap(value)
     },
   },
   created() {
@@ -1052,7 +1055,10 @@ export default {
           { animate: true, duration: 0.45 }
         )
       }
-      this.$emit('select-marker', marker)
+      this.$emit(
+        'select-marker',
+        latlng ? { ...marker, lat: latlng.lat, lng: latlng.lng } : marker
+      )
     },
     highlightMarker(mapMarker) {
       const element = mapMarker?.getElement?.() || mapMarker?._path
@@ -1086,18 +1092,28 @@ export default {
       )
       return fallback ? String(fallback[1]) : config.label
     },
-    async searchActiveLayers(query, signal) {
+    async searchActiveLayers(query, signal, { layerIds } = {}) {
       if (signal?.aborted || this.requestController.signal.aborted)
         return { results: [], available: false }
+      // Point/line datasets are searchable even when their layer is off;
+      // hazard areas only when shown (they carry no useful place names).
       const ids = Object.keys(GIS_LAYERS).filter(
-        (id) => this.layerVisibility[id]
+        (id) =>
+          (!layerIds || layerIds.includes(id)) &&
+          (this.layerVisibility[id] || GIS_LAYERS[id].type !== 'area')
       )
-      await Promise.all(ids.map((id) => this.loadGeoJson(id)))
+      // Wait only for layers the user turned on; other datasets load in the
+      // background and the page re-runs the search when each one arrives.
+      const loads = ids.map((id) => this.loadGeoJson(id))
+      await Promise.allSettled(
+        loads.filter((_, index) => this.layerVisibility[ids[index]])
+      )
       const terms = query.trim().toLocaleLowerCase('id-ID').split(/\s+/)
       if (signal?.aborted || this.requestController.signal.aborted)
         return { results: [], available: false }
       const results = ids.flatMap((id) => {
-        if (!this.layerVisibility[id]) return []
+        const config = GIS_LAYERS[id]
+        const active = Boolean(this.layerVisibility[id])
         const matches = []
         const features = this.geoJsonData[id]?.features || []
         for (
@@ -1109,13 +1125,14 @@ export default {
           if (!feature.geometry) continue
           let cached = this.searchFeatureCache.get(feature)
           if (!cached) {
-            const name = this.featureLabel(feature, GIS_LAYERS[id])
+            const name = this.featureLabel(feature, config)
             cached = { name, normalizedName: name.toLocaleLowerCase('id-ID') }
             this.searchFeatureCache.set(feature, cached)
           }
           const { name, normalizedName } = cached
           if (!terms.every((term) => normalizedName.includes(term))) continue
-          if (id === 'ruasJalan' && !this.roadMatchesClass(feature)) continue
+          if (id === 'ruasJalan' && active && !this.roadMatchesClass(feature))
+            continue
           let lat, lon
           if (feature.geometry.type === 'Point') {
             [lon, lat] = feature.geometry.coordinates || []
@@ -1130,14 +1147,23 @@ export default {
           matches.push({
             place_id: `${id}-${index}`,
             name,
-            display_name: GIS_LAYERS[id].label,
+            display_name: config.label,
+            source: 'dataset',
+            layerId: id,
+            active,
+            marker: {
+              type: config.label,
+              label: name,
+              properties: feature.properties || {},
+              fieldLabels: config.fieldLabels || null,
+            },
             lat,
             lon,
           })
         }
         return matches
       })
-      if (this.layerVisibility.bus) {
+      if (this.layerVisibility.bus && (!layerIds || layerIds.includes('bus'))) {
         const buses = Object.entries(this.busData)
           .flatMap(([id, bus]) => {
             const point = this.busMarkers[id]?.getLatLng()
@@ -1153,7 +1179,10 @@ export default {
               {
                 place_id: `bus-${id}`,
                 name,
-                display_name: 'Bus',
+                display_name: 'Bus real-time',
+                source: 'dataset',
+                layerId: 'bus',
+                active: true,
                 lat: point.lat,
                 lon: point.lng,
               },
@@ -1162,7 +1191,10 @@ export default {
           .slice(0, 5)
         results.push(...buses)
       }
-      if (this.layerVisibility.busStops) {
+      if (
+        this.layerVisibility.busStops &&
+        (!layerIds || layerIds.includes('busStops'))
+      ) {
         results.push(
           ...this.busStops
             .filter((stop) =>
@@ -1177,6 +1209,9 @@ export default {
               place_id: `bus-stop-${stop.id}`,
               name: stop.nama_selter,
               display_name: 'Halte Bus',
+              source: 'dataset',
+              layerId: 'busStops',
+              active: true,
               lat: stop.lat,
               lon: stop.lng,
             }))
@@ -1185,9 +1220,7 @@ export default {
       return {
         results,
         available:
-          ids.some(
-            (id) => this.layerVisibility[id] && Boolean(this.geoJsonData[id])
-          ) ||
+          ids.some((id) => Boolean(this.geoJsonData[id])) ||
           (this.layerVisibility.bus && Object.keys(this.busData).length > 0) ||
           (this.layerVisibility.busStops && this.busStopsLoaded),
       }
@@ -1265,6 +1298,162 @@ export default {
         })
       })
     },
+    prefetchSearchData(layerIds) {
+      Object.keys(GIS_LAYERS)
+        .filter(
+          (id) =>
+            GIS_LAYERS[id].type !== 'area' &&
+            (!layerIds || layerIds.includes(id))
+        )
+        .forEach((id) => this.loadGeoJson(id))
+    },
+    async getDatasets(ids) {
+      await Promise.allSettled(ids.map((id) => this.loadGeoJson(id)))
+      return Object.fromEntries(ids.map((id) => [id, this.geoJsonData[id]]))
+    },
+    datasetSnapshot(ids) {
+      return Object.fromEntries(ids.map((id) => [id, this.geoJsonData[id]]))
+    },
+    featureName(feature, id) {
+      return GIS_LAYERS[id] ? this.featureLabel(feature, GIS_LAYERS[id]) : ''
+    },
+    drawJourney({ lines = [], pins = [] }) {
+      if (!this.map || !this.leaflet) return
+      this.clearRoute()
+      const L = this.leaflet
+      const layers = []
+      lines.forEach((line) => {
+        if (!line.coords?.length) return
+        if (line.casing !== false)
+          layers.push(
+            L.polyline(line.coords, {
+              color: '#ffffff',
+              weight: (line.weight || 6) + 4,
+              opacity: line.dashed ? 0.7 : 0.95,
+              lineCap: 'round',
+              lineJoin: 'round',
+              interactive: false,
+            })
+          )
+        layers.push(
+          L.polyline(line.coords, {
+            color: line.color || '#0d6d43',
+            weight: line.weight || 6,
+            opacity: line.opacity ?? 1,
+            dashArray: line.dashed ? '2 9' : null,
+            lineCap: 'round',
+            lineJoin: 'round',
+            interactive: false,
+          })
+        )
+      })
+      pins.forEach((pin) => {
+        const small = pin.size === 'small'
+        layers.push(
+          L.marker([pin.lat, pin.lng], {
+            icon: L.divIcon({
+              className: `jalan-aing-route-pin is-${pin.variant || 'stop'}${
+                small ? ' is-small' : ''
+              }`,
+              html: `<span style="${
+                pin.color ? `background:${pin.color}` : ''
+              }">${pin.label || ''}</span>`,
+              iconSize: small ? [14, 14] : [28, 28],
+              iconAnchor: small ? [7, 7] : [14, 14],
+            }),
+            keyboard: false,
+            interactive: false,
+            title: pin.title || '',
+            zIndexOffset: small ? 1100 : 1200,
+          })
+        )
+      })
+      this.routeLayer = L.layerGroup(layers).addTo(this.map)
+    },
+    showRoute(route, from, to) {
+      if (!this.map || !this.leaflet) return
+      this.clearRoute()
+      const L = this.leaflet
+      const pin = (label, variant) =>
+        L.divIcon({
+          className: `jalan-aing-route-pin is-${variant}`,
+          html: `<span>${label}</span>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        })
+      const walking = route.profile === 'foot'
+      this.routeLayer = L.layerGroup([
+        L.polyline(route.coordinates, {
+          color: '#ffffff',
+          weight: 10,
+          opacity: 0.95,
+          lineCap: 'round',
+          lineJoin: 'round',
+          interactive: false,
+        }),
+        L.polyline(route.coordinates, {
+          className: 'jalan-aing-route-line',
+          color: '#0d6d43',
+          weight: 6,
+          dashArray: walking ? '1 10' : null,
+          lineCap: 'round',
+          lineJoin: 'round',
+          interactive: false,
+        }),
+        L.marker([from.lat, from.lng], {
+          icon: pin('A', 'from'),
+          keyboard: false,
+          interactive: false,
+          zIndexOffset: 1200,
+        }),
+        L.marker([to.lat, to.lng], {
+          icon: pin('B', 'to'),
+          keyboard: false,
+          interactive: false,
+          zIndexOffset: 1200,
+        }),
+      ]).addTo(this.map)
+    },
+    showRoutePoints(points) {
+      if (!this.map || !this.leaflet) return
+      this.clearRoute()
+      const L = this.leaflet
+      const markers = points
+        .filter(Boolean)
+        .map(({ point, label, variant }) =>
+          L.marker([point.lat, point.lng], {
+            icon: L.divIcon({
+              className: `jalan-aing-route-pin is-${variant}`,
+              html: `<span>${label}</span>`,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14],
+            }),
+            keyboard: false,
+            interactive: false,
+            zIndexOffset: 1200,
+          })
+        )
+      if (markers.length) this.routeLayer = L.layerGroup(markers).addTo(this.map)
+    },
+    clearRoute() {
+      if (this.routeLayer) {
+        this.routeLayer.remove()
+        this.routeLayer = null
+      }
+    },
+    fitRoute(coordinates, padding = {}) {
+      if (!this.map || !this.leaflet || !coordinates?.length) return
+      const { top = 40, right = 40, bottom = 40, left = 40 } = padding
+      this.map.flyToBounds(this.leaflet.latLngBounds(coordinates), {
+        paddingTopLeft: [left, top],
+        paddingBottomRight: [right, bottom],
+        maxZoom: 17,
+        duration: 0.6,
+      })
+    },
+    refreshSize() {
+      this.map?.invalidateSize({ pan: false })
+    },
     zoomIn() {
       this.map?.zoomIn()
     },
@@ -1334,8 +1523,23 @@ export default {
 }
 
 @media (max-width: 640px) {
+  .jalan-aing-attribution-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .jalan-aing-leaflet .jalan-aing-attribution-toggle {
+    width: 44px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 640px) {
   .jalan-aing-map-footer {
-    right: 12px;
+    right: auto;
     bottom: calc(12px + env(safe-area-inset-bottom));
     left: 12px;
     display: flex;
@@ -1510,5 +1714,45 @@ export default {
   .jalan-aing-leaflet .ja-map-zoom-button {
     display: none;
   }
+}
+
+.jalan-aing-route-pin {
+  background: transparent;
+}
+.jalan-aing-route-pin span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  background: #14233f;
+  box-shadow: 0 2px 8px rgba(20, 35, 63, 0.35);
+  color: #fff;
+  font: 800 13px/1 Lato, sans-serif;
+}
+.jalan-aing-route-pin.is-to span {
+  background: #0d6d43;
+}
+.jalan-aing-route-line {
+  animation: jalan-aing-route-draw 600ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes jalan-aing-route-draw {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jalan-aing-route-line {
+    animation: none;
+  }
+}
+.jalan-aing-route-pin.is-small span {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(20, 35, 63, 0.35);
+  font-size: 0;
 }
 </style>

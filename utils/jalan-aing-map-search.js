@@ -109,6 +109,9 @@ function fetchBusStops() {
               (route.shelters || []).map((shelter) => ({
                 place_id: `bus-stop:${shelter.nama_selter}:${shelter.latitude}:${shelter.longitude}`,
                 name: shelter.nama_selter || 'Halte Bus',
+                source: 'dataset',
+                layerId: 'busStops',
+                active: false,
                 display_name: [
                   'Halte Bus',
                   route.kor,
