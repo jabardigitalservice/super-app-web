@@ -307,6 +307,7 @@ export default {
       resetForm: 'resetForm',
       setAuthToken: 'setAuthToken',
       checkKkDuplicate: 'checkKkDuplicate',
+      checkNikSubmission: 'checkNikSubmission',
     }),
     async nextStep() {
       const step = Number(this.currentFormStep)
@@ -316,19 +317,35 @@ export default {
           return
         }
         this.$refs.stepTwo.clearKkDuplicateMessage()
-        try {
-          const exists = await this.checkKkDuplicate()
-          if (exists) {
-            this.$refs.stepTwo.setKkDuplicateMessage(
-              'No KK Sudah Pernah Diajukan. Silahkan Hubungi Hotline Jabar di Nomor WhatsApp 082126030038.'
-            )
-            return
-          }
-        } catch {
-          if (this.statusSubmitForm.status === 'SESSION_EXPIRED') {
-            return
-          }
+        this.$refs.stepTwo.clearNikSubmissionMessage()
+        // Cek KK & NIK paralel; kalau keduanya gagal, dua pesan tampil di field masing-masing.
+        const [kkResult, nikResult] = await Promise.allSettled([
+          this.checkKkDuplicate(),
+          this.checkNikSubmission(),
+        ])
+        if (this.statusSubmitForm.status === 'SESSION_EXPIRED') {
+          return
+        }
+        let blocked = false
+        if (kkResult.status === 'rejected') {
           this.$refs.stepTwo.setKkDuplicateMessage('Gagal memverifikasi No KK. Silakan coba lagi.')
+          blocked = true
+        } else if (kkResult.value) {
+          this.$refs.stepTwo.setKkDuplicateMessage(
+            'No KK Sudah Pernah Diajukan. Silahkan Hubungi Hotline Jabar di Nomor WhatsApp 082126030038.'
+          )
+          blocked = true
+        }
+        if (nikResult.status === 'rejected') {
+          this.$refs.stepTwo.setNikSubmissionMessage('Gagal memverifikasi NIK. Silakan coba lagi.')
+          blocked = true
+        } else if (!nikResult.value) {
+          this.$refs.stepTwo.setNikSubmissionMessage(
+            'NIK Sudah Pernah Diajukan. Silahkan Hubungi Hotline Jabar di Nomor WhatsApp 082126030038.'
+          )
+          blocked = true
+        }
+        if (blocked) {
           return
         }
       }
