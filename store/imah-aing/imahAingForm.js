@@ -599,6 +599,39 @@ export default {
       }
     },
     /**
+     * Cek apakah NIK boleh mengajukan usulan (cegah duplikasi pengusulan).
+     * @returns {Promise<boolean>} `true` jika boleh mengajukan (`data.can_submit`).
+     */
+    async checkNikSubmission({ state, commit }) {
+      // Mode edit: NIK milik usulan yang sedang diedit — lewati cek.
+      if (state.editComplaintId) {
+        return true
+      }
+
+      const nik = String(state.dataPengusul.nik || '').replace(/\D/g, '')
+      if (!nik) {
+        return true
+      }
+
+      try {
+        const res = await this.$gatewayPartnerAPI.post(
+          '/aduan/complaints/check-nik-submission',
+          { nik },
+          { headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {} }
+        )
+        const canSubmit = res?.data?.data?.can_submit
+        if (typeof canSubmit !== 'boolean') {
+          throw new TypeError('Invalid check-nik-submission response')
+        }
+        return canSubmit
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          commit('SET_STATUS_SUBMIT', 'SESSION_EXPIRED')
+        }
+        throw error
+      }
+    },
+    /**
      * Prefetch opsi cascade lokasi (kecamatan & kelurahan) di mode edit.
      * Memakai `cityId`/`districtId` hasil hydrate detail agar opsi JdsSelect terisi
      * tanpa interaksi user. Bila id kosong, resolve dari nama via daftar yang ada.
