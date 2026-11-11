@@ -66,8 +66,8 @@
         :maxlength="maxNikKkLength"
         :placeholder="zwsPlaceholder"
         autocomplete="off"
-        :error="!!errors[0]"
-        :error-message="errors[0]"
+        :error="!!(errors[0] || nikSubmissionMessage)"
+        :error-message="errors[0] || nikSubmissionMessage"
       />
     </ValidationProvider>
 
@@ -106,6 +106,7 @@ export default {
       zwsPlaceholder: '\u200B',
       maxNikKkLength: 16,
       kkDuplicateMessage: '',
+      nikSubmissionMessage: '',
     }
   },
   computed: {
@@ -178,8 +179,17 @@ export default {
     setNomorKk() {
       this.kkDuplicateMessage = ''
     },
+    setNik() {
+      this.nikSubmissionMessage = ''
+    },
   },
   methods: {
+    clearNikSubmissionMessage() {
+      this.nikSubmissionMessage = ''
+    },
+    setNikSubmissionMessage(message) {
+      this.nikSubmissionMessage = message || ''
+    },
     clearKkDuplicateMessage() {
       this.kkDuplicateMessage = ''
     },
