@@ -104,3 +104,4 @@ skills-lock.json
 .spec/backlog/
 .spec/skills/
 docs/superpowers/
+.replica/

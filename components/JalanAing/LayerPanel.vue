@@ -2,221 +2,165 @@
   <aside
     :class="
       mobileOpen
-        ? 'fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-0 flex-col rounded-t-[32px] border-t shadow-2xl md:static md:bottom-auto md:h-full md:w-[340px] md:translate-y-0 md:rounded-none md:border-t-0 md:border-r md:shadow-none'
-        : 'fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-full pointer-events-none flex-col rounded-t-[32px] border-t shadow-2xl md:static md:bottom-auto md:h-full md:w-[340px] md:translate-y-0 md:pointer-events-auto md:rounded-none md:border-t-0 md:border-r md:shadow-none'
+        ? 'is-sheet fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-0 flex-col rounded-t-[16px] border border-t shadow-2xl md:static md:bottom-auto md:h-full md:translate-y-0 md:rounded-none md:border-0 md:shadow-none'
+        : 'fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-[800] flex h-[68svh] w-full max-w-none translate-y-full pointer-events-none flex-col rounded-t-[16px] border border-t shadow-2xl md:static md:bottom-auto md:h-full md:translate-y-0 md:pointer-events-auto md:rounded-none md:border-0 md:shadow-none'
     "
     :style="
       sheetDragging
         ? { transform: `translateY(${sheetDragY}px)`, transition: 'none' }
         : null
     "
-    class="flex-col flex-shrink-0 min-h-0 overflow-hidden transition-transform duration-300 ease-out bg-white border border-slate-200 font-lato text-slate-800"
+    class="ja-layer-panel flex-col flex-shrink-0 min-h-0 overflow-hidden bg-white border-slate-200 font-lato text-slate-800"
   >
     <div
-      class="p-4 border-b border-slate-200"
-      :class="mobileOpen ? 'touch-none select-none px-5 py-2' : ''"
+      class="ja-layer-head"
+      :class="mobileOpen ? 'touch-none select-none' : ''"
       @pointerdown="startSheetGesture"
       @pointermove="moveSheetGesture"
       @pointerup="endSheetGesture"
       @pointercancel="cancelSheetGesture"
     >
-      <h2
-        class="flex items-center gap-2 m-0 text-base font-semibold leading-5 text-jalan-aing-primary"
-      >
-        <svg
-          v-if="mobileOpen"
-          class="w-5 h-5 shrink-0"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.8"
-          aria-hidden="true"
+      <span v-if="mobileOpen" class="ja-layer-grabber" aria-hidden="true" />
+      <div class="ja-layer-head-row">
+        <div class="min-w-0">
+          <h2 class="ja-layer-title">Layer peta</h2>
+          <p class="ja-layer-count" aria-live="polite">
+            {{
+              activeCount
+                ? `${activeCount} layer aktif`
+                : 'Belum ada layer aktif'
+            }}
+          </p>
+        </div>
+        <button
+          v-if="activeCount"
+          type="button"
+          class="ja-layer-reset"
+          @pointerdown.stop
+          @click="$emit('reset-layers')"
         >
-          <path d="m3 8 9-5 9 5-9 5-9-5Z" />
-          <path d="m3 12 9 5 9-5" />
-          <path d="m3 16 9 5 9-5" />
-        </svg>
-        <Icon v-else name="info-circle-outline" size="18px" />
-        Layer Peta
+          Reset <span class="ja-layer-badge">{{ activeCount }}</span>
+        </button>
         <button
           v-if="mobileOpen"
           type="button"
-          class="p-1 ml-auto transition rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+          class="ja-layer-close"
           aria-label="Tutup layer"
           @pointerdown.stop
           @click="$emit('close')"
         >
           <Icon name="times" size="18px" />
         </button>
-      </h2>
-      <p v-if="!mobileOpen" class="mt-1 text-xs leading-normal text-slate-500">
-        Pilih layer untuk melihat informasi pada peta.
-      </p>
+      </div>
     </div>
 
-    <div
-      class="flex flex-col flex-1 min-h-0 overflow-y-auto divide-y divide-slate-100"
-    >
+    <div class="ja-layer-scroll">
       <section
         v-for="section in visibleSections"
         :key="section.id"
-        class="p-2"
-        :class="
-          mobileOpen
-            ? 'border-b border-slate-100 px-5 py-3 last:border-b-0'
-            : ''
-        "
+        class="ja-layer-section"
       >
         <button
           type="button"
-          class="flex items-center justify-between w-full p-3 font-semibold text-left transition rounded-lg text-slate-700 hover:bg-slate-50"
-          :class="mobileOpen ? 'p-1 text-sm' : 'text-sm'"
-          :aria-expanded="openSections[section.id]"
+          class="ja-layer-section-toggle"
+          :aria-expanded="String(openSections[section.id])"
           @click="toggleSection(section.id)"
         >
+          <span class="ja-layer-section-label">{{ section.label }}</span>
           <span
-            class="flex items-center min-w-0 gap-2"
-            :class="mobileOpen ? 'gap-3' : ''"
+            v-if="sectionActiveCount(section)"
+            class="ja-layer-section-count"
+            >{{ sectionActiveCount(section) }}</span
           >
-            <span
-              class="h-2.5 w-2.5 shrink-0 rounded-full"
-              :class="[section.color, mobileOpen ? 'h-3 w-3' : '']"
-            />
-            <span>{{ section.label }}</span>
-          </span>
           <span
-            class="transition-transform duration-200"
-            :class="openSections[section.id] ? 'rotate-180' : ''"
-            ><Icon name="chevron-down" :size="mobileOpen ? '18px' : '16px'"
+            class="ja-layer-chevron"
+            :class="{ 'is-open': openSections[section.id] }"
+            ><Icon name="chevron-down" size="16px"
           /></span>
         </button>
 
         <transition name="layer-expand">
-          <div
-            v-if="openSections[section.id]"
-            class="pb-3 pl-4 pr-2 mt-1 ml-4 space-y-3 border-l border-slate-200"
-            :class="mobileOpen ? 'mt-3 ml-2 space-y-4 pb-1 pl-4' : ''"
-          >
-            <div
+          <ul v-if="openSections[section.id]" class="ja-layer-list">
+            <li
               v-for="item in section.items"
               :key="item.id"
-              class="p-2 space-y-2 transition border rounded-lg"
-              :class="
-                layerVisibility[item.id]
-                  ? 'border-jalan-aing-primary'
-                  : 'border-transparent'
-              "
+              class="ja-layer-row"
+              :class="{
+                'is-on': layerVisibility[item.id],
+                'is-unavailable': !dataAvailability[item.id],
+              }"
             >
-              <div class="flex items-center justify-between gap-3">
-                <span
-                  class="flex flex-col min-w-0 font-medium text-slate-600"
-                  :class="mobileOpen ? 'text-[13px]' : 'text-xs'"
-                  ><span>{{ item.label }}</span
-                  ><span
-                    v-if="layerLoading[item.id]"
-                    class="mt-0.5 text-[10px] font-medium text-jalan-aing-primary"
-                    >Memuat…</span
-                  ></span
-                >
+              <div class="ja-layer-row-main">
+                <span class="ja-layer-text">
+                  <span class="ja-layer-name">{{ item.label }}</span>
+                  <span class="ja-layer-meta">
+                    {{
+                      !dataAvailability[item.id]
+                        ? 'Gagal dimuat · nyalakan untuk coba lagi'
+                        : layerLoading[item.id] && layerVisibility[item.id]
+                        ? 'Memuat data…'
+                        : section.label
+                    }}
+                  </span>
+                </span>
                 <button
                   type="button"
-                  class="rounded-md p-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary"
-                  :disabled="
-                    !dataAvailability[item.id] || layerLoading[item.id]
+                  role="switch"
+                  class="ja-layer-switch"
+                  :class="{
+                    'is-on': layerVisibility[item.id],
+                    'is-loading':
+                      layerLoading[item.id] && layerVisibility[item.id],
+                  }"
+                  :aria-busy="
+                    String(Boolean(layerLoading[item.id] && layerVisibility[item.id]))
                   "
-                  :class="
-                    !dataAvailability[item.id]
-                      ? 'cursor-not-allowed text-slate-300'
-                      : layerLoading[item.id]
-                      ? 'cursor-wait bg-jalan-aing-primary-soft text-jalan-aing-primary'
-                      : layerVisibility[item.id]
-                      ? 'bg-jalan-aing-primary-soft text-jalan-aing-primary hover:bg-jalan-aing-primary-border'
-                      : 'text-slate-500 hover:bg-slate-100 hover:text-slate-600'
-                  "
-                  :aria-busy="layerLoading[item.id]"
-                  :aria-pressed="layerVisibility[item.id]"
-                  :aria-label="
-                    layerLoading[item.id]
-                      ? `Memuat ${item.label}`
-                      : dataAvailability[item.id]
-                      ? `${
-                          layerVisibility[item.id] ? 'Sembunyikan' : 'Tampilkan'
-                        } ${item.label}`
-                      : `${item.label} belum tersedia`
-                  "
+                  :aria-checked="String(Boolean(layerVisibility[item.id]))"
+                  :aria-label="item.label"
                   @click="toggleLayer(item.id)"
                 >
-                  <span
-                    v-if="layerLoading[item.id]"
-                    class="block w-4 h-4 border-2 border-current rounded-full animate-spin border-t-transparent"
-                    aria-hidden="true"
-                  /><Icon
-                    v-else
-                    :name="layerVisibility[item.id] ? 'eye' : 'eye-off'"
-                    :size="mobileOpen ? '22px' : '16px'"
-                  />
+                  <span class="ja-layer-knob" aria-hidden="true" />
                 </button>
               </div>
-              <p
-                v-if="!dataAvailability[item.id]"
-                class="text-[11px] text-slate-400"
-              >
-                Data belum tersedia dari OPD
-              </p>
 
               <div
+                v-if="layerLoading[item.id] && layerVisibility[item.id]"
+                class="ja-layer-progress"
+                role="progressbar"
+                :aria-label="`Memuat ${item.label}`"
+              />
+              <div
                 v-if="item.id === 'ruasJalan' && layerVisibility[item.id]"
-                class="grid grid-cols-2 gap-2"
+                class="ja-layer-filters"
+                role="group"
+                aria-label="Kelas jalan"
               >
                 <button
                   v-for="status in roadStatuses"
                   :key="status.value"
                   type="button"
-                  class="flex items-center justify-center px-3 font-semibold transition border rounded-md min-h-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jalan-aing-primary"
-                  :class="[
-                    filterStatus.roadClass === status.value
-                      ? 'border-jalan-aing-primary bg-jalan-aing-primary-soft text-jalan-aing-primary'
-                      : 'border-slate-200 bg-white text-slate-500 hover:border-jalan-aing-primary hover:text-jalan-aing-primary',
-                    mobileOpen ? 'text-sm' : 'text-[11px]',
-                  ]"
-                  :aria-pressed="filterStatus.roadClass === status.value"
+                  class="ja-layer-filter"
+                  :class="{ 'is-on': filterStatus.roadClass === status.value }"
+                  :aria-pressed="String(filterStatus.roadClass === status.value)"
                   @click="updateFilter('roadClass', status.value)"
                 >
                   {{ status.label }}
                 </button>
               </div>
-            </div>
-          </div>
+            </li>
+          </ul>
         </transition>
       </section>
     </div>
 
-    <div
-      v-if="activeLegendItems.length"
-      class="p-4 border-t border-slate-200 bg-slate-50"
-      :class="mobileOpen ? 'px-5 py-4' : ''"
-    >
-      <h3
-        class="mb-2 text-xs font-semibold text-slate-500"
-        :class="mobileOpen ? 'mb-3 text-sm text-slate-700' : ''"
-      >
-        Legenda layer aktif
-      </h3>
-      <div
-        class="space-y-2"
-        :class="mobileOpen ? 'grid grid-cols-2 gap-x-6 gap-y-3 space-y-0' : ''"
-      >
-        <div
-          v-for="legend in activeLegendItems"
-          :key="legend.id"
-          class="flex items-center gap-3 text-xs text-slate-600"
-        >
-          <span class="w-6 h-2 rounded-full" :style="legendStyle(legend)" />
+    <div v-if="activeLegendItems.length" class="ja-layer-legend">
+      <h3>Legenda</h3>
+      <ul>
+        <li v-for="legend in activeLegendItems" :key="legend.id">
+          <span class="ja-layer-legend-bar" :style="legendStyle(legend)" />
           <span>{{ legend.label }}</span>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
   </aside>
 </template>
@@ -245,6 +189,9 @@ export default {
       sheetPointerId: null,
       sheetDragStartY: 0,
       sheetDragging: false,
+      sheetLastY: 0,
+      sheetLastTime: 0,
+      sheetVelocity: 0,
       openSections: {
         bus: true,
         dbmpr: false,
@@ -340,6 +287,11 @@ export default {
     }
   },
   computed: {
+    activeCount() {
+      return this.visibleSections
+        .flatMap((section) => section.items)
+        .filter((item) => this.layerVisibility[item.id]).length
+    },
     visibleSections() {
       return this.hospitalMode
         ? this.sections.filter((section) => section.id === 'dinkes')
@@ -384,6 +336,9 @@ export default {
 
       this.sheetPointerId = event.pointerId
       this.sheetDragStartY = event.clientY
+      this.sheetLastY = event.clientY
+      this.sheetLastTime = event.timeStamp
+      this.sheetVelocity = 0
       this.sheetDragY = 0
       this.sheetDragging = true
       event.currentTarget.setPointerCapture(event.pointerId)
@@ -391,16 +346,22 @@ export default {
     moveSheetGesture(event) {
       if (!this.sheetDragging || event.pointerId !== this.sheetPointerId) return
 
-      this.sheetDragY = Math.max(
-        0,
-        Math.min(event.clientY - this.sheetDragStartY, 180)
-      )
+      const delta = event.clientY - this.sheetDragStartY
+      // Follow the finger downwards; resist upward pulls like a native sheet.
+      this.sheetDragY = delta >= 0 ? delta : -Math.min(24, Math.sqrt(-delta) * 3)
+      const elapsed = event.timeStamp - this.sheetLastTime
+      if (elapsed > 0)
+        this.sheetVelocity = (event.clientY - this.sheetLastY) / elapsed
+      this.sheetLastY = event.clientY
+      this.sheetLastTime = event.timeStamp
       event.preventDefault()
     },
     endSheetGesture(event) {
       if (!this.sheetDragging || event.pointerId !== this.sheetPointerId) return
 
-      const shouldClose = this.sheetDragY >= 72
+      const shouldClose =
+        this.sheetDragY >= 96 ||
+        (this.sheetVelocity > 0.45 && this.sheetDragY > 12)
       this.cancelSheetGesture(event)
       if (shouldClose) this.$emit('close')
     },
@@ -414,6 +375,10 @@ export default {
       this.sheetDragY = 0
       this.sheetPointerId = null
       this.sheetDragging = false
+    },
+    sectionActiveCount(section) {
+      return section.items.filter((item) => this.layerVisibility[item.id])
+        .length
     },
     toggleSection(id) {
       this.openSections[id] = !this.openSections[id]
@@ -441,6 +406,356 @@ export default {
 <style scoped>
 aside {
   flex-direction: column;
+}
+.ja-layer-panel {
+  transition: transform 420ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+  --ja-ink: #14233f;
+  --ja-muted: #68758a;
+  --ja-rule: #e7ece9;
+  --ja-green: #0d6d43;
+  --ja-green-soft: #e6f6ec;
+}
+.ja-layer-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--ja-rule);
+}
+.ja-layer-grabber {
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: -8px auto 12px;
+  border-radius: 999px;
+  background: #d5dbe3;
+}
+.ja-layer-head-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ja-layer-head-row > .min-w-0 {
+  flex: 1;
+}
+.ja-layer-title {
+  margin: 0;
+  color: var(--ja-ink);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.ja-layer-count {
+  margin: 2px 0 0;
+  color: var(--ja-muted);
+  font-size: 12px;
+}
+.ja-layer-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  border: 1px solid #d9dfe6;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ja-ink);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ja-layer-reset:hover {
+  border-color: var(--ja-green);
+}
+.ja-layer-badge {
+  display: inline-grid;
+  min-width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--ja-green);
+  color: #fff;
+  font-size: 12px;
+}
+.ja-layer-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748b;
+}
+.ja-layer-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0 12px;
+}
+.ja-layer-section + .ja-layer-section {
+  border-top: 1px solid var(--ja-rule);
+}
+.ja-layer-section-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ja-muted);
+  cursor: pointer;
+  text-align: left;
+}
+.ja-layer-section-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ja-layer-section-count {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--ja-green-soft);
+  color: var(--ja-green);
+  font-size: 11px;
+  font-weight: 800;
+}
+.ja-layer-chevron {
+  display: grid;
+  transition: transform 200ms ease;
+}
+.ja-layer-chevron.is-open {
+  transform: rotate(180deg);
+}
+.ja-layer-list {
+  margin: 0;
+  padding: 0 0 6px;
+  list-style: none;
+}
+.ja-layer-row {
+  margin: 0 12px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  transition: background-color 160ms ease;
+}
+.ja-layer-row + .ja-layer-row {
+  margin-top: 2px;
+}
+.ja-layer-row:hover {
+  background: #f6f8f7;
+}
+.ja-layer-row.is-on {
+  background: #f1f8f4;
+}
+.ja-layer-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ja-layer-text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.ja-layer-name {
+  color: var(--ja-ink);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.ja-layer-meta {
+  margin-top: 1px;
+  overflow: hidden;
+  color: var(--ja-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ja-layer-row.is-unavailable .ja-layer-meta {
+  color: #b45309;
+}
+.ja-layer-switch {
+  position: relative;
+  width: 40px;
+  height: 24px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #d6dce3;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+.ja-layer-switch.is-on {
+  background: var(--ja-green);
+}
+.ja-layer-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.ja-layer-switch.is-loading {
+  cursor: wait;
+  opacity: 1;
+}
+.ja-layer-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(20, 35, 63, 0.25);
+  transition: transform 200ms cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+.ja-layer-switch.is-on .ja-layer-knob {
+  transform: translateX(16px);
+}
+.ja-layer-progress {
+  position: relative;
+  height: 3px;
+  margin: 10px 0 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dcebe2;
+}
+.ja-layer-progress::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  border-radius: inherit;
+  background: var(--ja-green);
+  content: '';
+  animation: ja-layer-progress 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.ja-layer-switch:focus-visible,
+.ja-layer-reset:focus-visible,
+.ja-layer-filter:focus-visible,
+.ja-layer-section-toggle:focus-visible {
+  outline: 2px solid var(--ja-green);
+  outline-offset: 2px;
+}
+.ja-layer-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 2px;
+}
+.ja-layer-filter {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid #d9dfe6;
+  border-radius: 999px;
+  background: #fff;
+  color: #4b5567;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ja-layer-filter:hover {
+  border-color: var(--ja-green);
+  color: var(--ja-green);
+}
+.ja-layer-filter.is-on {
+  border-color: var(--ja-green);
+  background: var(--ja-green);
+  color: #fff;
+}
+.ja-layer-legend {
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--ja-rule);
+  background: #fafbfa;
+}
+.ja-layer-legend h3 {
+  margin: 0 0 10px;
+  color: var(--ja-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ja-layer-legend ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ja-layer-legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #4b5567;
+  font-size: 12px;
+}
+.ja-layer-legend-bar {
+  width: 24px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+.is-sheet .ja-layer-head {
+  padding: 16px 16px 12px;
+}
+.is-sheet .ja-layer-grabber {
+  width: 36px;
+  border-radius: 2px;
+}
+.is-sheet .ja-layer-reset,
+.is-sheet .ja-layer-close {
+  height: 40px;
+  border-radius: 8px;
+}
+.is-sheet .ja-layer-close {
+  width: 40px;
+}
+.is-sheet .ja-layer-section-toggle {
+  min-height: 44px;
+  padding: 12px 16px 8px;
+}
+.is-sheet .ja-layer-row {
+  margin: 0 8px;
+  padding: 12px 8px;
+  border-radius: 8px;
+}
+.is-sheet .ja-layer-filter {
+  height: 36px;
+  border-radius: 6px;
+}
+.is-sheet .ja-layer-legend {
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.is-sheet .ja-layer-legend ul {
+  grid-template-columns: 1fr 1fr;
+}
+@keyframes ja-layer-progress {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ja-layer-panel {
+    transition-duration: 1ms;
+  }
+  .ja-layer-progress::after {
+    animation-duration: 2.4s;
+  }
+  .ja-layer-knob,
+  .ja-layer-chevron {
+    transition: none;
+  }
 }
 
 .layer-expand-enter-active,
