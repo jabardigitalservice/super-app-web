@@ -374,16 +374,18 @@ export default {
     setAuthToken({ commit }, token) {
       commit('SET_AUTH_TOKEN', token)
     },
-    async initForm({ commit }, payload) {
+    async initForm({ commit, state }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
       commit('SET_SOURCE_ID', sourceId)
+      commit('SET_NIK_KK_FROM_META', false)
 
       if (meta) {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
           commit('SET_SOURCE_ID', resolveSourceId(sourceId, decoded))
-          commit('SET_NIK_KK_FROM_META', !!(decoded.nik && (decoded.kk || decoded.nomor_kk)))
           applyQueryMetaToDataPengusul(commit, decoded)
+          // Dihitung dari field yang benar-benar terisi (sudah trim), bukan dari meta mentah.
+          commit('SET_NIK_KK_FROM_META', !!(state.dataPengusul.nik && state.dataPengusul.nomorKk))
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
           if (decoded.token) {
