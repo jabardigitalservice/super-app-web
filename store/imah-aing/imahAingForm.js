@@ -235,6 +235,14 @@ function normalizeInitQueryPayload(payload) {
   }
 }
 
+// source_id kosong → turunkan dari role meta: warga → sapawarga_warga, role lain → sapawarga, tanpa role → hotline.
+function resolveSourceId(sourceId, decoded) {
+  if (sourceId) return sourceId
+  const role = String(decoded?.role ?? '').trim().toLowerCase()
+  if (!role) return 'hotline'
+  return role === 'warga' ? 'sapawarga_warga' : 'sapawarga'
+}
+
 export default {
   namespaced: true,
   state: getDefaultState(),
@@ -368,6 +376,7 @@ export default {
       if (meta) {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
+          commit('SET_SOURCE_ID', resolveSourceId(sourceId, decoded))
           applyQueryMetaToDataPengusul(commit, decoded)
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
