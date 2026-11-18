@@ -114,7 +114,7 @@ export default {
     isNikKkLocked() {
       if (this.isEditMode) return false
       const role = (this.$store.state.imahAingForm.dataPengusul.role || '').trim().toLowerCase()
-      return role === 'warga'
+      return role === 'warga' && this.$store.state.imahAingForm.nikKkFromMeta
     },
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name

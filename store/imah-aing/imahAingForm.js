@@ -14,6 +14,8 @@ const getDefaultState = () => ({
   authToken: null,
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
+  /** true jika meta membawa nik dan kk sekaligus; dasar penguncian field NIK/KK warga */
+  nikKkFromMeta: false,
   currentFormStep: 0,
 
   consent: {
@@ -291,6 +293,9 @@ export default {
     SET_AUTH_TOKEN(state, token) {
       state.authToken = token
     },
+    SET_NIK_KK_FROM_META(state, val) {
+      state.nikKkFromMeta = !!val
+    },
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
     },
@@ -377,6 +382,7 @@ export default {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
           commit('SET_SOURCE_ID', resolveSourceId(sourceId, decoded))
+          commit('SET_NIK_KK_FROM_META', !!(decoded.nik && (decoded.kk || decoded.nomor_kk)))
           applyQueryMetaToDataPengusul(commit, decoded)
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
@@ -811,6 +817,7 @@ export default {
     async submitForm({ commit, state, rootState }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
+        if (!state.sourceId) throw new Error('source_id kosong')
         const docMapping = [
           { key: 'ktp', field: 'ktp' },
           { key: 'fotoDepan', field: 'foto_depan' },
