@@ -111,13 +111,10 @@ export default {
   },
   computed: {
     ...mapGetters('imahAingForm', ['isEditMode']),
-    isSapawargaSource() {
-      return this.$store.state.imahAingForm.sourceId === 'sapawarga'
-    },
     isNikKkLocked() {
       if (this.isEditMode) return false
       const role = (this.$store.state.imahAingForm.dataPengusul.role || '').trim().toLowerCase()
-      return this.isSapawargaSource && role === 'warga'
+      return role === 'warga'
     },
     name() {
       return this.$store.state.imahAingForm.dataPengusul.name
