@@ -122,3 +122,6 @@ export const getImahAingStepFlow = (statusKey) => {
 
   return { hidden: false, items }
 }
+
+// source_id sah dari query: rt/rw/kades/lurah, via hotline, warga mandiri.
+export const IMAH_AING_SOURCE_IDS = Object.freeze(['sapawarga', 'hotline', 'sapawarga_warga'])

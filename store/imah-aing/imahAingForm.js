@@ -834,7 +834,7 @@ export default {
           proposer_email: state.proposerMeta.email || '',
           proposer_role:  state.proposerMeta.role  || '',
           [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
-          source_id: state.sourceId || 'sapawarga',
+          source_id: state.sourceId,
           type: 'private',
           photos,
           category_id: 'imah-aing',
