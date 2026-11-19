@@ -1,6 +1,7 @@
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { UPLOAD_TIMEOUT_MS } from '~/constant/upload'
 import { mapUploadError } from '~/utils/upload'
+import { resolveImahAingSourceId } from '~/constant/imah-aing-status'
 
 /**
  * Pusat peta default / fallback Geolocation
@@ -237,14 +238,6 @@ function normalizeInitQueryPayload(payload) {
   }
 }
 
-// source_id kosong → turunkan dari role meta: warga → sapawarga_warga, role lain → sapawarga, tanpa role → hotline.
-function resolveSourceId(sourceId, decoded) {
-  if (sourceId) return sourceId
-  const role = String(decoded?.role ?? '').trim().toLowerCase()
-  if (!role) return 'hotline'
-  return role === 'warga' ? 'sapawarga_warga' : 'sapawarga'
-}
-
 export default {
   namespaced: true,
   state: getDefaultState(),
@@ -376,13 +369,14 @@ export default {
     },
     async initForm({ commit, state }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
-      commit('SET_SOURCE_ID', sourceId)
+      // Kosong sampai meta terdekripsi dan cocok dengan role; submit berhenti bila tetap kosong.
+      commit('SET_SOURCE_ID', '')
       commit('SET_NIK_KK_FROM_META', false)
 
       if (meta) {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
-          commit('SET_SOURCE_ID', resolveSourceId(sourceId, decoded))
+          commit('SET_SOURCE_ID', resolveImahAingSourceId(sourceId, decoded.role))
           applyQueryMetaToDataPengusul(commit, decoded)
           // Dihitung dari field yang benar-benar terisi (sudah trim), bukan dari meta mentah.
           commit('SET_NIK_KK_FROM_META', !!(state.dataPengusul.nik && state.dataPengusul.nomorKk))

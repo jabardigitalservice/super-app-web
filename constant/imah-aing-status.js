@@ -123,5 +123,17 @@ export const getImahAingStepFlow = (statusKey) => {
   return { hidden: false, items }
 }
 
-// source_id sah dari query: rt/rw/kades/lurah, via hotline, warga mandiri.
-export const IMAH_AING_SOURCE_IDS = Object.freeze(['sapawarga', 'hotline', 'sapawarga_warga'])
+// Role aparat (SWA). camat & posyandu sengaja belum diizinkan.
+export const IMAH_AING_APARAT_ROLES = Object.freeze(['rt', 'rw', 'kades', 'lurah', 'kadus'])
+
+// source_id menentukan prefix ID usulan di BE: hotline → HL, warga → SWW, aparat → SWA.
+// Role meta jadi sumber kebenaran; source_id query harus cocok. Return '' bila tidak sah.
+export function resolveImahAingSourceId(sourceId, role) {
+  const sid = String(sourceId ?? '').trim().toLowerCase()
+  const r = String(role ?? '').trim().toLowerCase()
+  const fromRole = r === 'warga' ? 'sapawarga_warga' : IMAH_AING_APARAT_ROLES.includes(r) ? 'sapawarga' : ''
+  // Hotline selalu kirim source_id=hotline dan meta tanpa role.
+  if (sid === 'hotline') return r ? '' : 'hotline'
+  if (sid && sid !== fromRole) return ''
+  return fromRole
+}
