@@ -1,17 +1,19 @@
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { IMAH_AING_INVALID_ACCESS_PATH } from '~/constant/imah-aing-closure'
+import { resolveImahAingSourceId } from '~/constant/imah-aing-status'
 
 const first = (value) => (Array.isArray(value) ? value[0] : value)
 
-// Akses sah = datang dari Sapawarga/Hotline Jabar: `source_id` ada, `meta` ada dan
-// terdekripsi menjadi object ber-`token`. Fail-closed: semua jalur gagal → false.
+// Akses sah = datang dari Sapawarga/Hotline Jabar: `meta` terdekripsi menjadi object ber-`token`
+// dan `source_id` valid terhadap role meta (resolveImahAingSourceId; role jadi sumber kebenaran). Fail-closed: semua jalur gagal → false.
 export async function isValidImahAingAccess(query, secret) {
   const sourceId = first(query.source_id)
   const meta = first(query.meta)
-  if (!sourceId || !meta) return false
+  if (!meta) return false
 
   const decoded = await decryptMetaQueryParam(String(meta), secret)
-  return !!(decoded && typeof decoded === 'object' && decoded.token)
+  if (!(decoded && typeof decoded === 'object' && decoded.token)) return false
+  return !!resolveImahAingSourceId(sourceId, decoded.role)
 }
 
 // Query tidak dibawa ke halaman tujuan: isinya `meta` terenkripsi milik URL yang invalid.

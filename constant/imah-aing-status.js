@@ -122,3 +122,21 @@ export const getImahAingStepFlow = (statusKey) => {
 
   return { hidden: false, items }
 }
+
+// Role aparat (SWA). camat & posyandu sengaja belum diizinkan.
+export const IMAH_AING_APARAT_ROLES = Object.freeze(['rt', 'rw', 'kades', 'lurah', 'kadus'])
+
+// source_id menentukan prefix ID usulan di BE: hotline → HL, warga → SWW, aparat → SWA.
+// Mobile hardcode source_id=sapawarga, jadi role di meta (terenkripsi) jadi sumber kebenaran,
+// bukan query. Query hanya boleh: kosong, sapawarga, sapawarga_warga, atau hotline (tanpa role).
+// Return '' bila tidak sah.
+export function resolveImahAingSourceId(sourceId, role) {
+  const sid = String(sourceId ?? '').trim().toLowerCase()
+  const r = String(role ?? '').trim().toLowerCase()
+  // Hotline selalu kirim source_id=hotline dan meta tanpa role; role kosong selain itu = bug pengirim.
+  if (!r) return sid === 'hotline' ? 'hotline' : ''
+  if (sid && !['sapawarga', 'sapawarga_warga'].includes(sid)) return ''
+  const fromRole = r === 'warga' ? 'sapawarga_warga' : IMAH_AING_APARAT_ROLES.includes(r) ? 'sapawarga' : ''
+  if (fromRole && sid && sid !== fromRole) console.warn('[imah-aing] source_id query beda dari role, pakai role', { sid, r, fromRole }) // eslint-disable-line no-console
+  return fromRole
+}

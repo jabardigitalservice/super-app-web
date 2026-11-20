@@ -1,6 +1,7 @@
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { UPLOAD_TIMEOUT_MS } from '~/constant/upload'
 import { mapUploadError } from '~/utils/upload'
+import { resolveImahAingSourceId } from '~/constant/imah-aing-status'
 
 /**
  * Pusat peta default / fallback Geolocation
@@ -14,6 +15,8 @@ const getDefaultState = () => ({
   authToken: null,
   /** Dari query `source_id` (mis. sapawarga), diisi saat `initForm` */
   sourceId: '',
+  /** true jika meta membawa nik dan kk sekaligus; dasar penguncian field NIK/KK warga */
+  nikKkFromMeta: false,
   currentFormStep: 0,
 
   consent: {
@@ -283,6 +286,9 @@ export default {
     SET_AUTH_TOKEN(state, token) {
       state.authToken = token
     },
+    SET_NIK_KK_FROM_META(state, val) {
+      state.nikKkFromMeta = !!val
+    },
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
     },
@@ -361,14 +367,19 @@ export default {
     setAuthToken({ commit }, token) {
       commit('SET_AUTH_TOKEN', token)
     },
-    async initForm({ commit }, payload) {
+    async initForm({ commit, state }, payload) {
       const { meta, sourceId } = normalizeInitQueryPayload(payload)
-      commit('SET_SOURCE_ID', sourceId)
+      // Kosong sampai meta terdekripsi dan cocok dengan role; submit berhenti bila tetap kosong.
+      commit('SET_SOURCE_ID', '')
+      commit('SET_NIK_KK_FROM_META', false)
 
       if (meta) {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
         if (decoded && typeof decoded === 'object') {
+          commit('SET_SOURCE_ID', resolveImahAingSourceId(sourceId, decoded.role))
           applyQueryMetaToDataPengusul(commit, decoded)
+          // Dihitung dari field yang benar-benar terisi (sudah trim), bukan dari meta mentah.
+          commit('SET_NIK_KK_FROM_META', !!(state.dataPengusul.nik && state.dataPengusul.nomorKk))
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
           if (decoded.token) {
@@ -802,6 +813,7 @@ export default {
     async submitForm({ commit, state, rootState }) {
       commit('SET_STATUS_SUBMIT', 'LOADING')
       try {
+        if (!state.sourceId) throw new Error('source_id kosong')
         const docMapping = [
           { key: 'ktp', field: 'ktp' },
           { key: 'fotoDepan', field: 'foto_depan' },
@@ -834,7 +846,7 @@ export default {
           proposer_email: state.proposerMeta.email || '',
           proposer_role:  state.proposerMeta.role  || '',
           [USER_INCOME_PER_MONTH_KEY]: userIncomePerMonth,
-          source_id: state.sourceId || 'sapawarga',
+          source_id: state.sourceId,
           type: 'private',
           photos,
           category_id: 'imah-aing',
