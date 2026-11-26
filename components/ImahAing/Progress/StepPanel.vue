@@ -1,95 +1,73 @@
 <template>
-  <div class="font-roboto">
-    <p v-if="statusText" class="mb-2 text-sm text-gray-700 dark:text-dark-text-medium">
+  <div class="flex flex-col gap-2">
+    <h2 class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high">
+      {{ title }} <span class="text-red-500">*</span>
+    </h2>
+    <p class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
+      Ukuran maksimal file 5 MB{{ isSingle ? '' : ' per foto' }}. Format yang didukung adalah {{ rule.formatLabel }}.
+    </p>
+    <p v-if="statusText" class="font-lato text-[13px] text-gray-600 dark:text-dark-text-medium">
       {{ statusText }}
     </p>
 
-    <!-- Input disembunyikan secara visual saja (sr-only) supaya tetap bisa dipakai lewat keyboard -->
-    <label
-      class="block cursor-pointer rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 px-3 py-6 text-center focus-within:ring-2 focus-within:ring-green-700 dark:border-dark-emphasis-high dark:bg-dark-emphasis-medium"
-      :class="{ 'cursor-wait opacity-60': busy }"
+    <!-- Input BaseDropzone `hidden`, tidak bisa dicapai keyboard: pembungkus ini yang menerima fokus -->
+    <div
+      ref="picker"
+      role="button"
+      tabindex="0"
+      :aria-label="isSingle ? 'Pilih file Bukti Transfer' : `Pilih ${title}`"
+      :aria-disabled="String(busy)"
+      class="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+      @keydown.enter.prevent="openPicker"
+      @keydown.space.prevent="openPicker"
     >
-      <input
-        ref="input"
-        type="file"
-        class="sr-only"
+      <BaseDropzone
         :accept="rule.accept"
         :multiple="!isSingle"
         :disabled="busy"
+        :is-error="errors.length > 0"
         @change="onPick"
       />
-      <span class="block text-sm font-semibold text-gray-900 dark:text-dark-text-high">
-        {{ pickText }}
-      </span>
-      <span class="block text-xs text-gray-600 dark:text-dark-text-medium">
-        {{ rule.formatLabel }} · maks 5 MB{{ isSingle ? '' : ' per foto' }}
-      </span>
-    </label>
+    </div>
 
-    <p v-if="busy" role="status" class="mt-2 text-sm text-gray-600 dark:text-dark-text-medium">
+    <p v-if="busy" role="status" class="font-lato text-[13px] text-gray-600 dark:text-dark-text-medium">
       Memproses file...
     </p>
-    <ul v-if="errors.length" role="alert" class="mt-2 text-sm text-red-700 break-words dark:text-red-300">
+    <ul v-if="errors.length" role="alert" class="font-lato text-[13px] text-red-700 break-words dark:text-red-400">
       <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
     </ul>
 
     <p
       v-if="!isSingle"
-      class="mt-2 text-xs"
-      :class="draft.length >= rule.min ? 'text-green-800 dark:text-green-300' : 'text-red-700 dark:text-red-300'"
+      class="font-lato text-[13px]"
+      :class="draft.length >= rule.min ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'"
     >
-      {{ draft.length }}/{{ rule.min }} minimal{{ draft.length >= rule.min ? ' - sudah cukup' : '' }}
+      {{ draft.length }}/{{ rule.min }} foto minimal{{ draft.length >= rule.min ? ' - sudah cukup' : '' }}
     </p>
 
-    <ul class="mt-3 grid gap-2" :class="isSingle ? 'grid-cols-1' : 'grid-cols-3'">
-      <li
-        v-for="(file, index) in draft"
-        :key="fileKey(file)"
-        :class="
-          isSingle
-            ? 'flex items-center gap-3 rounded-lg border border-gray-200 p-2 dark:border-dark-emphasis-medium'
-            : 'relative aspect-square overflow-hidden rounded-lg bg-gray-200 dark:bg-dark-emphasis-medium'
-        "
-      >
-        <div
-          class="flex items-center justify-center overflow-hidden text-xs font-bold text-gray-600 dark:text-dark-text-medium"
-          :class="isSingle ? 'h-16 w-16 flex-none rounded-lg bg-gray-100 dark:bg-dark-emphasis-medium' : 'h-full w-full'"
-        >
-          <span v-if="isPdf(file)">PDF</span>
-          <img
-            v-else
-            :src="previewUrl(file)"
-            :alt="isSingle ? 'Pratinjau bukti transfer' : `Foto ${index + 1}`"
-            class="h-full w-full object-cover"
-          />
-        </div>
-        <div v-if="isSingle" class="min-w-0 flex-1 text-sm text-gray-900 dark:text-dark-text-high">
-          <p class="break-all font-semibold">{{ file.name }}</p>
-          <p class="text-xs text-gray-500 dark:text-dark-text-medium">{{ formatSize(file) }}</p>
-        </div>
-        <button
-          type="button"
-          class="flex h-11 w-11 flex-none items-center justify-center"
-          :class="{ 'absolute right-0 top-0': !isSingle }"
-          :aria-label="isSingle ? 'Hapus file' : `Hapus foto ${index + 1}`"
-          :disabled="busy"
-          @click="remove(index)"
-        >
-          <span aria-hidden="true" class="flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-sm text-white">✕</span>
-        </button>
+    <ul v-if="draft.length" class="space-y-4">
+      <li v-for="(file, index) in draft" :key="fileKey(file)" class="text-black dark:text-dark-emphasis-high">
+        <BaseDropzoneUploadProgress
+          :file="file"
+          :image-url="previewUrl(file)"
+          status="HASDEFAULT"
+          @delete="remove(index)"
+        />
       </li>
     </ul>
 
-    <Button
-      class="mt-4 w-full !justify-center"
-      variant="primary"
-      type="button"
-      :disabled="!canSave"
-      :style="[!canSave && { backgroundColor: '#E0E0E0', color: '#616161' }]"
-      @click="$emit('request-save', [...draft])"
-    >
-      {{ saved.length ? 'Simpan Perubahan' : 'Simpan' }}
-    </Button>
+    <div class="mt-2 flex md:justify-end">
+      <Button
+        class="w-full md:w-fit !justify-center"
+        variant="primary"
+        type="button"
+        :disabled="!canSave"
+        :style="[!canSave && { backgroundColor: '#E0E0E0', color: '#FFFFFF' }]"
+        @click="$emit('request-save', [...draft])"
+      >
+        {{ saved.length ? 'Simpan Perubahan' : 'Simpan' }}
+      </Button>
+    </div>
   </div>
 </template>
 
@@ -108,7 +86,7 @@ export default {
       type: Number,
       required: true
     },
-    /** File tersimpan tahap ini: `File`, atau `{ name, type, size, url }` untuk data contoh */
+    /** File tersimpan tahap ini; file data contoh membawa `url` gambar statis */
     saved: {
       type: Array,
       required: true
@@ -128,6 +106,9 @@ export default {
     isSingle() {
       return this.rule.max === 1
     },
+    title() {
+      return this.isSingle ? this.rule.label : `Foto ${this.rule.label}`
+    },
     isDirty() {
       return this.draft.length !== this.saved.length || this.draft.some((file, i) => file !== this.saved[i])
     },
@@ -140,10 +121,6 @@ export default {
       }
       if (this.saved.length) return 'Tersimpan'
       return this.isSingle ? 'Belum ada bukti transfer' : ''
-    },
-    pickText() {
-      if (!this.isSingle) return `Pilih minimal ${this.rule.min} Foto untuk Upload`
-      return this.draft.length ? 'Pilih file lain' : 'Pilih Bukti Transfer untuk Upload'
     }
   },
   created() {
@@ -152,14 +129,25 @@ export default {
     this.keys = new WeakMap()
     this.lastKey = 0
   },
+  mounted() {
+    this.$nextTick(this.labelDeleteButtons)
+  },
+  updated() {
+    this.$nextTick(this.labelDeleteButtons)
+  },
   beforeDestroy() {
     this.urls.forEach((url) => URL.revokeObjectURL(url))
   },
   methods: {
-    async onPick(event) {
-      const picked = Array.from(event.target.files || [])
-      event.target.value = '' // file yang sama bisa dipilih lagi setelah dihapus
-      if (!picked.length) return
+    openPicker() {
+      this.$refs.picker.querySelector('input').click()
+    },
+    // BaseDropzone mengirim `File` (single) atau `FileList` (multiple)
+    async onPick(selection) {
+      const picked = selection instanceof File ? [selection] : Array.from(selection || [])
+      // Base tidak mereset input: tanpa ini file yang sama tidak bisa dipilih lagi setelah dihapus
+      this.$refs.picker.querySelector('input').value = ''
+      if (this.busy || !picked.length) return
 
       this.busy = true
       this.errors = []
@@ -183,9 +171,16 @@ export default {
       this.busy = false
     },
     remove(index) {
+      if (this.busy) return
       this.draft.splice(index, 1)
       this.errors = []
-      this.$refs.input.focus()
+      this.$refs.picker.focus()
+    },
+    // Tombol hapus di Base hanya berisi ikon tanpa nama aksesibel
+    labelDeleteButtons() {
+      this.$el
+        .querySelectorAll?.('[data-cy$="__button-delete"]')
+        .forEach((button, i) => button.setAttribute('aria-label', `Hapus ${this.draft[i]?.name}`))
     },
     fileKey(file) {
       if (!this.keys.has(file)) this.keys.set(file, ++this.lastKey)
@@ -193,14 +188,13 @@ export default {
     },
     previewUrl(file) {
       if (file.url) return file.url
+      // Base jatuh ke gambar default yang tidak ada di repo untuk PDF
+      if (this.isPdf(file)) return '/icon/file-pdf.svg'
       if (!this.urls.has(file)) this.urls.set(file, URL.createObjectURL(file))
       return this.urls.get(file)
     },
     isPdf(file) {
       return file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '')
-    },
-    formatSize(file) {
-      return `${(file.size / (1024 * 1024)).toFixed(2)} MB`
     }
   }
 }

@@ -11,12 +11,9 @@ export const isImahAingMockBypass = (route) =>
   IMAH_AING_MOCK_PATHS.includes(String(route?.path || '').replace(/\/$/, '')) &&
   isImahAingMock(route.query)
 
-const mockFile = (name) => ({
-  name,
-  type: 'image/png',
-  size: 300 * 1024,
-  url: '/icon/file-image.svg',
-})
+// `File` kosong (syarat prop BaseDropzoneUploadProgress); gambarnya ikon statis lewat `url`
+const mockFile = (name) =>
+  Object.assign(new File([], name, { type: 'image/png' }), { url: '/icon/file-image.svg' })
 
 const mockPhotos = (stage) =>
   [1, 2, 3].map((n) => mockFile(`contoh-tahap-${stage}-foto-${n}.png`))
