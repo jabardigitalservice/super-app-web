@@ -10,6 +10,7 @@ import location from './location'
 import imahAingForm from './imah-aing/imahAingForm'
 import imahAingHistory from './imah-aing/imahAingHistory'
 import imahAingSanggah from './imah-aing/imahAingSanggah'
+import imahAingProgress from './imah-aing/imahAingProgress'
 Vue.use(Vuex)
 
 // Define the module
@@ -21,6 +22,7 @@ const modules = {
   imahAingForm,
   imahAingHistory,
   imahAingSanggah,
+  imahAingProgress,
 }
 
 export default () =>
