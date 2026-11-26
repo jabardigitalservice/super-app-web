@@ -194,13 +194,14 @@ export default {
       if (step === 0) {
         return {
           title: 'Simpan Bukti Transfer',
-          description: 'Apakah Anda yakin ingin menyimpan bukti transfer ini?'
+          description:
+            'Apakah Anda yakin ingin menyimpan bukti transfer ini? Setelah disimpan, file tidak bisa diubah atau dihapus.'
         }
       }
       const { label, percent } = IMAH_AING_PROGRESS_STEPS[step]
       return {
         title: 'Simpan Progres',
-        description: `Apakah Anda yakin ingin menyimpan progres ${label} (${percent})?`
+        description: `Apakah Anda yakin ingin menyimpan progres ${label} (${percent})? Setelah disimpan, foto tidak bisa diubah atau dihapus.`
       }
     }
   },
@@ -250,6 +251,10 @@ export default {
         files
       })
       if (!ok) return
+      // Tombol Simpan hilang setelah tersimpan: pindahkan fokus ke tab aktif
+      this.$nextTick(() =>
+        this.$el.querySelector(`#progress-tab-${this.active}`)?.focus({ preventScroll: true })
+      )
       const { label, percent } = IMAH_AING_PROGRESS_STEPS[step]
       this.showToast(
         step === 0
