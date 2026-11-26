@@ -140,3 +140,80 @@ export function resolveImahAingSourceId(sourceId, role) {
   if (fromRole && sid && sid !== fromRole) console.warn('[imah-aing] source_id query beda dari role, pakai role', { sid, r, fromRole }) // eslint-disable-line no-console
   return fromRole
 }
+
+// ---- Update Progress (#256): Bukti Transfer + Tahap 1–3 ----
+// Status pemicu, aturan file, dan minimal foto = default sementara, belum dikonfirmasi PO.
+
+export const PROGRESS_ELIGIBLE_STATUSES = Object.freeze([
+  'regency_aid_determination',
+  'provincial_aid_determination',
+  'central_aid_determination',
+  'other_aid_determination',
+  'rutilahu_repair_process',
+])
+
+export const canUpdateProgressStatus = (statusKey) =>
+  PROGRESS_ELIGIBLE_STATUSES.includes(statusKey)
+
+export const PROGRESS_FILE_MAX_SIZE = 5 * 1024 * 1024 // 5 MB
+
+const PROGRESS_TRANSFER_RULE = {
+  min: 1,
+  max: 1,
+  accept: 'image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf',
+  mime: ['image/jpeg', 'image/png', 'application/pdf'],
+  ext: /\.(jpe?g|png|pdf)$/i,
+  formatLabel: 'JPG, PNG, atau PDF',
+}
+
+const PROGRESS_PHOTO_RULE = {
+  min: 3,
+  max: Infinity,
+  accept: 'image/jpeg,image/png,.jpg,.jpeg,.png',
+  mime: ['image/jpeg', 'image/png'],
+  ext: /\.(jpe?g|png)$/i,
+  formatLabel: 'JPG atau PNG',
+}
+
+/** Urutan array = urutan upload dan urutan tab. */
+export const IMAH_AING_PROGRESS_STEPS = Object.freeze([
+  { ...PROGRESS_TRANSFER_RULE, label: 'Bukti Transfer', percent: '' },
+  { ...PROGRESS_PHOTO_RULE, label: 'Tahap 1', percent: '0%' },
+  { ...PROGRESS_PHOTO_RULE, label: 'Tahap 2', percent: '50%' },
+  { ...PROGRESS_PHOTO_RULE, label: 'Tahap 3', percent: '100%' },
+])
+
+/** Jumlah file memenuhi aturan tahap `step`. */
+export const isProgressStepFilled = (files, step) => {
+  const rule = IMAH_AING_PROGRESS_STEPS[step]
+  const count = files?.length || 0
+  return !!rule && count >= rule.min && count <= rule.max
+}
+
+/**
+ * Tahap terbuka hanya bila semua tahap sebelumnya sudah tersimpan.
+ * @param {Array<Array>} saved - data TERSIMPAN per tahap, bukan draft
+ */
+export const isProgressStepUnlocked = (saved, step) =>
+  !!IMAH_AING_PROGRESS_STEPS[step] &&
+  IMAH_AING_PROGRESS_STEPS.slice(0, step).every((_, i) => isProgressStepFilled(saved?.[i], i))
+
+/** Tahap pertama yang belum tersimpan; semua tersimpan → tahap terakhir. */
+export const getFirstOpenProgressStep = (saved) => {
+  const index = IMAH_AING_PROGRESS_STEPS.findIndex((_, i) => !isProgressStepFilled(saved?.[i], i))
+  return index === -1 ? IMAH_AING_PROGRESS_STEPS.length - 1 : index
+}
+
+/** Pesan error tipe/ukuran file untuk tahap `step`; '' bila lolos. */
+export const getProgressFileError = (file, step) => {
+  const rule = IMAH_AING_PROGRESS_STEPS[step]
+  const type = (file.type || '').toLowerCase()
+  const allowed = type ? rule.mime.includes(type) : rule.ext.test(file.name || '')
+  if (!allowed) {
+    return `${file.name}: tipe file tidak didukung. Gunakan ${rule.formatLabel}.`
+  }
+  if (file.size > PROGRESS_FILE_MAX_SIZE) {
+    return `${file.name}: ukuran file melebihi batas 5 MB.`
+  }
+  return ''
+}
