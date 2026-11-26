@@ -10,11 +10,10 @@
       {{ statusText }}
     </p>
 
-    <!-- Tersimpan: hanya preview. `tabindex` supaya daftar bisa digeser lewat keyboard -->
+    <!-- Tersimpan: hanya preview. `p-0.5` memberi ruang ring fokus di dalam area geser -->
     <ul
       v-if="isSaved"
-      class="flex gap-2 overflow-x-auto pb-2"
-      tabindex="0"
+      class="flex gap-2 overflow-x-auto p-0.5 pb-2"
       :aria-label="`${title} tersimpan`"
     >
       <li v-for="(file, index) in saved" :key="fileKey(file)" class="flex-shrink-0 max-w-full">
@@ -28,12 +27,20 @@
           <img src="/icon/file-pdf.svg" alt="" class="w-8 h-8 flex-shrink-0" />
           <span class="break-all">{{ file.name }}</span>
         </a>
-        <img
+        <a
           v-else
-          :src="file.url"
-          :alt="isSingle ? `Bukti transfer: ${file.name}` : `${title} ${index + 1}: ${file.name}`"
-          class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-dark-emphasis-medium"
-        />
+          :href="file.url"
+          target="_blank"
+          rel="noopener"
+          :aria-label="`Buka gambar ${isSingle ? 'bukti transfer' : `${title} ${index + 1}`}: ${file.name} di tab baru`"
+          class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+        >
+          <img
+            :src="file.url"
+            alt=""
+            class="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-dark-emphasis-medium"
+          />
+        </a>
       </li>
     </ul>
 
