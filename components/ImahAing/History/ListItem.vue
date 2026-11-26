@@ -70,7 +70,7 @@
         <button
           v-if="canUpdateProgress"
           type="button"
-          class="min-h-[44px] px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors"
+          class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors"
           @click.stop="$emit('update-progress')"
         >
           Update Progress
