@@ -4,7 +4,7 @@
       <div
         class="md:border md:border-gray-300 md:rounded-lg md:max-w-[650px] md:mx-auto md:bg-white md:dark:border-dark-emphasis-medium md:dark:bg-dark-emphasis-low"
       >
-        <h1 class="px-4 pt-4 md:px-7 md:pt-5 uppercase font-roboto font-bold text-[20px] dark:text-dark-text-high">
+        <h1 class="px-4 pt-4 md:px-7 md:pt-5 uppercase font-roboto font-bold text-[20px] dark:text-dark-emphasis-high">
           Progres Perbaikan
         </h1>
 
