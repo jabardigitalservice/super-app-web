@@ -50,7 +50,7 @@
     <!-- Kolom Kanan: Tanggal (atas) + Tombol Edit + Info Icon (bawah) -->
     <div
       class="flex flex-col flex-shrink-0 items-end gap-2 self-stretch"
-      :class="{ 'justify-center': !canEdit && !canSanggah }"
+      :class="{ 'justify-center': !canEdit && !canSanggah && !canUpdateProgress }"
     >
       <div class="flex items-center gap-1">
         <button
@@ -66,6 +66,14 @@
           @click.stop="$emit('sanggah')"
         >
           Ajukan Sanggah
+        </button>
+        <button
+          v-if="canUpdateProgress"
+          type="button"
+          class="min-h-[44px] px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-colors"
+          @click.stop="$emit('update-progress')"
+        >
+          Update Progress
         </button>
         <button
           type="button"
@@ -108,6 +116,10 @@ export default {
       default: false
     },
     canSanggah: {
+      type: Boolean,
+      default: false
+    },
+    canUpdateProgress: {
       type: Boolean,
       default: false
     },
