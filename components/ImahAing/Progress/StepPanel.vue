@@ -3,6 +3,9 @@
     <h2 class="text-sm font-medium text-black font-roboto dark:text-dark-emphasis-high">
       {{ title }} <span v-if="!isSaved" class="text-red-500">*</span>
     </h2>
+    <p v-if="!isSaved" class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
+      Ukuran maksimal file 5 MB{{ isSingle ? '' : ' per foto' }}. Format yang didukung adalah {{ rule.formatLabel }}.
+    </p>
     <p v-if="statusText" class="font-lato text-[13px] text-gray-600 dark:text-dark-text-medium">
       {{ statusText }}
     </p>
@@ -35,10 +38,6 @@
     </ul>
 
     <template v-else>
-      <p class="font-lato text-[12px] leading-[18px] text-gray-600 dark:text-dark-emphasis-high">
-        Ukuran maksimal file 5 MB{{ isSingle ? '' : ' per foto' }}. Format yang didukung adalah {{ rule.formatLabel }}.
-      </p>
-
       <!-- Input BaseDropzone `hidden`, tidak bisa dicapai keyboard: pembungkus ini yang menerima fokus -->
       <div
         ref="picker"
