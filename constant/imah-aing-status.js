@@ -198,6 +198,12 @@ export const isProgressStepUnlocked = (saved, step) =>
   !!IMAH_AING_PROGRESS_STEPS[step] &&
   IMAH_AING_PROGRESS_STEPS.slice(0, step).every((_, i) => isProgressStepFilled(saved?.[i], i))
 
+/** Simpan sekali saja: tahap terbuka, belum tersimpan, dan jumlah file memenuhi. */
+export const canSaveProgressStep = (saved, step, files) =>
+  isProgressStepUnlocked(saved, step) &&
+  !isProgressStepFilled(saved?.[step], step) &&
+  isProgressStepFilled(files, step)
+
 /** Tahap pertama yang belum tersimpan; semua tersimpan → tahap terakhir. */
 export const getFirstOpenProgressStep = (saved) => {
   const index = IMAH_AING_PROGRESS_STEPS.findIndex((_, i) => !isProgressStepFilled(saved?.[i], i))
