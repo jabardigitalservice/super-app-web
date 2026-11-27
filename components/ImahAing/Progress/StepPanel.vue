@@ -53,6 +53,7 @@
         :aria-label="isSingle ? 'Pilih file Bukti Transfer' : `Pilih ${title}`"
         :aria-disabled="String(busy)"
         class="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+        @click="onPickerClick"
         @keydown.enter.prevent="openPicker"
         @keydown.space.prevent="openPicker"
       >
@@ -175,6 +176,11 @@ export default {
   methods: {
     openPicker() {
       this.$refs.picker.querySelector('input').click()
+    },
+    // Screen reader / switch access mengirim `click` ke pembungkus. Klik label dan `input.click()`
+    // di atas ikut bubbling ke sini: dilewati supaya dialog tidak dobel. Saat busy input `disabled`.
+    onPickerClick(event) {
+      if (!event.target.closest('label, input')) this.openPicker()
     },
     // BaseDropzone mengirim `File` (single) atau `FileList` (multiple)
     async onPick(selection) {
