@@ -13,6 +13,8 @@
         <hr class="mt-4 md:mt-5 dark:border-dark-emphasis-medium" />
 
         <div class="px-4 py-4 md:px-7 md:py-5">
+          <ImahAingMockBanner v-if="isMock" class="mb-4" />
+
           <!-- Add new submission -->
           <div class="flex justify-end mb-4">
             <Button v-if="canAddUsulan" variant="primary" @click="goToForm">
@@ -24,17 +26,18 @@
           <ImahAingHistorySkeleton v-if="isLoading" />
 
           <!-- Empty state -->
-          <ImahAingHistoryNoData v-else-if="!isLoading && items.length === 0" />
+          <ImahAingHistoryNoData v-else-if="!isLoading && listItems.length === 0" />
 
           <!-- List -->
           <div v-else class="flex flex-col gap-3 md:gap-4">
             <ImahAingHistoryListItem
-              v-for="item in items"
+              v-for="item in listItems"
               :key="item.id"
               :item="item"
               :selected="selectedIds.includes(item.id)"
               :can-edit="canEdit(item)"
               :can-sanggah="canSanggah(item)"
+              :can-update-progress="canUpdateProgress(item)"
               :is-self-item="isSelfItem(item)"
               :proposer-role="item.proposer?.role || ''"
               :proposer-name="item.proposer?.name || ''"
@@ -42,11 +45,12 @@
               @click="openPreview(item)"
               @edit="editUsulan(item)"
               @sanggah="sanggahUsulan(item)"
+              @update-progress="updateProgress(item)"
               @show-info="showEditInfo"
             />
 
             <!-- Load more -->
-            <div v-if="hasMore" class="text-center py-4">
+            <div v-if="!isMock && hasMore" class="text-center py-4">
               <Button
                 variant="secondary"
                 :loading="status === 'LOADING'"
@@ -62,7 +66,7 @@
 
     <!-- Floating bottom bar — mobile full-width, desktop centered -->
     <div
-      v-if="selectedIds.length > 0"
+      v-if="!isMock && selectedIds.length > 0"
       class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.08)] z-10 dark:bg-dark-emphasis-low dark:border-dark-emphasis-medium md:max-w-[650px] md:mx-auto md:left-1/2 md:-translate-x-1/2 md:rounded-t-xl md:border md:border-b-0 md:shadow-lg"
     >
       <Button
@@ -77,6 +81,7 @@
 
     <!-- Preview Modal -->
     <ImahAingHistoryPreviewModal
+      v-if="!isMock"
       :open="previewOpen"
       :item="previewItem"
       :is-self-item="previewItem ? isSelfItem(previewItem) : true"
@@ -117,7 +122,8 @@
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
-import { getImahAingStatusKey, canSanggahStatus } from '~/constant/imah-aing-status'
+import { getImahAingStatusKey, canSanggahStatus, canUpdateProgressStatus } from '~/constant/imah-aing-status'
+import { isImahAingMock, IMAH_AING_MOCK_ITEMS } from '~/constant/imah-aing-mock-data'
 import { isImahAingSelfItem, isImahAingOwnerItem, canAppealItem } from '~/constant/imah-aing-sanggah'
 
 const EDIT_INFO_TEXT =
@@ -138,8 +144,15 @@ export default {
   },
   computed: {
     ...mapState('imahAingHistory', ['items', 'selectedIds', 'pagination', 'status', 'errorMessage', 'authToken', 'metaPayload']),
+    isMock() {
+      return isImahAingMock(this.$route.query)
+    },
+    // Data contoh tidak pernah masuk store riwayat, jadi tidak bisa tercampur data asli
+    listItems() {
+      return this.isMock ? IMAH_AING_MOCK_ITEMS : this.items
+    },
     isLoading() {
-      return this.status === 'LOADING' && this.pagination.page === 1
+      return !this.isMock && this.status === 'LOADING' && this.pagination.page === 1
     },
     isCancelling() {
       return this.status === 'CANCELLING'
@@ -153,6 +166,7 @@ export default {
     // Warga hanya boleh mengajukan usulan baru ketika seluruh usulannya sudah
     // dibatalkan. Semua guard di bawah fail-closed: saat ragu, tombol disembunyikan.
     canAddUsulan() {
+      if (this.isMock) return false
       if (!this.isWarga) return true
       // Status transisi (IDLE / LOADING / ERROR / CANCELLING) belum bisa dipercaya.
       if (this.status !== 'SUCCESS') return false
@@ -163,7 +177,17 @@ export default {
       return this.items.every((item) => getImahAingStatusKey(item) === 'canceled')
     }
   },
+  watch: {
+    // Ganti mode tanpa remount → muat ulang penuh: guard jalan lagi, state kedua mode tidak tercampur
+    isMock() {
+      window.location.reload()
+    }
+  },
   async mounted() {
+    // Mode data contoh: tanpa meta, token, maupun request API
+    if (this.isMock) return
+    this.$store.commit('imahAingProgress/RESET_STATE')
+
     // Dekripsi meta query param (async — Web Crypto). Sebelumnya di created(),
     // dipindah ke sini karena decrypt tidak bisa di-await di created().
     const { meta } = this.$route.query
@@ -219,6 +243,8 @@ export default {
     },
 
     openPreview(item) {
+      // Preview memanggil API detail
+      if (this.isMock) return
       this.previewItem = item
       this.previewOpen = true
     },
@@ -242,22 +268,39 @@ export default {
     },
 
     isSelfItem(item) {
-      return isImahAingSelfItem(item, this.metaPayload)
+      // Mode data contoh tidak punya identitas: semua data dianggap milik sendiri
+      return this.isMock || isImahAingSelfItem(item, this.metaPayload)
     },
 
     canEdit(item) {
       const EDITABLE_STATUSES = ['unverified', 'rejected_appeal']
       const statusId = getImahAingStatusKey(item)
-      return this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
+      return !this.isMock && this.isSelfItem(item) && EDITABLE_STATUSES.includes(statusId)
     },
 
     canSanggah(item) {
       return (
+        !this.isMock &&
         this.isSelfItem(item) &&
         isImahAingOwnerItem(item, this.metaPayload) &&
         canSanggahStatus(getImahAingStatusKey(item)) &&
         canAppealItem(item)
       )
+    },
+
+    // Hanya mode data contoh sampai API progres ada
+    canUpdateProgress(item) {
+      return this.isMock && this.isSelfItem(item) && canUpdateProgressStatus(getImahAingStatusKey(item))
+    },
+
+    updateProgress(item) {
+      this.$router.push({
+        path: '/imah-aing/progress',
+        query: {
+          ...this.$route.query,
+          id: item.id,
+        },
+      })
     },
 
     sanggahUsulan(item) {

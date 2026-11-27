@@ -1,6 +1,7 @@
 import { decryptMetaQueryParam } from '~/utils/decode-meta'
 import { IMAH_AING_INVALID_ACCESS_PATH } from '~/constant/imah-aing-closure'
 import { resolveImahAingSourceId } from '~/constant/imah-aing-status'
+import { isImahAingMockBypass } from '~/constant/imah-aing-mock-data'
 
 const first = (value) => (Array.isArray(value) ? value[0] : value)
 
@@ -18,6 +19,9 @@ export async function isValidImahAingAccess(query, secret) {
 
 // Query tidak dibawa ke halaman tujuan: isinya `meta` terenkripsi milik URL yang invalid.
 export default async function ({ route, redirect, $config }) {
+  // Pengecualian atas izin owner (#256): riwayat & progress mode data contoh, tanpa API sama sekali.
+  if (isImahAingMockBypass(route)) return
+
   if (!(await isValidImahAingAccess(route.query, $config.metadataSecret))) {
     redirect({ path: IMAH_AING_INVALID_ACCESS_PATH })
   }
