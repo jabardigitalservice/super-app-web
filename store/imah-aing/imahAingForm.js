@@ -17,6 +17,9 @@ const getDefaultState = () => ({
   sourceId: '',
   /** true jika meta membawa nik dan kk sekaligus; dasar penguncian field NIK/KK warga */
   nikKkFromMeta: false,
+  /** true jika meta membawa rt / rw; dasar penguncian field RT / RW non-warga */
+  rtFromMeta: false,
+  rwFromMeta: false,
   currentFormStep: 0,
 
   consent: {
@@ -289,6 +292,13 @@ export default {
     SET_NIK_KK_FROM_META(state, val) {
       state.nikKkFromMeta = !!val
     },
+    SET_RT_RW_FROM_META(state, { role, rt, rw }) {
+      // Syarat sama dengan prefill di applyQueryMetaToLokasiTanah, agar field terkunci tidak pernah kosong.
+      const r = (role || '').trim().toLowerCase()
+      const prefilled = !!r && r !== 'warga'
+      state.rtFromMeta = prefilled && !!String(rt ?? '').trim()
+      state.rwFromMeta = prefilled && !!String(rw ?? '').trim()
+    },
     SET_SOURCE_ID(state, id) {
       state.sourceId = id || ''
     },
@@ -372,6 +382,7 @@ export default {
       // Kosong sampai meta terdekripsi dan cocok dengan role; submit berhenti bila tetap kosong.
       commit('SET_SOURCE_ID', '')
       commit('SET_NIK_KK_FROM_META', false)
+      commit('SET_RT_RW_FROM_META', {})
 
       if (meta) {
         const decoded = await decryptMetaQueryParam(meta, this.$config.metadataSecret)
@@ -382,6 +393,7 @@ export default {
           commit('SET_NIK_KK_FROM_META', !!(state.dataPengusul.nik && state.dataPengusul.nomorKk))
           applyQueryMetaToProposerMeta(commit, decoded)
           applyQueryMetaToLokasiTanah(commit, decoded)
+          commit('SET_RT_RW_FROM_META', decoded)
           if (decoded.token) {
             commit('SET_META_TOKEN', String(decoded.token).trim())
           }
@@ -413,13 +425,14 @@ export default {
       setPengusul('nomorKk', item.user_kk)
       setPengusul('id', item.user_id)
 
-      // Prefill lokasi RT/RW dari list item
-      if (item.rt != null) {
-        commit('SET_LOKASI_TANAH_FIELD', { field: 'rt', value: String(item.rt) })
+      // Prefill lokasi RT/RW dari list item; nilai kosong tidak menimpa prefill meta
+      const setLokasi = (field, value) => {
+        if (value != null && String(value).trim() !== '') {
+          commit('SET_LOKASI_TANAH_FIELD', { field, value: String(value).trim() })
+        }
       }
-      if (item.rw != null) {
-        commit('SET_LOKASI_TANAH_FIELD', { field: 'rw', value: String(item.rw) })
-      }
+      setLokasi('rt', item.rt)
+      setLokasi('rw', item.rw)
 
       // Consent dianggap sudah disetujui di mode edit
       commit('SET_CONSENT_PRIVACY', true)

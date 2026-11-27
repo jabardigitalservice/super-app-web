@@ -115,7 +115,7 @@
               class="w-full"
               :error-message="errors[0]"
               placeholder="Contoh: 001"
-              :disabled="isNonWarga && !!rw"
+              :disabled="isNonWarga && rwFromMeta"
               @input="setRw($event)"
             />
           </ValidationProvider>
@@ -138,7 +138,7 @@
               class="w-full"
               :error-message="errors[0]"
               placeholder="Contoh: 002"
-              :disabled="isNonWarga && !!rt"
+              :disabled="isNonWarga && rtFromMeta"
               @input="setRt($event)"
             />
           </ValidationProvider>
@@ -303,6 +303,8 @@ export default {
     ...mapState('imahAingForm', {
       lokasiTanah: (state) => state.lokasiTanah,
       dataPengusul: (state) => state.dataPengusul,
+      rtFromMeta: (state) => state.rtFromMeta,
+      rwFromMeta: (state) => state.rwFromMeta,
     }),
     ...mapGetters('location', [
       'citiesOption',
